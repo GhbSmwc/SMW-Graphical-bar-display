@@ -1,0 +1,42 @@
+<html>
+	<head>
+		<style>
+			html {
+			background-color: #000207;
+			color: white;
+			font-family: sans-serif;
+			}
+			
+			table, th, td {
+			border: 1px solid white;
+			border-collapse: collapse;
+			}
+		</style>
+	</head>
+<body>
+
+<a href="../Readme.html#DoubleBar">Back</a><br><br>
+<a href="../ExampleUsage/DoubleBar.asm" target="_blank">See this ASM file</a> (again, link will break if moved or deleted). View
+<a href="DoubleBarFills.png" target="_blank">this image</a> for table format.<br>
+
+<h1><center>How a Double Bar works</h1>
+<center><img src="DoubleBarInfo.png"></center><br>
+Remember that this is a lyer 3 graphic using 2bpp (2 bits per pixel; 4 colors stored: 1 transparent and 3 other colors), thus, the texture of the filled region of the bar
+is now flat.<br><br>
+Just to warn you, because layer tiles cannot overlap each other if they are in the same layer, the tiles had to be combined in order to always display 2 fills correctly. This means that
+there a huge amount of combinations of the double-fill graphic (I've ordered the tiles with SecondFill increases until full byte/8x8 tile, then increments FirstFill by 1 and repeat):
+<center><img src="DoubleBarVRAMGraphic.png"></center><br>
+So be very careful when you have more pieces per 8x8, because that would add more tiles for both the two fills, taking up more space exponentially. Because of that, the amount of fill
+for handling each 8x8 tile are now 8-bit rather than 16. You can avoid that by using sprite OAM and have them literally overlap without combining them.<br><br>
+
+Here are some notes to keep in mind:
+<ul>
+<li>The amount of fill for SecondFill does not measure from the edge of FirstFill, rather it measures from the leftmost of the bar like FirstFill would. So if you have 1
+for FirstFill and 5 for SecondFill, 4 SecondFill pieces appear just after FirstFill, not 5. Should SecondFill be less than or equal to FirstFill, it simply won't display.</li><br>
+
+<li>If you want something like this without having your graphics hogged up, there is an alternative way on doing this, by using &ldquo;pseudo transparency&rdquo;. By using a frame
+counter (best if it doesn't freeze on certain events, like address $13 when $9D is set in smw), make it display 2 values depending on the frame, preferably flicker every even or
+odd frames.</li><br>
+
+<li>There are more explanations in the ASM file linked here, and I wouldn't keep rambling about every detail, since it is very complex.</li>
+</ul>

@@ -1,0 +1,218 @@
+<html>
+	<head>
+		<style>
+			html {
+			background-color: #000207;
+			color: white;
+			font-family: sans-serif;
+			}
+			
+			table, th, td {
+			border: 1px solid white;
+			border-collapse: collapse;
+			}
+		</style>
+	</head>
+<body>
+<center><h1>Graphical Bar ELITE</h1><br>
+By <a href="https://www.smwcentral.net/?p=profile&id=18802">GreenHammerBro</a></center><br>
+<hr>
+<h2>Introduction</h2>
+This is a guide on how to setup a display of a value of something as a graphical bar that you see in many games. Unlike some hacks like SMWCP2 and
+brutal Mario, which are 1-unit per tiles, this package contains code to display multiple units per tile (8 units normally), as well as representing
+a ratio of something with any number (1-65535) as the max.<br><br>
+
+The purpose of the code contained here is to represent something as a graphical bar to be used on various things like health, progress, percentage of
+something, etc. as opposed to merely displaying numbers.<br><br>
+<hr>
+<h2>The resources you need</h2>
+<ul>
+<li><a href="https://www.smwcentral.net/?p=section&a=details&id=18113">Uberasm tool</a>, needed for codes to run every frame.</li>
+<li><a href="https://www.smwcentral.net/?p=section&a=details&id=18716">Lunar Magic</a>, for level testing purposes.</li>
+</ul><br>
+
+<h3>Recommended resources</h3>
+<ul>
+<li><a href="https://www.smwcentral.net/?p=section&a=details&id=16031">Super Status Bar patch</a>, SMW's status bar (or, heads-up display (HUD)) space is really small.</li>
+</ul>
+<hr>
+<h2>Installation (test run)</h2>
+<ol>
+<li>First make any necessary changes to the defines in <tt>GraphicalBarDefines</tt>. Assuming you testing this out on a clean ROM with nothing
+else besides LM making modifications, it is likely you don't have to edit anything. If you're planning to use the Super Status Bar patch, open
+<tt>StatusBarSettings.asm</tt> and change <nobr><tt>!StatusBarFormat</tt></nobr> to <tt>$02</tt> so that it displays properly.</li>
+<li>Now paste the folders:
+<ul>
+<li><tt>GraphicalBarDefines</tt> (the whole folder) &rightarrow; Uberasm tool's main directory (same area as the .exe)</li>
+<li><tt>GraphicalBarELITE.asm</tt> &rightarrow; Uberasm tool's <tt>library</tt>.</li>
+</ul></li>
+<li>Open uberasm tool's <tt>list.txt</tt>, and paste these so that the codes get inserted:
+<table><tr><td><pre>; Level list. Valid values: 000-1FF.
+level:
+104		DoubleBar.asm
+105		Simple.asm
+106		RoundAwayFromComplete.asm</pre></td></tr></table><br>
+</li>
+<li>Insert the graphics by:
+<ol>
+<li>Create the &ldquo;ExGraphics&rdquo; if you haven't done so by clicking on the blue mushroom in Lunar Magic.</li>
+<li>Paste the graphic bin files (from this package's &ldquo;ExGraphics&rdquo; folder) of your choice into the other where your
+game resides. Then, take out the appended characters after the &ldquo;<tt>ExGFX&lt;number&gt;</tt>&rdquo; but before the &ldquo;<tt>.bin</tt>&rdquo;</li>
+<li>Now in your level editor, click on the green poision mushroom to open a dialog about Layer 3 GFX bypass. On LG1, set that
+to use the graphic files (obviously the bin files are conveniently named to tell you what slot uses what file). Level 105
+and 106 LG1s to be slot 80, but for 104, it needs LG1 to be slot 81 and LG2 to be slot 82 to accommodate the large number of
+tiles. Then hit OK and save to apply the changes.
+</li>
+</ol>
+</li>
+<li>Now you are done:
+<ul>
+<li>Level 104 (Yoshi's house) is a double-bar, which can display two &ldquo;fills&rdquo; overlapping each other. Press right a couple of times, then up
+a handful of times to see.</li>
+<li>Level 105 (Yoshi's island 1) is a progress meter, keep heading right to see it fills up.</li>
+<li>Level 106 (Yoshi's island 2) is a coin meter, once 99 is reached, it should be full. It also avoids displaying 0% if if not 0 coins and 100% less than 99 coins,
+a failsafe measure to avoid misleading value displays.</li>
+</ul>
+
+If you're not using the Super Status Bar patch, the bar will be displayed over the word &ldquo;TIME&rdquo; and the coin symbol. The palette will be yellow on some areas,
+but thats intentional as SMW's status bar is very limited.
+</li>
+</ol>
+<hr>
+<h2>Displaying a value of any RAM value</h2>
+Perhaps if you want to display something other than the provided examples above, here is the template:
+<table><tr><td><pre>incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
+incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
+;^These are needed so the defines relating to the graphical bars work.
+
+.InputRatio
+	LDA &lt;Value&gt;						;\Quantity (example: current HP). Use RAM here.
+	STA !Scratchram_GraphicalBar_FillByteTbl		;/
+	LDA &lt;Value_high_byte&gt;					;\High byte of above. Should your value here is 8-bit or only 1 byte long,
+	STA !Scratchram_GraphicalBar_FillByteTbl+1		;/use [LDA #$00 : STA !Scratchram_GraphicalBar_FillByteTbl+1].
+	LDA &lt;Max_value&gt;						;\Max quantity (example: max HP). Can be a fixed value (#$) or adjustable RAM in-game.
+	STA !Scratchram_GraphicalBar_FillByteTbl+2		;/
+	LDA &lt;Max_value_high_byte&gt;				;\High byte above, same format as &lt;Value_high_byte&gt;, so do the same
+	STA !Scratchram_GraphicalBar_FillByteTbl+3		;/as that if your value is 8-bit.
+.InputGraphicalBarAttributes
+	LDA.b #!Default_LeftPieces				;\Left and right pieces
+	STA !Scratchram_GraphicalBar_LeftEndPiece		;|
+	LDA.b #!Default_RightPieces				;|
+	STA !Scratchram_GraphicalBar_RightEndPiece		;/
+	LDA.b #!Default_MiddlePieces				;\Number of pieces in each middle byte/8x8 tile
+	STA !Scratchram_GraphicalBar_MiddlePiece		;/
+	LDA.b #!Default_MiddleLength				;\length (number of middle tiles)
+	STA !Scratchram_GraphicalBar_TempLength			;/
+.ConvertToBar
+	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage	;>Get ratio/percentage
+	JSL GraphicalBarELITE_DrawGraphicalBar			;>get bar values.</pre></td></tr></table>
+<hr>
+<h2>ASM Documentation</h2>
+
+How this works:
+<ol>
+<li><tt>CalculateGraphicalBarPercentage</tt>: Calculates the ratio of something over max. For example: 50/100 would output the amount of fill half of the maximum of the bar.</li>
+<li><tt>DrawGraphicalBar</tt>: it takes a value representing how much fill in the bar, and represent them as individual tiles bytes table with each containing the set maximum amount, then
+the &ldquo;fraction&rd; and then finally the &ldquo;empty&rdquo; bytes after. It is important to note that this isn't tile numbers but rather <i>fill amounts</i>, to be indexed into
+tile numbers.</li>
+<li><tt>ConvertFillTo8x8</tt>: converts the bar fill table into tile numbers via indexing.</li>
+<li>After this, the tile numbers are written to the status bar.</li>
+</ol>
+Here what it looks like visually:<br>
+<center><img src="readme_files/FillBytes.png"></center><br>
+<font size=1>just think there are 7 cups, and you have a large jug of water and filling it starting on the leftmost cup until its full, and you want the jug to
+be empty, you will fill up the next cup.</font><br>
+
+<h2>Data documentation (and what you can and can't do)</h2>
+<h3>Routine info</h3>
+<table>
+ <tr>
+  <th>Subroutine (JSL)</th>
+  <th>Description</th>
+ </tr>
+ <tr>
+  <td><tt>CalculateGraphicalBarPercentage</tt></td>
+  <td>
+  <u>Input:</u>
+  <ul>
+   <li><b><tt>!Scratchram_GraphicalBar_FillByteTbl</tt> to <tt>!Scratchram_GraphicalBar_FillByteTbl+1</tt></b>: The quantity of something.</li>
+   <li><b><tt>!Scratchram_GraphicalBar_FillByteTbl+2</tt> to <tt>!Scratchram_GraphicalBar_FillByteTbl+3</tt></b>: The max quantity of something.</li>
+   <li><b><tt>!Scratchram_GraphicalBar_LeftEndPiece</tt></b>: The number of pieces in the left end.</li>
+   <li><b><tt>!Scratchram_GraphicalBar_MiddlePiece</tt></b>: Same as above but for each middle.</li>
+   <li><b><tt>!Scratchram_GraphicalBar_RightEndPiece</tt></b>: Same as above but for right end (each middle byte/tile).</li>
+   <li><b><tt>!Scratchram_GraphicalBar_TempLength</tt></b>: Number of middle tiles in the bar (excluding left and right end tiles), also known as the <i>length</i> of the bar.</li>
+  </ul>
+  <u>Output:</u>
+  <ul>
+   <li><b><tt>$00</tt> to <tt>$01</tt></b>: The ratio or &ldquo;percentage&rdquo; amout of fill in
+   the whole bar (rounded 1/2 up).</li>
+   <li><b><tt>Y register</tt></b>: Rounded towards full or empty indicator, not considered &ldquo;rounded to&rdquo; if the calculation (which is <tt>(Quantity * TotalMaxPieces)/MaxQuantity</tt>)
+   lands exactly on empty or full, Y will be #$00 if:</li>
+   <ul>
+    <li>Exactly full (or more, so it treats as if the bar is full if more than enough) or empty.</li>
+    <li>Anywhere between full or empty</li>
+   </ul>
+   ...and when rounded:
+   <ul>
+   <li><tt>Y = #$01 if rounded towards 0 (0 &lt; FillAmount &lt; 0.5)</tt></li>
+   <li><tt>Y = #$02 if rounded towards full ([Max-0.5] &le; FillAmount &lt; Max)</tt></li>
+   </ul>
+   See <a name="RoundAwayFromComplete" href="readme_files/RoundAwayFromComplete.html">here</a> for more information regarding rounding away from empty and full.
+  </ul>
+  <u>Destroyed/Overwritten:</u>
+  <ul>
+   <li><b><tt>$02</tt> to <tt>$0F</tt></b>: Whole scratch RAM was destroyed by the 32x32 bit multiplication.</li>
+  </ul>
+  </td>
+ </tr>
+ <tr>
+  <td><tt>DrawGraphicalBar</tt></td>
+  <td>
+  <u>Input:</u>
+  <ul>
+   <li><b><tt>$00</tt> to <tt>$01</tt></b>: The (total) amount of pieces filled for the whole bar (broken into each byte).</li>
+   <li><b><tt>!Scratchram_GraphicalBar_LeftEndPiece</tt></b>: (valid values are #$00 to #$FF) number of pieces the left end. Also the maximum number of
+   filled pieces before having to fill the next tile over. If set to #$00, it won't be stored in the output table.</li>
+   <li><b><tt>!Scratchram_GraphicalBar_MiddlePiece</tt></b>: Same as above, but for each middle tile.</li>
+   <li><b><tt>!Scratchram_GraphicalBar_RightEndPiece</tt></b>: Same as above, but for right end tile.</li>
+   <li><b><tt>!Scratchram_GraphicalBar_TempLength</tt></b>: Number of middle tiles in the bar (excluding left and right end tiles), also known as the
+   <i>length</i> of the bar.</li>
+  </ul>
+  <u>Output:</u>
+  <ul>
+   <li><b><tt>!Scratchram_GraphicalBar_FillByteTbl</tt> to <tt>!Scratchram_GraphicalBar_FillByteTbl+x:</tt></b> A table that each byte containing the fill
+   amount ordered from maxed (any number of maxed bytes), fraction (only one such byte will exist and ranges from 0 to max-1 inclusively), then empty (any number of
+   empty bytes) The formula for the end of this table is this formula:
+   <table><td>X = (LeftEndExist + MiddleLength + RightEndExist) - 1</td></table> Where LeftEndExist and/or RightEndExist will be 0 if their pieces are set to 0,
+   and 1 if greater than, while MiddleLength is the number of middle bytes. They are ordered from full (maxed value) bytes, then fraction, then empty. Remember that
+   this is NOT the tile number.<br><br>
+   
+   Should the total amount of fill be greater than the value needed to be full, the table would treat this as if the bar is
+   exactly full (not exceeding); capping from writing more values in. For example: trying to input 63/62 pieces filled would have the table saying 62/62.</li>
+  </ul>
+ <u>Destroyed/Overwritten:</u>
+  <ul>
+  <li><b><tt>$02</tt> to <tt>$09</tt></b>: $00 to $07 are often used by math routines, $08 and $09 are the amount of fill handled by each of the 3 sections.</li>
+  <ul>
+  <li><b><tt>$08</tt> to <tt>$09</tt></b>: the amount of fill that you have input for $00 to $01 (not capped to the value to be full if greater than).</li>
+  </ul>
+  </ul>
+  </td>
+ </tr>
+</table><br><br>
+<h3>What the settings and scratch RAM do</h3>
+
+If you set any of the 3 sections to &ldquo;non-exist&rdquo; (by setting left end, middle and right end pieces to 0), they will not be included in the table and will be skipped:
+<center><img src="Readme_files/DisabledSections.png"></center>
+
+<h3>The 1-fraction tile rule</h3>
+Do note that the routine outputs with only 1 partially filled byte, due to how the maths work this out. This means that when translating it to 8x8 tiles, you cannot have such
+graphics (like diagonal fill edge) that can take over multiple tiles when used directly:<br>
+<center><img src="Readme_files/MultiPartiallyFilled.png"></center><br>
+unless you make a code that reads the amount of fill in the fraction (after executing the routine) and check if that value is above/below a certain number (that the
+&ldquo;edge&rdquo; <i>crosses</i> between 2 8x8 bytes), then you can overwrite the adjacent byte/8x8 next to the fraction to display a custom edge engulfing multiple.<br><br>
+
+<h3>Changing the amount of fills per tile</h3>
+You have the full freedom of having different amount of fill pieces in each byte even at the same time when using the routine twice (because they are
+RAM values and not fixed values), in this case, setting left end to 6:<br>
+<center><img src="Readme_files/LeftEndMorePieces.png"></center><br><br>

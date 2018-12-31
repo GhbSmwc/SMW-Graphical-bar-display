@@ -1,0 +1,81 @@
+<html>
+	<head>
+		<style>
+			html {
+			background-color: #000207;
+			color: white;
+			font-family: sans-serif;
+			}
+			
+			table, th, td {
+			border: 1px solid white;
+			border-collapse: collapse;
+			}
+		</style>
+	</head>
+<body>
+
+<a href="../Readme.html#RoundAwayFromComplete">Back</a><br><br>
+<center><h1>Rounding towards &ldquo;Complete&rdquo; detection</h1></center>
+
+The purpose of this feature is to prevent the bar from misrepresenting the value of something when they get rounded down towards empty or
+rounded up to full. Thus, before this was implemented, when used on such things such as a health bar, the meter can display empty when
+the character (player or enemy) isn't defeated or dead yet, due to the bar's fill value (number of pieces filled) was
+<nobr><tt>0 &lt; NumberOfPiecesFilled &lt; 0.5</tt></nobr> (the amount is in between those two numbers without being in exact), should
+there be a low number of pieces and/or high amount of quantities.<br><br>
+
+
+You may wondering why I rather have the information about the rounding towards empty or full (best to be called &ldquo;complete&rdquo;
+for both empty and full) to be as an output of <tt>CalculateGraphicalBarPercentage</tt> subroutine in Y than directly have $00 (amount of fill) set to #$0001 (the fill
+amount is 16-bit) or <tt>MaxValue-1</tt>. This is in case if you want to have <i>certain</i> bar(s) with the rounding <i>away</i> from either full or empty,
+or if you want to display that it is very close to complete using &ldquo;pseudo extra pieces&rdquo; (these actually do not modify the amount of fill in any form or way):<br>
+<center><img src="GraphicIndicateRounded.png"></center><br>
+Use <a target="_blank" href="../ExampleUsage/RoundAwayFromComplete.asm">this code</a> (link break if moved or deleted) as a template when designing such a feature.<br><br>
+
+Just remember that the tile table for each amount of fill graphic, also includes the tiles for near-empty and near-full:
+<table><td><pre>GraphicalBar_LeftEnd8x8s:
+	;    0   1   2   3 [*]
+	db $36,$37,$38,$39,<font color="red">$29</font>
+GraphicalBar_Middle8x8s:
+	;    0   1   2   3   4   5   6   7   8 [*] [*]
+	db $55,$56,$57,$58,$59,$65,$66,$67,$68,<font color="red">$2A,$2B</font>
+GraphicalBar_RightEnd8x8s:
+	;    0   1   2   3 [*]
+	db $50,$51,$52,$53,<font color="red">$54</font></pre></td></table><br>
+The red colored font (under the &ldquo;<tt>[*]</tt>&rdquo; if you're colorblind) means those are <b>not part</b> of the amount of fill, rather use as a tile substitute when
+the bar rounds towards complete. So after executing <tt>CalculateGraphicalBarPercentage</tt> and <tt>DrawGraphicalBar</tt> (you must <tt>PHY...PLY</tt> around the latter), you
+do this:
+<table><td><pre>	PHY							;>push rounding flag (obviously the following routine overwrites Y)
+	JSL GraphicalBarELITE_DrawGraphicalBar			;>get bar values.
+	PLY							;>pull rounding flag
+
+	CPY #$00 : BEQ ..NoRound				;>Y can only be #$00 to #$02
+	CPY #$01 : BEQ ..RoundedEmpty				;>comment line if you want to allow round towards to empty (left end is no longer mandatory to be enabled)
+	CPY #$02 : BEQ ..RoundedFull				;>comment line if you want to allow round towards full (right end is no longer mandatory to be enabled)
+	;BRA ..NoRound						;>remove comment if any above gets commented so following code doesn't inadvertently gets executed
+
+	..RoundedEmpty
+	if !Default_LeftPieces != 0
+		LDA <font color="red">#$04</font>					;[*]left end
+	else
+		LDA <font color="red">#$09</font>					;[*]first middle byte/8x8
+	endif
+	STA !Scratchram_GraphicalBar_FillByteTbl		;/(remember, the table contains index numbers for tile numbers, not tile numbers directly!!)
+	BRA ..NoRound						;>and done
+	
+	..RoundedFull
+	if !Default_RightPieces != 0
+		LDA <font color="red">#$04</font>					;[*]right end
+	else
+		LDA <font color="red">#$0A</font>					;[*]last middle byte/8x8
+	endif
+	STA !Scratchram_GraphicalBar_FillByteTbl+(!GraphiBar_LeftTileExist+(!GraphiBar_MiddleTileExist*!Default_MiddleLength)+!GraphiBar_RightTileExist)-1</pre></td></table>
+^Please excuse the if statement, it's because it varies depending if you have the left/right parts enabled, due to the fact it is possible to have rounded to complete on the middle
+section as well.<br><br>
+
+Those colored in red fonts numbers indicate what item on the tile table mentioned previously (like an &ldquo;index&rdquo;), they should be a value that picks a number from the table located <b>after</b> the last
+tile number (picks a number greater than the value that would represent full, so 3/3 full, you use #$04 as index). Same thing goes to the right end
+but when rounded to full instead. If your bar does not have any ends, you include the near-rounded for the middle 8x8s. Do note that having both ends disabled means you have <b>both</b>
+near-empty and near-full tile numbers appended after the last tile number (that indicates full 8x8 (individually)), in this example, #$09 and #$0A are for near-empty and near-full (order mentioned
+correspond). For easy understanding, here is what I mean:<br>
+<center><img src="RoundAwayFromCompleteTileTable.png"></center>
