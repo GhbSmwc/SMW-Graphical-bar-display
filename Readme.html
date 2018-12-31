@@ -182,7 +182,7 @@ be empty, you will fill up the next cup.</font><br>
   <ul>
    <li><b><tt>!Scratchram_GraphicalBar_FillByteTbl</tt> to <tt>!Scratchram_GraphicalBar_FillByteTbl+x:</tt></b> A table that each byte containing the fill
    amount ordered from maxed (any number of maxed bytes), fraction (only one such byte will exist and ranges from 0 to max-1 inclusively), then empty (any number of
-   empty bytes) The formula for the end of this table is this formula:
+   empty bytes). The formula for the end of this table is this formula:
    <table><td>X = (LeftEndExist + MiddleLength + RightEndExist) - 1</td></table> Where LeftEndExist and/or RightEndExist will be 0 if their pieces are set to 0,
    and 1 if greater than, while MiddleLength is the number of middle bytes. They are ordered from full (maxed value) bytes, then fraction, then empty. Remember that
    this is NOT the tile number.<br><br>
