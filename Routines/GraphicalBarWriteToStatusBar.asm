@@ -2,7 +2,7 @@ incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;This routine directly writes the tile to the status bar.
-;Note: This only writes up to 128  (64 if using super status
+;Note: This only writes up to 128 (64 if using super status
 ;bar format) tiles. But it is unlikely you would ever need that
 ;much tiles, considering that the screen is 32 ($20) 8x8 tiles
 ;wide and 28 ($1C) 8x8 tiles tall.
