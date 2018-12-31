@@ -11,7 +11,10 @@
  ; $7FA000 and $404000 takes the top-left corner when using the super status bar patch.
  ;
   if !StatusBarFormat == $01
-   !GraphicalBarPos                      = $0f09|!addr  ;>Location of the bar when above define is $01.
+   if !sa1 == 0
+    !GraphicalBarPos                      = $7E0f09
+   else
+    !GraphicalBarPos                      = $400f09
   else
    if !sa1 == 0
     !GraphicalBarPos                     = $7FA000      ;>Status bar RAM data.
@@ -19,7 +22,8 @@
     !GraphicalBarPos                     = $404000      ;>Status bar RAM data.
    endif
   endif
-  
+   ;^Location of the bar when !StatusBarFormat is $01. This is under use of
+   ; STA [$00], that is why it needs to be 3-bytes.
   
 ;Tile settings:
  !Default_MiddleLength                = 7             ;>30 = screen-wide (30 + 2 end tiles = 32, all 8x8 tile row in the screen's width)
