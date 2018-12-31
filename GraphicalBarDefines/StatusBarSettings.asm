@@ -40,19 +40,19 @@
   ; the tiles in the file bin then or edit SMW's status bar table at
   ; address $008C81.
 
- ;Don't touch, these are used for loops to write to the status bar.
-  !GraphiBar_LeftTileExist = 0
-  !GraphiBar_MiddleTileExist = 0
-  !GraphiBar_RightTileExist = 0
-  if !Default_LeftPieces != 0
-   !GraphiBar_LeftTileExist = 1
-  endif
-  if !Default_MiddlePieces != 0 && !Default_MiddleLength != 0
-   !GraphiBar_MiddleTileExist = 1
-  endif
-  if !Default_RightPieces != 0
-   !GraphiBar_RightTileExist = 1
-  endif
-  
-  !GraphicalBar_TotalTileUsed = !GraphiBar_LeftTileExist+(!GraphiBar_MiddleTileExist*!Default_MiddleLength)+!GraphiBar_RightTileExist
-   ;^The amount of bytes the table used up.
+; ;Don't touch, these are used for loops to write to the status bar.
+;  !GraphiBar_LeftTileExist = 0
+;  !GraphiBar_MiddleTileExist = 0
+;  !GraphiBar_RightTileExist = 0
+;  if !Default_LeftPieces != 0
+;   !GraphiBar_LeftTileExist = 1
+;  endif
+;  if !Default_MiddlePieces != 0 && !Default_MiddleLength != 0
+;   !GraphiBar_MiddleTileExist = 1
+;  endif
+;  if !Default_RightPieces != 0
+;   !GraphiBar_RightTileExist = 1
+;  endif
+;  
+;  !GraphicalBar_TotalTileUsed = !GraphiBar_LeftTileExist+(!GraphiBar_MiddleTileExist*!Default_MiddleLength)+!GraphiBar_RightTileExist
+;   ;^The amount of bytes the table used up.
