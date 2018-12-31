@@ -1,0 +1,60 @@
+incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
+incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;This routine directly writes the tile to the status bar.
+;Note: This only writes up to 128  (64 if using super status
+;bar format) tiles. But it is unlikely you would ever need that
+;much tiles, considering that the screen is 32 ($20) 8x8 tiles
+;wide and 28 ($1C) 8x8 tiles tall.
+;
+;Input:
+; -$00 to $02: The starting byte address of the status bar.
+; --IF you're using SA-1 mode here and using vanilla status bar,
+;   the status bar tilemap table is moved to bank $40.
+; -!Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
+;  the maximum amount of fill for this byte itself. If 0, it's not included in table.
+; -!Scratchram_GraphicalBar_MiddlePiece: Same as above but each middle byte.
+; -!Scratchram_GraphicalBar_RightEndPiece: Same as above but for right end.
+; -!Scratchram_Graphica
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+WriteBarToHUD:
+	.CountTiles
+	LDX #$00
+	LDA !Scratchram_GraphicalBar_LeftEndPiece
+	BEQ +
+	INX
+	+
+	LDA !Scratchram_GraphicalBar_MiddlePiece
+	BEQ +
+	TXA
+	CLC
+	ADC !Scratchram_GraphicalBar_TempLength
+	TAX
+	+
+	LDA !Scratchram_GraphicalBar_RightEndPiece
+	BEQ +
+	INX
+	+
+	DEX					;>Subtract by 1 because index 0 exists.
+	CPX #$FF				;\If 0-1 = (-1), there is no tile to write.
+	BEQ .Done				;/(non-existent bar)
+	
+	if !StatusBarFormat == $01
+		TXY
+	else
+		TXA
+		ASL
+		TAY
+	endif
+	
+	.Loop
+	LDA !Scratchram_GraphicalBar_FillByteTbl,x
+	STA [$00],y
+	
+	.Next
+	DEX
+	DEY #!StatusBarFormat
+	BPL .Loop
+	
+	.Done
+	RTL
