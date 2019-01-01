@@ -124,12 +124,314 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
 How this works:
 <ol>
+<li>Inside <tt>GraphicalBarELITE.asm</tt></li>
+<ul>
 <li><tt>CalculateGraphicalBarPercentage</tt>: Calculates the ratio of something over max. For example: 50/100 would output the amount of fill half of the maximum of the bar.</li>
-<li><tt>DrawGraphicalBar</tt>: it takes a value representing how much fill in the bar, and represent them as individual tiles bytes table with each containing the set maximum amount, then
-the &ldquo;fraction&rd; and then finally the &ldquo;empty&rdquo; bytes after. It is important to note that this isn't tile numbers but rather <i>fill amounts</i>, to be indexed into
-tile numbers.</li>
-<li><tt>ConvertFillTo8x8</tt>: converts the bar fill table into tile numbers via indexing.</li>
-<li>After this, the tile numbers are written to the status bar.</li>
+<li><tt>DrawGraphicalBar</tt>: it takes a value representing how much fill in the bar, and represent them as individual tiles bytes table containing a number of them that is &ldquo;full&rdquo;,
+one byte holding the &ldquo;fraction&rdquo; and then a number of &ldquo;empty&rdquo; bytes after if any of them exist. If you were to add up each byte, the total would equal to the value of the
+input. It is important to note that this isn't tile numbers but rather <i>fill amounts</i>, to be indexed into tile numbers. This is what it looks like as an example:<br><br>
+<ul>
+<li><font color="cyan">Cyan</font> means the left end tile byte.</li>
+<li><font color="scarlet">Red</font> means right end tile byte.</li>
+<li><font color=#00C000>Green</font> means the middle tile byte(s).</li>
+<li><font color="orange">Orange </font> means the tile byte is full or reaches maximum.</li>
+<li><font color="yellow">Yellow</font> means the tile byte is between 0 to max-1 inclusively.</li>
+<li><font color="grey">Grey</font> means the tile byte is empty.</li><br>
+
+</ul>
+<table>
+<tr>
+<td>
+<pre>;These three are what sets the maximum fill values for the byte table.
+ <font color="cyan">!Scratchram_GraphicalBar_LeftEndPiece:      $03</font>
+ <font color="scarlet">!Scratchram_GraphicalBar_RightEndPiece:     $03</font>
+ <font color=#00C000>!Scratchram_GraphicalBar_MiddlePiece:       $08</font>
+;This is how long the middle section.
+ <font color=#00C000>!Scratchram_GraphicalBar_TempLength:        $07</font>
+RAM address $00:                             $17 (23)</pre>
+</td>
+<td>
+
+<table>
+<tr>
+<td><tt>!Scratchram_GraphicalBar_FillByteTbl</tt><br>
+relative address:</td>
+<td bgcolor="cyan"><font color="black"><tt>+0</tt></font></td>
+<td bgcolor=#00C000><tt>+1</tt></td>
+<td bgcolor=#00C000><tt>+2</tt></td>
+<td bgcolor=#00C000><tt>+3</tt></td>
+<td bgcolor=#00C000><tt>+4</tt></td>
+<td bgcolor=#00C000><tt>+5</tt></td>
+<td bgcolor=#00C000><tt>+6</tt></td>
+<td bgcolor=#00C000><tt>+7</tt></td>
+<td bgcolor="scarlet"><tt>+8</tt></td>
+</tr>
+<tr>
+<td>Table values:</td>
+<td bgcolor="orange"><tt>$03</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="yellow"><font color="black"><tt>$04</tt></font></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+</tr>
+</table>
+</td>
+</tr>
+</table><br>
+
+If any maximum was set to $00, they are excluded from the table and are skipped:
+<table>
+<tr>
+<td>
+<pre>
+<font color="cyan">!Scratchram_GraphicalBar_LeftEndPiece:       $00</font>
+<font color="scarlet">!Scratchram_GraphicalBar_RightEndPiece:      $03</font>
+<font color=#00C000>!Scratchram_GraphicalBar_MiddlePiece:        $08</font>
+<font color=#00C000>!Scratchram_GraphicalBar_TempLength:         $07</font>
+RAM address $00:                             $17 (23)</pre>
+</td>
+<td>
+
+<table>
+<tr>
+<td><tt>!Scratchram_GraphicalBar_FillByteTbl</tt><br>
+relative address:</td>
+<td bgcolor=#00C000><tt>+0</tt></td>
+<td bgcolor=#00C000><tt>+1</tt></td>
+<td bgcolor=#00C000><tt>+2</tt></td>
+<td bgcolor=#00C000><tt>+3</tt></td>
+<td bgcolor=#00C000><tt>+4</tt></td>
+<td bgcolor=#00C000><tt>+5</tt></td>
+<td bgcolor=#00C000><tt>+6</tt></td>
+<td bgcolor="scarlet"><tt>+7</tt></td>
+<td><tt>+8</tt></td>
+</tr>
+<tr>
+<td>Table values:</td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="yellow"><font color="black"><tt>$07</tt></font></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td><tt>(unused, garbage)</tt></td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<pre>
+<font color="cyan">!Scratchram_GraphicalBar_LeftEndPiece:       $03</font>
+<font color="scarlet">!Scratchram_GraphicalBar_RightEndPiece:      $03</font>
+<font color=#00C000>!Scratchram_GraphicalBar_MiddlePiece:        $00</font>
+<font color=#00C000>!Scratchram_GraphicalBar_TempLength:         $00</font>
+RAM address $00:                             $04 (4)
+
+Note: !Scratchram_GraphicalBar_MiddlePiece <u>and/or</u>
+!Scratchram_GraphicalBar_TempLength is set to zero,
+excludes the middle section.</pre>
+</td>
+<td>
+
+<table>
+<tr>
+<td><tt>!Scratchram_GraphicalBar_FillByteTbl</tt><br>
+relative address:</td>
+<td bgcolor="cyan"><font color="black"><tt>+0</tt></font></td>
+<td bgcolor="scarlet"><tt>+1</tt></td>
+<td><tt>+2</tt></td>
+<td><tt>+3</tt></td>
+<td><tt>+4</tt></td>
+<td><tt>+5</tt></td>
+<td><tt>+6</tt></td>
+<td><tt>+7</tt></td>
+<td><tt>+8</tt></td>
+</tr>
+<tr>
+<td>Table values:</td>
+<td bgcolor="orange"><tt>$03</tt></td>
+<td bgcolor="yellow"><font color="black"><tt>$01</tt></font></td>
+<td colspan="7"><tt>(unused, garbage)</tt></td>
+</tr>
+</table>
+</td>
+<tr>
+<td>
+<pre><font color="cyan">!Scratchram_GraphicalBar_LeftEndPiece:       $03</font>
+<font color="scarlet">!Scratchram_GraphicalBar_RightEndPiece:      $00</font>
+<font color=#00C000>!Scratchram_GraphicalBar_MiddlePiece:        $08</font>
+<font color=#00C000>!Scratchram_GraphicalBar_TempLength:         $07</font>
+RAM address $00:                             $17 (23)</pre>
+</td>
+<td>
+
+<table>
+<tr>
+<td><tt>!Scratchram_GraphicalBar_FillByteTbl</tt><br>
+relative address:</td>
+<td bgcolor="cyan"><font color="black"><tt>+0</tt></font></td>
+<td bgcolor=#00C000><tt>+1</tt></td>
+<td bgcolor=#00C000><tt>+2</tt></td>
+<td bgcolor=#00C000><tt>+3</tt></td>
+<td bgcolor=#00C000><tt>+4</tt></td>
+<td bgcolor=#00C000><tt>+5</tt></td>
+<td bgcolor=#00C000><tt>+6</tt></td>
+<td bgcolor=#00C000><tt>+7</tt></td>
+<td><tt>+8</tt></td>
+</tr>
+<tr>
+<td>Table values:</td>
+<td bgcolor="orange"><tt>$03</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="yellow"><font color="black"><tt>$04</tt></font></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td><tt>(unused, garbage)</tt></td>
+</tr>
+</table>
+</td>
+</tr>
+</tr>
+</table><br>
+</li>
+</ul>
+<li>Inside <tt>GraphicalBarConvertToTile.asm</tt></li>
+<ul>
+<li><tt>ConvertBarFillAmountToTiles</tt>: converts the bar fill table into tile numbers via indexing:
+
+<table>
+<tr>
+<td>Left end</td>
+<td>Middle</td>
+<td>Right end</td>
+</tr>
+<tr>
+<td><ul>
+<li><tt>Fill amount $00 &rightarrow; tile number $36</tt> <img src="readme_files/GraphicalBarFills/LeftEnd_0_of_3.png"></li>
+<li><tt>Fill amount $01 &rightarrow; tile number $37</tt> <img src="readme_files/GraphicalBarFills/LeftEnd_1_of_3.png"></li>
+<li><tt>Fill amount $02 &rightarrow; tile number $38</tt> <img src="readme_files/GraphicalBarFills/LeftEnd_2_of_3.png"></li>
+<li><tt>Fill amount $03 &rightarrow; tile number $39</tt> <img src="readme_files/GraphicalBarFills/LeftEnd_3_of_3.png"></li>
+</ul></td>
+<td><ul>
+<li><tt>Fill amount $00 &rightarrow; tile number $55</tt> <img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"></li>
+<li><tt>Fill amount $01 &rightarrow; tile number $56</tt> <img src="readme_files/GraphicalBarFills/Middle_1_of_8.png"></li>
+<li><tt>Fill amount $02 &rightarrow; tile number $57</tt> <img src="readme_files/GraphicalBarFills/Middle_2_of_8.png"></li>
+<li><tt>Fill amount $03 &rightarrow; tile number $58</tt> <img src="readme_files/GraphicalBarFills/Middle_3_of_8.png"></li>
+<li><tt>Fill amount $04 &rightarrow; tile number $59</tt> <img src="readme_files/GraphicalBarFills/Middle_4_of_8.png"></li>
+<li><tt>Fill amount $05 &rightarrow; tile number $65</tt> <img src="readme_files/GraphicalBarFills/Middle_5_of_8.png"></li>
+<li><tt>Fill amount $06 &rightarrow; tile number $66</tt> <img src="readme_files/GraphicalBarFills/Middle_6_of_8.png"></li>
+<li><tt>Fill amount $07 &rightarrow; tile number $67</tt> <img src="readme_files/GraphicalBarFills/Middle_7_of_8.png"></li>
+<li><tt>Fill amount $08 &rightarrow; tile number $68</tt> <img src="readme_files/GraphicalBarFills/Middle_8_of_8.png"></li>
+</ul></td>
+<td><ul>
+<li><tt>Fill amount $00 &rightarrow; tile number $50</tt> <img src="readme_files/GraphicalBarFills/RightEnd_0_of_3.png"></li>
+<li><tt>Fill amount $01 &rightarrow; tile number $51</tt> <img src="readme_files/GraphicalBarFills/RightEnd_1_of_3.png"></li>
+<li><tt>Fill amount $02 &rightarrow; tile number $52</tt> <img src="readme_files/GraphicalBarFills/RightEnd_2_of_3.png"></li>
+<li><tt>Fill amount $03 &rightarrow; tile number $53</tt> <img src="readme_files/GraphicalBarFills/RightEnd_3_of_3.png"></li>
+</ul></td>
+</tr>
+</table><br>
+
+So if <tt>!Scratchram_GraphicalBar_FillByteTbl</tt> contains these values:
+<table>
+<tr>
+<td><tt>!Scratchram_GraphicalBar_FillByteTbl</tt><br>
+relative address:</td>
+<td bgcolor="cyan"><font color="black"><tt>+0</tt></font></td>
+<td bgcolor=#00C000><tt>+1</tt></td>
+<td bgcolor=#00C000><tt>+2</tt></td>
+<td bgcolor=#00C000><tt>+3</tt></td>
+<td bgcolor=#00C000><tt>+4</tt></td>
+<td bgcolor=#00C000><tt>+5</tt></td>
+<td bgcolor=#00C000><tt>+6</tt></td>
+<td bgcolor=#00C000><tt>+7</tt></td>
+<td bgcolor="scarlet"><tt>+8</tt></td>
+</tr>
+<tr>
+<td>Table values:</td>
+<td bgcolor="orange"><tt>$03</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="yellow"><font color="black"><tt>$04</tt></font></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+</tr>
+</table><br>
+
+Will now contain these values:
+<table>
+<tr>
+<td><tt>!Scratchram_GraphicalBar_FillByteTbl</tt><br>
+relative address:</td>
+<td bgcolor="cyan"><font color="black"><tt>+0</tt></font></td>
+<td bgcolor=#00C000><tt>+1</tt></td>
+<td bgcolor=#00C000><tt>+2</tt></td>
+<td bgcolor=#00C000><tt>+3</tt></td>
+<td bgcolor=#00C000><tt>+4</tt></td>
+<td bgcolor=#00C000><tt>+5</tt></td>
+<td bgcolor=#00C000><tt>+6</tt></td>
+<td bgcolor=#00C000><tt>+7</tt></td>
+<td bgcolor="scarlet"><tt>+8</tt></td>
+</tr>
+<tr>
+<td>Table tile number:</td>
+<td bgcolor="orange"><tt>$39</tt></td>
+<td bgcolor="orange"><tt>$68</tt></td>
+<td bgcolor="orange"><tt>$68</tt></td>
+<td bgcolor="yellow"><font color="black"><tt>$59</tt></font></td>
+<td bgcolor="grey"><tt>$55</tt></td>
+<td bgcolor="grey"><tt>$55</tt></td>
+<td bgcolor="grey"><tt>$55</tt></td>
+<td bgcolor="grey"><tt>$55</tt></td>
+<td bgcolor="grey"><tt>$50</tt></td>
+</tr>
+<tr>
+<td>Tile image:</td>
+<td><center><img src="readme_files/GraphicalBarFills/LeftEnd_3_of_3.png"></center></td>
+<td><center><img src="readme_files/GraphicalBarFills/Middle_8_of_8.png"></center></td>
+<td><center><img src="readme_files/GraphicalBarFills/Middle_8_of_8.png"></center></td>
+<td><center><img src="readme_files/GraphicalBarFills/Middle_4_of_8.png"></center></td>
+<td><center><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"></center></td>
+<td><center><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"></center></td>
+<td><center><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"></center></td>
+<td><center><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"></center></td>
+<td><center><img src="readme_files/GraphicalBarFills/RightEnd_0_of_3.png"></center></td>
+</tr>
+<tr>
+<td>
+Result:
+</td>
+<td colspan="9">
+<center>
+<nobr>
+<img src="readme_files/GraphicalBarFills/LeftEnd_3_of_3.png"><img src="readme_files/GraphicalBarFills/Middle_8_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_8_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_4_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"><img src="readme_files/GraphicalBarFills/RightEnd_0_of_3.png">
+</nobr>
+</center>
+</td>
+</tr>
+</table><br>
+
+
+</li>
+</ul>
+<li>Inside <tt>GraphicalBarWriteToStatusBar.asm</tt></li>
+<ul>
+<li><tt>WriteBarToHUD</tt>: Writes the tiles to the HUD.</li>
+<li><tt>WriteBarToHUDLeftwards</tt>: Same as above but flipped to fill leftwards.</li>
+</ul>
 </ol>
 Here what it looks like visually:<br>
 <center><img src="readme_files/FillBytes.png"></center><br>
