@@ -15,6 +15,7 @@
     !GraphicalBarPos                      = $7E0f09
    else
     !GraphicalBarPos                      = $400f09
+   endif
   else
    if !sa1 == 0
     !GraphicalBarPos                     = $7FA000      ;>Status bar RAM data.
@@ -32,13 +33,14 @@
  !Default_RightPieces                 = 3             ;/
 
  !Leftwards                           = 0
-  ;^Have the bar fill leftwards. Note that end tiles are also
-  ; mirrored. This only works properly on any status bar patches
-  ; that allow editing the tile properties. Having this set to 1
-  ; while using SMW's vanilla status bar causes each tiles to fill
-  ; backwards while advancing to the left. If that is the case, flip
-  ; the tiles in the file bin then or edit SMW's status bar table at
-  ; address $008C81.
+  ;^0 = Fill from left to right
+  ; 1 = Fill from right to left
+  ; Note that end tiles are also mirrored. This only works properly
+  ; on any status bar patches that allow editing the tile properties.
+  ; Having this set to 1 while using SMW's vanilla status bar causes
+  ; each tiles to fill backwards while advancing to the left. If
+  ; that is the case, flip the tiles in the file bin then or edit
+  ; SMW's status bar table at address $008C81.
 
 ; ;Don't touch, these are used for loops to write to the status bar.
 ;  !GraphiBar_LeftTileExist = 0
