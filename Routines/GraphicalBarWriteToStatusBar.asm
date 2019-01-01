@@ -18,7 +18,57 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ; -!Scratchram_Graphica
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 WriteBarToHUD:
-	.CountTiles
+	JSR CountNumberOfTiles
+	CPX #$FF				;\If 0-1 = (-1), there is no tile to write.
+	BEQ .Done				;/(non-existent bar)
+	
+	if !StatusBarFormat == $01
+		TXY
+	else
+		TXA				;\Have Y = X*2 due to Super Status Bar patch formated for 2 contiguous bytes per tile.
+		ASL				;|
+		TAY				;/
+	endif
+	
+	.Loop
+	LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\Write each tile.
+	STA [$00],y					;|
+	
+	..Next
+	DEX
+	DEY #!StatusBarFormat
+	BPL .Loop
+	
+	.Done
+	RTL
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;Same as above, but fills leftwards as opposed to rightwards.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+WriteBarToHUDLeftwards:
+	JSR CountNumberOfTiles
+	CPX #$FF
+	BEQ .Done
+	LDY #$00
+	
+	.Loop
+	LDA !Scratchram_GraphicalBar_FillByteTbl,x
+	STA [$00],y
+	
+	..Next
+	INY #!StatusBarFormat
+	DEX
+	BPL .Loop
+	
+	.Done
+	RTL
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;Count tiles.
+;Output:
+; X = number of bytes or 8x8 tiles the bar is composed of. Returns
+; x being #$FF should not a single tile exist.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+CountNumberOfTiles:
 	LDX #$00
 	LDA !Scratchram_GraphicalBar_LeftEndPiece
 	BEQ +
@@ -36,25 +86,4 @@ WriteBarToHUD:
 	INX
 	+
 	DEX					;>Subtract by 1 because index 0 exists.
-	CPX #$FF				;\If 0-1 = (-1), there is no tile to write.
-	BEQ .Done				;/(non-existent bar)
-	
-	if !StatusBarFormat == $01
-		TXY
-	else
-		TXA
-		ASL
-		TAY
-	endif
-	
-	.Loop
-	LDA !Scratchram_GraphicalBar_FillByteTbl,x
-	STA [$00],y
-	
-	.Next
-	DEX
-	DEY #!StatusBarFormat
-	BPL .Loop
-	
-	.Done
-	RTL
+	RTS

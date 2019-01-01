@@ -298,8 +298,10 @@ CalculateGraphicalBarPercentage:
 ; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+x:
 ;  A table containing the amount of fill for each byte. Table formated like this:
 ;  1) Nth number of maxed bytes.
-;  2) 1 fraction byte containing 0 to max-1
+;  2) 1 "fraction" byte that contains a value 0 to max-1 inclusively.
 ;  3) Nth number of empty bytes.
+;  The numbers of each byte should total equal to the value stored in ram address
+;  $00 prior.
 ;
 ;  Should the total amount of fill of the bar be greater than than the amount
 ;  needed to be full, the table act as if the bar is EXACTLY full (not exceeding);
