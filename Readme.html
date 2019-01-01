@@ -45,6 +45,7 @@ else besides LM making modifications, it is likely you don't have to edit anythi
 <ul>
 <li><tt>GraphicalBarDefines</tt> (the whole folder) &rightarrow; Uberasm tool's main directory (same area as the .exe)</li>
 <li><tt>GraphicalBarELITE.asm</tt> &rightarrow; Uberasm tool's <tt>library</tt>.</li>
+<li><b>Inside</b> the folder <tt>ExampleUsage</tt>, copy all the ASM files and paste them in Uberasm tool's <tt>level</tt>.</li>
 </ul></li>
 <li>Open uberasm tool's <tt>list.txt</tt>, and paste these so that the codes get inserted:
 <table><tr><td><pre>; Level list. Valid values: 000-1FF.
@@ -104,8 +105,20 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	LDA.b #!Default_MiddleLength				;\length (number of middle tiles)
 	STA !Scratchram_GraphicalBar_TempLength			;/
 .ConvertToBar
-	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage	;>Get ratio/percentage
-	JSL GraphicalBarELITE_DrawGraphicalBar			;>get bar values.</pre></td></tr></table>
+	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
+	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
+	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
+	LDA.b #!GraphicalBarPos						;\Setup address to where to draw the bar.
+	STA $00								;|
+	LDA.b #!GraphicalBarPos>>8					;|
+	STA $01								;|
+	LDA.b #!GraphicalBarPos>>16					;|
+	STA $02								;/
+	if !Leftwards == 0							;\Write to status bar
+		JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;|
+	else									;|
+		JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards		;|
+	endif									;/</pre></td></tr></table>
 <hr>
 <h2>ASM Documentation</h2>
 
@@ -182,7 +195,7 @@ be empty, you will fill up the next cup.</font><br>
   <ul>
    <li><b><tt>!Scratchram_GraphicalBar_FillByteTbl</tt> to <tt>!Scratchram_GraphicalBar_FillByteTbl+x:</tt></b> A table that each byte containing the fill
    amount ordered from maxed (any number of maxed bytes), fraction (only one such byte will exist and ranges from 0 to max-1 inclusively), then empty (any number of
-   empty bytes). The formula for the end of this table is this formula:
+   empty bytes) The formula for the end of this table is this formula:
    <table><td>X = (LeftEndExist + MiddleLength + RightEndExist) - 1</td></table> Where LeftEndExist and/or RightEndExist will be 0 if their pieces are set to 0,
    and 1 if greater than, while MiddleLength is the number of middle bytes. They are ordered from full (maxed value) bytes, then fraction, then empty. Remember that
    this is NOT the tile number.<br><br>
