@@ -127,17 +127,95 @@ How this works:
 <li>Inside <tt>GraphicalBarELITE.asm</tt></li>
 <ul>
 <li><tt>CalculateGraphicalBarPercentage</tt>: Calculates the ratio of something over max. For example: 50/100 would output the amount of fill half of the maximum of the bar.</li>
+<table>
+<tr>
+<th>RAM input</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>
+<tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl</b></nobr></tt> to
+<tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+1</b></nobr></tt> (16-bit)
+</td>
+<td>The number or amount of something out of the maximum.</td>
+</tr>
+<tr>
+<td>
+<tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+2</b></nobr></tt> to
+<tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+3</b></nobr></tt> (16-bit)
+</td>
+<td>The maximum amount something. If this value is <tt>$0000</tt>, will assume
+the bar is full due to dividing by zero.</td>
+</tr>
+<tr>
+<td>
+<tt><nobr><b>!Scratchram_GraphicalBar_LeftEndPiece</b></nobr></tt>,
+<tt><nobr><b>!Scratchram_GraphicalBar_MiddlePiece</b></nobr></tt>,
+<tt><nobr><b>!Scratchram_GraphicalBar_RightEndPiece</b></nobr></tt>, and
+<tt><nobr><b>!Scratchram_GraphicalBar_TempLength</b></nobr></tt> (8-bit each)
+</td>
+<td>Graphical bar attributes. The ones with the word &ldquo;Piece&rdquo; refer to the number of pieces
+or units in their respective byte or 8x8 tile. When 0, they are not included in the table. <tt>!Scratchram_GraphicalBar_TempLength</tt>
+is the number of repeated middle tile bytes between the left and right end tile bytes.</td>
+</tr>
+<tr>
+<td colspan="2">
+Result:
+<table>
+<tr>
+<th>Output:</th>
+<th>Description</th>
+</tr>
+<tr>
+<td><tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$01</b></nobr></tt> (16-bit)</td>
+<td>The amount of fill as a &ldquo;percentage&rdquo;. Calculated by <tt>Fill_Amount = RoundHalfUp(!Scratchram_GraphicalBar_FillByteTbl * NumberOfUnitsInBar / !Scratchram_GraphicalBar_FillByteTbl)</tt></td>
+</tr>
+<tr>
+<td><tt><nobr><b>Y register</b></nobr></tt></td>
+<td>Rounding towards empty and full indicator:
+<ul>
+<li>Y = $00 if exactly full (or more) or empty.</li>
+<li>Y = $01 if rounded to empty.</li>
+<li>Y = $02 if rounded to full.</li>
+See more information <a name="RoundAwayFromComplete" href="readme_files/RoundAwayFromComplete.html">here</a>.
+</ul></td>
+</tr>
+<tr>
+<td><tt><nobr><b>$02</b></nobr></tt> to <tt><nobr><b>$09</b></nobr></tt></td>
+<td>Overwritten by math routines. Values should not be used here.</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+
 <li><tt>DrawGraphicalBar</tt>: it takes a value representing how much fill in the bar, and represent them as individual tiles bytes table containing a number of them that is &ldquo;full&rdquo;,
-one byte holding the &ldquo;fraction&rdquo; and then a number of &ldquo;empty&rdquo; bytes after if any of them exist. If you were to add up each byte, the total would equal to the value of the
-input. It is important to note that this isn't tile numbers but rather <i>fill amounts</i>, to be indexed into tile numbers. This is what it looks like as an example:<br><br>
+one byte holding the &ldquo;fraction&rdquo; and then a number of &ldquo;empty&rdquo; bytes after if any of them exist. If you were to add up each byte, the total would equal to the value the number of pieces
+you entered. The inputs are similar to the previously mentioned routine (such as requiring the attributes), but you don't write to <nobr><tt>!Scratchram_GraphicalBar_FillByteTbl</tt></nobr> to
+<nobr><tt>!Scratchram_GraphicalBar_FillByteTbl+3</tt></nobr>, as it is no longer needed. Just to keep in mind, the attributes are kept after running this routine, so you don't have to rewrite them again.
+<tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$01</b></nobr></tt> is the number of units (or pieces) filled as the input. It is important to note that this isn't tile numbers but rather <i>fill amounts</i>,
+to be indexed into tile numbers.<br><br>
+
+<table>
+<tr>
+<th>Output</th>
+<th>Description</th>
+</tr>
+<tr>
+<td><tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl</b></nobr></tt> to <tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+X</b></nobr></tt></td>
+<td>The table containing a series of bytes ordered from full, then one containing a fraction byte, then a series of empty bytes. The ending address is
+<tt>X = (LeftEnd + MiddleLength + RightEnd) - 1</tt>, where <tt>LeftEnd</tt> and <tt>RightEnd</tt> is 0 should they have 0 pieces on either, and <tt>MiddleLength</tt>
+is basically <tt>!Scratchram_GraphicalBar_TempLength</tt> if <tt>!Scratchram_GraphicalBar_MiddlePiece</tt> is a nonzero number, and 0 otherwise.</td>
+</tr>
+</table>
+This is what it looks like as an example:
 <ul>
 <li><font color="cyan">Cyan</font> means the left end tile byte.</li>
 <li><font color="scarlet">Red</font> means right end tile byte.</li>
 <li><font color=#00C000>Green</font> means the middle tile byte(s).</li>
 <li><font color="orange">Orange </font> means the tile byte is full or reaches maximum.</li>
-<li><font color="yellow">Yellow</font> means the tile byte is between 0 to max-1 inclusively.</li>
+<li><font color="yellow">Yellow</font> means the tile byte is between 0 to max-1 inclusively (known as a fraction tile).</li>
 <li><font color="grey">Grey</font> means the tile byte is empty.</li><br>
-
 </ul>
 <table>
 <tr>
@@ -307,13 +385,14 @@ relative address:</td>
 </ul>
 <li>Inside <tt>GraphicalBarConvertToTile.asm</tt></li>
 <ul>
-<li><tt>ConvertBarFillAmountToTiles</tt>: converts the bar fill table into tile numbers via indexing:
+<li><tt>ConvertBarFillAmountToTiles</tt>: converts the bar fill table into tile numbers via indexing (inputs the same as above and don't
+need to be rewritten):
 
 <table>
 <tr>
-<td>Left end</td>
-<td>Middle</td>
-<td>Right end</td>
+<th>Left end</th>
+<th>Middle</th>
+<th>Right end</th>
 </tr>
 <tr>
 <td><ul>
@@ -429,14 +508,34 @@ Result:
 </ul>
 <li>Inside <tt>GraphicalBarWriteToStatusBar.asm</tt></li>
 <ul>
-<li><tt>WriteBarToHUD</tt>: Writes the tiles to the HUD.</li>
-<li><tt>WriteBarToHUDLeftwards</tt>: Same as above but flipped to fill leftwards.</li>
+<li><tt>WriteBarToHUD</tt>: Writes the tiles to the HUD. Inputs are again, similar to <tt>CalculateGraphicalBarPercentage</tt> with only
+the attributes being used, but a new input is required:
+
+<table>
+<tr>
+<th>Input</th>
+<th>Description</th>
+</tr>
+<tr>
+<td><tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$02</b></nobr></tt> (24-bit)</td>
+<td>The starting address (left end, extends rightwards) to write the tiles to the status bar.</td>
+</tr>
+</table><br>
+Remember that this is low endian (The address $7E0F09, for example are stored in each bytes as
+<pre>$7E0000: $09
+$7E0001: $0F
+$7E0002: $7E</pre>
+
+so be careful on that.).
+
+
+</li>
+<li><tt>WriteBarToHUDLeftwards</tt>: Same as above but flipped to fill leftwards. Anything at the beginning of the tile table (the &ldquo;left side&rdquo;)
+will be placed on the right side, the second tile on the second rightmost spot and so on). Currently, if you try to do this without flipping the tiles via
+super status bar patch or editing around address $008C81 to change their <tt>YXPCCCTT</tt> properties, you end up with the left and right ends being
+inverted, and when the bar fills up, it fills up from left to right within each tile starting on the right and heading left.</li>
 </ul>
 </ol>
-Here what it looks like visually:<br>
-<center><img src="readme_files/FillBytes.png"></center><br>
-<font size=1>just think there are 7 cups, and you have a large jug of water and filling it starting on the leftmost cup until its full, and you want the jug to
-be empty, you will fill up the next cup.</font><br>
 
 <h2>Data documentation (and what you can and can't do)</h2>
 <h3>Routine info</h3>
@@ -515,19 +614,3 @@ be empty, you will fill up the next cup.</font><br>
   </td>
  </tr>
 </table><br><br>
-<h3>What the settings and scratch RAM do</h3>
-
-If you set any of the 3 sections to &ldquo;non-exist&rdquo; (by setting left end, middle and right end pieces to 0), they will not be included in the table and will be skipped:
-<center><img src="Readme_files/DisabledSections.png"></center>
-
-<h3>The 1-fraction tile rule</h3>
-Do note that the routine outputs with only 1 partially filled byte, due to how the maths work this out. This means that when translating it to 8x8 tiles, you cannot have such
-graphics (like diagonal fill edge) that can take over multiple tiles when used directly:<br>
-<center><img src="Readme_files/MultiPartiallyFilled.png"></center><br>
-unless you make a code that reads the amount of fill in the fraction (after executing the routine) and check if that value is above/below a certain number (that the
-&ldquo;edge&rdquo; <i>crosses</i> between 2 8x8 bytes), then you can overwrite the adjacent byte/8x8 next to the fraction to display a custom edge engulfing multiple.<br><br>
-
-<h3>Changing the amount of fills per tile</h3>
-You have the full freedom of having different amount of fill pieces in each byte even at the same time when using the routine twice (because they are
-RAM values and not fixed values), in this case, setting left end to 6:<br>
-<center><img src="Readme_files/LeftEndMorePieces.png"></center><br><br>
