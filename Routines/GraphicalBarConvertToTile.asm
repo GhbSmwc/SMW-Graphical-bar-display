@@ -3,7 +3,6 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Convert fill amount in bar to tile numbers.
-;Note: This only works with non-double bar graphics.
 ;
 ;Input:
 ; -!Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also

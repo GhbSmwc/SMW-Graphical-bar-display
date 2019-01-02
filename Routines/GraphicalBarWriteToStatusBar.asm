@@ -8,8 +8,8 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;wide and 28 ($1C) 8x8 tiles tall.
 ;
 ;Input:
-; -$00 to $02: The starting byte address of the status bar.
-; --IF you're using SA-1 mode here and using vanilla status bar,
+; -$00 to $02: The starting byte address of the status bar (tile number).
+; --If you're using SA-1 mode here and using vanilla status bar,
 ;   the status bar tilemap table is moved to bank $40.
 ; -!Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
 ;  the maximum amount of fill for this byte itself. If 0, it's not included in table.
@@ -17,6 +17,10 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ; -!Scratchram_GraphicalBar_RightEndPiece: Same as above but for right end.
 ; -!Scratchram_GraphicalBar_TempLength: The length of the bar (only counts
 ;   middle bytes)
+; -If you are using custom status bar patches that enables editing tile properties in-game,
+;  and have set "!StatusBar_UsingCustomProperties" to 1, you have another input:
+; --$03 to $05: Same as $00 to $02 but for tile properties instead of tile numbers.
+;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 WriteBarToHUD:
 	JSR CountNumberOfTiles
@@ -34,7 +38,10 @@ WriteBarToHUD:
 	.Loop
 	LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\Write each tile.
 	STA [$00],y					;|
-	
+	if !StatusBar_UsingCustomProperties
+		LDA.b #(!Default_StatusBar_TilePropertiesSetting | (!Default_LeftwardsBar<<6))
+		STA [$03],y
+	endif
 	..Next
 	DEX
 	DEY #!StatusBarFormat
