@@ -19,11 +19,11 @@ By <a href="https://www.smwcentral.net/?p=profile&id=18802">GreenHammerBro</a></
 <hr>
 <h2>Introduction</h2>
 This is a guide on how to setup a display of a value of something as a graphical bar that you see in many games. Unlike some hacks like SMWCP2 and
-brutal Mario, which are 1-unit per tiles, this package contains code to display multiple units per tile (8 units normally), as well as representing
+brutal Mario, which are 1-unit (or piece) per tiles, this package contains code to display multiple units per tile (8 units normally), as well as representing
 a ratio of something with any number (1-65535) as the max.<br><br>
 
 The purpose of the code contained here is to represent something as a graphical bar to be used on various things like health, progress, percentage of
-something, etc. as opposed to merely displaying numbers.<br><br>
+something, etc. as opposed to merely displaying digits.<br><br>
 <hr>
 <h2>The resources you need</h2>
 <ul>
@@ -87,22 +87,22 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;^These are needed so the defines relating to the graphical bars work.
 
 .InputRatio
-	LDA &lt;Value&gt;						;\Quantity (example: current HP). Use RAM here.
+	LDA <font color="red">&lt;Value&gt;</font>						;\Quantity (example: current HP). Use RAM here.
 	STA !Scratchram_GraphicalBar_FillByteTbl		;/
-	LDA &lt;Value_high_byte&gt;					;\High byte of above. Should your value here is 8-bit or only 1 byte long,
+	LDA <font color="red">&lt;Value_high_byte&gt;</font>					;\High byte of above. Should your value here is 8-bit or only 1 byte long,
 	STA !Scratchram_GraphicalBar_FillByteTbl+1		;/use [LDA #$00 : STA !Scratchram_GraphicalBar_FillByteTbl+1].
-	LDA &lt;Max_value&gt;						;\Max quantity (example: max HP). Can be a fixed value (#$) or adjustable RAM in-game.
+	LDA <font color="red">&lt;Max_value&gt;</font>						;\Max quantity (example: max HP). Can be a fixed value (#$) or adjustable RAM in-game.
 	STA !Scratchram_GraphicalBar_FillByteTbl+2		;/
-	LDA &lt;Max_value_high_byte&gt;				;\High byte above, same format as &lt;Value_high_byte&gt;, so do the same
+	LDA <font color="red">&lt;Max_value_high_byte&gt;</font>				;\High byte above, same format as &lt;Value_high_byte&gt;, so do the same
 	STA !Scratchram_GraphicalBar_FillByteTbl+3		;/as that if your value is 8-bit.
 .InputGraphicalBarAttributes
-	LDA.b #!Default_LeftPieces				;\Left and right pieces
-	STA !Scratchram_GraphicalBar_LeftEndPiece		;|
-	LDA.b #!Default_RightPieces				;|
-	STA !Scratchram_GraphicalBar_RightEndPiece		;/
-	LDA.b #!Default_MiddlePieces				;\Number of pieces in each middle byte/8x8 tile
+	LDA.b #<font color="green">!Default_LeftPieces</font>				;\Left end normally have 3 pieces.
+	STA !Scratchram_GraphicalBar_LeftEndPiece		;/
+	LDA.b #<font color="green">!Default_MiddlePieces</font>				;\Number of pieces in each middle byte/8x8 tile
 	STA !Scratchram_GraphicalBar_MiddlePiece		;/
-	LDA.b #!Default_MiddleLength				;\length (number of middle tiles)
+	LDA.b #<font color="green">!Default_RightPieces</font>				;\Right end
+	STA !Scratchram_GraphicalBar_RightEndPiece		;/
+	LDA.b #<font color="green">!Default_MiddleLength</font>				;\length (number of middle tiles)
 	STA !Scratchram_GraphicalBar_TempLength			;/
 .ConvertToBar
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
@@ -118,7 +118,9 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 		JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;|
 	else									;|
 		JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards		;|
-	endif									;/</pre></td></tr></table>
+	endif									;/</pre></td></tr></table><br>
+Highlighted in red is the things you can change, while the green, you can edit values in the defines via opening up <tt>GraphicalBarDefines/StatusBarSettings.asm</tt>
+and changing those, and yes, you can safely redefine them when you have multiple bars. Of course you can also place fixed number (#$xx) directly in here as well.
 <hr>
 <h2>ASM Documentation</h2>
 
@@ -137,7 +139,7 @@ How this works:
 <tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl</b></nobr></tt> to
 <tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+1</b></nobr></tt> (16-bit)
 </td>
-<td>The number or amount of something out of the maximum.</td>
+<td>The number or amount of something out of the maximum (known as the &ldquo;quantity&rdquo;).</td>
 </tr>
 <tr>
 <td>
@@ -145,7 +147,7 @@ How this works:
 <tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+3</b></nobr></tt> (16-bit)
 </td>
 <td>The maximum amount something. If this value is <tt>$0000</tt>, will assume
-the bar is full due to dividing by zero.</td>
+the bar is full due to dividing by zero (known as &ldquo;max quantity&rdquo;).</td>
 </tr>
 <tr>
 <td>
@@ -154,7 +156,7 @@ the bar is full due to dividing by zero.</td>
 <tt><nobr><b>!Scratchram_GraphicalBar_RightEndPiece</b></nobr></tt>, and
 <tt><nobr><b>!Scratchram_GraphicalBar_TempLength</b></nobr></tt> (8-bit each)
 </td>
-<td>Graphical bar attributes. The ones with the word &ldquo;Piece&rdquo; refer to the number of pieces
+<td>Graphical bar attributes. The ones with the word &ldquo;piece&rdquo; refer to the number of pieces
 or units in their respective byte or 8x8 tile. When 0, they are not included in the table. <tt>!Scratchram_GraphicalBar_TempLength</tt>
 is the number of repeated middle tile bytes between the left and right end tile bytes.</td>
 </tr>
@@ -168,7 +170,7 @@ Result:
 </tr>
 <tr>
 <td><tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$01</b></nobr></tt> (16-bit)</td>
-<td>The amount of fill as a &ldquo;percentage&rdquo;. Calculated by <tt>Fill_Amount = RoundHalfUp(!Scratchram_GraphicalBar_FillByteTbl * NumberOfUnitsInBar / !Scratchram_GraphicalBar_FillByteTbl)</tt></td>
+<td>The amount of fill as a &ldquo;percentage&rdquo;. Calculated by <tt>FillAmount = RoundHalfUp(Quantity * TotalNumberOfPiecesInBar / MaxQuantity)</tt></td>
 </tr>
 <tr>
 <td><tt><nobr><b>Y register</b></nobr></tt></td>
@@ -204,8 +206,9 @@ to be indexed into tile numbers.<br><br>
 <tr>
 <td><tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl</b></nobr></tt> to <tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+X</b></nobr></tt></td>
 <td>The table containing a series of bytes ordered from full, then one containing a fraction byte, then a series of empty bytes. The ending address is
-<tt>X = (LeftEnd + MiddleLength + RightEnd) - 1</tt>, where <tt>LeftEnd</tt> and <tt>RightEnd</tt> is 0 should they have 0 pieces on either, and <tt>MiddleLength</tt>
-is basically <tt>!Scratchram_GraphicalBar_TempLength</tt> if <tt>!Scratchram_GraphicalBar_MiddlePiece</tt> is a nonzero number, and 0 otherwise.</td>
+<tt>X = (LeftEnd + MiddleLength + RightEnd) - 1</tt>, where <tt>LeftEnd</tt> is 0 if the left end have 0 pieces and 1 if any non-zero number, the same
+applies to the <tt>RightEnd</tt> as well, and <tt>MiddleLength</tt> is equal to <tt>!Scratchram_GraphicalBar_TempLength</tt> if
+<tt>!Scratchram_GraphicalBar_MiddlePiece</tt> is a nonzero number, and 0 otherwise.</td>
 </tr>
 </table>
 This is what it looks like as an example:
@@ -266,7 +269,7 @@ If any maximum was set to $00, they are excluded from the table and are skipped:
 <tr>
 <td>
 <pre>
-<font color="cyan">!Scratchram_GraphicalBar_LeftEndPiece:       $00</font>
+<font color="cyan"><s>!Scratchram_GraphicalBar_LeftEndPiece:       $00</s></font>
 <font color="scarlet">!Scratchram_GraphicalBar_RightEndPiece:      $03</font>
 <font color=#00C000>!Scratchram_GraphicalBar_MiddlePiece:        $08</font>
 <font color=#00C000>!Scratchram_GraphicalBar_TempLength:         $07</font>
@@ -308,8 +311,8 @@ relative address:</td>
 <pre>
 <font color="cyan">!Scratchram_GraphicalBar_LeftEndPiece:       $03</font>
 <font color="scarlet">!Scratchram_GraphicalBar_RightEndPiece:      $03</font>
-<font color=#00C000>!Scratchram_GraphicalBar_MiddlePiece:        $00</font>
-<font color=#00C000>!Scratchram_GraphicalBar_TempLength:         $00</font>
+<font color=#00C000><s>!Scratchram_GraphicalBar_MiddlePiece:        $00</s></font>
+<font color=#00C000><s>!Scratchram_GraphicalBar_TempLength:         $00</s></font>
 RAM address $00:                             $04 (4)
 
 Note: !Scratchram_GraphicalBar_MiddlePiece <u>and/or</u>
@@ -343,7 +346,7 @@ relative address:</td>
 <tr>
 <td>
 <pre><font color="cyan">!Scratchram_GraphicalBar_LeftEndPiece:       $03</font>
-<font color="scarlet">!Scratchram_GraphicalBar_RightEndPiece:      $00</font>
+<font color="scarlet"><s>!Scratchram_GraphicalBar_RightEndPiece:      $00</s></font>
 <font color=#00C000>!Scratchram_GraphicalBar_MiddlePiece:        $08</font>
 <font color=#00C000>!Scratchram_GraphicalBar_TempLength:         $07</font>
 RAM address $00:                             $17 (23)</pre>
@@ -496,7 +499,7 @@ Result:
 <td colspan="9">
 <center>
 <nobr>
-<img src="readme_files/GraphicalBarFills/LeftEnd_3_of_3.png"><img src="readme_files/GraphicalBarFills/Middle_8_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_8_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_4_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"><img src="readme_files/GraphicalBarFills/RightEnd_0_of_3.png">
+<img src="readme_files/GraphicalBarFills/LeftEnd_3_of_3.png"><img src="readme_files/GraphicalBarFills/Middle_8_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_8_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_4_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"><img src="readme_files/GraphicalBarFills/RightEnd_0_of_3.png">
 </nobr>
 </center>
 </td>
