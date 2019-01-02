@@ -3,23 +3,24 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Only include this if there is no SA-1 detection, such as including this
 ;in a (seperate) patch.
-;	!dp = $0000
-;	!addr = $0000
-;	!sa1 = 0
-;	!gsu = 0
+if defined("!sa1") == 0
+	!dp = $0000
+	!addr = $0000
+	!sa1 = 0
+	!gsu = 0
 
-;	if read1($00FFD6) == $15
-;		sfxrom
-;		!dp = $6000
-;		!addr = !dp
-;		!gsu = 1
-;	elseif read1($00FFD5) == $23
-;		sa1rom
-;		!dp = $3000
-;		!addr = $6000
-;		!sa1 = 1
-;	endif
-
+	if read1($00FFD6) == $15
+		sfxrom
+		!dp = $6000
+		!addr = !dp
+		!gsu = 1
+	elseif read1($00FFD5) == $23
+		sa1rom
+		!dp = $3000
+		!addr = $6000
+		!sa1 = 1
+	endif
+endif
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Graphical bar defines
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

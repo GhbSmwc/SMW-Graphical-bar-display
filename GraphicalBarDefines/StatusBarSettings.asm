@@ -4,6 +4,15 @@
  ; $01 = Minimalist/SMB3 [TTTTTTTT, TTTTTTTT]...[YXPCCCTT, YXPCCCTT] or SMW's default.
  ; $02 = Super status bar/Overworld border plus [TTTTTTTT YXPCCCTT, TTTTTTTT YXPCCCTT]...
  
+ !StatusBar_UsingCustomProperties           = 0
+ ;^Set this to 0 if you are using the vanilla SMW status bar or any status bar patches
+ ; that doesn't enable editing the tile properties, otherwise set this to 1 (you may
+ ; have to edit "!Default_GraphicalBarProperties" in order for it to work though.).
+ 
+ !Default_StatusBar_TilePropertiesSetting      = %00111000
+ ;^Tile properties (if you enable editing properties in-game). Note: Bit 6 (X-flip) is
+ ; forced to be set when !Default_LeftwardsBar is set to 1.
+ 
  ;Tile positions. If you are using other status bar patches other than the Super Status Bar
  ;patch, make sure the RAMs here matches the RAM address those patch are using. By default:
  ;
@@ -12,19 +21,35 @@
  ;
   if !StatusBarFormat == $01
    if !sa1 == 0
-    !GraphicalBarPos                      = $7E0f09
+    !Default_GraphicalBarPosition                      = $7E0F09     ;>SMW's status bar. Replace with "$0C00|!addr" for SMB3 status bar and "$0BF6|!addr" for minimalist status bar.
    else
-    !GraphicalBarPos                      = $400f09
+    !Default_GraphicalBarPosition                      = $400F09     ;>SMW's status bar (SA-1). Replace with "$0C00|!addr" for SMB3 status bar and "$0BF6|!addr" for minimalist status bar.
    endif
   else
    if !sa1 == 0
-    !GraphicalBarPos                     = $7FA000      ;>Status bar RAM data.
+    !Default_GraphicalBarPosition                     = $7FA000      ;>Status bar RAM data.
    else
-    !GraphicalBarPos                     = $404000      ;>Status bar RAM data.
+    !Default_GraphicalBarPosition                     = $404000      ;>Status bar RAM data (SA-1).
    endif
   endif
    ;^Location of the bar when !StatusBarFormat is $01. This is under use of
    ; STA [$00], that is why it needs to be 3-bytes.
+  if !StatusBarFormat == $01
+   if !sa1 == 0
+    !Default_GraphicalBarProperties      = $0C80|!addr  ;>SMB3 status bar properties, change to "$0C36|!base" for minimalist.
+   else
+    !Default_GraphicalBarProperties      = $0C80|!addr  ;>SMB3 status bar properties, change to "$0C36|!base" for minimalist.
+   endif
+  else
+   if !sa1 == 0
+    !Default_GraphicalBarProperties      = $7FA001  ;>Super status bar
+   else
+    !Default_GraphicalBarProperties      = $404001  ;>Same as above but SA-1
+   endif
+  endif
+   ;^Tile properties (only applies to status bar patches that lets you change the properties in-game).
+   ; Remember: bit format is [YXPCCCTT].
+
   
 ;Tile settings:
  !Default_MiddleLength                = 7             ;>30 = screen-wide (30 + 2 end tiles = 32, all 8x8 tile row in the screen's width)
@@ -32,7 +57,7 @@
  !Default_MiddlePieces                = 8             ;|
  !Default_RightPieces                 = 3             ;/
 
- !Leftwards                           = 0
+ !Default_LeftwardsBar                           = 0
   ;^0 = Fill from left to right
   ; 1 = Fill from right to left
   ; Note that end tiles are also mirrored. This only works properly
