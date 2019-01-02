@@ -88,8 +88,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;  This is useful in case you don't want the bar to display completely full or empty
 ;  when it is not.
 ;Overwritten/Destroyed:
-; -$02 to $0F: because the 32x32bit multiplication routine ate the whole scratch RAM
-;  data.
+; -$02 to $09: because math routines need that much bytes.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 CalculateGraphicalBarPercentage:
 .FindTotalPieces

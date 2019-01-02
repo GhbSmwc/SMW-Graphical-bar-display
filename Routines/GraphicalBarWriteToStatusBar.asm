@@ -15,7 +15,8 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;  the maximum amount of fill for this byte itself. If 0, it's not included in table.
 ; -!Scratchram_GraphicalBar_MiddlePiece: Same as above but each middle byte.
 ; -!Scratchram_GraphicalBar_RightEndPiece: Same as above but for right end.
-; -!Scratchram_Graphica
+; -!Scratchram_GraphicalBar_TempLength: The length of the bar (only counts
+;   middle bytes)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 WriteBarToHUD:
 	JSR CountNumberOfTiles
