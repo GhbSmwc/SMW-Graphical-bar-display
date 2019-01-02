@@ -167,6 +167,8 @@ main:
 	STA !Freeram_SecondFill
 	
 .DisplayFillAmount
+	;This displays the hex numbers representing the two fill in the bar.
+	;Only works with Super Status Bar patch.
 	if !StatusBarFormat == $02
 		LDA !Freeram_FirstFill					;\every 16th number increments the 1st digit.
 		LSR #$04						;|

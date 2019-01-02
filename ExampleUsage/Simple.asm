@@ -51,161 +51,89 @@ main:
 	STA !Scratchram_GraphicalBar_MiddlePiece		;|
 	LDA.b #!Default_RightPieces				;|
 	STA !Scratchram_GraphicalBar_RightEndPiece		;/
-	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage	;>Get percentage
-	JSL GraphicalBarELITE_DrawGraphicalBar			;>get bar values.
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;Convert fill to 8x8 tile (can be turned into a reusable routine with minor changes).
-;
-;Now you would translate the table into tile number for each byte (assuming if you have left end
-;and middle enabled):
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-.ConvertFillTo8x8
-	PHB						;>Preserve bank (so that table indexing work properly)
-	PHK						;>push current bank
-	PLB						;>pull out as regular bank
-
-	if !Setting_GraphicalBar_IndexSize == 0
-		LDX #$00
+	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
+	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
+	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
+	LDA.b #!Default_GraphicalBarPosition
+	STA $00
+	LDA.b #!Default_GraphicalBarPosition>>8
+	STA $01
+	LDA.b #!Default_GraphicalBarPosition>>16
+	STA $02
+	if !StatusBar_UsingCustomProperties != 0
+		LDA.b #!Default_GraphicalBarProperties
+		STA $03
+		LDA.b #!Default_GraphicalBarProperties>>8
+		STA $04
+		LDA.b #!Default_GraphicalBarProperties>>16
+		STA $05
+	endif
+	if !Default_LeftwardsBar == 0
+		JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;>Write to status bar
 	else
-		REP #$10								;>16-bit XY
-		LDX #$0000								;>The index for what byte tile position to write.
+		JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards
 	endif
-
-..LeftEndTranslate
-	LDA !Scratchram_GraphicalBar_LeftEndPiece	;\can only be either 0 or the correct number of pieces listed in the table.
-	BEQ ..MiddleTranslate				;/
-	if !Setting_GraphicalBar_IndexSize == 0
-		LDA !Scratchram_GraphicalBar_FillByteTbl
-		TAY
-	else
-		REP #$20
-		LDA !Scratchram_GraphicalBar_FillByteTbl
-		AND #$00FF
-		TAY
-		SEP #$20
-	endif
-	LDA GraphicalBar_LeftEnd8x8s,y
-	STA !Scratchram_GraphicalBar_FillByteTbl
-	INX						;>next tile
-
-..MiddleTranslate
-	LDA !Scratchram_GraphicalBar_MiddlePiece	;\check if middle exist.
-	BEQ ..RightEndTranslate				;|
-	LDA !Scratchram_GraphicalBar_TempLength		;|
-	BEQ ..RightEndTranslate				;/
-
-	if !Setting_GraphicalBar_IndexSize == 0
-		LDA !Scratchram_GraphicalBar_TempLength
-		STA $00
-	else
-		REP #$20
-		LDA !Scratchram_GraphicalBar_TempLength
-		AND #$00FF
-		STA $00
-	endif
-	...Loop
-	if !Setting_GraphicalBar_IndexSize == 0
-		LDA !Scratchram_GraphicalBar_FillByteTbl,x
-		TAY
-	else
-		LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\amount of filled, indexed
-		AND #$00FF					;|
-		TAY						;/
-		SEP #$20
-	endif
-	LDA GraphicalBar_Middle8x8s,y			;\amount filled as graphics
-	STA !Scratchram_GraphicalBar_FillByteTbl,x	;/
-	
-	....Next
-	INX
-	if !Setting_GraphicalBar_IndexSize != 0
-		REP #$20
-	endif
-	DEC $00
-	BNE ...Loop
-	
-	SEP #$20
-..RightEndTranslate
-	LDA !Scratchram_GraphicalBar_RightEndPiece
-	BEQ ..Done
-	if !Setting_GraphicalBar_IndexSize == 0
-		LDA !Scratchram_GraphicalBar_FillByteTbl,x
-		TAY
-	else
-		REP #$20
-		LDA !Scratchram_GraphicalBar_FillByteTbl,x
-		AND #$00FF
-		TAY
-		SEP #$20
-	endif
-	LDA GraphicalBar_RightEnd8x8s,y
-	STA !Scratchram_GraphicalBar_FillByteTbl,x
-	
-	..Done
-	SEP #$30					;>Just in case
-	PLB						;>Pull bank
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Write to status bar
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-.TransferBarTileNumberToHud:
-if !StatusBarFormat == $01
-	if !Leftwards == 0
-		LDX.b #!GraphiBar_LeftTileExist+(!Default_MiddleLength*!GraphiBar_MiddleTileExist)+!GraphiBar_RightTileExist-1	;>Start loop counter
+;.TransferBarTileNumberToHud:
+;if !StatusBarFormat == $01
+;	if !Default_LeftwardsBar == 0
+;		LDX.b #!GraphiBar_LeftTileExist+(!Default_MiddleLength*!GraphiBar_MiddleTileExist)+!GraphiBar_RightTileExist-1	;>Start loop counter
 
-		..Loop
-		LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\Store tile data into status bar tiles
-		STA !GraphicalBarPos,x				;/
-		DEX						;>Next tile
-		BPL ..Loop					;>And loop
-	else
-		LDX.b #!GraphiBar_LeftTileExist+(!Default_MiddleLength*!GraphiBar_MiddleTileExist)+!GraphiBar_RightTileExist-1	;\Start loop
-		LDY #$00						;/
+;		..Loop
+;		LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\Store tile data into status bar tiles
+;		STA !GraphicalBarPos,x				;/
+;		DEX						;>Next tile
+;		BPL ..Loop					;>And loop
+;	else
+;		LDX.b #!GraphiBar_LeftTileExist+(!Default_MiddleLength*!GraphiBar_MiddleTileExist)+!GraphiBar_RightTileExist-1	;\Start loop
+;		LDY #$00						;/
 
-		..Loop
-		LDA !Scratchram_GraphicalBar_FillByteTbl,x		;\Transfer scratch to status bar
-		STA !GraphicalBarPos,y					;/
-		LDA.b #%01000000					;\Tile properties, use +$40 for minimalist status bars, $80 for SMB3. Note that leftwards does
-		STA !GraphicalBarPos+$80,y				;/not work on smw's status bar (or future HUD patches that doesn't support tile properties stored in RAM.
-		INY							;\Next tile
-		DEX							;/
-		BPL ..Loop						;>And loop
-	endif
-else
-	if !Leftwards == 0
-		LDX.b #((!GraphiBar_LeftTileExist+(!Default_MiddleLength*!GraphiBar_MiddleTileExist)+!GraphiBar_RightTileExist)*2)-2	;>Each 8x8 of SSB has 2 bytes
-		LDY.b #(!GraphiBar_LeftTileExist+(!Default_MiddleLength*!GraphiBar_MiddleTileExist)+!GraphiBar_RightTileExist)-1	;>Each 8x8 of scratch is 1 byte each.
+;		..Loop
+;		LDA !Scratchram_GraphicalBar_FillByteTbl,x		;\Transfer scratch to status bar
+;		STA !GraphicalBarPos,y					;/
+;		LDA.b #%01000000					;\Tile properties, use +$40 for minimalist status bars, $80 for SMB3. Note that leftwards does
+;		STA !GraphicalBarPos+$80,y				;/not work on smw's status bar (or future HUD patches that doesn't support tile properties stored in RAM.
+;		INY							;\Next tile
+;		DEX							;/
+;		BPL ..Loop						;>And loop
+;	endif
+;else
+;	if !Default_LeftwardsBar == 0
+;		LDX.b #((!GraphiBar_LeftTileExist+(!Default_MiddleLength*!GraphiBar_MiddleTileExist)+!GraphiBar_RightTileExist)*2)-2	;>Each 8x8 of SSB has 2 bytes
+;		LDY.b #(!GraphiBar_LeftTileExist+(!Default_MiddleLength*!GraphiBar_MiddleTileExist)+!GraphiBar_RightTileExist)-1	;>Each 8x8 of scratch is 1 byte each.
 
-		..Loop
-		PHX						;>Save SSB index
-		TYX						;\LDA $xxxxxx,y does not exist
-		LDA !Scratchram_GraphicalBar_FillByteTbl,x	;/
-		PLX						;>Restore SSB index
-		STA !GraphicalBarPos,x				;>Transfer to status bar tiles
-		LDA #%00111000					;\Setup tile properties (bit 6 must be clear)
-		STA !GraphicalBarPos+1,x			;/
-		
-		...Next
-		DEY							;\Next tile
-		DEX #2							;/
-		BPL ..Loop						;>and loop
-	else
-		LDX.b #((!GraphiBar_LeftTileExist+(!Default_MiddleLength*!GraphiBar_MiddleTileExist)+!GraphiBar_RightTileExist)*2)-2	;>Status bar index
-		LDY.b #$00							;>Scratch index
+;		..Loop
+;		PHX						;>Save SSB index
+;		TYX						;\LDA $xxxxxx,y does not exist
+;		LDA !Scratchram_GraphicalBar_FillByteTbl,x	;/
+;		PLX						;>Restore SSB index
+;		STA !GraphicalBarPos,x				;>Transfer to status bar tiles
+;		LDA #%00111000					;\Setup tile properties (bit 6 must be clear)
+;		STA !GraphicalBarPos+1,x			;/
+;		
+;		...Next
+;		DEY							;\Next tile
+;		DEX #2							;/
+;		BPL ..Loop						;>and loop
+;	else
+;		LDX.b #((!GraphiBar_LeftTileExist+(!Default_MiddleLength*!GraphiBar_MiddleTileExist)+!GraphiBar_RightTileExist)*2)-2	;>Status bar index
+;		LDY.b #$00							;>Scratch index
 
-		..Loop
-		PHX						;\Transfer to status bar tiles
-		TYX						;|
-		LDA !Scratchram_GraphicalBar_FillByteTbl,x	;|
-		PLX						;|
-		STA !GraphicalBarPos,x				;/
-		LDA #%01111000					;\Setup tile properties (bit 6 must be set)
-		STA !GraphicalBarPos+1,x			;/
-		
-		...Next
-		INY						;\Next tile
-		DEX #2						;/
-		BPL ..Loop					;>And loop
-	endif
-endif
+;		..Loop
+;		PHX						;\Transfer to status bar tiles
+;		TYX						;|
+;		LDA !Scratchram_GraphicalBar_FillByteTbl,x	;|
+;		PLX						;|
+;		STA !GraphicalBarPos,x				;/
+;		LDA #%01111000					;\Setup tile properties (bit 6 must be set)
+;		STA !GraphicalBarPos+1,x			;/
+;		
+;		...Next
+;		INY						;\Next tile
+;		DEX #2						;/
+;		BPL ..Loop					;>And loop
+;	endif
+;endif
 	RTL
