@@ -17,6 +17,9 @@
 <center><h1>Graphical Bar ELITE</h1><br>
 By <a href="https://www.smwcentral.net/?p=profile&id=18802">GreenHammerBro</a></center><br>
 <hr>
+Note: This HTML uses ASCII art to represent something, so make sure you have your browser setting for <a href="https://en.wikipedia.org/wiki/Monospaced_font">fixed-width font</a> such as
+&ldquo;Consolas&rdquo; so it displays properly.
+
 <h2>Introduction</h2>
 This is a guide on how to setup a display of a value of something as a graphical bar that you see in many games. Unlike some hacks like SMWCP2 and
 brutal Mario, which are 1-unit (or piece) per tiles, this package contains code to display multiple units per tile (8 units normally), as well as representing
@@ -195,8 +198,8 @@ See more information <a name="RoundAwayFromComplete" href="readme_files/RoundAwa
 one byte holding the &ldquo;fraction&rdquo; and then a number of &ldquo;empty&rdquo; bytes after if any of them exist. If you were to add up each byte, the total would equal to the value the number of pieces
 you entered. The inputs are similar to the previously mentioned routine (such as requiring the attributes), but you don't write to <nobr><tt>!Scratchram_GraphicalBar_FillByteTbl</tt></nobr> to
 <nobr><tt>!Scratchram_GraphicalBar_FillByteTbl+3</tt></nobr>, as it is no longer needed. Just to keep in mind, the attributes are kept after running this routine, so you don't have to rewrite them again.
-<tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$01</b></nobr></tt> is the number of units (or pieces) filled as the input. It is important to note that this isn't tile numbers but rather <i>fill amounts</i>,
-to be indexed into tile numbers.<br><br>
+<tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$01</b></nobr></tt> is the number of units (or pieces) filled as the input. It is important to note that this output table isn't tile numbers but rather
+<i>fill amounts</i>, to be indexed into tile numbers.<br><br>
 
 <table>
 <tr>
@@ -214,8 +217,8 @@ applies to the <tt>RightEnd</tt> as well, and <tt>MiddleLength</tt> is equal to 
 This is what it looks like as an example:
 <ul>
 <li><font color="cyan">Cyan</font> means the left end tile byte.</li>
-<li><font color="scarlet">Red</font> means right end tile byte.</li>
 <li><font color=#00C000>Green</font> means the middle tile byte(s).</li>
+<li><font color="scarlet">Red</font> means right end tile byte.</li>
 <li><font color="orange">Orange </font> means the tile byte is full or reaches maximum.</li>
 <li><font color="yellow">Yellow</font> means the tile byte is between 0 to max-1 inclusively (known as a fraction tile).</li>
 <li><font color="grey">Grey</font> means the tile byte is empty.</li><br>
@@ -229,42 +232,29 @@ This is what it looks like as an example:
  <font color=#00C000>!Scratchram_GraphicalBar_MiddlePiece:       $08</font>
 ;This is how long the middle section.
  <font color=#00C000>!Scratchram_GraphicalBar_TempLength:        $07</font>
-RAM address $00:                             $17 (23)</pre>
+;The number of units or pieces filled:
+ RAM address $00-$01:                        $0017 (23)</pre>
 </td>
 <td>
 
-<table>
-<tr>
-<td><tt>!Scratchram_GraphicalBar_FillByteTbl</tt><br>
-relative address:</td>
-<td bgcolor="cyan"><font color="black"><tt>+0</tt></font></td>
-<td bgcolor=#00C000><tt>+1</tt></td>
-<td bgcolor=#00C000><tt>+2</tt></td>
-<td bgcolor=#00C000><tt>+3</tt></td>
-<td bgcolor=#00C000><tt>+4</tt></td>
-<td bgcolor=#00C000><tt>+5</tt></td>
-<td bgcolor=#00C000><tt>+6</tt></td>
-<td bgcolor=#00C000><tt>+7</tt></td>
-<td bgcolor="scarlet"><tt>+8</tt></td>
-</tr>
-<tr>
-<td>Table values:</td>
-<td bgcolor="orange"><tt>$03</tt></td>
-<td bgcolor="orange"><tt>$08</tt></td>
-<td bgcolor="orange"><tt>$08</tt></td>
-<td bgcolor="yellow"><font color="black"><tt>$04</tt></font></td>
-<td bgcolor="grey"><tt>$00</tt></td>
-<td bgcolor="grey"><tt>$00</tt></td>
-<td bgcolor="grey"><tt>$00</tt></td>
-<td bgcolor="grey"><tt>$00</tt></td>
-<td bgcolor="grey"><tt>$00</tt></td>
-</tr>
-</table>
+
+<pre>                                     Table: <span style="background-color: orange">$03</span>,<span style="background-color: orange">$08</span>,<span style="background-color: orange">$08</span>,<span style="background-color: yellow"><font color="black">$04</font></span>,<span style="background-color: grey">$00</span>,<span style="background-color: grey">$00</span>,<span style="background-color: grey">$00</span>,<span style="background-color: grey">$00</span>,<span style="background-color: grey">$00</span>
+                                             |   |   |   |   |   |   |   |   |
+<font color="cyan">!Scratchram_GraphicalBar_FillByteTbl+0</font> ------/   |   |   |   |   |   |   |   |
+<font color=#00C000>!Scratchram_GraphicalBar_FillByteTbl+1</font> ----------/   |   |   |   |   |   |   |
+<font color=#00C000>!Scratchram_GraphicalBar_FillByteTbl+2</font> --------------/   |   |   |   |   |   |
+<font color=#00C000>!Scratchram_GraphicalBar_FillByteTbl+3</font> ------------------/   |   |   |   |   |
+<font color=#00C000>!Scratchram_GraphicalBar_FillByteTbl+4</font> ----------------------/   |   |   |   |
+<font color=#00C000>!Scratchram_GraphicalBar_FillByteTbl+5</font> --------------------------/   |   |   |
+<font color=#00C000>!Scratchram_GraphicalBar_FillByteTbl+6</font> ------------------------------/   |   |
+<font color=#00C000>!Scratchram_GraphicalBar_FillByteTbl+7</font> ----------------------------------/   |
+<font color="scarlet">!Scratchram_GraphicalBar_FillByteTbl+8</font> --------------------------------------/
+</pre>
 </td>
 </tr>
 </table><br>
 
-If any maximum was set to $00, they are excluded from the table and are skipped:
+If any maximum was set to $00, they are excluded from the table and are skipped (no longer uses the ASCII lookup table for smaller display):
 <table>
 <tr>
 <td>
@@ -273,7 +263,7 @@ If any maximum was set to $00, they are excluded from the table and are skipped:
 <font color="scarlet">!Scratchram_GraphicalBar_RightEndPiece:      $03</font>
 <font color=#00C000>!Scratchram_GraphicalBar_MiddlePiece:        $08</font>
 <font color=#00C000>!Scratchram_GraphicalBar_TempLength:         $07</font>
-RAM address $00:                             $17 (23)</pre>
+RAM address $00-$01:                         $0017 (23)</pre>
 </td>
 <td>
 
@@ -313,7 +303,7 @@ relative address:</td>
 <font color="scarlet">!Scratchram_GraphicalBar_RightEndPiece:      $03</font>
 <font color=#00C000><s>!Scratchram_GraphicalBar_MiddlePiece:        $00</s></font>
 <font color=#00C000><s>!Scratchram_GraphicalBar_TempLength:         $00</s></font>
-RAM address $00:                             $04 (4)
+RAM address $00-$01:                         $0004 (4)
 
 Note: !Scratchram_GraphicalBar_MiddlePiece <u>and/or</u>
 !Scratchram_GraphicalBar_TempLength is set to zero,
@@ -349,7 +339,7 @@ relative address:</td>
 <font color="scarlet"><s>!Scratchram_GraphicalBar_RightEndPiece:      $00</s></font>
 <font color=#00C000>!Scratchram_GraphicalBar_MiddlePiece:        $08</font>
 <font color=#00C000>!Scratchram_GraphicalBar_TempLength:         $07</font>
-RAM address $00:                             $17 (23)</pre>
+RAM address $00-$01:                         $0017 (23)</pre>
 </td>
 <td>
 
@@ -424,7 +414,7 @@ need to be rewritten):
 </tr>
 </table><br>
 
-So if <tt>!Scratchram_GraphicalBar_FillByteTbl</tt> contains these values:
+So if <tt>!Scratchram_GraphicalBar_FillByteTbl</tt> contains these values and gets converted, this happens:
 <table>
 <tr>
 <td><tt>!Scratchram_GraphicalBar_FillByteTbl</tt><br>
@@ -440,7 +430,7 @@ relative address:</td>
 <td bgcolor="scarlet"><tt>+8</tt></td>
 </tr>
 <tr>
-<td>Table values:</td>
+<td>Table values...:</td>
 <td bgcolor="orange"><tt>$03</tt></td>
 <td bgcolor="orange"><tt>$08</tt></td>
 <td bgcolor="orange"><tt>$08</tt></td>
@@ -451,25 +441,8 @@ relative address:</td>
 <td bgcolor="grey"><tt>$00</tt></td>
 <td bgcolor="grey"><tt>$00</tt></td>
 </tr>
-</table><br>
-
-Will now contain these values:
-<table>
 <tr>
-<td><tt>!Scratchram_GraphicalBar_FillByteTbl</tt><br>
-relative address:</td>
-<td bgcolor="cyan"><font color="black"><tt>+0</tt></font></td>
-<td bgcolor=#00C000><tt>+1</tt></td>
-<td bgcolor=#00C000><tt>+2</tt></td>
-<td bgcolor=#00C000><tt>+3</tt></td>
-<td bgcolor=#00C000><tt>+4</tt></td>
-<td bgcolor=#00C000><tt>+5</tt></td>
-<td bgcolor=#00C000><tt>+6</tt></td>
-<td bgcolor=#00C000><tt>+7</tt></td>
-<td bgcolor="scarlet"><tt>+8</tt></td>
-</tr>
-<tr>
-<td>Table tile number:</td>
+<td>...converted to tile number:</td>
 <td bgcolor="orange"><tt>$39</tt></td>
 <td bgcolor="orange"><tt>$68</tt></td>
 <td bgcolor="orange"><tt>$68</tt></td>
@@ -521,15 +494,23 @@ the attributes being used, but a new input is required:
 </tr>
 <tr>
 <td><tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$02</b></nobr></tt> (24-bit)</td>
-<td>The starting address (left end, extends rightwards) to write the tiles to the status bar.</td>
+<td>The starting address (left end, extends rightwards, even when filling leftwards) to write the tile numbers to the status bar.</td>
 </tr>
-</table><br>
+<tr>
+<td><tt><nobr><b>$03</b></nobr></tt> to <tt><nobr><b>$05</b></nobr></tt> (24-bit)</td>
+<td>Same as above, but for tile properties. (This only applies if you installed status bar patches that enable editing the properties
+in-game.)</td>
+</tr>
+</table>
 Remember that this is low endian (The address $7E0F09, for example are stored in each bytes as
 <pre>$7E0000: $09
 $7E0001: $0F
 $7E0002: $7E</pre>
 
 so be careful on that.).
+Of course, because the <a href="https://www.smwcentral.net/?p=section&a=details&id=15222">Overworld Border Plus</a> patch have the same format as the Super Status Bar patch,
+it will work on that as well (if <tt>!StatusBarFormat</tt> set to $02 and you make a different version of the routine <tt>ConvertBarFillAmountToTiles</tt> to use a different
+table to use OW layer 3 tiles).<br><br>
 
 
 </li>
