@@ -73,8 +73,10 @@ WriteBarToHUDLeftwards:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Count tiles.
 ;Output:
-; X = number of bytes or 8x8 tiles the bar is composed of. Returns
-; x being #$FF should not a single tile exist.
+; X = Number of bytes or 8x8 tiles the bar takes up of minus 1
+;     (if there is left and right ends in existent and one middle
+;     tile, will be 3 tiles, this routine outputs X=$02). Returns
+;     X=$FF should not a single tile exist.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 CountNumberOfTiles:
 	LDX #$00
