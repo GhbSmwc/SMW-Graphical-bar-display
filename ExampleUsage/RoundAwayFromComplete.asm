@@ -40,15 +40,15 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;for GraphicalBar_Middle8x8s when either end tiles are disabled, include
 ;after the last number: $xx,$yy where $xx is the near-empty and $yy is near-full
 ;the 
-GraphicalBar_LeftEnd8x8s:
-	;    0   1   2   3 [*]
-	db $36,$37,$38,$39,$29
-GraphicalBar_Middle8x8s:
-	;    0   1   2   3   4   5   6   7   8 [*] [*]
-	db $55,$56,$57,$58,$59,$65,$66,$67,$68,$2A,$2B
-GraphicalBar_RightEnd8x8s:
-	;    0   1   2   3 [*]
-	db $50,$51,$52,$53,$54
+;GraphicalBar_LeftEnd8x8s:
+;	;    0   1   2   3 [*]
+;	db $36,$37,$38,$39,$29
+;GraphicalBar_Middle8x8s:
+;	;    0   1   2   3   4   5   6   7   8 [*] [*]
+;	db $55,$56,$57,$58,$59,$65,$66,$67,$68,$2A,$2B
+;GraphicalBar_RightEnd8x8s:
+;	;    0   1   2   3 [*]
+;	db $50,$51,$52,$53,$54
 
 ;if you edit the number of pieces along with the number of fill graphic tiles here,
 ;make sure you CTRL+F "Use additional index of the table for near-rounded graphic"
@@ -111,92 +111,57 @@ main:
 		JSL GraphicalBarELITE_DrawGraphicalBar			;>get bar values.
 		PLY							;>pull rounding flag
 
+		print "asdfasdfasdf",pc
 		CPY #$00 : BEQ ..NoRound				;>Y can only be #$00 to #$02
 		CPY #$01 : BEQ ..RoundedEmpty				;>comment line if you want to allow round towards to empty (left end is no longer mandatory to be enabled)
 		CPY #$02 : BEQ ..RoundedFull				;>comment line if you want to allow round towards full (right end is no longer mandatory to be enabled)
 		;BRA ..NoRound						;>remove comment if any above gets commented so following code doesn't inadvertently gets executed
 
 		..RoundedEmpty
-		if !Default_LeftPieces != 0
-			LDA #$04					;[*]left end
-		else
-			LDA #$09					;[*]first middle byte/8x8
-		endif
+		LDA !Scratchram_GraphicalBar_LeftEndPiece
+		BEQ ...FirstMiddle
+		LDA #$04					;[*]left end
+		BRA ...Write
+
+		...FirstMiddle
+		LDA #$09					;[*]first middle byte/8x8
+
+		...Write
 		STA !Scratchram_GraphicalBar_FillByteTbl		;/(remember, the table contains index numbers for tile numbers, not tile numbers directly!!)
 		BRA ..NoRound						;>and done
 		
 		..RoundedFull
-		if !Default_RightPieces != 0
-			LDA #$04					;[*]right end
-		else
-			LDA #$0A					;[*]last middle byte/8x8
-		endif
-		STA !Scratchram_GraphicalBar_FillByteTbl+(!GraphiBar_LeftTileExist+(!GraphiBar_MiddleTileExist*!Default_MiddleLength)+!GraphiBar_RightTileExist)-1
+		JSL GraphicalBarWriteToStatusBar_CountNumberOfTiles	;>Get X to point to the last 8x8 byte.
+		LDA !Scratchram_GraphicalBar_RightEndPiece
+		BEQ ...LastMiddle
+		LDA #$04					;[*]right end
+		BRA ...Write
 		
+		...LastMiddle
+		LDA #$0A					;[*]last middle byte/8x8
+		
+		...Write
+		STA !Scratchram_GraphicalBar_FillByteTbl,x
 	endif
 	..NoRound
-	JSL GraphiBar_ConvertToTile				;>Convert tiles.
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;Write to status bar
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-.TransferBarTileNumberToHud:
-if !StatusBarFormat == $01
-	if !Leftwards == 0
-		LDX.b #!GraphiBar_LeftTileExist+(!Default_MiddleLength*!GraphiBar_MiddleTileExist)+!GraphiBar_RightTileExist-1	;>Start loop counter
-
-		..Loop
-		LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\Store tile data into status bar tiles
-		STA !GraphicalBarPos,x				;/
-		DEX						;>Next tile
-		BPL ..Loop					;>And loop
-	else
-		LDX.b #!GraphiBar_LeftTileExist+(!Default_MiddleLength*!GraphiBar_MiddleTileExist)+!GraphiBar_RightTileExist-1	;\Start loop
-		LDY #$00						;/
-
-		..Loop
-		LDA !Scratchram_GraphicalBar_FillByteTbl,x		;\Transfer scratch to status bar
-		STA !GraphicalBarPos,y					;/
-		LDA.b #%01000000					;\Tile properties, use +$40 for minimalist status bars, $80 for SMB3. Note that leftwards does
-		STA !GraphicalBarPos+$80,y				;/not work on smw's status bar (or future HUD patches that doesn't support tile properties stored in RAM.
-		INY							;\Next tile
-		DEX							;/
-		BPL ..Loop						;>And loop
+	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
+	LDA.b #!Default_GraphicalBarPosition
+	STA $00
+	LDA.b #!Default_GraphicalBarPosition>>8
+	STA $01
+	LDA.b #!Default_GraphicalBarPosition>>16
+	STA $02
+	if !StatusBar_UsingCustomProperties != 0
+		LDA.b #!Default_GraphicalBarProperties
+		STA $03
+		LDA.b #!Default_GraphicalBarProperties>>8
+		STA $04
+		LDA.b #!Default_GraphicalBarProperties>>16
+		STA $05
 	endif
-else
-	if !Leftwards == 0
-		LDX.b #((!GraphiBar_LeftTileExist+(!Default_MiddleLength*!GraphiBar_MiddleTileExist)+!GraphiBar_RightTileExist)*2)-2	;>Each 8x8 of SSB has 2 bytes
-		LDY.b #(!GraphiBar_LeftTileExist+(!Default_MiddleLength*!GraphiBar_MiddleTileExist)+!GraphiBar_RightTileExist)-1	;>Each 8x8 of scratch is 1 byte each.
-
-		..Loop
-		PHX						;>Save SSB index
-		TYX						;\LDA $xxxxxx,y does not exist
-		LDA !Scratchram_GraphicalBar_FillByteTbl,x	;/
-		PLX						;>Restore SSB index
-		STA !GraphicalBarPos,x				;>Transfer to status bar tiles
-		LDA #%00111000					;\Setup tile properties (bit 6 must be clear)
-		STA !GraphicalBarPos+1,x			;/
-		
-		...Next
-		DEY							;\Next tile
-		DEX #2							;/
-		BPL ..Loop						;>and loop
+	if !Default_LeftwardsBar == 0
+		JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;>Write to status bar
 	else
-		LDX.b #((!GraphiBar_LeftTileExist+(!Default_MiddleLength*!GraphiBar_MiddleTileExist)+!GraphiBar_RightTileExist)*2)-2	;>Status bar index
-		LDY.b #$00							;>Scratch index
-
-		..Loop
-		PHX						;\Transfer to status bar tiles
-		TYX						;|
-		LDA !Scratchram_GraphicalBar_FillByteTbl,x	;|
-		PLX						;|
-		STA !GraphicalBarPos,x				;/
-		LDA #%01111000					;\Setup tile properties (bit 6 must be set)
-		STA !GraphicalBarPos+1,x			;/
-		
-		...Next
-		INY						;\Next tile
-		DEX #2						;/
-		BPL ..Loop					;>And loop
+		JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards
 	endif
-endif
 	RTL
