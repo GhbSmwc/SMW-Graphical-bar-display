@@ -23,7 +23,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 WriteBarToHUD:
-	JSR CountNumberOfTiles
+	JSL CountNumberOfTiles
 	CPX #$FF				;\If 0-1 = (-1), there is no tile to write.
 	BEQ .Done				;/(non-existent bar)
 	
@@ -53,7 +53,7 @@ WriteBarToHUD:
 ;Same as above, but fills leftwards as opposed to rightwards.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 WriteBarToHUDLeftwards:
-	JSR CountNumberOfTiles
+	JSL CountNumberOfTiles
 	CPX #$FF
 	BEQ .Done
 	LDY #$00
@@ -96,4 +96,4 @@ CountNumberOfTiles:
 	INX
 	+
 	DEX					;>Subtract by 1 because index 0 exists.
-	RTS
+	RTL

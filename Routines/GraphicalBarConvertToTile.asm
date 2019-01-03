@@ -16,14 +16,14 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;  converted to tile numbers.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	GraphicalBar_LeftEnd8x8s:
-	;    0   1   2   3
-	db $36,$37,$38,$39
+	;    0   1   2   3 [*]
+	db $36,$37,$38,$39,$29
 	GraphicalBar_Middle8x8s:
-	;    0   1   2   3   4   5   6   7   8
-	db $55,$56,$57,$58,$59,$65,$66,$67,$68
+	;    0   1   2   3   4   5   6   7   8 [*] [*]
+	db $55,$56,$57,$58,$59,$65,$66,$67,$68,$2A,$2B
 	GraphicalBar_RightEnd8x8s:
-	;    0   1   2   3
-	db $50,$51,$52,$53
+	;    0   1   2   3 [*]
+	db $50,$51,$52,$53,$54
 	;^Tile numbers, ordered from 0 to maximum. This one assumes
 	; you're using GFX28, for the SMW's status bar.
 	
