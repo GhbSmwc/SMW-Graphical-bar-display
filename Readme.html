@@ -179,7 +179,7 @@ Result:
 <td><tt><nobr><b>Y register</b></nobr></tt></td>
 <td>Rounding towards empty and full indicator:
 <ul>
-<li>Y = $00 if exactly full (or more) or empty.</li>
+<li>Y = $00 if not rounded to empty or full (if exact empty, rounded to any number besides 0 or maximum, or full (or higher))</li>
 <li>Y = $01 if rounded to empty.</li>
 <li>Y = $02 if rounded to full.</li>
 See more information <a name="RoundAwayFromComplete" href="readme_files/RoundAwayFromComplete.html">here</a>.
@@ -187,7 +187,7 @@ See more information <a name="RoundAwayFromComplete" href="readme_files/RoundAwa
 </tr>
 <tr>
 <td><tt><nobr><b>$02</b></nobr></tt> to <tt><nobr><b>$09</b></nobr></tt></td>
-<td>Overwritten by math routines. Values should not be used here.</td>
+<td>Overwritten by math routines. Contains garbage values.</td>
 </tr>
 </table>
 </td>
@@ -207,11 +207,43 @@ you entered. The inputs are similar to the previously mentioned routine (such as
 <th>Description</th>
 </tr>
 <tr>
-<td><tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl</b></nobr></tt> to <tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+X</b></nobr></tt></td>
-<td>The table containing a series of bytes ordered from full, then one containing a fraction byte, then a series of empty bytes. The ending address is
+<td>
+<tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl</b></nobr></tt> to <tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+X</b></nobr></tt>
+</td>
+<td>
+The table containing a series of bytes ordered from full, then one containing a fraction byte, then a series of empty bytes. The ending address is
 <tt>X = (LeftEnd + MiddleLength + RightEnd) - 1</tt>, where <tt>LeftEnd</tt> is 0 if the left end have 0 pieces and 1 if any non-zero number, the same
 applies to the <tt>RightEnd</tt> as well, and <tt>MiddleLength</tt> is equal to <tt>!Scratchram_GraphicalBar_TempLength</tt> if
-<tt>!Scratchram_GraphicalBar_MiddlePiece</tt> is a nonzero number, and 0 otherwise.</td>
+<tt>!Scratchram_GraphicalBar_MiddlePiece</tt> is a nonzero number, and 0 otherwise.
+</td>
+</tr>
+<tr>
+<td>
+<tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$07</b></nobr></tt>
+</td>
+<td>
+Garbage:
+<ul>
+<li><tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$01</b></nobr></tt>:</li>
+<ul>
+<li>If the right end exist without regards of the middle and left end, will contain the right end amount.</li>
+<li>#$00 if right end does not exist and middle exist.</li>
+<li>If the left end only exist and middle and right are not, contains the left end amount.</li>
+</ul>
+
+<li><tt><nobr><b>$02</b></nobr></tt> to <tt><nobr><b>$07</b></nobr></tt>: Needed to move the values to another
+address due to subroutines as well as outputs of the subroutines.</li>
+</ul>
+</td>
+</tr>
+<tr>
+<td>
+<tt><nobr><b>$08</b></nobr></tt> to <tt><nobr><b>$09</b></nobr></tt>
+</td>
+<td>
+The amount of fill that was <tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$01</b></nobr></tt> was originally before calling this routine.
+Can be used on such things like &ldquo;stacked bars&rdquo; in which after the first bar fills up, it fills up again with another color.
+</td>
 </tr>
 </table>
 This is what it looks like as an example:
