@@ -38,10 +38,7 @@ WriteBarToHUD:
 	.Loop
 	LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\Write each tile.
 	STA [$00],y					;|
-	if !StatusBar_UsingCustomProperties
-		LDA.b #(!Default_StatusBar_TilePropertiesSetting | (!Default_LeftwardsBar<<6))
-		STA [$03],y
-	endif
+	
 	..Next
 	DEX
 	DEY #!StatusBarFormat
@@ -61,6 +58,10 @@ WriteBarToHUDLeftwards:
 	.Loop
 	LDA !Scratchram_GraphicalBar_FillByteTbl,x
 	STA [$00],y
+	if !StatusBar_UsingCustomProperties != 0
+		LDA.b #(!Default_StatusBar_TilePropertiesSetting|(!Default_LeftwardsBar<<6))
+		STA [$03],y
+	endif
 	
 	..Next
 	INY #!StatusBarFormat
