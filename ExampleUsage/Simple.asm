@@ -13,18 +13,6 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;This is a simple test ASM using the graphical bar.
 ;best tested using uberasm tool.
 
-;These (below) are tables to convert whats in !Scratchram_GraphicalBar_FillByteTbl to tile numbers.
-GraphicalBar_LeftEnd8x8s:
-	;    0   1   2   3
-	db $36,$37,$38,$39
-GraphicalBar_Middle8x8s:
-	;    0   1   2   3   4   5   6   7   8
-	db $55,$56,$57,$58,$59,$65,$66,$67,$68
-GraphicalBar_RightEnd8x8s:
-	;    0   1   2   3
-	db $50,$51,$52,$53
-	
-
 ;Be careful not to have the table shorter than the possible fill value, else glitched
 ;tiles will appear. (so there are 3 tile numbers (0/2 to 2/2) in table, and you have
 ;a fill value of 3 in the byte, this causes it to use a value past the last valid value
@@ -73,67 +61,4 @@ main:
 	else
 		JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards
 	endif
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;Write to status bar
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;.TransferBarTileNumberToHud:
-;if !StatusBarFormat == $01
-;	if !Default_LeftwardsBar == 0
-;		LDX.b #!GraphiBar_LeftTileExist+(!Default_MiddleLength*!GraphiBar_MiddleTileExist)+!GraphiBar_RightTileExist-1	;>Start loop counter
-
-;		..Loop
-;		LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\Store tile data into status bar tiles
-;		STA !GraphicalBarPos,x				;/
-;		DEX						;>Next tile
-;		BPL ..Loop					;>And loop
-;	else
-;		LDX.b #!GraphiBar_LeftTileExist+(!Default_MiddleLength*!GraphiBar_MiddleTileExist)+!GraphiBar_RightTileExist-1	;\Start loop
-;		LDY #$00						;/
-
-;		..Loop
-;		LDA !Scratchram_GraphicalBar_FillByteTbl,x		;\Transfer scratch to status bar
-;		STA !GraphicalBarPos,y					;/
-;		LDA.b #%01000000					;\Tile properties, use +$40 for minimalist status bars, $80 for SMB3. Note that leftwards does
-;		STA !GraphicalBarPos+$80,y				;/not work on smw's status bar (or future HUD patches that doesn't support tile properties stored in RAM.
-;		INY							;\Next tile
-;		DEX							;/
-;		BPL ..Loop						;>And loop
-;	endif
-;else
-;	if !Default_LeftwardsBar == 0
-;		LDX.b #((!GraphiBar_LeftTileExist+(!Default_MiddleLength*!GraphiBar_MiddleTileExist)+!GraphiBar_RightTileExist)*2)-2	;>Each 8x8 of SSB has 2 bytes
-;		LDY.b #(!GraphiBar_LeftTileExist+(!Default_MiddleLength*!GraphiBar_MiddleTileExist)+!GraphiBar_RightTileExist)-1	;>Each 8x8 of scratch is 1 byte each.
-
-;		..Loop
-;		PHX						;>Save SSB index
-;		TYX						;\LDA $xxxxxx,y does not exist
-;		LDA !Scratchram_GraphicalBar_FillByteTbl,x	;/
-;		PLX						;>Restore SSB index
-;		STA !GraphicalBarPos,x				;>Transfer to status bar tiles
-;		LDA #%00111000					;\Setup tile properties (bit 6 must be clear)
-;		STA !GraphicalBarPos+1,x			;/
-;		
-;		...Next
-;		DEY							;\Next tile
-;		DEX #2							;/
-;		BPL ..Loop						;>and loop
-;	else
-;		LDX.b #((!GraphiBar_LeftTileExist+(!Default_MiddleLength*!GraphiBar_MiddleTileExist)+!GraphiBar_RightTileExist)*2)-2	;>Status bar index
-;		LDY.b #$00							;>Scratch index
-
-;		..Loop
-;		PHX						;\Transfer to status bar tiles
-;		TYX						;|
-;		LDA !Scratchram_GraphicalBar_FillByteTbl,x	;|
-;		PLX						;|
-;		STA !GraphicalBarPos,x				;/
-;		LDA #%01111000					;\Setup tile properties (bit 6 must be set)
-;		STA !GraphicalBarPos+1,x			;/
-;		
-;		...Next
-;		INY						;\Next tile
-;		DEX #2						;/
-;		BPL ..Loop					;>And loop
-;	endif
-;endif
 	RTL
