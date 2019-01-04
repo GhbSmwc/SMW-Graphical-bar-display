@@ -301,6 +301,10 @@ CalculateGraphicalBarPercentage:
 ;  3) Nth number of empty bytes.
 ;  The numbers of each byte should total equal to the value stored in ram address
 ;  $00 prior.
+; -$08 to $09 are used for handling fill for each of the 3 groups of bytes
+;  (left, middle, and right). Once the routine is done, it's the amount of
+;  fill you have input for $00 to $01 (not capped to the value to be full
+;  if greater than).
 ;
 ;  Should the total amount of fill of the bar be greater than than the amount
 ;  needed to be full, the table act as if the bar is EXACTLY full (not exceeding);
@@ -316,18 +320,14 @@ CalculateGraphicalBarPercentage:
 ;  if MiddlePiece = zero (either 16 or 8-bit, this will be zero and will not be
 ;  included). This can be read as each byte means each 8x8 tile.
 ;Overwritten/Destroyed:
-; -$00 to $01: will be when this routine is finished:
-; --The amount right end contains if right end exist.
-; --#$00 if no right end exist but middle exist.
-; --The amount left end contains when middle and right end doesn't exist.
-; -$02 to $09: often used by other routines:
-; --$00 to $03 always used due to division routine.
-; --$04 to $07 are used by the multiplication routine should right end exist
-;   (right end piece is nonzero).
-; --$08 to $09 are used for handling fill for each of the 3 groups of bytes
-;   (left, middle, and right). Once the routine is done, it's the amount of
-;   fill you have input for $00 to $01 (not capped to the value to be full
-;   if greater than).
+; -$00 to $07: garbage:
+; --$00 to $01: will be when this routine is finished:
+; ---The amount right end contains if right end exist and no reguards to left
+;    end and middle.
+; ---#$00 if no right end exist but middle exist.
+; ---The amount left end contains when middle and right end doesn't exist.
+; --$02 to $07: needed to move values to another address due to subroutines,
+;   as well as outputs of the subroutines.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 DrawGraphicalBar:
 	if !Setting_GraphicalBar_IndexSize == 0
