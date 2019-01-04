@@ -16,18 +16,68 @@
 <body>
 
 <a href="../Readme.html#DoubleBar">Back</a><br><br>
-<a href="../ExampleUsage/DoubleBar.asm" target="_blank">See this ASM file</a> (again, link will break if moved or deleted). View
-<a href="DoubleBarFills.png" target="_blank">this image</a> for table format.<br>
 
 <h1><center>How a Double Bar works</h1>
-<center><img src="DoubleBarInfo.png"></center><br>
-Remember that this is a lyer 3 graphic using 2bpp (2 bits per pixel; 4 colors stored: 1 transparent and 3 other colors), thus, the texture of the filled region of the bar
-is now flat.<br><br>
-Just to warn you, because layer tiles cannot overlap each other if they are in the same layer, the tiles had to be combined in order to always display 2 fills correctly. This means that
-there a huge amount of combinations of the double-fill graphic (I've ordered the tiles with SecondFill increases until full byte/8x8 tile, then increments FirstFill by 1 and repeat):
-<center><img src="DoubleBarVRAMGraphic.png"></center><br>
-So be very careful when you have more pieces per 8x8, because that would add more tiles for both the two fills, taking up more space exponentially. Because of that, the amount of fill
-for handling each 8x8 tile are now 8-bit rather than 16. You can avoid that by using sprite OAM and have them literally overlap without combining them.<br><br>
+You have probably seen this type of bar: <img src="GraphicalBarFillsAnimation.gif"> in most video games that display health. This is common in fighting games
+and some RPG games that when the fill drops, part or all of the fill that is loss is represented as a separate fill. This represents the damage taken to the
+character.<br><br>
+
+There are two ways to do this using this graphical bar code:
+<table>
+<tr>
+<th>Rapid flicker</th>
+<th>Using differently colored fill</th>
+</tr>
+<td>
+<center><img src="DoubleBarFills_Flicker.gif"></center><br>
+Flickers between two fill values every other frame (frame 0 displays the current HP, for example, while frame 1 displays the previous before-damage HP)
+This gives a &ldquo;transparent&rdquo; appearance at 60 frames per second. The game, <i>Kirby Super Star Ultra</i> uses this mechanic.</td>
+<td>
+<center><img src="DoubleBarFills_AnotherColor.png"></center>
+Very graphic-expensive, as <a href="DoubleBarVRAMGraphic.png" target="_blank">each tile have its own combination of display of the two fills individually</a> as layer
+background tiles on the same layer cannot overlap. Not recommended for use due to this. Do note that you are limited to 4 colors on a 2BPP (2 bits per pixel) graphic
+(palette 0 is transparent, and palettes 1-3 are the actual colors)</td>
+</table><br>
+
+<h2>How this works</h2>
+These bars have two values stored in memory so that they are both represented as separate fills. It's essentially two bars merged into one. The code to do this is
+considerably different if you want the &ldquo;rapid-flicker&rdquo; or &ldquo;differently colored fill&rdquo;.
+<ul>
+<li><b>Rapid-flicker</b>: before you call <tt>JSL</tt> to <tt>DrawGraphicalBar</tt> (if you are using this on uberasm tool, you use <tt>GraphicalBarELITE_DrawGraphicalBar</tt>
+due to its library system), and write to <nobr><tt>$00-$01</tt></nobr>, you first check the frame counter. SMW's frame counter is RAM address $13 (counts even when frozen)
+and $14 (freezable frame counter, not recommended for use). And then you can determine should you use one of the two values to store to <nobr><tt>$00-$01</tt></nobr>:
+
+<table><tr><td><pre>	LDA $13			;\Frame counter [0-255] MOD 2
+	AND.b #%00000001	;/
+	BEQ .Frame0
+	
+	.Frame1
+	;Odd frame
+	;REP #$20
+	LDA <font color="red">&lt;Value1&gt;</font>
+	BRA .Write
+	
+	.Frame0
+	;Even frame
+	;REP #$20
+	LDA <font color="red">&lt;Value0&gt;</font>
+	
+	.Write
+	STA $00
+	;SEP #$20
+	JSL GraphicalBarELITE_DrawGraphicalBar
+	;...</pre></td></tr></table>
+Remove the semicolons in front of <nobr><tt>REP #$20</tt></nobr> and <nobr><tt>SEP #$20</tt></nobr> should your fill amount is ever a 16-bit number going over 255
+(very unlikely due to the screen is 256 pixels wide and each tile is normally up to 8 pieces per tile).
+
+</li>
+
+
+
+</ul>
+
+
+
 
 Here are some notes to keep in mind:
 <ul>
