@@ -111,11 +111,11 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
 	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
-	LDA.b #!GraphicalBarPos						;\Setup address to where to draw the bar.
+	LDA.b #<font color="yellow">!GraphicalBarPos</font>						;\Setup address to where to draw the bar.
 	STA $00								;|
-	LDA.b #!GraphicalBarPos>>8					;|
+	LDA.b #<font color="yellow">!GraphicalBarPos>>8</font>					;|
 	STA $01								;|
-	LDA.b #!GraphicalBarPos>>16					;|
+	LDA.b #<font color="yellow">!GraphicalBarPos>>16</font>					;|
 	STA $02								;/
 	if !Leftwards == 0							;\Write to status bar
 		JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;|
@@ -123,7 +123,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 		JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards		;|
 	endif									;/</pre></td></tr></table><br>
 Highlighted in red is the things you can change, while the green, you can edit values in the defines via opening up <tt>GraphicalBarDefines/StatusBarSettings.asm</tt>
-and changing those, and yes, you can safely redefine them when you have multiple bars. Of course you can also place fixed number (#$xx) directly in here as well.
+and changing those, and yes, you can safely redefine them when you have multiple bars. Yellow is the same as green, but it has to be a 3-byte (24-bit) address.
 <hr>
 <h2>ASM Documentation</h2>
 
@@ -270,7 +270,9 @@ This is what it looks like as an example:
 <td>
 
 
-<pre>                                     Table: <span style="background-color: orange">$03</span>,<span style="background-color: orange">$08</span>,<span style="background-color: orange">$08</span>,<span style="background-color: yellow"><font color="black">$04</font></span>,<span style="background-color: grey">$00</span>,<span style="background-color: grey">$00</span>,<span style="background-color: grey">$00</span>,<span style="background-color: grey">$00</span>,<span style="background-color: grey">$00</span>
+<pre>ASCII art depicting the byte table and how each byte correlates to the table.
+
+                                     Table: <span style="background-color: orange">$03</span>,<span style="background-color: orange">$08</span>,<span style="background-color: orange">$08</span>,<span style="background-color: yellow"><font color="black">$04</font></span>,<span style="background-color: grey">$00</span>,<span style="background-color: grey">$00</span>,<span style="background-color: grey">$00</span>,<span style="background-color: grey">$00</span>,<span style="background-color: grey">$00</span>
                                              |   |   |   |   |   |   |   |   |
 <font color="cyan">!Scratchram_GraphicalBar_FillByteTbl+0</font> ------/   |   |   |   |   |   |   |   |
 <font color=#00C000>!Scratchram_GraphicalBar_FillByteTbl+1</font> ----------/   |   |   |   |   |   |   |
@@ -528,12 +530,8 @@ the attributes being used, but a new input is required:
 <td><tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$02</b></nobr></tt> (24-bit)</td>
 <td>The starting address (left end, extends rightwards, even when filling leftwards) to write the tile numbers to the status bar.</td>
 </tr>
-<tr>
-<td><tt><nobr><b>$03</b></nobr></tt> to <tt><nobr><b>$05</b></nobr></tt> (24-bit)</td>
-<td>Same as above, but for tile properties. (This only applies if you installed status bar patches that enable editing the properties
-in-game.)</td>
-</tr>
-</table>
+</table><br>
+
 Remember that this is low endian (The address $7E0F09, for example are stored in each bytes as
 <pre>$7E0000: $09
 $7E0001: $0F
@@ -544,11 +542,24 @@ Of course, because the <a href="https://www.smwcentral.net/?p=section&a=details&
 it will work on that as well (if <tt>!StatusBarFormat</tt> set to $02 and you make a different version of the routine <tt>ConvertBarFillAmountToTiles</tt> to use a different
 table to use OW layer 3 tiles).<br><br>
 
+<li><tt>WriteBarToHUDLeftwards</tt>: Same as above, but requires an even more additional input (this time, tile properties). This will write a X-flipped version that the bar
+now fills from right to left. Tiles arranged are flipped so the leftmost tile (including the end tiles) is now the right most, the second leftmost is second rightmost, and
+so on. If you didn't X-flip the tiles via editing the tile properties (YXPCCCTT), each tile won't be X-flipped but are still arranged backwards (when filling up, the rightmost
+tile fills towards the right and advances to the tile towards the left). In vanilla SMW, it is still possible to edit the tile properties (but cannot be changed in-game as the
+data is stored in ROM) at around address $008C81.</li>
+<table>
+<tr>
+<th>Input</th>
+<th>Description</th>
+</tr>
+<tr>
+<td><tt><nobr><b>$03</b></nobr></tt> to <tt><nobr><b>$05</b></nobr></tt> (24-bit)</td>
+<td>The starting address (left end, extends rightwards, even when filling leftwards) to write the tile properties to the status bar.
+(This only works if you installed status bar patches that enable editing the properties in-game.)</td>
+</tr>
+</table>
+
 
 </li>
-<li><tt>WriteBarToHUDLeftwards</tt>: Same as above but flipped to fill leftwards. Anything at the beginning of the tile table (the &ldquo;left side&rdquo;)
-will be placed on the right side, the second tile on the second rightmost spot and so on). Currently, if you try to do this without flipping the tiles via
-super status bar patch or editing around address $008C81 to change their <tt>YXPCCCTT</tt> properties, you end up with the left and right ends being
-inverted, and when the bar fills up, it fills up from left to right within each tile starting on the right and heading left.</li>
 </ul>
 </ol>
