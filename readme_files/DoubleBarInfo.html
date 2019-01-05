@@ -25,7 +25,7 @@ character.<br><br>
 There are two ways to do this using this graphical bar code:
 <table>
 <tr>
-<th>Rapid flicker</th>
+<th>Rapid-flicker</th>
 <th>Using differently colored fill</th>
 </tr>
 <td>
@@ -69,9 +69,66 @@ and $14 (freezable frame counter, not recommended for use). And then you can det
 	;...</pre></td></tr></table>
 Remove the semicolons in front of <nobr><tt>REP #$20</tt></nobr> and <nobr><tt>SEP #$20</tt></nobr> should your fill amount is ever a 16-bit number going over 255
 (very unlikely due to the screen is 256 pixels wide and each tile is normally up to 8 pieces per tile).
-
 </li>
+<li><b>Differently colored fill</b>: You actually have to call the graphical bar routines (<tt>DrawGraphicalBar</tt> and maybe
+<tt>CalculateGraphicalBarPercentage</tt>) twice, with the first one's table being moved to another location in memory:
+<table><tr><td><pre>	..GraphicalDoubleBarFirstFill
+	LDA !Freeram_FirstFill				;\Amount of fill for first fill
+	STA $00						;|
+	STZ $01						;/
+	
+	;Set attributes for both bars
+	LDA #!Default_LeftPieces			;\Left end pieces
+	STA !Scratchram_GraphicalBar_LeftEndPiece	;/
+	LDA #!Default_MiddlePieces			;\Middle pieces
+	STA !Scratchram_GraphicalBar_MiddlePiece	;/
+	LDA.b #!Default_MiddleLength			;\Middle length
+	STA !Scratchram_GraphicalBar_TempLength		;/
+	LDA #!Default_RightPieces			;\Right end pieces
+	STA !Scratchram_GraphicalBar_RightEndPiece	;/
+	JSL GraphicalBarELITE_DrawGraphicalBar		;>Get amount of fill.
 
+	...TransferFirstFillBar
+	;Relocate FirstFill table to another location (Located at !Scratchram_GraphicalBar_FillByteTbl + !GraphicalBar_TotalTileUsed)
+	;where !GraphicalBar_TotalTileUsed is 32 ($20 in hex) by default.
+	PHB
+	REP #$30
+	LDA.w #!GraphicalBar_TotalTileUsed-1								;>Number of bytes to transfer, -1 (because byte 0 is included)
+	LDX.w #!Scratchram_GraphicalBar_FillByteTbl							;>Source address
+	LDY.w #!Scratchram_GraphicalBar_FillByteTbl+!GraphicalBar_TotalTileUsed				;>Destination address
+	MVN (!Scratchram_GraphicalBar_FillByteTbl>>16), (!Scratchram_GraphicalBar_FillByteTbl>>16)	;>Move them
+	SEP #$30
+	PLB
+
+	..GraphicalDoubleBarSecondFill
+	;Thankfully the graphical bar routines does not mess up the scratch RAM inputs, therefore
+	;you only need to set them once.
+	LDA !Freeram_SecondFill							;\Amount of fill for second fill
+	STA $00									;|
+	STZ $01									;/
+	JSL GraphicalBarELITE_DrawGraphicalBar					;>Get amount of fill.
+	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTilesDoubleBar	;>Translate duo fill amount to tile numbers.
+	LDA.b #!Default_GraphicalBarPosition
+	STA $00
+	LDA.b #!Default_GraphicalBarPosition>>8
+	STA $01
+	LDA.b #!Default_GraphicalBarPosition>>16
+	STA $02
+	if !StatusBar_UsingCustomProperties != 0
+		LDA.b #!Default_GraphicalBarProperties
+		STA $03
+		LDA.b #!Default_GraphicalBarProperties>>8
+		STA $04
+		LDA.b #!Default_GraphicalBarProperties>>16
+		STA $05
+	endif
+	if !Default_LeftwardsBar == 0
+		JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;>Write to status bar
+	else
+		JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards
+	endif
+	RTL</pre></td></tr></table>
+</li>
 
 
 </ul>

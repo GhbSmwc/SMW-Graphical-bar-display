@@ -56,6 +56,27 @@
  !Default_LeftPieces                  = 3             ;\These will by default, set the RAM for the pieces for each section
  !Default_MiddlePieces                = 8             ;|
  !Default_RightPieces                 = 3             ;/
+ 
+ !GraphicalBar_TotalTileUsed          = 32
+ ;^The maximum number of 8x8 tile bytes you are going
+ ; to use (as in, if you have multiple bars with their own
+ ; lengths, the one the longest plus any of the two
+ ; existing end tiles is this number). This is only
+ ; needed during a code handling a double-bar. 32
+ ; tiles is the full width of the screen.
+ ;
+ ; This positions the secondary table containing "FirstFill"
+ ; !Scratchram_GraphicalBar_FillByteTbl plus this define,
+ ; resulting the tables to be like this (ASCII):
+ ;  SecondFill                     FirstFill
+ ;     |                               |
+ ;     V                               V
+ ; <=======>.......................<=======>
+ ;
+ ; < is left end.
+ ; = is middle tile.
+ ; > is right end.
+ ; . is unused RAM that can be garbage or used when bar is extended.
 
  !Default_LeftwardsBar                           = 0
   ;^0 = Fill from left to right

@@ -162,7 +162,7 @@ main:
 	PLB
 
 	..GraphicalDoubleBarSecondFill
-	;Thankfully the routine does not mess up the scratch RAM inputs, therefore
+	;Thankfully the graphical bar routines does not mess up the scratch RAM inputs, therefore
 	;you only need to set them once.
 	LDA !Freeram_SecondFill							;\Amount of fill for second fill
 	STA $00									;|
@@ -189,8 +189,3 @@ main:
 		JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards
 	endif
 	RTL
-
-	if !sa1 == 0
-		WaitCalculation:	;>The register to perform multiplication and division takes 8/16 cycles to complete.
-		RTS
-	endif

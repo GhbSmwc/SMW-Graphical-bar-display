@@ -17,9 +17,12 @@
 <center><h1>Graphical Bar ELITE</h1><br>
 By <a href="https://www.smwcentral.net/?p=profile&id=18802">GreenHammerBro</a></center><br>
 <hr>
-Note: This HTML uses ASCII art to represent something, so make sure you have your browser setting for <a href="https://en.wikipedia.org/wiki/Monospaced_font">fixed-width font</a> such as
-&ldquo;Consolas&rdquo; so it displays properly.
-
+Notes:
+<ul>
+<li>This HTML uses ASCII art to represent something, so make sure you have your browser setting for <a href="https://en.wikipedia.org/wiki/Monospaced_font">fixed-width font</a> such as
+&ldquo;Consolas&rdquo; so it displays properly.</li>
+<li>You must have at least some ASM knowledge. See this ASM tutorial <a href="https://www.smwcentral.net/?p=section&a=details&id=14268">here.</a></li>
+</ul>
 <h2>Introduction</h2>
 This is a guide on how to setup a display of a value of something as a graphical bar that you see in many games. Unlike some hacks like SMWCP2 and
 brutal Mario, which are 1-unit (or piece) per tiles, this package contains code to display multiple units per tile (8 units normally), as well as representing
@@ -83,8 +86,11 @@ but thats intentional as SMW's status bar is very limited.
 </li>
 </ol>
 <hr>
-<h2>Displaying a value of any RAM value</h2>
-Perhaps if you want to display something other than the provided examples above, here is the template:
+<h2>Displaying your own value as a graphical bar</h2>
+Perhaps if you want to display something other than the provided examples above, here are the templates:
+
+<ul>
+<li>A simple graphical bar.
 <table><tr><td><pre>incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;^These are needed so the defines relating to the graphical bars work.
@@ -99,23 +105,42 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	LDA <font color="red">&lt;Max_value_high_byte&gt;</font>				;\High byte above, same format as &lt;Value_high_byte&gt;, so do the same
 	STA !Scratchram_GraphicalBar_FillByteTbl+3		;/as that if your value is 8-bit.
 .InputGraphicalBarAttributes
-	LDA.b #<font color="green">!Default_LeftPieces</font>				;\Left end normally have 3 pieces.
+	LDA.b <font color="green">#!Default_LeftPieces</font>				;\Left end normally have 3 pieces.
 	STA !Scratchram_GraphicalBar_LeftEndPiece		;/
-	LDA.b #<font color="green">!Default_MiddlePieces</font>				;\Number of pieces in each middle byte/8x8 tile
+	LDA.b <font color="green">#!Default_MiddlePieces</font>				;\Number of pieces in each middle byte/8x8 tile
 	STA !Scratchram_GraphicalBar_MiddlePiece		;/
-	LDA.b #<font color="green">!Default_RightPieces</font>				;\Right end
+	LDA.b <font color="green">#!Default_RightPieces</font>				;\Right end
 	STA !Scratchram_GraphicalBar_RightEndPiece		;/
-	LDA.b #<font color="green">!Default_MiddleLength</font>				;\length (number of middle tiles)
+	LDA.b <font color="green">#!Default_MiddleLength</font>				;\length (number of middle tiles)
 	STA !Scratchram_GraphicalBar_TempLength			;/
 .ConvertToBar
-	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
+	<font color="orange">JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
+	
+	..RoundingDetect
+	CPY #$00						;\check rounding flags (Y is only #$00 to #$02)
+	BEQ ..BarWrite						;|
+	CPY #$01						;|
+	BEQ ..RoundedEmpty					;|
+	BRA ..RoundedFull					;>Of course, if Y cannot be 0 and 1, it has to be 2, so no extra checks.
+	
+	..RoundedEmpty
+	REP #$20
+	INC $00							;>if fill amount is a nonzero less than 0.5, make it display fillvalue = 1 to not display "empty".
+	SEP #$20
+	BRA ..BarWrite						;>and done
+
+	..RoundedFull
+	REP #$20
+	DEC $00							;>if fill amount is at least Max-0.5 and less than Max, make it display fillvalue = max-1 to not display "full".
+	SEP #$20</font>
+	
 	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
-	LDA.b #<font color="yellow">!GraphicalBarPos</font>						;\Setup address to where to draw the bar.
+	LDA.b <font color="yellow">#!GraphicalBarPos</font>						;\Setup address to where to draw the bar.
 	STA $00								;|
-	LDA.b #<font color="yellow">!GraphicalBarPos>>8</font>					;|
+	LDA.b <font color="yellow">#!GraphicalBarPos>>8</font>					;|
 	STA $01								;|
-	LDA.b #<font color="yellow">!GraphicalBarPos>>16</font>					;|
+	LDA.b <font color="yellow">#!GraphicalBarPos>>16</font>					;|
 	STA $02								;/
 	if !Leftwards == 0							;\Write to status bar
 		JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;|
@@ -124,6 +149,11 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	endif									;/</pre></td></tr></table><br>
 Highlighted in red is the things you can change, while the green, you can edit values in the defines via opening up <tt>GraphicalBarDefines/StatusBarSettings.asm</tt>
 and changing those, and yes, you can safely redefine them when you have multiple bars. Yellow is the same as green, but it has to be a 3-byte (24-bit) address.
+Orange means you can remove the rounding away code if you want the bar to be able to round towards empty or full.</li><br>
+
+<li>Double Bar. See <a name="DoubleBar" href="readme_files/DoubleBarInfo.html">this information</a>.</li>
+
+</ul>
 <hr>
 <h2>ASM Documentation</h2>
 
