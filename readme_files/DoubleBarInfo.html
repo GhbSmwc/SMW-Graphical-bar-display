@@ -33,10 +33,10 @@ There are two ways to do this using this graphical bar code:
 Flickers between two fill values every other frame (frame 0 displays the current HP, for example, while frame 1 displays the previous before-damage HP)
 This gives a &ldquo;transparent&rdquo; appearance at 60 frames per second. The game, <i>Kirby Super Star Ultra</i> uses this mechanic.</td>
 <td>
-<center><img src="DoubleBarFills_AnotherColor.png"></center>
+<center><img src="DoubleBarFills_AnotherColor.png"></center><br>
 Very graphic-expensive, as <a href="DoubleBarVRAMGraphic.png" target="_blank">each tile have its own combination of display of the two fills individually</a> as layer
 background tiles on the same layer cannot overlap. Not recommended for use due to this. Do note that you are limited to 4 colors on a 2BPP (2 bits per pixel) graphic
-(palette 0 is transparent, and palettes 1-3 are the actual colors)</td>
+(palette 0 is transparent, and palettes 1-3 are the actual colors).</td>
 </table><br>
 
 <h2>How this works</h2>
@@ -164,23 +164,12 @@ to convert the pairs of fill values into tile numbers (this will write to <nobr>
 
 You can set <nobr><tt>!GraphicalBar_TotalTileUsed</tt></nobr> to any number (beware of bank borders though), just be careful not to have your longest bar in your game to exceed this number
 (so if you have a bar that can go higher than 9 tile bytes long, and you set <nobr><tt>!GraphicalBar_TotalTileUsed</tt></nobr> to 9 or lower), else SecondFill will overwrite FirstFill
-and end up with glitched tiles.
+and end up with glitched tiles.<br><br>
+
+The table for the tiles to write to the status bar are formated <a href="DoubleBarFills.png"  target="_blank">like this</a>. FirstFill is the fill that is &ldquo;on top&rdquo; (overlaps)
+of SecondFill. The value in SecondFill is not how &ldquo;long&rdquo; the fill between the edge of FirstFill and the right edge of the fill of SecondFill, rather how &ldquo;long&rdquo;
+from the beginning side (left end or first middle tile) of the bar, thus of both FirstFill and SecondFill are a value of <tt>$0001</tt>, will only display FirstFill, while SecondFill
+is actually a nonzero value &ldquo;covered&rdquo; by FirstFill. Should SecondFill be <tt>$0002</tt> and the other is still <tt>$0001</tt>, you see 1 piece of first fill and 1 piece
+after that SecondFill.
 </li>
-
-
-</ul>
-
-
-
-
-Here are some notes to keep in mind:
-<ul>
-<li>The amount of fill for SecondFill does not measure from the edge of FirstFill, rather it measures from the leftmost of the bar like FirstFill would. So if you have 1
-for FirstFill and 5 for SecondFill, 4 SecondFill pieces appear just after FirstFill, not 5. Should SecondFill be less than or equal to FirstFill, it simply won't display.</li><br>
-
-<li>If you want something like this without having your graphics hogged up, there is an alternative way on doing this, by using &ldquo;pseudo transparency&rdquo;. By using a frame
-counter (best if it doesn't freeze on certain events, like address $13 when $9D is set in smw), make it display 2 values depending on the frame, preferably flicker every even or
-odd frames.</li><br>
-
-<li>There are more explanations in the ASM file linked here, and I wouldn't keep rambling about every detail, since it is very complex.</li>
 </ul>
