@@ -99,7 +99,7 @@ main:
 	STA !Freeram_SecondFill
 	
 .DisplayFillAmount
-	;This displays the hex numbers representing the two fill in the bar.
+	;This displays the hex numbers representing the two fills in the bar.
 	;Only works with Super Status Bar patch.
 	if !StatusBarFormat == $02
 		LDA !Freeram_FirstFill					;\every 16th number increments the 1st digit.
@@ -118,7 +118,6 @@ main:
 	endif
 
 .GraphicalDoubleBarTest
-	print "bug here.......................................",pc
 	if !DoubleBar_DisplayType == 0
 		LDA !Freeram_SecondFill		;\If secondfill is less than firstfill, don't show secondfill.
 		CMP !Freeram_FirstFill		;|over firstfill
@@ -146,13 +145,7 @@ main:
 		LDA !Freeram_FirstFill				;\Amount of fill for first fill
 		STA !Scratchram_GraphicalBar_FillByteTbl	;|
 	endif
-	LDA #$00						;\High byte of above. Should your value here is 8-bit or only 1 byte long,
-	STA !Scratchram_GraphicalBar_FillByteTbl+1		;/use [LDA #$00 : STA !Scratchram_GraphicalBar_FillByteTbl+1].
-	LDA #!DoubleBar_MaxQuantity				;\Max quantity (example: max HP). Can be a fixed value (#$) or adjustable RAM in-game.
-	STA !Scratchram_GraphicalBar_FillByteTbl+2		;/
-	LDA #$00						;\High byte above, same format as <Value_high_byte>, so do the same
-	STA !Scratchram_GraphicalBar_FillByteTbl+3		;/as that if your value is 8-bit.
-
+	JSR GetPercentageQuantity
 	LDA #!Default_LeftPieces				;\Left end pieces
 	STA !Scratchram_GraphicalBar_LeftEndPiece		;/
 	LDA #!Default_MiddlePieces				;\Middle pieces
@@ -163,25 +156,15 @@ main:
 	STA !Scratchram_GraphicalBar_RightEndPiece		;/
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
 	if !DoubleBar_RoundAway != 0
-		..RoundingDetect
-		CPY #$00						;\check rounding flags (Y is only #$00 to #$02)
-		BEQ ..BarWrite						;|
-		CPY #$01						;|
-		BEQ ..RoundedEmpty					;|
-		BRA ..RoundedFull					;>Of course, if Y cannot be 0 and 1, it has to be 2, so no extra checks.
-		
-		..RoundedEmpty
-		REP #$20
-		INC $00							;>if fill amount is a nonzero less than 0.5, make it display fillvalue = 1 to not display "empty".
-		SEP #$20
-		BRA ..BarWrite						;>and done
-
-		..RoundedFull
-		REP #$20
-		DEC $00							;>if fill amount is at least Max-0.5 and less than Max, make it display fillvalue = max-1 to not display "full".
-		SEP #$20
-		
-		..BarWrite
+		JSR RoundAway
+	endif
+	if and(notequal(!DoubleBar_DisplayType, 0), equal(!StatusBarFormat, $02))
+		LDA $00								;\every 16th number increments the 1st digit.
+		LSR #$04							;|
+		STA !FirstFillPercentHexValDisplayPos				;/
+		LDA $00								;\limit it to #$00-#$0F on 2nd digit digit.
+		AND #$0F							;|
+		STA !FirstFillPercentHexValDisplayPos+(1*!StatusBarFormat)	;/
 	endif
 	JSL GraphicalBarELITE_DrawGraphicalBar
 	if !DoubleBar_DisplayType == 0
@@ -202,33 +185,18 @@ main:
 		;you only need to set them once.
 		LDA !Freeram_SecondFill					;\Amount of fill for second fill
 		STA !Scratchram_GraphicalBar_FillByteTbl		;/
-		LDA #$00						;\High byte of above. Should your value here is 8-bit or only 1 byte long,
-		STA !Scratchram_GraphicalBar_FillByteTbl+1		;/use [LDA #$00 : STA !Scratchram_GraphicalBar_FillByteTbl+1].
-		LDA #!DoubleBar_MaxQuantity				;\Max quantity (example: max HP). Can be a fixed value (#$) or adjustable RAM in-game.
-		STA !Scratchram_GraphicalBar_FillByteTbl+2		;/
-		LDA #$00						;\High byte above, same format as <Value_high_byte>, so do the same
-		STA !Scratchram_GraphicalBar_FillByteTbl+3		;/as that if your value is 8-bit.
+		JSR GetPercentageQuantity
 		JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
 		if !DoubleBar_RoundAway != 0
-			...RoundingDetect
-			CPY #$00						;\check rounding flags (Y is only #$00 to #$02)
-			BEQ ...BarWrite						;|
-			CPY #$01						;|
-			BEQ ...RoundedEmpty					;|
-			BRA ...RoundedFull					;>Of course, if Y cannot be 0 and 1, it has to be 2, so no extra checks.
-			
-			...RoundedEmpty
-			REP #$20
-			INC $00							;>if fill amount is a nonzero less than 0.5, make it display fillvalue = 1 to not display "empty".
-			SEP #$20
-			BRA ...BarWrite						;>and done
-
-			...RoundedFull
-			REP #$20
-			DEC $00							;>if fill amount is at least Max-0.5 and less than Max, make it display fillvalue = max-1 to not display "full".
-			SEP #$20
-			
-			...BarWrite
+			JSR RoundAway
+		endif
+		if !StatusBarFormat == $02
+			LDA $00								;\every 16th number increments the 1st digit.
+			LSR #$04							;|
+			STA !SecondFillPercentHexValDisplayPos				;/
+			LDA $00								;\limit it to #$00-#$0F on 2nd digit digit.
+			AND #$0F							;|
+			STA !SecondFillPercentHexValDisplayPos+(1*!StatusBarFormat)	;/
 		endif
 		JSL GraphicalBarELITE_DrawGraphicalBar					;>Get amount of fill.
 		JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTilesDoubleBar
@@ -252,4 +220,73 @@ main:
 	else
 		JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards
 	endif
+	;Display both fill percentage when !DoubleBar_DisplayType is 0
+	;due to every other frame, doesn't have the info for both at the same frame.
+	if !DoubleBar_DisplayType == 0
+		.FirstFillPercentageRapidFlicker
+		LDA !Freeram_FirstFill				;\Amount of fill for first fill
+		STA !Scratchram_GraphicalBar_FillByteTbl		;/
+		JSR GetPercentageQuantity
+		JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
+		if !DoubleBar_RoundAway != 0
+			JSR RoundAway
+		endif
+		if !StatusBarFormat == $02
+			LDA $00								;\every 16th number increments the 1st digit.
+			LSR #$04							;|
+			STA !FirstFillPercentHexValDisplayPos				;/
+			LDA $00								;\limit it to #$00-#$0F on 2nd digit digit.
+			AND #$0F							;|
+			STA !FirstFillPercentHexValDisplayPos+(1*!StatusBarFormat)	;/
+		endif
+		.SecondFillPercentageRapidFlicker
+		LDA !Freeram_SecondFill					;\Amount of fill for second fill
+		STA !Scratchram_GraphicalBar_FillByteTbl		;/
+		JSR GetPercentageQuantity
+		JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
+		if !DoubleBar_RoundAway != 0
+			JSR RoundAway
+		endif
+		if !StatusBarFormat == $02
+			LDA $00								;\every 16th number increments the 1st digit.
+			LSR #$04							;|
+			STA !SecondFillPercentHexValDisplayPos				;/
+			LDA $00								;\limit it to #$00-#$0F on 2nd digit digit.
+			AND #$0F							;|
+			STA !SecondFillPercentHexValDisplayPos+(1*!StatusBarFormat)	;/
+		endif
+	endif
 	RTL
+	;-------------------------------------------------------------------------------------------------
+	GetPercentageQuantity:
+	LDA #$00						;\High byte of above. Should your value here is 8-bit or only 1 byte long,
+	STA !Scratchram_GraphicalBar_FillByteTbl+1		;/use [LDA #$00 : STA !Scratchram_GraphicalBar_FillByteTbl+1].
+	LDA #!DoubleBar_MaxQuantity				;\Max quantity (example: max HP). Can be a fixed value (#$) or adjustable RAM in-game.
+	STA !Scratchram_GraphicalBar_FillByteTbl+2		;/
+	LDA #$00						;\High byte above, same format as <Value_high_byte>, so do the same
+	STA !Scratchram_GraphicalBar_FillByteTbl+3		;/as that if your value is 8-bit.
+	RTS
+	if !DoubleBar_RoundAway != 0
+		RoundAway:
+		;output:
+		;$00 = percentage rounded away from empty and full.
+		CPY #$00						;\check rounding flags (Y is only #$00 to #$02)
+		BEQ .Done						;|
+		CPY #$01						;|
+		BEQ .RoundedEmpty					;|
+		BRA .RoundedFull					;>Of course, if Y cannot be 0 and 1, it has to be 2, so no extra checks.
+		
+		.RoundedEmpty
+		REP #$20
+		INC $00							;>if fill amount is a nonzero less than 0.5, make it display fillvalue = 1 to not display "empty".
+		SEP #$20
+		BRA .Done						;>and done
+
+		.RoundedFull
+		REP #$20
+		DEC $00							;>if fill amount is at least Max-0.5 and less than Max, make it display fillvalue = max-1 to not display "full".
+		SEP #$20
+		
+		.Done
+		RTS
+	endif

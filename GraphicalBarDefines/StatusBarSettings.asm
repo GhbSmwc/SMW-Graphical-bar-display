@@ -1,17 +1,17 @@
 ;Status bar stuff
  !StatusBarFormat                     = $01
- ;^Number of grouped bytes per 8x8 tile:
- ; $01 = Minimalist/SMB3 [TTTTTTTT, TTTTTTTT]...[YXPCCCTT, YXPCCCTT] or SMW's default.
- ; $02 = Super status bar/Overworld border plus [TTTTTTTT YXPCCCTT, TTTTTTTT YXPCCCTT]...
+  ;^Number of grouped bytes per 8x8 tile:
+  ; $01 = Minimalist/SMB3 [TTTTTTTT, TTTTTTTT]...[YXPCCCTT, YXPCCCTT] or SMW's default.
+  ; $02 = Super status bar/Overworld border plus [TTTTTTTT YXPCCCTT, TTTTTTTT YXPCCCTT]...
  
  !StatusBar_UsingCustomProperties           = 0
- ;^Set this to 0 if you are using the vanilla SMW status bar or any status bar patches
- ; that doesn't enable editing the tile properties, otherwise set this to 1 (you may
- ; have to edit "!Default_GraphicalBarProperties" in order for it to work though.).
+  ;^Set this to 0 if you are using the vanilla SMW status bar or any status bar patches
+  ; that doesn't enable editing the tile properties, otherwise set this to 1 (you may
+  ; have to edit "!Default_GraphicalBarProperties" in order for it to work though.).
  
  !Default_StatusBar_TilePropertiesSetting      = %00111000
- ;^Tile properties (if you enable editing properties in-game). Note: Bit 6 (X-flip) is
- ; forced to be set when !Default_LeftwardsBar is set to 1.
+  ;^Tile properties (if you enable editing properties in-game). Note: Bit 6 (X-flip) is
+  ; forced to be set when !Default_LeftwardsBar is set to 1.
  
  ;Tile positions. If you are using other status bar patches other than the Super Status Bar
  ;patch, make sure the RAMs here matches the RAM address those patch are using. By default:
@@ -58,25 +58,25 @@
  !Default_RightPieces                 = 3             ;/
  
  !GraphicalBar_TotalTileUsed          = 32
- ;^The maximum number of 8x8 tile bytes you are going
- ; to use (as in, if you have multiple bars with their own
- ; lengths, the one the longest plus any of the two
- ; existing end tiles is this number). This is only
- ; needed during a code handling a double-bar. 32
- ; tiles is the full width of the screen.
- ;
- ; This positions the secondary table containing "FirstFill"
- ; !Scratchram_GraphicalBar_FillByteTbl plus this define,
- ; resulting the tables to be like this (ASCII):
- ;  SecondFill                     FirstFill
- ;     |                               |
- ;     V                               V
- ; <=======>.......................<=======>
- ;
- ; < is left end.
- ; = is middle tile.
- ; > is right end.
- ; . is unused RAM that can be garbage or used when bar is extended.
+  ;^The maximum number of 8x8 tile bytes you are going
+  ; to use (as in, if you have multiple bars with their own
+  ; lengths, the one the longest plus any of the two
+  ; existing end tiles is this number). This is only
+  ; needed during a code handling a double-bar. 32
+  ; tiles is the full width of the screen.
+  ;
+  ; This positions the secondary table containing "FirstFill"
+  ; !Scratchram_GraphicalBar_FillByteTbl plus this define,
+  ; resulting the tables to be like this (ASCII):
+  ;  SecondFill                     FirstFill
+  ;     |                               |
+  ;     V                               V
+  ; <=======>.......................<=======>
+  ;
+  ; < is left end.
+  ; = is middle tile.
+  ; > is right end.
+  ; . is unused RAM that can be garbage or used when bar is extended.
 
  !Default_LeftwardsBar                           = 0
   ;^0 = Fill from left to right
@@ -88,27 +88,52 @@
   ; that is the case, flip the tiles in the file bin then or edit
   ; SMW's status bar table at address $008C81.
 
-;Double bar debugging
+;Double bar. Only works with the super status bar patch.
  if !sa1 == 0
   !FirstFillHexValDisplayPos           = $7FA036
  else
   !FirstFillHexValDisplayPos           = $404036
  endif
- ;Position of a hex number display of the amount of firstfill.
+  ;Position of a hex number display of the amount of firstfill.
 
  if !sa1 == 0
   !SecondFillHexValDisplayPos          = $7FA03C
  else
   !SecondFillHexValDisplayPos          = $40403C
  endif
- ;Same as above, but secondfill.
+  ;Same as above, but secondfill.
+ ;Same as above, but this is the "percent" fill.
+  if !sa1 == 0
+   !FirstFillPercentHexValDisplayPos   = $7FA076
+  else
+   !FirstFillPercentHexValDisplayPos   = $404076
+  endif
+  if !sa1 == 0
+   !SecondFillPercentHexValDisplayPos  = $7FA07C
+  else
+   !SecondFillPercentHexValDisplayPos  = $40407C
+  endif
 
-;RAM testing for how much fill in bar.
- !Freeram_FirstFill = $58
- ;^[1 byte] The amount of fill for the first fill
+ ;RAM testing for how much fill in bar.
+  !Freeram_FirstFill = $58
+   ;^[1 byte] The amount of fill for the first fill
 
- !Freeram_SecondFill = $5C
- ;^[1 byte] The amount of fill for the second fill
+  !Freeram_SecondFill = $5C
+   ;^[1 byte] The amount of fill for the second fill
+   
+ ;Display type
+  !DoubleBar_DisplayType = 1
+   ;0 = Use alternating frames (rapid flicker). Must use
+   ;    the non-double bar graphic.
+   ;1 = Use overlapping graphic (differently colored fill).
+   ;    This must have LG1 and LG2 use the double bar graphic.
+   
+  !DoubleBar_RoundAway = 1
+   ;0 = allow rounding towards empty and full
+   ;1 = force to round towards either 1 pieces or maximum-1.
+   
+  !DoubleBar_MaxQuantity = $FF
+   ;^The maximum value (max quantity) controlled by D-pad.
 
 
 ; ;Don't touch, these are used for loops to write to the status bar.
