@@ -43,29 +43,32 @@ background tiles on the same layer cannot overlap. Not recommended for use due t
 These bars have two values stored in memory so that they are both represented as separate fills. It's essentially two bars merged into one. The code to do this is
 considerably different if you want the &ldquo;rapid-flicker&rdquo; or &ldquo;differently colored fill&rdquo;.
 <ul>
-<li><b>Rapid-flicker</b>: before you call <tt>JSL</tt> to <tt>DrawGraphicalBar</tt> (if you are using this on uberasm tool, you use <tt>GraphicalBarELITE_DrawGraphicalBar</tt>
-due to its library system), and write to <nobr><tt>$00-$01</tt></nobr>, you first check the frame counter. SMW's frame counter is RAM address $13 (counts even when frozen)
-and $14 (freezable frame counter, not recommended for use). And then you can determine should you use one of the two values to store to <nobr><tt>$00-$01</tt></nobr>:
+<li><b>Rapid-flicker</b>: before you do any of the two:
+<table><tr><td><pre>	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
+	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.</pre></td></tr></table>
+you do this:
 
-<table><tr><td><pre>	LDA $13			;\Frame counter [0-255] MOD 2
+<table><tr><td><pre>	LDA !Freeram_SecondFill		;\If secondfill is less than firstfill, don't show secondfill.
+	CMP !Freeram_FirstFill		;|over firstfill
+	BCC .Frame0			;/
+	
+	LDA $13			;\Frame counter [0-255] MOD 2
 	AND.b #%00000001	;/
 	BEQ .Frame0
 	
 	.Frame1
 	;Odd frame
 	;REP #$20
-	LDA <font color="red">&lt;Value1&gt;</font>
+	LDA !Freeram_SecondFill
 	BRA .Write
 	
 	.Frame0
 	;Even frame
 	;REP #$20
-	LDA <font color="red">&lt;Value0&gt;</font>
+	LDA !Freeram_FirstFill
 	
 	.Write
 	STA $00
-	;SEP #$20
-	JSL GraphicalBarELITE_DrawGraphicalBar
 	;...</pre></td></tr></table>
 Remove the semicolons in front of <nobr><tt>REP #$20</tt></nobr> and <nobr><tt>SEP #$20</tt></nobr> should your fill amount is ever a 16-bit number going over 255
 (very unlikely due to the screen is 256 pixels wide and each tile is normally up to 8 pieces per tile).
