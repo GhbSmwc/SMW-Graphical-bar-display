@@ -19,7 +19,7 @@ By <a href="https://www.smwcentral.net/?p=profile&id=18802">GreenHammerBro</a></
 <hr>
 Notes:
 <ul>
-<li>This HTML uses ASCII art to represent something, so make sure you have your browser setting for <a href="https://en.wikipedia.org/wiki/Monospaced_font">fixed-width font</a> such as
+<li>This HTML uses <a href="https://en.wikipedia.org/wiki/ASCII_art">ASCII art</a> to represent something, so make sure you have your browser setting for <a href="https://en.wikipedia.org/wiki/Monospaced_font">fixed-width font</a> such as
 &ldquo;Consolas&rdquo; so it displays properly.</li>
 <li>You must have at least some ASM knowledge. See this ASM tutorial <a href="https://www.smwcentral.net/?p=section&a=details&id=14268">here.</a></li>
 </ul>
@@ -46,10 +46,11 @@ something, etc. as opposed to merely displaying digits.<br><br>
 <ol>
 <li>First make any necessary changes to the defines in <tt>GraphicalBarDefines</tt>. Assuming you testing this out on a clean ROM with nothing
 else besides LM making modifications, it is likely you don't have to edit anything. If you're planning to use the Super Status Bar patch, open
-<tt>StatusBarSettings.asm</tt> and change <nobr><tt>!StatusBarFormat</tt></nobr> to <tt>$02</tt> so that it displays properly.</li>
+<tt>StatusBarSettings.asm</tt> and change <nobr><tt>!StatusBarFormat</tt></nobr> to <tt>$02</tt> and <nobr><tt>!StatusBar_UsingCustomProperties</tt></nobr>
+to <tt>1</tt> so that it displays properly.</li>
 <li>Now paste the folders:
 <ul>
-<li><tt>GraphicalBarDefines</tt> (the whole folder) &rightarrow; Uberasm tool's main directory (same area as the .exe)</li>
+<li><tt>GraphicalBarDefines</tt> (the folder itself) &rightarrow; Uberasm tool's main directory (same area as the .exe)</li>
 <li><tt>GraphicalBarELITE.asm</tt> &rightarrow; Uberasm tool's <tt>library</tt>.</li>
 <li><b>Inside</b> the folder <tt>ExampleUsage</tt>, copy all the ASM files and paste them in Uberasm tool's <tt>level</tt>.</li>
 </ul></li>
@@ -63,8 +64,11 @@ level:
 <li>Insert the graphics by:
 <ol>
 <li>Create the &ldquo;ExGraphics&rdquo; if you haven't done so by clicking on the blue mushroom in Lunar Magic.</li>
-<li>Paste the graphic bin files (from this package's &ldquo;ExGraphics&rdquo; folder) of your choice into the other where your
-game resides. Then, take out the appended characters after the &ldquo;<tt>ExGFX&lt;number&gt;</tt>&rdquo; but before the &ldquo;<tt>.bin</tt>&rdquo;</li>
+<li>Paste the graphic bin files (from this package's &ldquo;ExGraphics&rdquo; folder) of your choice (If you want &ldquo;TransperentBackground&rdquo;
+(<img width="96" src="readme_files/TransperentBackground.png">) or &ldquo;BlackBackground&rdquo; (<img width="96" src="readme_files/BlackBackground.png">))
+into the other where your game resides. Then, take out the appended characters after the &ldquo;<tt>ExGFX&lt;number&gt;</tt>&rdquo; but before the &ldquo;<tt>.bin</tt>&rdquo;.<br><br>
+
+This readme assumes you're using &ldquo;TransperentBackground&rdquo;.</li><br>
 <li>Now in your level editor, click on the green poision mushroom to open a dialog about Layer 3 GFX bypass. On LG1, set that
 to use the graphic files (obviously the bin files are conveniently named to tell you what slot uses what file). Level 105
 and 106 LG1s to be slot 80, but for 104, it needs LG1 to be slot 81 and LG2 to be slot 82 to accommodate the large number of
@@ -74,7 +78,7 @@ tiles. Then hit OK and save to apply the changes.
 </li>
 <li>Now you are done:
 <ul>
-<li>Level 104 (Yoshi's house) is a double-bar, which can display two &ldquo;fills&rdquo; overlapping each other. Press right a couple of times, then up
+<li>Level 104 (Yoshi's house) is a double-bar, which can display two &ldquo;fills&rdquo; overlapping each other (<img width="96" src="readme_files/DoubleBarFills_AnotherColor.png">). Press right a couple of times, then up
 a handful of times to see.</li>
 <li>Level 105 (Yoshi's island 1) is a progress meter, keep heading right to see it fills up.</li>
 <li>Level 106 (Yoshi's island 2) is a coin meter, once 99 is reached, it should be full. It also avoids displaying 0% if if not 0 coins and 100% less than 99 coins,
@@ -114,9 +118,9 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	LDA.b <font color="green">#!Default_MiddleLength</font>				;\length (number of middle tiles)
 	STA !Scratchram_GraphicalBar_TempLength			;/
 .ConvertToBar
-	<font color="orange">JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
+	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
 	
-	..RoundingDetect
+	<font color="orange">..RoundingDetect
 	CPY #$00						;\check rounding flags (Y is only #$00 to #$02)
 	BEQ ..BarWrite						;|
 	CPY #$01						;|
@@ -269,8 +273,9 @@ address due to subroutines as well as outputs of the subroutines.</li>
 <tt><nobr><b>$08</b></nobr></tt> to <tt><nobr><b>$09</b></nobr></tt>
 </td>
 <td>
-The amount of fill that was <tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$01</b></nobr></tt> was originally before calling this routine.
-Can be used on such things like &ldquo;stacked bars&rdquo; in which after the first bar fills up, it fills up again with another color.
+The amount of fill that was <tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$01</b></nobr></tt> was originally before calling this routine, this also
+includes values greater max (it is uncapped). Can be used on such things like &ldquo;multi-bars&rdquo; that multiple bars are shown, and the fills advances
+to the next bar: <img src="readme_files/MultiBar.gif"
 </td>
 </tr>
 </table>
@@ -556,8 +561,11 @@ the attributes being used, but a new input is required:
 </tr>
 <tr>
 <td><tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$02</b></nobr></tt> (24-bit)</td>
-<td>The starting address (left end, extends rightwards, even when filling leftwards) to write the tile numbers to the status bar.</td>
+<td>The starting address (left end, extends rightwards, even when the bar is set to fill leftwards) to write the tile numbers to the status bar.</td>
 </tr>
+<td><tt><nobr><b>$03</b></nobr></tt> to <tt><nobr><b>$05</b></nobr></tt> (24-bit)</td>
+<td>The starting address (left end, extends rightwards, even when the bar is set to fill leftwards) to write the tile properties to the status bar.
+(This only works if you installed status bar patches that enable editing the properties in-game, else this is no longer needed to write values to this input).</td>
 </table><br>
 
 Remember that this is low endian (The address $7E0F09, for example are stored in each bytes as
@@ -570,22 +578,11 @@ Of course, because the <a href="https://www.smwcentral.net/?p=section&a=details&
 it will work on that as well (if <tt>!StatusBarFormat</tt> set to $02 and you make a different version of the routine <tt>ConvertBarFillAmountToTiles</tt> to use a different
 table to use OW layer 3 tiles).<br><br>
 
-<li><tt>WriteBarToHUDLeftwards</tt>: Same as above, but requires an even more additional input (this time, tile properties). This will write a X-flipped version that the bar
-now fills from right to left. Tiles arranged are flipped so the leftmost tile (including the end tiles) is now the right most, the second leftmost is second rightmost, and
-so on. If you didn't X-flip the tiles via editing the tile properties (YXPCCCTT), each tile won't be X-flipped but are still arranged backwards (when filling up, the rightmost
+<li><tt>WriteBarToHUDLeftwards</tt>: Same as above, but only works properly if you managed to set bit 6 of YXPCCCTT properties byte. This will write a X-flipped version that
+the bar now fills from right to left. Tiles arranged are flipped so the leftmost tile (including the end tiles) is now the right most, the second leftmost is second rightmost,
+and so on. If you didn't X-flip the tiles via editing the tile properties (YXPCCCTT), each tile won't be X-flipped but are still arranged backwards (when filling up, the rightmost
 tile fills towards the right and advances to the tile towards the left). In vanilla SMW, it is still possible to edit the tile properties (but cannot be changed in-game as the
 data is stored in ROM) at around address $008C81.</li>
-<table>
-<tr>
-<th>Input</th>
-<th>Description</th>
-</tr>
-<tr>
-<td><tt><nobr><b>$03</b></nobr></tt> to <tt><nobr><b>$05</b></nobr></tt> (24-bit)</td>
-<td>The starting address (left end, extends rightwards, even when filling leftwards) to write the tile properties to the status bar.
-(This only works if you installed status bar patches that enable editing the properties in-game.)</td>
-</tr>
-</table>
 
 
 </li>
