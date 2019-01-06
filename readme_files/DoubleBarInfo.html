@@ -69,7 +69,7 @@ and $14 (freezable frame counter, not recommended for use). And then you can det
 	;...</pre></td></tr></table>
 Remove the semicolons in front of <nobr><tt>REP #$20</tt></nobr> and <nobr><tt>SEP #$20</tt></nobr> should your fill amount is ever a 16-bit number going over 255
 (very unlikely due to the screen is 256 pixels wide and each tile is normally up to 8 pieces per tile).
-</li>
+</li><br>
 <li><b>Differently colored fill</b>: You actually have to call the graphical bar routines (<tt>DrawGraphicalBar</tt> and maybe
 <tt>CalculateGraphicalBarPercentage</tt>) twice, with the first one's table being moved to another location in memory:
 <table><tr><td><pre>	..GraphicalDoubleBarFirstFill
@@ -127,7 +127,44 @@ Remove the semicolons in front of <nobr><tt>REP #$20</tt></nobr> and <nobr><tt>S
 	else
 		JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards
 	endif
-	RTL</pre></td></tr></table>
+	RTL</pre></td></tr></table><br>
+	
+	Thus, assuming you left <nobr><tt>!GraphicalBar_TotalTileUsed</tt></nobr> equal to <tt>32</tt>, both ends set to 3
+	pieces, middle set to 8 pieces, and middle span 7 tile bytes long, the table of values
+	are laid out like this:
+<table><tr><td><pre>!Scratchram_GraphicalBar_FillByteTbl+0:  (left end)
+!Scratchram_GraphicalBar_FillByteTbl+1:  (SecondFill 1st middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+2:  (SecondFill 2nd middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+3:  (SecondFill 3rd middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+4:  (SecondFill 4th middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+5:  (SecondFill 5th middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+6:  (SecondFill 6th middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+7:  (SecondFill 7th and final middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+8:  (SecondFill right end)
+!Scratchram_GraphicalBar_FillByteTbl+9:  (unused garbage)
+!Scratchram_GraphicalBar_FillByteTbl+10: (unused garbage)
+!Scratchram_GraphicalBar_FillByteTbl+11: (unused garbage)
+;;;;;;;;;;;;;;;;;;;;;;;;
+;11 bytes later...
+;;;;;;;;;;;;;;;;;;;;;;;;
+!Scratchram_GraphicalBar_FillByteTbl+30: (unused garbage)
+!Scratchram_GraphicalBar_FillByteTbl+31: (unused garbage)
+!Scratchram_GraphicalBar_FillByteTbl+32: (FirstFill left end)
+!Scratchram_GraphicalBar_FillByteTbl+33: (FirstFill 1st middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+34: (FirstFill 2nd middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+35: (FirstFill 3rd middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+36: (FirstFill 4th middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+37: (FirstFill 5th middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+38: (FirstFill 6th middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+39: (FirstFill 7th and final middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+40: (FirstFill right end)</pre></td></tr></table>
+Now that both bar tiles are stored, the routine <nobr><tt>ConvertBarFillAmountToTilesDoubleBar</tt></nobr> in
+<nobr><tt>GraphicalBarConvertToTile.asm</tt></nobr> checks the two equivalent tiles to determine what index to use in order
+to convert the pairs of fill values into tile numbers (this will write to <nobr><tt>!Scratchram_GraphicalBar_FillByteTbl+0</tt></nobr>, not the other table address).<br><br>
+
+You can set <nobr><tt>!GraphicalBar_TotalTileUsed</tt></nobr> to any number (beware of bank borders though), just be careful not to have your longest bar in your game to exceed this number
+(so if you have a bar that can go higher than 9 tile bytes long, and you set <nobr><tt>!GraphicalBar_TotalTileUsed</tt></nobr> to 9 or lower), else SecondFill will overwrite FirstFill
+and end up with glitched tiles.
 </li>
 
 

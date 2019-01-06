@@ -52,28 +52,6 @@
 incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
-
- if !sa1 == 0
-  !FirstFillHexValDisplayPos           = $7FA036
- else
-  !FirstFillHexValDisplayPos           = $404036
- endif
- ;Position of a hex number display of the amount of firstfill.
-
- if !sa1 == 0
-  !SecondFillHexValDisplayPos          = $7FA03C
- else
-  !SecondFillHexValDisplayPos          = $40403C
- endif
- ;Same as above, but secondfill.
-
-;RAM testing for how much fill in bar.
- !Freeram_FirstFill = $58
- ;^[1 byte] The amount of fill for the first fill
-
- !Freeram_SecondFill = $5C
- ;^[1 byte] The amount of fill for the second fill
-
 ;Note that this does not use CalculateGraphicalBarPercentage, to ease the simplicity (it is already complex).
 
 main:

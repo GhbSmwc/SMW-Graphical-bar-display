@@ -88,6 +88,29 @@
   ; that is the case, flip the tiles in the file bin then or edit
   ; SMW's status bar table at address $008C81.
 
+;Double bar debugging
+ if !sa1 == 0
+  !FirstFillHexValDisplayPos           = $7FA036
+ else
+  !FirstFillHexValDisplayPos           = $404036
+ endif
+ ;Position of a hex number display of the amount of firstfill.
+
+ if !sa1 == 0
+  !SecondFillHexValDisplayPos          = $7FA03C
+ else
+  !SecondFillHexValDisplayPos          = $40403C
+ endif
+ ;Same as above, but secondfill.
+
+;RAM testing for how much fill in bar.
+ !Freeram_FirstFill = $58
+ ;^[1 byte] The amount of fill for the first fill
+
+ !Freeram_SecondFill = $5C
+ ;^[1 byte] The amount of fill for the second fill
+
+
 ; ;Don't touch, these are used for loops to write to the status bar.
 ;  !GraphiBar_LeftTileExist = 0
 ;  !GraphiBar_MiddleTileExist = 0
