@@ -52,12 +52,10 @@
 incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
-;Note that this does not use CalculateGraphicalBarPercentage, to ease the simplicity (it is already complex).
-
 main:
 .IncrementDecrementTest
 ..Vertical
-	LDA $16				;\Pressing up and down to adjust firstfill value
+	LDA $15				;\Pressing up and down to adjust firstfill value
 	BIT.b #%00001000		;|
 	BNE ...Up			;|
 	BIT.b #%00000100		;|
@@ -66,31 +64,37 @@ main:
 	
 	...Up
 	LDA !Freeram_FirstFill
+	CMP #!DoubleBar_MaxQuantity
+	BEQ ..Horizontal
 	INC A
 	STA !Freeram_FirstFill
 	BRA ..Horizontal
 	
 	...Down
 	LDA !Freeram_FirstFill
+	BEQ ..Horizontal
 	DEC A
 	STA !Freeram_FirstFill
 	
 	..Horizontal
-	LDA $16
-	BIT.b #%00000010
-	BNE ...Left
-	BIT.b #%00000001
-	BNE ...Right
+	LDA $15				;\SecondFill control
+	BIT.b #%00000010		;|
+	BNE ...Left			;|
+	BIT.b #%00000001		;|
+	BNE ...Right			;/
 	BRA .DisplayFillAmount
 	
 	...Left
 	LDA !Freeram_SecondFill
+	BEQ .DisplayFillAmount
 	DEC A
 	STA !Freeram_SecondFill
 	BRA .DisplayFillAmount
 	
 	...Right
 	LDA !Freeram_SecondFill
+	CMP #!DoubleBar_MaxQuantity
+	BEQ .DisplayFillAmount
 	INC A
 	STA !Freeram_SecondFill
 	
@@ -114,39 +118,121 @@ main:
 	endif
 
 .GraphicalDoubleBarTest
+	print "bug here.......................................",pc
+	if !DoubleBar_DisplayType == 0
+		LDA !Freeram_SecondFill		;\If secondfill is less than firstfill, don't show secondfill.
+		CMP !Freeram_FirstFill		;|over firstfill
+		BCC .Frame0			;/
+		
+		LDA $13			;\Frame counter [0-255] MOD 2
+		AND.b #%00000001	;/
+		BEQ .Frame0
+		
+		.Frame1
+		;Odd frame
+		;REP #$20
+		LDA !Freeram_SecondFill
+		BRA .Write
+		
+		.Frame0
+		;Even frame
+		;REP #$20
+		LDA !Freeram_FirstFill
+		
+		.Write
+		STA !Scratchram_GraphicalBar_FillByteTbl
+	else
+		..GraphicalDoubleBarFirstFill
+		LDA !Freeram_FirstFill				;\Amount of fill for first fill
+		STA !Scratchram_GraphicalBar_FillByteTbl	;|
+	endif
+	LDA #$00						;\High byte of above. Should your value here is 8-bit or only 1 byte long,
+	STA !Scratchram_GraphicalBar_FillByteTbl+1		;/use [LDA #$00 : STA !Scratchram_GraphicalBar_FillByteTbl+1].
+	LDA #!DoubleBar_MaxQuantity				;\Max quantity (example: max HP). Can be a fixed value (#$) or adjustable RAM in-game.
+	STA !Scratchram_GraphicalBar_FillByteTbl+2		;/
+	LDA #$00						;\High byte above, same format as <Value_high_byte>, so do the same
+	STA !Scratchram_GraphicalBar_FillByteTbl+3		;/as that if your value is 8-bit.
 
-	..GraphicalDoubleBarFirstFill
-	LDA !Freeram_FirstFill				;\Amount of fill for first fill
-	STA $00						;|
-	STZ $01						;/
-	LDA #!Default_LeftPieces			;\Left end pieces
-	STA !Scratchram_GraphicalBar_LeftEndPiece	;/
-	LDA #!Default_MiddlePieces			;\Middle pieces
-	STA !Scratchram_GraphicalBar_MiddlePiece	;/
-	LDA.b #!Default_MiddleLength			;\Middle length
-	STA !Scratchram_GraphicalBar_TempLength		;/
-	LDA #!Default_RightPieces			;\Right end pieces
-	STA !Scratchram_GraphicalBar_RightEndPiece	;/
-	JSL GraphicalBarELITE_DrawGraphicalBar		;>Get amount of fill.
+	LDA #!Default_LeftPieces				;\Left end pieces
+	STA !Scratchram_GraphicalBar_LeftEndPiece		;/
+	LDA #!Default_MiddlePieces				;\Middle pieces
+	STA !Scratchram_GraphicalBar_MiddlePiece		;/
+	LDA.b #!Default_MiddleLength				;\Middle length
+	STA !Scratchram_GraphicalBar_TempLength			;/
+	LDA #!Default_RightPieces				;\Right end pieces
+	STA !Scratchram_GraphicalBar_RightEndPiece		;/
+	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
+	if !DoubleBar_RoundAway != 0
+		..RoundingDetect
+		CPY #$00						;\check rounding flags (Y is only #$00 to #$02)
+		BEQ ..BarWrite						;|
+		CPY #$01						;|
+		BEQ ..RoundedEmpty					;|
+		BRA ..RoundedFull					;>Of course, if Y cannot be 0 and 1, it has to be 2, so no extra checks.
+		
+		..RoundedEmpty
+		REP #$20
+		INC $00							;>if fill amount is a nonzero less than 0.5, make it display fillvalue = 1 to not display "empty".
+		SEP #$20
+		BRA ..BarWrite						;>and done
 
-	...TransferFirstFillBar ;>FirstFill will be located just after SecondFill in memory address: <SecondFill_Table><FirstFill_Table>
-	PHB
-	REP #$30
-	LDA.w #!GraphicalBar_TotalTileUsed-1									;>Number of bytes to transfer, -1 (because byte 0 is included)
-	LDX.w #!Scratchram_GraphicalBar_FillByteTbl							;>Source address
-	LDY.w #!Scratchram_GraphicalBar_FillByteTbl+!GraphicalBar_TotalTileUsed					;>Destination address
-	MVN (!Scratchram_GraphicalBar_FillByteTbl>>16), (!Scratchram_GraphicalBar_FillByteTbl>>16)	;>Move them
-	SEP #$30
-	PLB
+		..RoundedFull
+		REP #$20
+		DEC $00							;>if fill amount is at least Max-0.5 and less than Max, make it display fillvalue = max-1 to not display "full".
+		SEP #$20
+		
+		..BarWrite
+	endif
+	JSL GraphicalBarELITE_DrawGraphicalBar
+	if !DoubleBar_DisplayType == 0
+		JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles
+	else
+		...TransferFirstFillBar ;>FirstFill will be located just after SecondFill in memory address: <SecondFill_Table><FirstFill_Table>
+		PHB
+		REP #$30
+		LDA.w #!GraphicalBar_TotalTileUsed-1									;>Number of bytes to transfer, -1 (because byte 0 is included)
+		LDX.w #!Scratchram_GraphicalBar_FillByteTbl							;>Source address
+		LDY.w #!Scratchram_GraphicalBar_FillByteTbl+!GraphicalBar_TotalTileUsed					;>Destination address
+		MVN (!Scratchram_GraphicalBar_FillByteTbl>>16), (!Scratchram_GraphicalBar_FillByteTbl>>16)	;>Move them
+		SEP #$30
+		PLB
 
-	..GraphicalDoubleBarSecondFill
-	;Thankfully the graphical bar routines does not mess up the scratch RAM inputs, therefore
-	;you only need to set them once.
-	LDA !Freeram_SecondFill							;\Amount of fill for second fill
-	STA $00									;|
-	STZ $01									;/
-	JSL GraphicalBarELITE_DrawGraphicalBar					;>Get amount of fill.
-	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTilesDoubleBar
+		..GraphicalDoubleBarSecondFill
+		;Thankfully the graphical bar routines does not mess up the scratch RAM inputs (other than !Scratchram_GraphicalBar_FillByteTbl), therefore
+		;you only need to set them once.
+		LDA !Freeram_SecondFill					;\Amount of fill for second fill
+		STA !Scratchram_GraphicalBar_FillByteTbl		;/
+		LDA #$00						;\High byte of above. Should your value here is 8-bit or only 1 byte long,
+		STA !Scratchram_GraphicalBar_FillByteTbl+1		;/use [LDA #$00 : STA !Scratchram_GraphicalBar_FillByteTbl+1].
+		LDA #!DoubleBar_MaxQuantity				;\Max quantity (example: max HP). Can be a fixed value (#$) or adjustable RAM in-game.
+		STA !Scratchram_GraphicalBar_FillByteTbl+2		;/
+		LDA #$00						;\High byte above, same format as <Value_high_byte>, so do the same
+		STA !Scratchram_GraphicalBar_FillByteTbl+3		;/as that if your value is 8-bit.
+		JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
+		if !DoubleBar_RoundAway != 0
+			...RoundingDetect
+			CPY #$00						;\check rounding flags (Y is only #$00 to #$02)
+			BEQ ...BarWrite						;|
+			CPY #$01						;|
+			BEQ ...RoundedEmpty					;|
+			BRA ...RoundedFull					;>Of course, if Y cannot be 0 and 1, it has to be 2, so no extra checks.
+			
+			...RoundedEmpty
+			REP #$20
+			INC $00							;>if fill amount is a nonzero less than 0.5, make it display fillvalue = 1 to not display "empty".
+			SEP #$20
+			BRA ...BarWrite						;>and done
+
+			...RoundedFull
+			REP #$20
+			DEC $00							;>if fill amount is at least Max-0.5 and less than Max, make it display fillvalue = max-1 to not display "full".
+			SEP #$20
+			
+			...BarWrite
+		endif
+		JSL GraphicalBarELITE_DrawGraphicalBar					;>Get amount of fill.
+		JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTilesDoubleBar
+	endif
 	LDA.b #!Default_GraphicalBarPosition
 	STA $00
 	LDA.b #!Default_GraphicalBarPosition>>8
