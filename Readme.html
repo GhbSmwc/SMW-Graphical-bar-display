@@ -150,7 +150,8 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 		JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;|
 	else									;|
 		JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards		;|
-	endif									;/</pre></td></tr></table><br>
+	endif									;/
+	RTL</pre></td></tr></table><br>
 Highlighted in red is the things you can change, while the green, you can edit values in the defines via opening up <tt>GraphicalBarDefines/StatusBarSettings.asm</tt>
 and changing those, and yes, you can safely redefine them when you have multiple bars. Yellow is the same as green, but it has to be a 3-byte (24-bit) address.
 Orange means you can remove the rounding away code if you want the bar to be able to round towards empty or full.</li><br>
@@ -548,7 +549,11 @@ Result:
 
 
 </li>
-</ul>
+<li><tt>ConvertBarFillAmountToTilesDoubleBar</tt>: Same as above, but handles a double-filled bar. Tiles are formated <a href="readme_files/DoubleBarFills.png" target="_blank">like this</a>.</li>
+
+</ul><br>
+
+
 <li>Inside <tt>GraphicalBarWriteToStatusBar.asm</tt></li>
 <ul>
 <li><tt>WriteBarToHUD</tt>: Writes the tiles to the HUD. Inputs are again, similar to <tt>CalculateGraphicalBarPercentage</tt> with only
