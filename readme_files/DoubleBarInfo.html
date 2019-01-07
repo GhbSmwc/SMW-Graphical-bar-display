@@ -45,7 +45,12 @@ considerably different if you want the &ldquo;rapid-flicker&rdquo; or &ldquo;dif
 <ul>
 <li><b>Rapid-flicker</b>: Template:
 
-<table><tr><td><pre>	LDA <font color="red">!Freeram_SecondQuantity</font>		;\If SecondQuantity is less than FirstQuantity, don't show secondfill.
+<table><tr><td><pre>incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
+incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
+;^These are needed so the defines relating to the graphical bars work.
+
+
+	LDA <font color="red">!Freeram_SecondQuantity</font>		;\If SecondQuantity is less than FirstQuantity, don't show secondfill.
 	CMP <font color="red">!Freeram_FirstQuantity</font>		;|over firstfill
 	BCC .Frame0				;/
 	
@@ -126,7 +131,11 @@ a slower flicker animation to accommodate this (however the flicker distinct fra
 <li><b>Differently colored fill</b>: You actually have to call the graphical bar routines (<tt>DrawGraphicalBar</tt> and maybe
 <tt>CalculateGraphicalBarPercentage</tt>) twice, with the first one's (<tt>FirstQuantity</tt>) table being moved to another location in memory.
 Oh, and because there are repeated codes, they are moved to subroutines to save space:
-<table><tr><td><pre>.FirstQuantity
+<table><tr><td><pre>incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
+incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
+;^These are needed so the defines relating to the graphical bars work.
+
+.FirstQuantity
 	LDA <font color="red">!Freeram_FirstQuantity</font>				;\Amount of fill for first fill
 	STA !Scratchram_GraphicalBar_FillByteTbl		;/
 	LDA <font color="red">#$00</font>						;\High byte of above. Should your value here is 8-bit or only 1 byte long,
