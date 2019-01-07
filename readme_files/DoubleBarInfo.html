@@ -117,6 +117,14 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	STA $01								;|
 	LDA.b <font color="yellow">#!Default_GraphicalBarPosition>>16</font>			;|
 	STA $02								;/
+	if !StatusBar_UsingCustomProperties != 0
+		LDA.b <font color="yellow">#!Default_GraphicalBarProperties</font>				;\Same as above but properties
+		STA $03								;|
+		LDA.b <font color="yellow">#!Default_GraphicalBarProperties>>8</font>			;|
+		STA $04								;|
+		LDA.b <font color="yellow">#!Default_GraphicalBarProperties>>16</font>			;|
+		STA $05								;/
+	endif
 	if !Default_LeftwardsBar == 0						;\Write to status bar
 		JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;|
 	else									;|
@@ -183,6 +191,14 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	STA $01									;|
 	LDA.b <font color="yellow">#!Default_GraphicalBarPosition>>16</font>				;|
 	STA $02									;/
+	if !StatusBar_UsingCustomProperties != 0
+		LDA.b <font color="yellow">#!Default_GraphicalBarProperties</font>				;\Same as above but properties
+		STA $03								;|
+		LDA.b <font color="yellow">#!Default_GraphicalBarProperties>>8</font>			;|
+		STA $04								;|
+		LDA.b <font color="yellow">#!Default_GraphicalBarProperties>>16</font>			;|
+		STA $05								;/
+	endif
 	if !Default_LeftwardsBar == 0						;\Write to status bar
 		JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;|
 	else									;|
@@ -234,7 +250,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 !Scratchram_GraphicalBar_FillByteTbl+10: (unused garbage)
 !Scratchram_GraphicalBar_FillByteTbl+11: (unused garbage)
 ;;;;;;;;;;;;;;;;;;;;;;;;
-;11 bytes later...
+;19 bytes later...
 ;;;;;;;;;;;;;;;;;;;;;;;;
 !Scratchram_GraphicalBar_FillByteTbl+30: (unused garbage)
 !Scratchram_GraphicalBar_FillByteTbl+31: (unused garbage)
@@ -261,4 +277,6 @@ from the beginning side (left end or first middle tile) of the bar, thus of both
 is actually a nonzero value &ldquo;covered&rdquo; by FirstFill. Should SecondFill be <tt>$0002</tt> and the other is still <tt>$0001</tt>, you see 1 piece of first fill and 1 piece
 after that SecondFill.
 </li>
-</ul>
+</ul><br>
+
+And thats it, be very careful as the quantity inputs data are loss when calling <tt>GraphicalBarELITE_DrawGraphicalBar</tt> due to the reused scratch RAM to save memory.
