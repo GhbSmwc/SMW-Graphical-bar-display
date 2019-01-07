@@ -136,17 +136,19 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	..RoundedFull
 	REP #$20
 	DEC $00							;>if fill amount is at least Max-0.5 and less than Max, make it display fillvalue = max-1 to not display "full".
-	SEP #$20</font>
+	SEP #$20
+	
+	..BarWrite</font>
 	
 	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
-	LDA.b <font color="yellow">#!GraphicalBarPos</font>						;\Setup address to where to draw the bar.
+	LDA.b <font color="yellow">#!Default_GraphicalBarPosition</font>				;\Setup address to where to draw the bar.
 	STA $00								;|
-	LDA.b <font color="yellow">#!GraphicalBarPos>>8</font>					;|
+	LDA.b <font color="yellow">#!Default_GraphicalBarPosition>>8</font>				;|
 	STA $01								;|
-	LDA.b <font color="yellow">#!GraphicalBarPos>>16</font>					;|
+	LDA.b <font color="yellow">#!Default_GraphicalBarPosition>>16</font>			;|
 	STA $02								;/
-	if !Leftwards == 0							;\Write to status bar
+	if !Default_LeftwardsBar == 0						;\Write to status bar
 		JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;|
 	else									;|
 		JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards		;|
@@ -156,7 +158,7 @@ Highlighted in red is the things you can change, while the green, you can edit v
 and changing those, and yes, you can safely redefine them when you have multiple bars. Yellow is the same as green, but it has to be a 3-byte (24-bit) address.
 Orange means you can remove the rounding away code if you want the bar to be able to round towards empty or full.</li><br>
 
-<li>Double Bar. See <a name="DoubleBar" href="readme_files/DoubleBarInfo.html">this information</a>.</li>
+<li>Double Bar. See <a name="DoubleBar" href="readme_files/DoubleBarInfo.html">this information</a>. The colored fonts last mentioned above code also applies here.</li>
 
 </ul>
 <hr>

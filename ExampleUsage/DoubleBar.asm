@@ -63,18 +63,18 @@ main:
 	BRA ..Horizontal		
 	
 	...Up
-	LDA !Freeram_FirstFill
+	LDA !Freeram_FirstQuantity
 	CMP #!DoubleBar_MaxQuantity
 	BEQ ..Horizontal
 	INC A
-	STA !Freeram_FirstFill
+	STA !Freeram_FirstQuantity
 	BRA ..Horizontal
 	
 	...Down
-	LDA !Freeram_FirstFill
+	LDA !Freeram_FirstQuantity
 	BEQ ..Horizontal
 	DEC A
-	STA !Freeram_FirstFill
+	STA !Freeram_FirstQuantity
 	
 	..Horizontal
 	LDA $15				;\SecondFill control
@@ -85,42 +85,42 @@ main:
 	BRA .DisplayFillAmount
 	
 	...Left
-	LDA !Freeram_SecondFill
+	LDA !Freeram_SecondQuantity
 	BEQ .DisplayFillAmount
 	DEC A
-	STA !Freeram_SecondFill
+	STA !Freeram_SecondQuantity
 	BRA .DisplayFillAmount
 	
 	...Right
-	LDA !Freeram_SecondFill
+	LDA !Freeram_SecondQuantity
 	CMP #!DoubleBar_MaxQuantity
 	BEQ .DisplayFillAmount
 	INC A
-	STA !Freeram_SecondFill
+	STA !Freeram_SecondQuantity
 	
 .DisplayFillAmount
 	;This displays the hex numbers representing the two fills in the bar.
 	;Only works with Super Status Bar patch.
 	if !StatusBarFormat == $02
-		LDA !Freeram_FirstFill					;\every 16th number increments the 1st digit.
+		LDA !Freeram_FirstQuantity				;\every 16th number increments the 1st digit.
 		LSR #$04						;|
 		STA !FirstFillHexValDisplayPos				;/
-		LDA !Freeram_FirstFill					;\limit it to #$00-#$0F on 2nd digit digit.
+		LDA !Freeram_FirstQuantity				;\limit it to #$00-#$0F on 2nd digit digit.
 		AND #$0F						;|
 		STA !FirstFillHexValDisplayPos+(1*!StatusBarFormat)	;/
 
-		LDA !Freeram_SecondFill					;\every 16th number increments the 1st digit.
+		LDA !Freeram_SecondQuantity				;\every 16th number increments the 1st digit.
 		LSR #$04						;|
 		STA !SecondFillHexValDisplayPos				;/
-		LDA !Freeram_SecondFill					;\limit it to #$00-#$0F on 2nd digit digit.
+		LDA !Freeram_SecondQuantity				;\limit it to #$00-#$0F on 2nd digit digit.
 		AND #$0F						;|
 		STA !SecondFillHexValDisplayPos+(1*!StatusBarFormat)	;/
 	endif
 
 .GraphicalDoubleBarTest
 	if !DoubleBar_DisplayType == 0
-		LDA !Freeram_SecondFill		;\If secondfill is less than firstfill, don't show secondfill.
-		CMP !Freeram_FirstFill		;|over firstfill
+		LDA !Freeram_SecondQuantity		;\If secondfill is less than firstfill, don't show secondfill.
+		CMP !Freeram_FirstQuantity		;|over firstfill
 		BCC .Frame0			;/
 		
 		LDA $13			;\Frame counter [0-255] MOD 2
@@ -130,19 +130,19 @@ main:
 		.Frame1
 		;Odd frame
 		;REP #$20
-		LDA !Freeram_SecondFill
+		LDA !Freeram_SecondQuantity
 		BRA .Write
 		
 		.Frame0
 		;Even frame
 		;REP #$20
-		LDA !Freeram_FirstFill
+		LDA !Freeram_FirstQuantity
 		
 		.Write
 		STA !Scratchram_GraphicalBar_FillByteTbl
 	else
 		..GraphicalDoubleBarFirstFill
-		LDA !Freeram_FirstFill				;\Amount of fill for first fill
+		LDA !Freeram_FirstQuantity				;\Amount of fill for first fill
 		STA !Scratchram_GraphicalBar_FillByteTbl	;|
 	endif
 	JSR GetPercentageQuantity
@@ -183,7 +183,7 @@ main:
 		..GraphicalDoubleBarSecondFill
 		;Thankfully the graphical bar routines does not mess up the scratch RAM inputs (other than !Scratchram_GraphicalBar_FillByteTbl), therefore
 		;you only need to set them once.
-		LDA !Freeram_SecondFill					;\Amount of fill for second fill
+		LDA !Freeram_SecondQuantity					;\Amount of fill for second fill
 		STA !Scratchram_GraphicalBar_FillByteTbl		;/
 		JSR GetPercentageQuantity
 		JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
@@ -224,7 +224,7 @@ main:
 	;due to every other frame, doesn't have the info for both at the same frame.
 	if !DoubleBar_DisplayType == 0
 		.FirstFillPercentageRapidFlicker
-		LDA !Freeram_FirstFill				;\Amount of fill for first fill
+		LDA !Freeram_FirstQuantity				;\Amount of fill for first fill
 		STA !Scratchram_GraphicalBar_FillByteTbl		;/
 		JSR GetPercentageQuantity
 		JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
@@ -240,7 +240,7 @@ main:
 			STA !FirstFillPercentHexValDisplayPos+(1*!StatusBarFormat)	;/
 		endif
 		.SecondFillPercentageRapidFlicker
-		LDA !Freeram_SecondFill					;\Amount of fill for second fill
+		LDA !Freeram_SecondQuantity					;\Amount of fill for second fill
 		STA !Scratchram_GraphicalBar_FillByteTbl		;/
 		JSR GetPercentageQuantity
 		JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
