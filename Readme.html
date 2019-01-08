@@ -17,12 +17,6 @@
 <center><h1>Graphical Bar ELITE</h1><br>
 By <a href="https://www.smwcentral.net/?p=profile&id=18802">GreenHammerBro</a></center><br>
 <hr>
-Notes:
-<ul>
-<li>This HTML uses <a href="https://en.wikipedia.org/wiki/ASCII_art">ASCII art</a> to represent something, so make sure you have your browser setting for <a href="https://en.wikipedia.org/wiki/Monospaced_font">fixed-width font</a> such as
-&ldquo;Consolas&rdquo; so it displays properly.</li>
-<li>You must have at least some ASM knowledge. See this ASM tutorial <a href="https://www.smwcentral.net/?p=section&a=details&id=14268">here.</a></li>
-</ul>
 <h2>Introduction</h2>
 This is a guide on how to setup a display of a value of something as a graphical bar that you see in many games. Unlike some hacks like SMWCP2 and
 brutal Mario, which are 1-unit (or piece) per tiles, this package contains code to display multiple units per tile (8 units normally), as well as representing
@@ -30,6 +24,13 @@ a ratio of something with any number (1-65535) as the max.<br><br>
 
 The purpose of the code contained here is to represent something as a graphical bar to be used on various things like health, progress, percentage of
 something, etc. as opposed to merely displaying digits.<br><br>
+<h2>Notes</h2>
+<ul>
+<li>This HTML uses <a href="https://en.wikipedia.org/wiki/ASCII_art">ASCII art</a> to represent something, so make sure you have your browser setting for <a href="https://en.wikipedia.org/wiki/Monospaced_font">fixed-width font</a> such as
+&ldquo;Consolas&rdquo; so it displays properly.</li>
+<li>You must have at least some ASM knowledge. See this ASM tutorial <a href="https://www.smwcentral.net/?p=section&a=details&id=14268">here.</a></li>
+</ul>
+
 <hr>
 <h2>The resources you need</h2>
 <ul>
@@ -612,7 +613,7 @@ table to use OW layer 3 tiles).<br><br>
 the bar now fills from right to left. Tiles arranged are flipped so the leftmost tile (including the end tiles) is now the right most, the second leftmost is second rightmost,
 and so on. If you didn't X-flip the tiles via editing the tile properties (YXPCCCTT), each tile won't be X-flipped but are still arranged backwards (when filling up, the rightmost
 tile fills towards the right and advances to the tile towards the left). In vanilla SMW, it is still possible to edit the tile properties (but cannot be changed in-game as the
-data is stored in ROM) at around address $008C81.</li>
+data is stored in ROM) at around address <tt>$008C81</tt>.</li>
 </li>
 </ul>
 </ol>
@@ -694,5 +695,9 @@ RAM address $00-$01:                         $0048 (72)</pre></td></tr></table>
 </li>
 <li>You might've noticed the define <nobr><tt>!Settings_GraphicalBar_IndexSize</tt></nobr> found in <tt>GraphicalBarDefines.asm</tt>, I left that there in for some rare cases anyone
 would need a bar that is more than 255 tile bytes long (So a 16-bit addressing was needed).</li>
-
+</ul>
+<hr>
+<h2>Credits</h2>
+<ul>
+<li><a href="https://www.smwcentral.net/?p=profile&id=8691">Akaginite</a>, for making the math routines</li>
 </ul>
