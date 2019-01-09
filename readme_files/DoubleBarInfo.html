@@ -218,7 +218,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	BEQ .Done						;|
 	CPY #$01						;|
 	BEQ .RoundedEmpty					;|
-	BRA .RoundedFull					;>Of course, if Y cannot be 0 and 1, it has to be 2, so no extra checks.
+	BRA .RoundedFull					;/>Of course, if Y cannot be 0 and 1, it has to be 2, so no extra checks.
 	
 	.RoundedEmpty
 	REP #$20
@@ -237,7 +237,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	Thus, assuming you left <nobr><tt>!GraphicalBar_TotalTileUsed</tt></nobr> equal to <tt>32</tt>, both ends set to 3
 	pieces, middle set to 8 pieces, and middle span 7 tile bytes long, the table of values
 	are laid out like this:
-<table><tr><td><pre>!Scratchram_GraphicalBar_FillByteTbl+0:  (left end)
+<table><tr><td><pre>!Scratchram_GraphicalBar_FillByteTbl+0:  (SecondFill left end)
 !Scratchram_GraphicalBar_FillByteTbl+1:  (SecondFill 1st middle tile)
 !Scratchram_GraphicalBar_FillByteTbl+2:  (SecondFill 2nd middle tile)
 !Scratchram_GraphicalBar_FillByteTbl+3:  (SecondFill 3rd middle tile)
