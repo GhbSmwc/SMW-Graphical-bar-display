@@ -46,10 +46,9 @@ is much bigger than the number of pieces in the whole bar, resulting some of the
 <u>199*62/200 = 61.69 pieces filled &rightarrow; round to 62 (Y=$02)</u>
 200*62/200 = 62.00 pieces filled &rightarrow; round to 62 (Y=$00) - A truly full bar
 201*62/200 = 62.31 pieces filled &rightarrow; round to 62 (Y=$00)
-202*62/200 = 62.62 pieces filled &rightarrow; round to 63 (Y=$00) - will still display 62/62, as display is capped but fill amount is kept.</pre></td></tr></table>
-Note that the bar will not display values over the maximum, rather caps the value off without writing to it.<br><br>
+202*62/200 = 62.62 pieces filled &rightarrow; round to 63 (Y=$00) - will still display 62/62, but filled amount is still 63.</pre></td></tr></table>
 
 You may wondering why I rather have the information about the rounding towards empty or full (best to be called &ldquo;complete&rdquo;
 for both empty and full) to be as an output of <tt>CalculateGraphicalBarPercentage</tt> subroutine in Y than directly have $00 (amount of fill) set to #$0001 (the fill
-amount is 16-bit) or <tt>MaxFill-1</tt>. This is in case if you want to have <i>certain</i> bar(s) with the rounding <i>away</i> from either full or empty (say a percent
+amount is 16-bit) or <tt>MaxFill-1</tt> be in the routine. This is in case if you want to have <i>certain</i> bar(s) with the rounding <i>away</i> from either full or empty (say a percent
 completion bar ALLOWS rounding down to 0%, but forbids rounding up to 100% when 99.99%, while the HP bar is the other way around).

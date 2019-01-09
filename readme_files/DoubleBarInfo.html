@@ -264,8 +264,8 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 !Scratchram_GraphicalBar_FillByteTbl+39: (FirstFill 7th and final middle tile)
 !Scratchram_GraphicalBar_FillByteTbl+40: (FirstFill right end)</pre></td></tr></table>
 Now that both bar tiles are stored, the routine <nobr><tt>ConvertBarFillAmountToTilesDoubleBar</tt></nobr> in
-<nobr><tt>GraphicalBarConvertToTile.asm</tt></nobr> checks the two equivalent tiles to determine what index to use in order
-to convert the pairs of fill values into tile numbers (this will write to <nobr><tt>!Scratchram_GraphicalBar_FillByteTbl+0</tt></nobr>, not the other table address).<br><br>
+<nobr><tt>GraphicalBarConvertToTile.asm</tt></nobr> checks the two equivalent tiles (the two left ends, then the two first middle tile, second middles, and so on...) to determine
+what index to use in order to convert the pairs of fill values into tile numbers (this will write to <nobr><tt>!Scratchram_GraphicalBar_FillByteTbl+0</tt></nobr>, not the other table address).<br><br>
 
 You can set <nobr><tt>!GraphicalBar_TotalTileUsed</tt></nobr> to any number (beware of bank borders though), just be careful not to have your longest bar in your game to exceed this number
 (so if you have a bar that can go higher than 9 tile bytes long, and you set <nobr><tt>!GraphicalBar_TotalTileUsed</tt></nobr> to 9 or lower), else SecondFill will overwrite FirstFill
@@ -273,7 +273,7 @@ and end up with glitched tiles.<br><br>
 
 The table for the tiles to write to the status bar are formated <a href="DoubleBarFills.png"  target="_blank">like this</a>. FirstFill is the fill that is &ldquo;on top&rdquo; (overlaps)
 of SecondFill. The value in SecondFill is not how &ldquo;long&rdquo; the fill between the edge of FirstFill and the right edge of the fill of SecondFill, rather how &ldquo;long&rdquo;
-from the beginning side (left end or first middle tile) of the bar, thus of both FirstFill and SecondFill are a value of <tt>$0001</tt>, will only display FirstFill, while SecondFill
+from the beginning side (left end or first middle tile) of the bar, thus if both FirstFill and SecondFill are a value of <tt>$0001</tt>, will only display FirstFill, while SecondFill
 is actually a nonzero value &ldquo;covered&rdquo; by FirstFill. Should SecondFill be <tt>$0002</tt> and the other is still <tt>$0001</tt>, you see 1 piece of first fill and 1 piece
 after that SecondFill.
 </li>

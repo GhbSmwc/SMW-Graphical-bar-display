@@ -30,6 +30,8 @@ something, etc. as opposed to merely displaying digits.<br><br>
 <li>This HTML uses <a href="https://en.wikipedia.org/wiki/ASCII_art">ASCII art</a> to represent something, so make sure you have your browser setting for <a href="https://en.wikipedia.org/wiki/Monospaced_font">fixed-width font</a> such as
 &ldquo;Consolas&rdquo; so it displays properly.</li>
 <li>You must have at least some ASM knowledge. See this ASM tutorial <a href="https://www.smwcentral.net/?p=section&a=details&id=14268">here.</a></li>
+<li>Routines presented here assumes you are using uberasm tool and does not expect you to use on other things like sprites, so routine calls that are outside the routine files are
+named <nobr><tt>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</tt></nobr> as opposed to just <nobr><tt>&lt;RoutineName&gt;</tt></nobr>.</li>
 </ul>
 
 <hr>
@@ -47,7 +49,7 @@ something, etc. as opposed to merely displaying digits.<br><br>
 <h2>Installation (test run)</h2>
 <ol>
 <li>First make any necessary changes to the defines in <tt>GraphicalBarDefines</tt>. Assuming you testing this out on a clean ROM with nothing
-else besides LM making modifications, it is likely you don't have to edit anything. If you're planning to use the Super Status Bar patch, open
+else besides LM making modifications, it is likely you don't have to edit anything. However, if you're planning to use the Super Status Bar patch, open
 <tt>StatusBarSettings.asm</tt> and change <nobr><tt>!StatusBarFormat</tt></nobr> to <tt>$02</tt> and <nobr><tt>!StatusBar_UsingCustomProperties</tt></nobr>
 to <tt>1</tt> so that it displays properly.</li>
 <li>Now paste the folders:
@@ -81,7 +83,7 @@ tiles. Then hit OK and save to apply the changes.
 <li>Now you are done:
 <ul>
 <li>Level 104 (Yoshi's house) is a double-bar, which can display two &ldquo;fills&rdquo; overlapping each other (<img width="96" src="readme_files/DoubleBarFills_AnotherColor.png">). Press and hold right, then
-press and hold up to see. If you're using the super status bar patch, it will display 4 hex numbers at the top right, displaying the first column the amount and fill-percentage amount of FirstFill
+press and hold up to see. If you're using the Super Status Bar patch, it will display 4 hex numbers at the top right, displaying the first column the amount and fill-percentage amount of FirstFill
 and the other column for SecondFill.</li>
 <li>Level 105 (Yoshi's island 1) is a progress meter, keep heading right to see it fills up.</li>
 <li>Level 106 (Yoshi's island 2) is a coin meter, once 99 is reached, it should be full. It also avoids displaying 0% if if not 0 coins and 100% less than 99 coins,
@@ -109,7 +111,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	STA !Scratchram_GraphicalBar_FillByteTbl+1		;/use [LDA #$00 : STA !Scratchram_GraphicalBar_FillByteTbl+1].
 	LDA <font color="red">&lt;Max_value&gt;</font>						;\Max quantity (example: max HP). Can be a fixed value (#$) or adjustable RAM in-game.
 	STA !Scratchram_GraphicalBar_FillByteTbl+2		;/
-	LDA <font color="red">&lt;Max_value_high_byte&gt;</font>				;\High byte above, same format as &lt;Value_high_byte&gt;, so do the same
+	LDA <font color="red">&lt;Max_value_high_byte&gt;</font>				;\High byte of above, same format as &lt;Value_high_byte&gt;, so do the same
 	STA !Scratchram_GraphicalBar_FillByteTbl+3		;/as that if your value is 8-bit.
 .InputGraphicalBarAttributes
 	LDA.b <font color="green">#!Default_LeftPieces</font>				;\Left end normally have 3 pieces.
@@ -165,12 +167,12 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 		JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards		;|
 	endif									;/
 	RTL</pre></td></tr></table><br>
-Highlighted in red is the things you can change, while the green, you can edit values in the defines via opening up <tt>GraphicalBarDefines/StatusBarSettings.asm</tt>
-and changing those, and yes, you can safely redefine them when you have multiple bars. Yellow is the same as green, but it has to be a 3-byte (24-bit) address.
+Highlighted in red is the things you change, while the green, you edit values in the defines via opening up <tt>GraphicalBarDefines/StatusBarSettings.asm</tt>
+and changing those, and yes, you can safely redefine them when you have multiple bars for advanced use. Yellow is the same as green, but it has to be a 3-byte (24-bit) address.
 Orange means you can remove the rounding away code if you want the bar to be able to round towards empty or full. Of course, the <tt>#</tt> symbol means a fixed number
 instead of a RAM address.</li><br>
 
-<li>Double Bar. See <a name="DoubleBar" href="readme_files/DoubleBarInfo.html">this information</a>. The colored fonts last mentioned above code also applies here.</li>
+<li>Double Bar. See <a name="DoubleBar" href="readme_files/DoubleBarInfo.html">this information</a>. The colored fonts last mentioned above code also applies on codes here as well.</li>
 
 </ul>
 <hr>
@@ -180,7 +182,8 @@ Routine information:
 <ol>
 <li>Inside <tt>GraphicalBarELITE.asm</tt></li>
 <ul>
-<li><tt>CalculateGraphicalBarPercentage</tt>: Calculates the ratio of something over max. For example: 50/100 would output the amount of fill half of the maximum of the bar.</li>
+<li><tt>CalculateGraphicalBarPercentage</tt>: Calculates the ratio of Quantity over MaxQuantity to X over the number of pieces (the whole bar).
+For example: 50/100 on a 62-pieced bar outputs value of 31.</li>
 <table>
 <tr>
 <th>RAM input</th>
@@ -250,7 +253,8 @@ one byte holding the &ldquo;fraction&rdquo; and then a number of &ldquo;empty&rd
 you entered. The inputs are similar to the previously mentioned routine (such as requiring the attributes), but you don't write to <nobr><tt>!Scratchram_GraphicalBar_FillByteTbl</tt></nobr> to
 <nobr><tt>!Scratchram_GraphicalBar_FillByteTbl+3</tt></nobr>, as it is no longer needed. Just to keep in mind, the attributes are kept after running this routine, so you don't have to rewrite them again.
 <tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$01</b></nobr></tt> is the number of units (or pieces) filled as the input. It is important to note that this output table isn't tile numbers but rather
-<i>fill amounts</i>, to be indexed into tile numbers. The only different input here is <tt>$00</tt>:<br><br>
+<i>fill amounts</i>, to be indexed into tile numbers (to allow different tile graphic locations for the same routine (such as different format on the overworld compared to level)). The only different
+input here is <tt>$00</tt>:<br><br>
 
 <table>
 <tr>
@@ -273,17 +277,19 @@ Result:
 <tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl</b></nobr></tt> to <tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+X</b></nobr></tt>
 </td>
 <td>
-The table containing a series of bytes ordered from full, then one containing a fraction byte (it ranges from <tt>0</tt> to <tt>max-1</tt>), then a series of empty bytes.<br><br>
+The table containing a series of bytes ordered from full, then one containing a fraction byte (it ranges from <tt>0</tt> to <tt>max-1</tt>), then a series of empty bytes.
+Should the bar be more than full (say, 63 out of 62 pieces), the values stored in this table will act as if the bar is full and does not write higher values nor write
+additional bytes.<br><br>
 
 
 The ending address is
 <table><tr><td><pre>X = (LeftEnd + MiddleLength + RightEnd) - 1</pre></td></tr></table>
-And the number of tile bytes this table uses is the same formula but without the &ldquo;<tt>- 1</tt>&rdquo;.<br><br>
+And the number of bytes this table uses is the same formula above but without the &ldquo;<tt>- 1</tt>&rdquo;.<br><br>
 where:
 <ul>
 <li><tt>LeftEnd</tt> is 0 if the left end have 0 pieces and 1 if any non-zero number.</li>
 <li><tt>RightEnd</tt> is the same as above but for right end.</li>
-<li><tt>MiddleLength</tt> is equal to <tt>!Scratchram_GraphicalBar_TempLength</tt> if
+<li><tt>MiddleLength</tt> is equal to <tt>!Scratchram_GraphicalBar_TempLength</tt> (number of middle tiles) if
 <tt>!Scratchram_GraphicalBar_MiddlePiece</tt> is a nonzero number, and 0 otherwise.
 </ul>
 If you are using &ldquo;DoubleBar&rdquo;, it is the duplicate table of above, just located
@@ -315,9 +321,9 @@ address due to subroutines as well as outputs of the subroutines.</li>
 <tt><nobr><b>$08</b></nobr></tt> to <tt><nobr><b>$09</b></nobr></tt>
 </td>
 <td>
-The amount of fill that was <tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$01</b></nobr></tt> was originally before calling this routine, this also
-includes values greater max (it is uncapped). Can be used on such things like &ldquo;multi-bars&rdquo; that multiple bars are shown, and the fills advances
-to the next bar: <img src="readme_files/MultiBar.gif"
+The amount of fill that was <tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$01</b></nobr></tt> was originally before calling this routine, the value is not
+capped, so inputting a number 63 when there are 62 pieces will have this RAM address storing the value 63. Can be used on such things like &ldquo;multi-bars&rdquo; that multiple bars are shown, and the
+fills advances to the next bar: <img src="readme_files/MultiBar.gif"
 </td>
 </tr>
 </table>
@@ -602,8 +608,8 @@ Of course, the default graphics included here are pixel-column-based, meaning ea
 
 <li>Inside <tt>GraphicalBarWriteToStatusBar.asm</tt></li>
 <ul>
-<li><tt>WriteBarToHUD</tt>: Writes the tiles to the HUD. Inputs are again, similar to <tt>CalculateGraphicalBarPercentage</tt> with only
-the attributes being used, but a new input is required:
+<li><tt>WriteBarToHUD</tt>: Copies the tile numbers in the table to paste to (writes) the status bar (if you're using the Super Status Bar patch, the if statement and defines will adopt to that).
+Inputs are again, similar to <tt>CalculateGraphicalBarPercentage</tt> with only the attributes being used, but a new input is required:
 
 <table>
 <tr>
@@ -619,7 +625,6 @@ the attributes being used, but a new input is required:
 (This only works if you installed status bar patches that enable editing the properties in-game, else this is no longer needed to write values to this input).
 I deliberately used the if statement around this to prevent writing to an arbitrary address (the <nobr><tt>STA [$03],y</tt></nobr> could write to an invalid address).</td>
 </table><br>
-
 Remember that this is low endian (The address $7E0F09, for example are stored in each bytes as
 <pre>$7E0000: $09
 $7E0001: $0F

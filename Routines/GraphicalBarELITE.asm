@@ -300,7 +300,8 @@ CalculateGraphicalBarPercentage:
 ;  2) 1 "fraction" byte that contains a value ranging from 0 to max-1 inclusively.
 ;  3) Nth number of empty bytes.
 ;  The numbers of each byte should total equal to the value stored in ram address
-;  $00 prior.
+;  $00 prior. Should the bar be more than full, the table will act as if the bar
+;  full and will not store higher values nor write additional bytes.
 ; -$08 to $09 are used for handling fill for each of the 3 groups of bytes
 ;  (left, middle, and right). Once the routine is done, it's the amount of
 ;  fill you have input for $00 to $01 (not capped to the value to be full
