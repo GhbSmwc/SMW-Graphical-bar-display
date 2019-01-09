@@ -16,17 +16,23 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+x:
 ;  converted to tile numbers.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	;These are tile numbers. Each number, starting from the
+	;left represent each tile of pieces ordered from empty
+	;(0) to full (in this default number of pieces, it is 3
+	;for both ends and 8 for middles).
+	
+	;Tiles will glitch out if the number of pieces in the
+	;corresponding type of bar part (left middle and right)
+	;does not equal to the number of tile numbers +1 here.
 	GraphicalBar_LeftEnd8x8s:
 	;    0   1   2   3
-	db $36,$37,$38,$39
+	db $36,$37,$38,$39 ;>Left end fills 0-3 (there are 3 pieces by default)
 	GraphicalBar_Middle8x8s:
 	;    0   1   2   3   4   5   6   7   8
-	db $55,$56,$57,$58,$59,$65,$66,$67,$68
+	db $55,$56,$57,$58,$59,$65,$66,$67,$68 ;>Middle fills 0-8 (there are 8 pieces on each middle tile by default)
 	GraphicalBar_RightEnd8x8s:
 	;    0   1   2   3
-	db $50,$51,$52,$53
-	;^Tile numbers, ordered from 0 to maximum. This one assumes
-	; you're using GFX28, for the SMW's status bar.
+	db $50,$51,$52,$53 ;>Right end fills 0-3 (there are 3 pieces by default)
 	
 	ConvertBarFillAmountToTiles:
 	PHB						;>Preserve bank (so that table indexing work properly)
@@ -44,8 +50,8 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	LDA !Scratchram_GraphicalBar_LeftEndPiece	;\can only be either 0 or the correct number of pieces listed in the table.
 	BEQ .MiddleTranslate				;/
 	if !Setting_GraphicalBar_IndexSize == 0
-		LDA !Scratchram_GraphicalBar_FillByteTbl
-		TAY
+		LDA !Scratchram_GraphicalBar_FillByteTbl	;\Y = amount filled byte
+		TAY						;/
 	else
 		REP #$20
 		LDA !Scratchram_GraphicalBar_FillByteTbl
@@ -53,9 +59,9 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 		TAY
 		SEP #$20
 	endif
-	LDA GraphicalBar_LeftEnd8x8s,y
-	STA !Scratchram_GraphicalBar_FillByteTbl
-	INX						;>next tile
+	LDA GraphicalBar_LeftEnd8x8s,y				;\Convert byte to tile number byte
+	STA !Scratchram_GraphicalBar_FillByteTbl		;/
+	INX							;>next tile byte
 
 	.MiddleTranslate
 	LDA !Scratchram_GraphicalBar_MiddlePiece	;\check if middle exist.
@@ -64,8 +70,8 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	BEQ .RightEndTranslate				;/
 
 	if !Setting_GraphicalBar_IndexSize == 0
-		LDA !Scratchram_GraphicalBar_TempLength
-		STA $00
+		LDA !Scratchram_GraphicalBar_TempLength		;\Number of middle tiles to convert
+		STA $00						;/
 	else
 		REP #$20
 		LDA !Scratchram_GraphicalBar_TempLength
@@ -74,7 +80,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	endif
 	..Loop
 	if !Setting_GraphicalBar_IndexSize == 0
-		LDA !Scratchram_GraphicalBar_FillByteTbl,x
+		LDA !Scratchram_GraphicalBar_FillByteTbl,x	;>Y = the fill amount
 		TAY
 	else
 		LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\amount of filled, indexed
@@ -82,7 +88,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 		TAY						;/
 		SEP #$20
 	endif
-	LDA GraphicalBar_Middle8x8s,y			;\amount filled as graphics
+	LDA GraphicalBar_Middle8x8s,y			;\amount filled as tile graphics
 	STA !Scratchram_GraphicalBar_FillByteTbl,x	;/
 	
 	...Next
@@ -160,14 +166,13 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;increase exponentially, potentially won't even be able to fit in the VRAM storage area with
 ;that many 8x8 tiles.
 
-;Each row represents each possible values of FirstFill, while each column represents SecondFill.
-;Hope that makes sense.
-
 ;Be extra careful with the bank borders, 2 bar fill data tables are stored with
 ;!Scratchram_GraphicalBar_FillByteTbl being SecondFill and
 ;!Scratchram_GraphicalBar_FillByteTbl+!GraphicalBar_TotalTileUsed being FirstFill. Bank border is basically
 ;the line between $**FFFF and $XXFFFF, since the index addressing only handle 16-bit processing.
 
+;If you are editing the number of pieces in any bar parts here, the number of pieces must equal
+;to (NumberOfPieces+1)^2 number of values in the table here.
 GraphicalBar_LeftEnd8x8sDoubleBar:
 db $29,$2A,$2B,$2C    ;>(0;0), (0;1), (0;2), (0;3). When FirstFill = 0, and SecondFill is any value
 db $2D,$2D,$2F,$35    ;>(1;0), (1;1), (1;2), (1;3). When FirstFill = 1, and SecondFill is any value
