@@ -15,7 +15,8 @@
 	</head>
 <body>
 <center><h1>Graphical Bar ELITE</h1><br>
-By <a href="https://www.smwcentral.net/?p=profile&id=18802">GreenHammerBro</a></center><br>
+By <a href="https://www.smwcentral.net/?p=profile&id=18802">GreenHammerBro</a><br>
+See <a href="https://github.com/GhbSmwc/SMW-Graphical-bar-display">github</a>.</center>
 <hr>
 <h2>Introduction</h2>
 This is a guide on how to setup a display of a value of something as a graphical bar that you see in many games. Unlike some hacks like SMWCP2 and
@@ -174,7 +175,7 @@ instead of a RAM address.</li><br>
 <hr>
 <h2>ASM Documentation</h2>
 
-How this works:
+Routine information:
 <ol>
 <li>Inside <tt>GraphicalBarELITE.asm</tt></li>
 <ul>
@@ -210,8 +211,9 @@ the bar is full due to dividing by zero (known as &ldquo;max quantity&rdquo;).</
 or units in their respective byte or 8x8 tile. When 0, they are not included in the table. <tt>!Scratchram_GraphicalBar_TempLength</tt>
 is the number of repeated middle tile bytes between the left and right end tile bytes.<br><br>
 
-The reason why the pieces setup is RAM-based is so you can have other than 1-pixel-column-based pieces, for example, <a href="readme_files/LeftEndMorePieces.png" target="_blank">
-6 pieces for left end</a> and have a different number of pieces in the same routine.</td>
+The reason why the pieces setup is RAM-based is so you can have different number of pieces in any bar part (left, middle, and right), for example,
+<a href="readme_files/LeftEndMorePieces.png" target="_blank"> 6 pieces for left end</a> along with 3 in the same routine. However, you have to have
+both tables in the tile converter in <tt>GraphicalBarConvertToTile.asm</tt> to avoid glitched tiles.</td>
 </tr>
 <tr>
 </table>
@@ -270,10 +272,22 @@ Result:
 <tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl</b></nobr></tt> to <tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+X</b></nobr></tt>
 </td>
 <td>
-The table containing a series of bytes ordered from full, then one containing a fraction byte (it ranges from <tt>0</tt> to <tt>max-1</tt>), then a series of empty bytes. The ending address is
-<tt>X = (LeftEnd + MiddleLength + RightEnd) - 1</tt>, where <tt>LeftEnd</tt> is 0 if the left end have 0 pieces and 1 if any non-zero number, the same
-applies to the <tt>RightEnd</tt> as well, and <tt>MiddleLength</tt> is equal to <tt>!Scratchram_GraphicalBar_TempLength</tt> if
+The table containing a series of bytes ordered from full, then one containing a fraction byte (it ranges from <tt>0</tt> to <tt>max-1</tt>), then a series of empty bytes.<br><br>
+
+
+The ending address is
+<table><tr><td><pre>X = (LeftEnd + MiddleLength + RightEnd) - 1</pre></td></tr></table>
+And the number of tile bytes this table uses is the same formula but without the &ldquo;<tt>- 1</tt>&rdquo;.<br><br>
+where:
+<ul>
+<li><tt>LeftEnd</tt> is 0 if the left end have 0 pieces and 1 if any non-zero number.</li>
+<li><tt>RightEnd</tt> is the same as above but for right end.</li>
+<li><tt>MiddleLength</tt> is equal to <tt>!Scratchram_GraphicalBar_TempLength</tt> if
 <tt>!Scratchram_GraphicalBar_MiddlePiece</tt> is a nonzero number, and 0 otherwise.
+</ul>
+If you are using &ldquo;DoubleBar&rdquo;, it is the duplicate table of above, just located
+nth bytes after depending on what you set <nobr><tt>!GraphicalBar_TotalTileUsed</tt></nobr>.
+See more information ahead on the bytes diagram.
 </td>
 </tr>
 <tr>
@@ -572,10 +586,15 @@ Result:
 </td>
 </tr>
 </table><br>
-
+If you changed the number of pieces in any of the 3 parts of the bar (left, middle, and right), the number of pieces must equal to the number of values +1 (+1 because an empty tile byte is included)
+in the table corresponding to the bar part, for example, by making left end have 4 pieces instead of 3, you must have 5 values in the left end tile table. Else your tiles will glitch.
 
 </li>
-<li><tt>ConvertBarFillAmountToTilesDoubleBar</tt>: Same as above, but handles a double-filled bar. Tiles are formated <a href="readme_files/DoubleBarFills.png" target="_blank">like this</a>.</li>
+<li><tt>ConvertBarFillAmountToTilesDoubleBar</tt>: Same as above, but handles a double-filled bar. Tiles are formated <a href="readme_files/DoubleBarFills.png" target="_blank">like this</a>.
+Also like above, make sure you have the number of pieces equal to <tt>(NumberOfPieces+1)^2</tt> number of values in table (for example, left end have 4 pieces, therefore you must have 25 values;
+<tt>(4+1)^2 = 25</tt>). I recommend to have the table to form a perfect square so that the fill values are visually organized.</li><br>
+
+Of course, the default graphics included here are pixel-column-based, meaning each column of pixels is 1 piece of a bar.
 
 </ul><br>
 
@@ -596,7 +615,8 @@ the attributes being used, but a new input is required:
 </tr>
 <td><tt><nobr><b>$03</b></nobr></tt> to <tt><nobr><b>$05</b></nobr></tt> (24-bit)</td>
 <td>The starting address (left end, extends rightwards, even when the bar is set to fill leftwards) to write the tile properties to the status bar.
-(This only works if you installed status bar patches that enable editing the properties in-game, else this is no longer needed to write values to this input).</td>
+(This only works if you installed status bar patches that enable editing the properties in-game, else this is no longer needed to write values to this input).
+I deliberately used the if statement around this to prevent writing to an arbitrary address (the <nobr><tt>STA [$03],y</tt></nobr> could write to an invalid address).</td>
 </table><br>
 
 Remember that this is low endian (The address $7E0F09, for example are stored in each bytes as
@@ -638,6 +658,7 @@ Less optimized:
 <font color="scarlet">!Scratchram_GraphicalBar_RightEndPiece:      $08</font>
 <font color=#00C000>!Scratchram_GraphicalBar_TempLength:         $07</font>
 RAM address $00-$01:                         $0048 (72)</pre></td></tr></table>
+Result:
 <table>
 <tr>
 <td bgcolor="cyan"><font color="black"><tt>+0</tt></font></td>
@@ -668,6 +689,7 @@ Vs optimized:
 <font color="scarlet"><s>!Scratchram_GraphicalBar_RightEndPiece:      $00</s></font>
 <font color=#00C000>!Scratchram_GraphicalBar_TempLength:         $09</font>
 RAM address $00-$01:                         $0048 (72)</pre></td></tr></table>
+Result:
 <table>
 <tr>
 <td bgcolor=#00C000><tt>+0</tt></td>
@@ -692,9 +714,14 @@ RAM address $00-$01:                         $0048 (72)</pre></td></tr></table>
 <td bgcolor="orange"><tt>$08</tt></td>
 </tr>
 </table>
+The only difference is the FillAmount &rightarrow; TileNumber conversion <tt>ConvertBarFillAmountToTiles</tt> (and the doublebar version) that utilizes the tile number you need
+to change (Left end have 9 tiles with values 0-8 same as middle's 0-8 but uses a different array tiles to display a outlined-left edge and same goes to the right end).
 </li>
 <li>You might've noticed the define <nobr><tt>!Settings_GraphicalBar_IndexSize</tt></nobr> found in <tt>GraphicalBarDefines.asm</tt>, I left that there in for some rare cases anyone
 would need a bar that is more than 255 tile bytes long (So a 16-bit addressing was needed).</li>
+<li>Be careful when you call the routine <tt>WriteBarToHUD</tt> (and <tt>WriteBarToHUDLeftwards</tt>), as because this is multi-bytes based, it will write from
+<nobr><tt>!Default_GraphicalBarPosition</tt></nobr> to <nobr><tt>!Default_GraphicalBarPosition+(NumberOfTiles-1)</tt></nobr> address. Thus if you place the bar at RAM address
+<tt>$0F2F</tt>, the address bytes beyond that (which is non-status-bar-related data, from timer data, scores, then an unused RAM area ($0F3A) and so on) gets overwritten.</li>
 </ul>
 <hr>
 <h2>Credits</h2>
