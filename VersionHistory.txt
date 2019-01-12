@@ -400,3 +400,8 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
 
 12/30/2018 3.17 - removal due to diffcult setup and missing information.
  -See here: https://www.smwcentral.net/?p=viewthread&t=96028
+
+12/31/2018 3.17 - converter and status bar codes moved to subroutines.
+ -Seeing them as potential for being a subroutine, I moved them there.
+ -The "write to status bar" is more flexible now, as the number of tiles are now RAM based
+  instead of fixed numbers.
