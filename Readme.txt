@@ -46,12 +46,17 @@ How to insert:
    [500:025 FanBlock.asm] in the list folder.**
 
 3) Open UberasmTool_library/TOHFan.asm and paste that ASM file in uberasm
-   tool's library folder, in any level file that you are going to use the fan,
-   add this code: [JSL TOHFan_TowerOfHeavenFan] as "main". This must be
-   executed every frame.
+   tool's "library" folder, in any level file that you are going to use
+   the fan, add this code: [JSL TOHFan_TowerOfHeavenFan] as "main". This must
+   be executed every frame. It should look like this:
+[
+main:
+	JSL TOHFan_TowerOfHeavenFan
+	RTL
+]
 
    Due to how SMW runs the code in a certain sequence, the holding the jump
-   button when you get caought in the fand wind does not work properly when
+   button when you get caought in the fan wind does not work properly when
    executed within a Gamemode 14 due to this taking place AFTER the player
    gravity handling at $00D948 and before the controller update at $0021CA.
 
