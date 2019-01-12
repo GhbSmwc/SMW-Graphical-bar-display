@@ -1,3 +1,7 @@
+;This is separate from the main define file "GraphicalBarDefines.asm" because of these reasons:
+;-This is a preset setting, made for specific bars and not for all of them.
+;-The main define file covers all stuff using the graphical bar routines.
+
 ;Status bar stuff
  !StatusBarFormat                     = $01
   ;^Number of grouped bytes per 8x8 tile:
