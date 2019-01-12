@@ -274,7 +274,7 @@ main:
 		BEQ .Done						;|
 		CPY #$01						;|
 		BEQ .RoundedEmpty					;|
-		BRA .RoundedFull					;>Of course, if Y cannot be 0 and 1, it has to be 2, so no extra checks.
+		BRA .RoundedFull					;/>Of course, if Y cannot be 0 and 1, it has to be 2, so no extra checks.
 		
 		.RoundedEmpty
 		REP #$20
