@@ -1,0 +1,84 @@
+<html>
+	<head>
+		<style>
+			html {
+			background-color: #000207;
+			color: white;
+			font-family: sans-serif;
+			}
+			
+			table, th, td {
+			border: 1px solid white;
+			border-collapse: collapse;
+			}
+		</style>
+	</head>
+<body>
+
+<table>
+<tr>
+<td></td>
+<th>Values (a decimal integer 0-255)</th>
+
+</tr>
+<tr>
+<td>Left end piece:</td>
+<td><input type="number" id="LeftEndPiece" value="3" min="0" max="255" step="1"></td>
+</tr>
+<tr>
+<td>Middle piece:</td>
+<td><input type="number" id="MiddlePiece" value="8" min="0" max="255" step="1"></td>
+</tr>
+<tr>
+<td>Right end piece:</td>
+<td><input type="number" id="RightEndPiece" value="3" min="0" max="255" step="1"></td>
+</tr>
+<tr>
+<td>Middle length:</td>
+<td><input type="number" id="MiddleLength" value="7" min="0" max="255" step="1"></td>
+</tr>
+</table>
+<button type="button" onclick="Calculate()">Submit</button> <button type="button" onclick="Reset()">Reset</button><br>
+<hr>
+<table><tr><td><pre>
+<p id="Output">Empty</p>
+<p id="Output1"></p>
+</pre></td></tr></table></table>
+
+<script>
+	function Reset() {
+		document.getElementById("LeftEndPiece").value = "3";
+		document.getElementById("MiddlePiece").value = "8";
+		document.getElementById("RightEndPiece").value = "3";
+		document.getElementById("MiddleLength").value = "7";
+		
+		document.getElementById("Output").innerHTML = "Empty";
+		document.getElementById("Output1").innerHTML = "";
+	}
+	function Calculate() {
+		var LeftEndPiece = document.getElementById("LeftEndPiece").value
+		var MiddlePiece = document.getElementById("MiddlePiece").value
+		var RightEndPiece = document.getElementById("RightEndPiece").value
+		var MiddleLength = document.getElementById("MiddleLength").value
+		var LeftEndExist = 0
+		var MiddleExist = 0
+		var RightEndExist = 0
+		
+		if (LeftEndPiece != 0) {
+			LeftEndExist = 1
+		}
+		if ((MiddlePiece != 0 && MiddleLength != 0)) {
+			MiddleExist = parseInt(document.getElementById("MiddleLength").value)
+		}
+		if (RightEndPiece != 0) {
+			RightEndExist = 1
+		}
+		if (parseInt(LeftEndExist + MiddleExist + RightEndExist) == 0) {
+			document.getElementById("Output").innerHTML = ("No bytes used, nonexistent bar.")
+			document.getElementById("Output1").innerHTML = "";
+		} else {
+			document.getElementById("Output").innerHTML = ("Bytes used: " + parseInt(parseInt(LeftEndExist) + parseInt(MiddleExist) + parseInt(RightEndExist)) + " (valid indexes from $0 to $" + parseInt((LeftEndExist + MiddleExist + RightEndExist - 1)).toString(16) + ")")
+			document.getElementById("Output1").innerHTML = ("Total pieces: " + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)) + " ($" + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)).toString(16) + ")")
+		}
+	}
+</script>
