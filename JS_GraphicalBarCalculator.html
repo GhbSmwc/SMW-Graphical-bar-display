@@ -13,7 +13,8 @@
 			}
 		</style>
 	</head>
-<body>
+<body onload = setInterval(Calculate(), 1);>
+
 
 <table>
 <tr>
@@ -38,9 +39,10 @@
 <td><input type="number" id="MiddleLength" value="7" min="0" max="255" step="1"></td>
 </tr>
 </table>
-<button type="button" onclick="Calculate()">Submit</button> <button type="button" onclick="Reset()">Reset</button><br>
+
+<button type="button" onclick="Calculate()">Submit</button><button type="button" onclick="Reset()">Reset</button><br>
 <hr>
-<table><tr><td><pre>
+<table onclick="OutputSelect()"><tr><td><pre>
 <p id="Output">Empty</p>
 <p id="Output1"></p>
 </pre></td></tr></table></table>
@@ -55,7 +57,10 @@
 		document.getElementById("Output").innerHTML = "Empty";
 		document.getElementById("Output1").innerHTML = "";
 	}
-	function Calculate() {
+	
+	//setInterval(function(){Calculate()}, 1)
+	
+	function Calculate(){
 		var LeftEndPiece = document.getElementById("LeftEndPiece").value
 		var MiddlePiece = document.getElementById("MiddlePiece").value
 		var RightEndPiece = document.getElementById("RightEndPiece").value
@@ -73,12 +78,18 @@
 		if (RightEndPiece != 0) {
 			RightEndExist = 1
 		}
+		
+		var BarBytesTotal = parseInt(LeftEndExist) + parseInt(MiddleExist) + parseInt(RightEndExist)
+		
 		if (parseInt(LeftEndExist + MiddleExist + RightEndExist) == 0) {
 			document.getElementById("Output").innerHTML = ("No bytes used, nonexistent bar.")
 			document.getElementById("Output1").innerHTML = "";
 		} else {
-			document.getElementById("Output").innerHTML = ("Bytes used: " + parseInt(parseInt(LeftEndExist) + parseInt(MiddleExist) + parseInt(RightEndExist)) + " (valid indexes from $0 to $" + parseInt((LeftEndExist + MiddleExist + RightEndExist - 1)).toString(16) + ")")
+			document.getElementById("Output").innerHTML = ("Bytes used: " + parseInt(BarBytesTotal) + " (valid indexes from $0 to $" + parseInt((LeftEndExist + MiddleExist + RightEndExist - 1)).toString(16) + ")")
 			document.getElementById("Output1").innerHTML = ("Total pieces: " + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)) + " ($" + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)).toString(16) + ")")
 		}
+	}
+	function OutputSelect() {
+		return TableSelect = true
 	}
 </script>
