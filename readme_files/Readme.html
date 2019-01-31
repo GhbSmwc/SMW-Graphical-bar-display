@@ -1,0 +1,747 @@
+<html>
+	<head>
+		<style>
+			html {
+			background-color: #000207;
+			color: white;
+			font-family: sans-serif;
+			}
+			
+			table, th, td {
+			border: 1px solid white;
+			border-collapse: collapse;
+			}
+		</style>
+	</head>
+<body>
+<center><h1>Graphical Bar ELITE</h1><br>
+By <a href="https://www.smwcentral.net/?p=profile&id=18802">GreenHammerBro</a><br>
+See <a href="https://github.com/GhbSmwc/SMW-Graphical-bar-display">github</a>.</center>
+<hr>
+<h2>Introduction</h2>
+This is a guide on how to setup a display of a value of something as a graphical bar that you see in many games. Unlike some hacks like SMWCP2 and
+brutal Mario, which are 1-unit (or piece) per tiles, this package contains code to display multiple units per tile (8 units normally), as well as representing
+a ratio of something with any number (1-65535) as the max.<br><br>
+
+The purpose of the code contained here is to represent something as a graphical bar to be used on various things like health, progress, percentage of
+something, etc. as opposed to merely displaying digits.<br><br>
+<h2>Notes</h2>
+<ul>
+<li>This HTML uses <a href="https://en.wikipedia.org/wiki/ASCII_art">ASCII art</a> to represent something, so make sure you have your browser setting for <a href="https://en.wikipedia.org/wiki/Monospaced_font">fixed-width font</a> such as
+&ldquo;Consolas&rdquo; so it displays properly.</li>
+<li>You must have at least some ASM knowledge. See this ASM tutorial <a href="https://www.smwcentral.net/?p=section&a=details&id=14268">here.</a></li>
+<li>Routines presented here assumes you are using uberasm tool and does not expect you to use on other things like sprites, so routine calls that are outside the routine files are
+named <nobr><tt>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</tt></nobr> as opposed to just <nobr><tt>&lt;RoutineName&gt;</tt></nobr>.</li>
+</ul>
+
+<hr>
+<h2>The resources you need</h2>
+<ul>
+<li><a href="https://www.smwcentral.net/?p=section&a=details&id=18113">Uberasm tool</a>, needed for codes to run every frame.</li>
+<li><a href="https://www.smwcentral.net/?p=section&a=details&id=18716">Lunar Magic</a>, for level testing purposes.</li>
+</ul><br>
+
+<h3>Recommended resources</h3>
+<ul>
+<li><a href="https://www.smwcentral.net/?p=section&a=details&id=16031">Super Status Bar patch</a>, SMW's status bar (or, heads-up display (HUD)) space is really small.</li>
+</ul>
+<hr>
+<h2>Installation (test run)</h2>
+<ol>
+<li>First make any necessary changes to the defines in <tt>GraphicalBarDefines</tt>. Assuming you testing this out on a clean ROM with nothing
+else besides LM making modifications, it is likely you don't have to edit anything. However, if you're planning to use the Super Status Bar patch, open
+<tt>StatusBarSettings.asm</tt> and change <nobr><tt>!StatusBarFormat</tt></nobr> to <tt>$02</tt> and <nobr><tt>!StatusBar_UsingCustomProperties</tt></nobr>
+to <tt>1</tt> so that it displays properly.</li>
+<li>Now paste the folders:
+<ul>
+<li><tt>GraphicalBarDefines</tt> (the folder itself) &rightarrow; Uberasm tool's main directory (same area as the .exe)</li>
+<li><tt>GraphicalBarELITE.asm</tt> &rightarrow; Uberasm tool's <tt>library</tt>.</li>
+<li><b>Inside</b> the folder <tt>ExampleUsage</tt>, copy all the ASM files and paste them in Uberasm tool's <tt>level</tt>.</li>
+</ul></li>
+<li>Open uberasm tool's <tt>list.txt</tt>, and paste these so that the codes get inserted:
+<table><tr><td><pre>; Level list. Valid values: 000-1FF.
+level:
+104		DoubleBar.asm
+105		Simple.asm
+106		RoundAwayFromComplete.asm</pre></td></tr></table><br>
+</li>
+<li>Insert the graphics by:
+<ol>
+<li>Create the &ldquo;ExGraphics&rdquo; if you haven't done so by clicking on the blue mushroom in Lunar Magic.</li>
+<li>Paste the graphic bin files (from this package's &ldquo;ExGraphics&rdquo; folder) of your choice (If you want &ldquo;TransperentBackground&rdquo;
+(<img width="96" src="readme_files/TransperentBackground.png">) or &ldquo;BlackBackground&rdquo; (<img width="96" src="readme_files/BlackBackground.png">))
+into the other where your game resides. Then, take out the appended characters after the &ldquo;<tt>ExGFX&lt;number&gt;</tt>&rdquo; but before the &ldquo;<tt>.bin</tt>&rdquo;.<br><br>
+
+This readme assumes you're using &ldquo;TransperentBackground&rdquo;.</li><br>
+<li>Now in your level editor, click on the green poision mushroom to open a dialog about Layer 3 GFX bypass. On LG1, set that
+to use the graphic files (obviously the bin files are conveniently named to tell you what slot uses what file). Level 105
+and 106 LG1s to be slot 80, but for 104, it needs LG1 to be slot 81 and LG2 to be slot 82 to accommodate the large number of
+tiles. Then hit OK and save to apply the changes.
+</li>
+</ol>
+</li>
+<li>Now you are done:
+<ul>
+<li>Level 104 (Yoshi's house) is a double-bar, which can display two &ldquo;fills&rdquo; overlapping each other (<img width="96" src="readme_files/DoubleBarFills_AnotherColor.png">). Press and hold right, then
+press and hold up to see. If you're using the Super Status Bar patch (and have modified the defines so that the code adopts to it), it will display 4 hex numbers at the top right, displaying the first column the amount and fill-percentage amount of FirstFill
+and the other column for SecondFill.</li>
+<li>Level 105 (Yoshi's island 1) is a progress meter, keep heading right to see it fills up.</li>
+<li>Level 106 (Yoshi's island 2) is a coin meter, once 99 is reached, it should be full. It also avoids displaying 0% if if not 0 coins and 100% less than 99 coins,
+a failsafe measure to avoid misleading value displays.</li>
+</ul>
+
+If you're not using the Super Status Bar patch, the bar will be displayed over the word &ldquo;TIME&rdquo; and the coin symbol. The palette will be yellow on some areas,
+but thats intentional as SMW's status bar is very limited.
+</li>
+</ol>
+<hr>
+<h2>Displaying your own value as a graphical bar</h2>
+Perhaps if you want to display something other than the provided examples above, here are the templates:
+
+<ul>
+<li>A simple graphical bar.
+<table><tr><td><pre>incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
+incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
+;^These are needed so the defines relating to the graphical bars work.
+
+.InputRatio
+	LDA <font color="red">$0DBF|!addr</font>						;\Quantity low byte (example: current HP). Use RAM here.
+	STA !Scratchram_GraphicalBar_FillByteTbl		;/
+	LDA <font color="red">#$00</font>						;\High byte of above. Should your value here is 8-bit or only 1 byte long,
+	STA !Scratchram_GraphicalBar_FillByteTbl+1		;/use [LDA #$00 : STA !Scratchram_GraphicalBar_FillByteTbl+1].
+	LDA <font color="red">#$63</font>						;\Max quantity low byte (example: max HP). Can be a fixed value (#$) or adjustable RAM in-game.
+	STA !Scratchram_GraphicalBar_FillByteTbl+2		;/
+	LDA <font color="red">#$00</font>						;\High byte of above, same format as &lt;Value_high_byte&gt;, so do the same
+	STA !Scratchram_GraphicalBar_FillByteTbl+3		;/as that if your value is 8-bit.
+.InputGraphicalBarAttributes
+	LDA.b <font color="green">#!Default_LeftPieces</font>				;\Left end normally have 3 pieces.
+	STA !Scratchram_GraphicalBar_LeftEndPiece		;/
+	LDA.b <font color="green">#!Default_MiddlePieces</font>				;\Number of pieces in each middle byte/8x8 tile
+	STA !Scratchram_GraphicalBar_MiddlePiece		;/
+	LDA.b <font color="green">#!Default_RightPieces</font>				;\Right end
+	STA !Scratchram_GraphicalBar_RightEndPiece		;/
+	LDA.b <font color="green">#!Default_MiddleLength</font>				;\length (number of middle tiles)
+	STA !Scratchram_GraphicalBar_TempLength			;/
+.ConvertToBar
+	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
+	
+	<font color="orange">..RoundingDetect
+	CPY #$00						;\check rounding flags (Y is only #$00 to #$02)
+	BEQ ..BarWrite						;|
+	CPY #$01						;|
+	BEQ ..RoundedEmpty					;|
+	BRA ..RoundedFull					;/>Of course, if Y cannot be 0 and 1, it has to be 2, so no extra checks.
+	
+	..RoundedEmpty
+	REP #$20
+	INC $00							;>if fill amount is a nonzero less than 0.5, make it display fillvalue = 1 to not display "empty".
+	SEP #$20
+	BRA ..BarWrite						;>and done
+
+	..RoundedFull
+	REP #$20
+	DEC $00							;>if fill amount is at least Max-0.5 and less than Max, make it display fillvalue = max-1 to not display "full".
+	SEP #$20
+	
+	..BarWrite</font>
+	
+	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
+	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
+	LDA.b <font color="yellow">#!Default_GraphicalBarPosition</font>				;\Setup address to where to draw the bar.
+	STA $00								;|
+	LDA.b <font color="yellow">#!Default_GraphicalBarPosition>>8</font>				;|
+	STA $01								;|
+	LDA.b <font color="yellow">#!Default_GraphicalBarPosition>>16</font>			;|
+	STA $02								;/
+	if !StatusBar_UsingCustomProperties != 0
+		LDA.b <font color="yellow">#!Default_GraphicalBarProperties</font>				;\Same as above but properties
+		STA $03								;|
+		LDA.b <font color="yellow">#!Default_GraphicalBarProperties>>8</font>			;|
+		STA $04								;|
+		LDA.b <font color="yellow">#!Default_GraphicalBarProperties>>16</font>			;|
+		STA $05								;/
+	endif
+	if !Default_LeftwardsBar == 0						;\Write to status bar
+		JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;|
+	else									;|
+		JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards		;|
+	endif									;/
+	RTL</pre></td></tr></table><br>
+Font colored in red is the things you change, while the green, you edit values in the defines via opening up <tt>GraphicalBarDefines/StatusBarSettings.asm</tt>
+and changing those, and yes, you can safely redefine them when you have multiple bars for advanced use. Yellow is the same as green, but it has to be a 3-byte (24-bit) address.
+Orange means you can remove the rounding away code if you want the bar to be able to round towards empty or full. Of course, the <tt>#</tt> symbol means a fixed number
+instead of a RAM address.<br><br>
+
+Also if you are handling 16-bit mode quantity while on 8-bit accumulator, you write the 16-bit number <tt>#$1234</tt> (a fixed value not stored in RAM) as
+storing the <tt>#$34</tt> onto the low byte and <tt>#$12</tt> on the high byte (if it was RAM, it should be obvious, low byte written to low byte and high to high). Remember that
+the SNES is low-endian when the bytes are adjacent from one another in memory.</li><br>
+
+<li>Double Bar. See <a name="DoubleBar" href="readme_files/DoubleBarInfo.html">this information</a>. The colored fonts last mentioned above code also applies on codes here as well.</li>
+
+</ul>
+<hr>
+<h2>ASM Documentation</h2>
+
+Routine information:
+<ol>
+<li>Inside <tt>GraphicalBarELITE.asm</tt></li>
+<ul>
+<li><tt>CalculateGraphicalBarPercentage</tt>: Calculates the ratio of Quantity over MaxQuantity to X over the number of pieces (the whole bar).
+For example: 50/100 on a 62-pieced bar outputs value of 31.</li>
+<table>
+<tr>
+<th>RAM input</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>
+<tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl</b></nobr></tt> to
+<tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+1</b></nobr></tt> (16-bit)
+</td>
+<td>The number or amount of something out of the maximum (known as the &ldquo;quantity&rdquo;).</td>
+</tr>
+<tr>
+<td>
+<tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+2</b></nobr></tt> to
+<tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+3</b></nobr></tt> (16-bit)
+</td>
+<td>The maximum amount something. If this value is <tt>$0000</tt>, will assume
+the bar is full due to dividing by zero (known as &ldquo;max quantity&rdquo;).</td>
+</tr>
+<tr>
+<td>
+<tt><nobr><b>!Scratchram_GraphicalBar_LeftEndPiece</b></nobr></tt>,
+<tt><nobr><b>!Scratchram_GraphicalBar_MiddlePiece</b></nobr></tt>,
+<tt><nobr><b>!Scratchram_GraphicalBar_RightEndPiece</b></nobr></tt>, and
+<tt><nobr><b>!Scratchram_GraphicalBar_TempLength</b></nobr></tt> (8-bit each)
+</td>
+<td>Graphical bar attributes. The ones with the word &ldquo;piece&rdquo; refer to the number of pieces
+or units in their respective byte or 8x8 tile. When 0, they are not included in the table. <tt>!Scratchram_GraphicalBar_TempLength</tt>
+is the number of repeated middle tile bytes between the left and right end tile bytes.<br><br>
+
+The reason why the pieces setup is RAM-based is so you can have different number of pieces in any bar part (left, middle, and right), for example,
+<a href="readme_files/LeftEndMorePieces.png" target="_blank"> 6 pieces for left end</a> along with 3 in the same routine. However, you have to have
+both tables in the tile converter in <tt>GraphicalBarConvertToTile.asm</tt> to avoid glitched tiles.</td>
+</tr>
+<tr>
+</table>
+Result:
+<table>
+<tr>
+<th>Output:</th>
+<th>Description</th>
+</tr>
+<tr>
+<td><tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$01</b></nobr></tt> (16-bit)</td>
+<td>The amount of fill as a &ldquo;percentage&rdquo;. Calculated by <tt>FillAmount = RoundHalfUp(Quantity * TotalNumberOfPiecesInBar / MaxQuantity)</tt></td>
+</tr>
+<tr>
+<td><tt><nobr><b>Y register</b></nobr></tt></td>
+<td>Rounding towards empty and full indicator:
+<ul>
+<li>Y = $00 if not rounded to empty or full (if exact empty, rounded to any number besides 0 or maximum, or full (or higher))</li>
+<li>Y = $01 if rounded to empty.</li>
+<li>Y = $02 if rounded to full.</li>
+See more information <a name="RoundAwayFromComplete" href="readme_files/RoundAwayFromComplete.html">here</a>.
+</ul></td>
+</tr>
+<tr>
+<td><tt><nobr><b>$02</b></nobr></tt> to <tt><nobr><b>$09</b></nobr></tt></td>
+<td>Overwritten by math routines. Contains garbage values.</td>
+</tr>
+</tr>
+</table>
+
+<li><tt>DrawGraphicalBar</tt>: it takes a value representing how much fill in the bar, and represent them as individual tiles bytes table containing a number of them that is &ldquo;full&rdquo;,
+one byte holding the &ldquo;fraction&rdquo; and then a number of &ldquo;empty&rdquo; bytes after if any of them exist. If you were to add up each byte, the total would equal to the value the number of pieces
+you entered. The inputs are similar to the previously mentioned routine (such as requiring the attributes), but you don't write to <nobr><tt>!Scratchram_GraphicalBar_FillByteTbl</tt></nobr> to
+<nobr><tt>!Scratchram_GraphicalBar_FillByteTbl+3</tt></nobr>, as it is no longer needed. Just to keep in mind, the attributes are kept after running this routine, so you don't have to rewrite them again.
+<tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$01</b></nobr></tt> is the number of units (or pieces) filled as the input. It is important to note that this output table isn't tile numbers but rather
+<i>fill amounts</i>, to be indexed into tile numbers (to allow different tile graphic locations for the same routine (such as different format on the overworld compared to level)). The only different
+input here is <tt>$00</tt>:<br><br>
+
+<table>
+<tr>
+<th>Input</th>
+<th>Description</th>
+</tr>
+<tr>
+<td><tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$01</b></nobr></tt> (16-bit)</td>
+<td>The amount of fill in the bar, as in, the total number of pieces filled.<br><br>
+
+The number of pieces for a full bar is
+<tt>[FullAmount = LeftEndPieces + (MiddlePieces * MiddleLength) + RightEndPieces]</tt>, for example, a bar with 3 pieces
+on both ends, and 8 pieces for each of the 7 middle tiles will be <tt>[62 = 3 + (8 * 7) + 3]</tt>.</td>
+</tr>
+</table>
+Result:
+<table>
+<tr>
+<th>Output</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>
+<tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl</b></nobr></tt> to <tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+X</b></nobr></tt>
+</td>
+<td>
+The table containing a series of bytes ordered from full, then one containing a fraction byte (it ranges from <tt>0</tt> to <tt>max-1</tt>), then a series of empty bytes.
+Should the bar be more than full (say, 63 out of 62 pieces), the values stored in this table will act as if the bar is full and does not write higher values nor write
+additional bytes.<br><br>
+
+
+The ending address is
+<table><tr><td><pre>X = (LeftEnd + MiddleLength + RightEnd) - 1</pre></td></tr></table>
+And the number of bytes this table uses is the same formula above but without the &ldquo;<tt>- 1</tt>&rdquo;.<br><br>
+where:
+<ul>
+<li><tt>LeftEnd</tt> is 0 if the left end have 0 pieces and 1 if any non-zero number.</li>
+<li><tt>RightEnd</tt> is the same as above but for right end.</li>
+<li><tt>MiddleLength</tt> is equal to <tt>!Scratchram_GraphicalBar_TempLength</tt> (number of middle tiles) if
+<tt>!Scratchram_GraphicalBar_MiddlePiece</tt> is a nonzero number, and 0 otherwise.
+</ul>
+If you are using &ldquo;DoubleBar&rdquo;, it is the duplicate table of above, just located
+nth bytes after depending on what you set <nobr><tt>!GraphicalBar_TotalTileUsed</tt></nobr>.
+See more information ahead on the bytes diagram.
+</td>
+</tr>
+<tr>
+<td>
+<tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$07</b></nobr></tt>
+</td>
+<td>
+Garbage:
+<ul>
+<li><tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$01</b></nobr></tt>:</li>
+<ul>
+<li>If the right end exist without regards of the middle and left end, will contain the right end amount.</li>
+<li>#$00 if right end does not exist and middle exist.</li>
+<li>If the left end only exist and middle and right are not, contains the left end amount.</li>
+</ul>
+
+<li><tt><nobr><b>$02</b></nobr></tt> to <tt><nobr><b>$07</b></nobr></tt>: Needed to move the values to another
+address due to subroutines as well as outputs of the subroutines.</li>
+</ul>
+</td>
+</tr>
+<tr>
+<td>
+<tt><nobr><b>$08</b></nobr></tt> to <tt><nobr><b>$09</b></nobr></tt>
+</td>
+<td>
+The amount of fill that was <tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$01</b></nobr></tt> was originally before calling this routine, the value is not
+capped, so inputting a number 63 when there are 62 pieces will have this RAM address storing the value 63. Can be used on such things like &ldquo;multi-bars&rdquo; that multiple bars are shown, and the
+fills advances to the next bar: <img src="readme_files/MultiBar.gif"
+</td>
+</tr>
+</table>
+This is what it looks like as an example:
+<ul>
+<li><font color="cyan">Cyan</font> means the left end tile byte.</li>
+<li><font color=#00C000>Green</font> means the middle tile byte(s).</li>
+<li><font color="scarlet">Red</font> means right end tile byte.</li>
+<li><font color="orange">Orange </font> means the tile byte is full or reaches maximum.</li>
+<li><font color="yellow">Yellow</font> means the tile byte is between 0 to max-1 inclusively (known as a fraction tile).</li>
+<li><font color="grey">Grey</font> means the tile byte is empty.</li><br>
+</ul>
+<table>
+<tr>
+<td>
+<pre>;These three are what sets the maximum fill values for the byte table.
+ <font color="cyan">!Scratchram_GraphicalBar_LeftEndPiece:      $03</font>
+ <font color=#00C000>!Scratchram_GraphicalBar_MiddlePiece:       $08</font>
+ <font color="scarlet">!Scratchram_GraphicalBar_RightEndPiece:     $03</font>
+;This is how long the middle section.
+ <font color=#00C000>!Scratchram_GraphicalBar_TempLength:        $07</font>
+;The number of units or pieces filled:
+ RAM address $00-$01:                        $0017 (23)</pre>
+</td>
+<td>
+
+
+<pre>ASCII art depicting the byte table and how each byte correlates to the table.
+
+                                     Table: <span style="background-color: orange">$03</span>,<span style="background-color: orange">$08</span>,<span style="background-color: orange">$08</span>,<span style="background-color: yellow"><font color="black">$04</font></span>,<span style="background-color: grey">$00</span>,<span style="background-color: grey">$00</span>,<span style="background-color: grey">$00</span>,<span style="background-color: grey">$00</span>,<span style="background-color: grey">$00</span>
+                                             |   |   |   |   |   |   |   |   |
+<font color="cyan">!Scratchram_GraphicalBar_FillByteTbl+0</font> ------/   |   |   |   |   |   |   |   |
+<font color=#00C000>!Scratchram_GraphicalBar_FillByteTbl+1</font> ----------/   |   |   |   |   |   |   |
+<font color=#00C000>!Scratchram_GraphicalBar_FillByteTbl+2</font> --------------/   |   |   |   |   |   |
+<font color=#00C000>!Scratchram_GraphicalBar_FillByteTbl+3</font> ------------------/   |   |   |   |   |
+<font color=#00C000>!Scratchram_GraphicalBar_FillByteTbl+4</font> ----------------------/   |   |   |   |
+<font color=#00C000>!Scratchram_GraphicalBar_FillByteTbl+5</font> --------------------------/   |   |   |
+<font color=#00C000>!Scratchram_GraphicalBar_FillByteTbl+6</font> ------------------------------/   |   |
+<font color=#00C000>!Scratchram_GraphicalBar_FillByteTbl+7</font> ----------------------------------/   |
+<font color="scarlet">!Scratchram_GraphicalBar_FillByteTbl+8</font> --------------------------------------/
+</pre>
+</td>
+</tr>
+</table><br>
+
+If any maximum was set to $00, they are excluded from the table and are skipped (no longer uses the ASCII lookup table for smaller display):
+<table>
+<tr>
+<td>
+<pre>
+<font color="cyan"><s>!Scratchram_GraphicalBar_LeftEndPiece:       $00</s></font>
+<font color=#00C000>!Scratchram_GraphicalBar_MiddlePiece:        $08</font>
+<font color="scarlet">!Scratchram_GraphicalBar_RightEndPiece:      $03</font>
+<font color=#00C000>!Scratchram_GraphicalBar_TempLength:         $07</font>
+RAM address $00-$01:                         $0017 (23)</pre>
+</td>
+<td>
+
+<table>
+<tr>
+<td><tt>!Scratchram_GraphicalBar_FillByteTbl</tt><br>
+relative address:</td>
+<td bgcolor=#00C000><tt>+0</tt></td>
+<td bgcolor=#00C000><tt>+1</tt></td>
+<td bgcolor=#00C000><tt>+2</tt></td>
+<td bgcolor=#00C000><tt>+3</tt></td>
+<td bgcolor=#00C000><tt>+4</tt></td>
+<td bgcolor=#00C000><tt>+5</tt></td>
+<td bgcolor=#00C000><tt>+6</tt></td>
+<td bgcolor="scarlet"><tt>+7</tt></td>
+<td><tt>+8</tt></td>
+</tr>
+<tr>
+<td>Table values:</td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="yellow"><font color="black"><tt>$07</tt></font></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td><tt>(unused, garbage)</tt></td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<pre>
+<font color="cyan">!Scratchram_GraphicalBar_LeftEndPiece:       $03</font>
+<font color=#00C000><s>!Scratchram_GraphicalBar_MiddlePiece:        $00</s></font>
+<font color="scarlet">!Scratchram_GraphicalBar_RightEndPiece:      $03</font>
+<font color=#00C000><s>!Scratchram_GraphicalBar_TempLength:         $00</s></font>
+RAM address $00-$01:                         $0004 (4)
+
+Note: !Scratchram_GraphicalBar_MiddlePiece <u>and/or</u>
+!Scratchram_GraphicalBar_TempLength is set to zero,
+excludes the middle section.</pre>
+</td>
+<td>
+
+<table>
+<tr>
+<td><tt>!Scratchram_GraphicalBar_FillByteTbl</tt><br>
+relative address:</td>
+<td bgcolor="cyan"><font color="black"><tt>+0</tt></font></td>
+<td bgcolor="scarlet"><tt>+1</tt></td>
+<td><tt>+2</tt></td>
+<td><tt>+3</tt></td>
+<td><tt>+4</tt></td>
+<td><tt>+5</tt></td>
+<td><tt>+6</tt></td>
+<td><tt>+7</tt></td>
+<td><tt>+8</tt></td>
+</tr>
+<tr>
+<td>Table values:</td>
+<td bgcolor="orange"><tt>$03</tt></td>
+<td bgcolor="yellow"><font color="black"><tt>$01</tt></font></td>
+<td colspan="7"><tt>(unused, garbage)</tt></td>
+</tr>
+</table>
+</td>
+<tr>
+<td>
+<pre><font color="cyan">!Scratchram_GraphicalBar_LeftEndPiece:       $03</font>
+<font color=#00C000>!Scratchram_GraphicalBar_MiddlePiece:        $08</font>
+<font color="scarlet"><s>!Scratchram_GraphicalBar_RightEndPiece:      $00</s></font>
+<font color=#00C000>!Scratchram_GraphicalBar_TempLength:         $07</font>
+RAM address $00-$01:                         $0017 (23)</pre>
+</td>
+<td>
+
+<table>
+<tr>
+<td><tt>!Scratchram_GraphicalBar_FillByteTbl</tt><br>
+relative address:</td>
+<td bgcolor="cyan"><font color="black"><tt>+0</tt></font></td>
+<td bgcolor=#00C000><tt>+1</tt></td>
+<td bgcolor=#00C000><tt>+2</tt></td>
+<td bgcolor=#00C000><tt>+3</tt></td>
+<td bgcolor=#00C000><tt>+4</tt></td>
+<td bgcolor=#00C000><tt>+5</tt></td>
+<td bgcolor=#00C000><tt>+6</tt></td>
+<td bgcolor=#00C000><tt>+7</tt></td>
+<td><tt>+8</tt></td>
+</tr>
+<tr>
+<td>Table values:</td>
+<td bgcolor="orange"><tt>$03</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="yellow"><font color="black"><tt>$04</tt></font></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td><tt>(unused, garbage)</tt></td>
+</tr>
+</table>
+</td>
+</tr>
+</tr>
+</table><br>
+</li>
+I've made a <a name="ComputeGraphicalBarData" href="readme_files/JS_GraphicalBarCalculator.html">javascript code page</a> that computes the byte layout and how many pieces so when designing a hack, you don't need a calculator
+to find the statistics of the bar data.
+</ul>
+<li>Inside <tt>GraphicalBarConvertToTile.asm</tt></li>
+<ul>
+<li><tt>ConvertBarFillAmountToTiles</tt>: converts the bar fill table into tile numbers via indexing (inputs the same as above and don't
+need to be rewritten):
+
+<table>
+<tr>
+<th>Left end</th>
+<th>Middle</th>
+<th>Right end</th>
+</tr>
+<tr>
+<td><ul>
+<li><tt>Fill amount $00 &rightarrow; tile number $36</tt> <img src="readme_files/GraphicalBarFills/LeftEnd_0_of_3.png"></li>
+<li><tt>Fill amount $01 &rightarrow; tile number $37</tt> <img src="readme_files/GraphicalBarFills/LeftEnd_1_of_3.png"></li>
+<li><tt>Fill amount $02 &rightarrow; tile number $38</tt> <img src="readme_files/GraphicalBarFills/LeftEnd_2_of_3.png"></li>
+<li><tt>Fill amount $03 &rightarrow; tile number $39</tt> <img src="readme_files/GraphicalBarFills/LeftEnd_3_of_3.png"></li>
+</ul></td>
+<td><ul>
+<li><tt>Fill amount $00 &rightarrow; tile number $55</tt> <img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"></li>
+<li><tt>Fill amount $01 &rightarrow; tile number $56</tt> <img src="readme_files/GraphicalBarFills/Middle_1_of_8.png"></li>
+<li><tt>Fill amount $02 &rightarrow; tile number $57</tt> <img src="readme_files/GraphicalBarFills/Middle_2_of_8.png"></li>
+<li><tt>Fill amount $03 &rightarrow; tile number $58</tt> <img src="readme_files/GraphicalBarFills/Middle_3_of_8.png"></li>
+<li><tt>Fill amount $04 &rightarrow; tile number $59</tt> <img src="readme_files/GraphicalBarFills/Middle_4_of_8.png"></li>
+<li><tt>Fill amount $05 &rightarrow; tile number $65</tt> <img src="readme_files/GraphicalBarFills/Middle_5_of_8.png"></li>
+<li><tt>Fill amount $06 &rightarrow; tile number $66</tt> <img src="readme_files/GraphicalBarFills/Middle_6_of_8.png"></li>
+<li><tt>Fill amount $07 &rightarrow; tile number $67</tt> <img src="readme_files/GraphicalBarFills/Middle_7_of_8.png"></li>
+<li><tt>Fill amount $08 &rightarrow; tile number $68</tt> <img src="readme_files/GraphicalBarFills/Middle_8_of_8.png"></li>
+</ul></td>
+<td><ul>
+<li><tt>Fill amount $00 &rightarrow; tile number $50</tt> <img src="readme_files/GraphicalBarFills/RightEnd_0_of_3.png"></li>
+<li><tt>Fill amount $01 &rightarrow; tile number $51</tt> <img src="readme_files/GraphicalBarFills/RightEnd_1_of_3.png"></li>
+<li><tt>Fill amount $02 &rightarrow; tile number $52</tt> <img src="readme_files/GraphicalBarFills/RightEnd_2_of_3.png"></li>
+<li><tt>Fill amount $03 &rightarrow; tile number $53</tt> <img src="readme_files/GraphicalBarFills/RightEnd_3_of_3.png"></li>
+</ul></td>
+</tr>
+</table><br>
+
+So if <tt>!Scratchram_GraphicalBar_FillByteTbl</tt> contains these values and gets converted, this happens:
+<table>
+<tr>
+<td><tt>!Scratchram_GraphicalBar_FillByteTbl</tt><br>
+relative address:</td>
+<td bgcolor="cyan"><font color="black"><tt>+0</tt></font></td>
+<td bgcolor=#00C000><tt>+1</tt></td>
+<td bgcolor=#00C000><tt>+2</tt></td>
+<td bgcolor=#00C000><tt>+3</tt></td>
+<td bgcolor=#00C000><tt>+4</tt></td>
+<td bgcolor=#00C000><tt>+5</tt></td>
+<td bgcolor=#00C000><tt>+6</tt></td>
+<td bgcolor=#00C000><tt>+7</tt></td>
+<td bgcolor="scarlet"><tt>+8</tt></td>
+</tr>
+<tr>
+<td>Table values...:</td>
+<td bgcolor="orange"><tt>$03</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="yellow"><font color="black"><tt>$04</tt></font></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="grey"><tt>$00</tt></td>
+</tr>
+<tr>
+<td>...converted to tile number:</td>
+<td bgcolor="orange"><tt>$39</tt></td>
+<td bgcolor="orange"><tt>$68</tt></td>
+<td bgcolor="orange"><tt>$68</tt></td>
+<td bgcolor="yellow"><font color="black"><tt>$59</tt></font></td>
+<td bgcolor="grey"><tt>$55</tt></td>
+<td bgcolor="grey"><tt>$55</tt></td>
+<td bgcolor="grey"><tt>$55</tt></td>
+<td bgcolor="grey"><tt>$55</tt></td>
+<td bgcolor="grey"><tt>$50</tt></td>
+</tr>
+<tr>
+<td>Tile image:</td>
+<td><center><img src="readme_files/GraphicalBarFills/LeftEnd_3_of_3.png"></center></td>
+<td><center><img src="readme_files/GraphicalBarFills/Middle_8_of_8.png"></center></td>
+<td><center><img src="readme_files/GraphicalBarFills/Middle_8_of_8.png"></center></td>
+<td><center><img src="readme_files/GraphicalBarFills/Middle_4_of_8.png"></center></td>
+<td><center><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"></center></td>
+<td><center><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"></center></td>
+<td><center><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"></center></td>
+<td><center><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"></center></td>
+<td><center><img src="readme_files/GraphicalBarFills/RightEnd_0_of_3.png"></center></td>
+</tr>
+<tr>
+<td>
+Result:
+</td>
+<td colspan="9">
+<center>
+<nobr>
+<img src="readme_files/GraphicalBarFills/LeftEnd_3_of_3.png"><img src="readme_files/GraphicalBarFills/Middle_8_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_8_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_4_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"><img src="readme_files/GraphicalBarFills/RightEnd_0_of_3.png">
+</nobr>
+</center>
+</td>
+</tr>
+</table><br>
+If you changed the number of pieces in any of the 3 parts of the bar (left, middle, and right), the number of pieces must equal to the number of values +1 (+1 because an empty tile byte is included)
+in the table corresponding to the bar part, for example, by making left end have 4 pieces instead of 3, you must have 5 values in the left end tile table. Else your tiles will glitch.
+
+</li>
+<li><tt>ConvertBarFillAmountToTilesDoubleBar</tt>: Same as above, but handles a double-filled bar. Tiles are formated <a href="readme_files/DoubleBarFills.png" target="_blank">like this</a>.
+Also like above, make sure you have the number of pieces equal to <tt>(NumberOfPieces+1)^2</tt> number of values in table (for example, left end have 4 pieces, therefore you must have 25 values;
+<tt>(4+1)^2 = 25</tt>). I recommend to have the table to form a perfect square so that the fill values are visually organized.</li><br>
+
+Of course, the default graphics included here are pixel-column-based, meaning each column of pixels is 1 piece of a bar.
+
+</ul><br>
+
+
+<li>Inside <tt>GraphicalBarWriteToStatusBar.asm</tt></li>
+<ul>
+<li><tt>WriteBarToHUD</tt>: Copies the tile numbers in the table to paste to (writes) the status bar (if you're using the Super Status Bar patch, the if statement and defines will adopt to that).
+Inputs are again, similar to <tt>CalculateGraphicalBarPercentage</tt> with only the attributes being used, but a new input is required:
+
+<table>
+<tr>
+<th>Input</th>
+<th>Description</th>
+</tr>
+<tr>
+<td><tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$02</b></nobr></tt> (24-bit)</td>
+<td>The starting address (left end, extends rightwards, even when the bar is set to fill leftwards) to write the tile numbers to the status bar.</td>
+</tr>
+<td><tt><nobr><b>$03</b></nobr></tt> to <tt><nobr><b>$05</b></nobr></tt> (24-bit)</td>
+<td>The starting address (left end, extends rightwards, even when the bar is set to fill leftwards) to write the tile properties to the status bar.
+(This only works if you installed status bar patches that enable editing the properties in-game, else this is no longer needed to write values to this input).
+I deliberately used the if statement around this to prevent writing to an arbitrary address (the <nobr><tt>STA [$03],y</tt></nobr> could write to an invalid address).</td>
+</table><br>
+Remember that this is low endian (The address $7E0F09, for example are stored in each bytes as
+<pre>$7E0000: $09
+$7E0001: $0F
+$7E0002: $7E</pre>
+
+so be careful on that.).
+Of course, because the <a href="https://www.smwcentral.net/?p=section&a=details&id=15222">Overworld Border Plus</a> patch have the same format as the Super Status Bar patch,
+it will work on that as well (if <tt>!StatusBarFormat</tt> set to $02 and you make a different version of the routine <tt>ConvertBarFillAmountToTiles</tt> to use a different
+table to use OW layer 3 tiles).<br><br>
+
+<li><tt>WriteBarToHUDLeftwards</tt>: Same as above, but only works properly if you managed to set bit 6 of YXPCCCTT properties byte. This will write a X-flipped version that
+the bar now fills from right to left. Tiles arranged are flipped so the leftmost tile (including the end tiles) is now the right most, the second leftmost is second rightmost,
+and so on. If you didn't X-flip the tiles via editing the tile properties (YXPCCCTT), each tile won't be X-flipped but are still arranged backwards (when filling up, the rightmost
+tile fills towards the right and advances to the tile towards the left). In vanilla SMW, it is still possible to edit the tile properties (but cannot be changed in-game as the
+data is stored in ROM) at around address <tt>$008C81</tt>.</li>
+</li>
+</ul>
+</ol>
+
+<hr>
+<h2>Notes</h2>
+<ul>
+
+<li>Due to how this routine works, when display a fill edge that encompass multiple 8x8 bytes at once, it doesn't work, as it was designed to have a single fraction tile.<br>
+<center><img src="readme_files/MultiPartiallyFilled.png"></center><br>
+You have to check the tile byte adjacent to the fraction byte to determine to show the &ldquo;second half&rdquo; of the fill edge. The logic on this is very complex and therefore
+a tutorial for that is not included.</li>
+<li>You don't have to call the routine <tt>CalculateGraphicalBarPercentage</tt> to use <tt>DrawGraphicalBar</tt>, this means you can make an icon-based HP system that each
+tile byte holds a set amount of HP, for example, in the <i>Legend of Zelda</i> series starting in <i>Ocarina of Time</i>, you can have each heart containing 4 pieces representing each 1 HP.</li>
+<li>It is best to avoid having any end tiles holding the same number of pieces as the middle, although it still works, it is less optimized as the routine <tt>DrawGraphicalBar</tt>
+only takes a value and represent them as each bytes capped at their maximum. Therefore if you're planning to have 8 pieces for both left and right ends, and have 7 middle bytes also
+having 8 pieces at the max, it is better to have both end tiles set to 0 pieces and have 9 middle tiles holding 8 pieces, here is what it looks like on a full bar:<br><br>
+
+Less optimized:
+<table><tr><td><pre><font color="cyan">!Scratchram_GraphicalBar_LeftEndPiece:       $08</font>
+<font color=#00C000>!Scratchram_GraphicalBar_MiddlePiece:        $08</font>
+<font color="scarlet">!Scratchram_GraphicalBar_RightEndPiece:      $08</font>
+<font color=#00C000>!Scratchram_GraphicalBar_TempLength:         $07</font>
+RAM address $00-$01:                         $0048 (72)</pre></td></tr></table>
+Result:
+<table>
+<tr>
+<td bgcolor="cyan"><font color="black"><tt>+0</tt></font></td>
+<td bgcolor=#00C000><tt>+1</tt></td>
+<td bgcolor=#00C000><tt>+2</tt></td>
+<td bgcolor=#00C000><tt>+3</tt></td>
+<td bgcolor=#00C000><tt>+4</tt></td>
+<td bgcolor=#00C000><tt>+5</tt></td>
+<td bgcolor=#00C000><tt>+6</tt></td>
+<td bgcolor=#00C000><tt>+7</tt></td>
+<td bgcolor="scarlet"><tt>+8</tt></td>
+</tr>
+<tr>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+</tr>
+</table>
+Vs optimized:
+<table><tr><td><pre><font color="cyan"><s>!Scratchram_GraphicalBar_LeftEndPiece:       $00</s></font>
+<font color=#00C000>!Scratchram_GraphicalBar_MiddlePiece:        $08</font>
+<font color="scarlet"><s>!Scratchram_GraphicalBar_RightEndPiece:      $00</s></font>
+<font color=#00C000>!Scratchram_GraphicalBar_TempLength:         $09</font>
+RAM address $00-$01:                         $0048 (72)</pre></td></tr></table>
+Result:
+<table>
+<tr>
+<td bgcolor=#00C000><tt>+0</tt></td>
+<td bgcolor=#00C000><tt>+1</tt></td>
+<td bgcolor=#00C000><tt>+2</tt></td>
+<td bgcolor=#00C000><tt>+3</tt></td>
+<td bgcolor=#00C000><tt>+4</tt></td>
+<td bgcolor=#00C000><tt>+5</tt></td>
+<td bgcolor=#00C000><tt>+6</tt></td>
+<td bgcolor=#00C000><tt>+7</tt></td>
+<td bgcolor=#00C000><tt>+8</tt></td>
+</tr>
+<tr>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><tt>$08</tt></td>
+</tr>
+</table>
+The only difference is the FillAmount &rightarrow; TileNumber conversion <tt>ConvertBarFillAmountToTiles</tt> (and the doublebar version) that utilizes the tile number you need
+to change (Left end have 9 tiles with values 0-8 same as middle's 0-8 but uses a different array tiles to display a outlined-left edge and same goes to the right end).
+</li>
+<li>You might've noticed the define <nobr><tt>!Settings_GraphicalBar_IndexSize</tt></nobr> found in <tt>GraphicalBarDefines.asm</tt>, I left that there in for some rare cases anyone
+would need a bar that is more than 255 tile bytes long (So a 16-bit addressing was needed).</li>
+<li>Be careful when you call the routine <tt>WriteBarToHUD</tt> (and <tt>WriteBarToHUDLeftwards</tt>), as because this is multi-bytes based, it will write from
+<nobr><tt>!Default_GraphicalBarPosition</tt></nobr> to <nobr><tt>!Default_GraphicalBarPosition+(NumberOfTiles-1)</tt></nobr> address. Thus if you place the bar at RAM address
+<tt>$0F2F</tt>, the address bytes beyond that (which is non-status-bar-related data, from timer data, scores, then an unused RAM area ($0F3A) and so on) gets overwritten.</li>
+</ul>
+<hr>
+<h2>Credits</h2>
+<ul>
+<li><a href="https://www.smwcentral.net/?p=profile&id=8691">Akaginite</a>, for making the math routines</li>
+<li><a href="https://www.w3schools.com">W3schools</a>, for the info on making javascript codes and HTML.</li>
+</ul>
