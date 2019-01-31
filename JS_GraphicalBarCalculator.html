@@ -18,34 +18,35 @@
 
 <table>
 <tr>
-<td></td>
-<th>Values (a decimal integer 0-255)</th>
-
-</tr>
-<tr>
 <td>Left end piece:</td>
-<td><input type="number" id="LeftEndPiece" value="3" min="0" max="255" step="1"></td>
+<td><input type="number" id="LeftEndPiece" value="3" min="0" max="255" step="1"> Use decimal integers 0-255</td>
 </tr>
 <tr>
 <td>Middle piece:</td>
-<td><input type="number" id="MiddlePiece" value="8" min="0" max="255" step="1"></td>
+<td><input type="number" id="MiddlePiece" value="8" min="0" max="255" step="1"> Use decimal integers 0-255</td>
 </tr>
 <tr>
 <td>Right end piece:</td>
-<td><input type="number" id="RightEndPiece" value="3" min="0" max="255" step="1"></td>
+<td><input type="number" id="RightEndPiece" value="3" min="0" max="255" step="1"> Use decimal integers 0-255</td>
 </tr>
 <tr>
 <td>Middle length:</td>
-<td><input type="number" id="MiddleLength" value="7" min="0" max="255" step="1"></td>
+<td><input type="number" id="MiddleLength" value="7" min="0" max="255" step="1"> Use decimal integers 0-255 (note: slowdown if this number is large!)</td>
 </tr>
+<td>RAM table:</td>
+<td><input type="text" id="RAM_address" value ="7F844A" maxlength="6" size="6"> Enter a hexadecimal RAM address here (don't add a prefix)</td>
 </table>
 
 <button type="button" onclick="Calculate()">Submit</button><button type="button" onclick="Reset()">Reset</button><br>
 <hr>
 <table onclick="OutputSelect()"><tr><td><pre>
-<p id="Output">Empty</p>
-<p id="Output1"></p>
+<span id="Output">Empty</span>
+<span id="Output2"></span>
+<span id="Output1"></span>
 </pre></td></tr></table></table>
+<nobr>Byte format:
+<span id="ByteFormatLeftEnd"></span><span id="ByteFormatMiddle"></span><span id="ByteFormatRightEnd"></span>
+</nobr>
 
 <script>
 	function Reset() {
@@ -53,18 +54,26 @@
 		document.getElementById("MiddlePiece").value = "8";
 		document.getElementById("RightEndPiece").value = "3";
 		document.getElementById("MiddleLength").value = "7";
+		document.getElementById("RAM_address").value = "7F844A";
 		
 		document.getElementById("Output").innerHTML = "Empty";
 		document.getElementById("Output1").innerHTML = "";
+		document.getElementById("Output2").innerHTML = "";
+		
+		document.getElementById("ByteFormatLeftEnd").innerHTML = "";
+		document.getElementById("ByteFormatMiddle").innerHTML = "";
+		document.getElementById("ByteFormatRightEnd").innerHTML = "";
 	}
 	
 	//setInterval(function(){Calculate()}, 1)
+	//^beta content
 	
 	function Calculate(){
 		var LeftEndPiece = document.getElementById("LeftEndPiece").value
 		var MiddlePiece = document.getElementById("MiddlePiece").value
 		var RightEndPiece = document.getElementById("RightEndPiece").value
 		var MiddleLength = document.getElementById("MiddleLength").value
+		var RAM_address =  document.getElementById("RAM_address").value
 		var LeftEndExist = 0
 		var MiddleExist = 0
 		var RightEndExist = 0
@@ -84,12 +93,35 @@
 		if (parseInt(LeftEndExist + MiddleExist + RightEndExist) == 0) {
 			document.getElementById("Output").innerHTML = ("No bytes used, nonexistent bar.")
 			document.getElementById("Output1").innerHTML = "";
+			document.getElementById("Output2").innerHTML = "";
 		} else {
-			document.getElementById("Output").innerHTML = ("Bytes used: " + parseInt(BarBytesTotal) + " (valid indexes from $0 to $" + parseInt((LeftEndExist + MiddleExist + RightEndExist - 1)).toString(16) + ")")
-			document.getElementById("Output1").innerHTML = ("Total pieces: " + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)) + " ($" + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)).toString(16) + ")")
+			document.getElementById("Output").innerHTML = ("Bytes used:         " + parseInt(BarBytesTotal) + " (valid indexes from $0 to $" + parseInt((LeftEndExist + MiddleExist + RightEndExist - 1)).toString(16) + ")")
+			document.getElementById("Output1").innerHTML = ("Total pieces:       " + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)) + " ($" + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)).toString(16) + ")")
+			document.getElementById("Output2").innerHTML = ("RAM address range:  $" + parseInt(RAM_address, 16).toString(16)) + " to $" + (parseInt(RAM_address, 16) + parseInt(BarBytesTotal, 10) - 1).toString(16)
 		}
-	}
-	function OutputSelect() {
-		return TableSelect = true
+		
+		if (LeftEndExist != 0) {
+			document.getElementById("ByteFormatLeftEnd").innerHTML = ("<img src='readme_files/JS_GraphicalBarCalculator_BytePreview/LeftEndByte.png'>")
+		} else {
+			document.getElementById("ByteFormatLeftEnd").innerHTML = ("")
+		}
+		
+		document.getElementById("ByteFormatMiddle").innerHTML = ("")
+		if (MiddleExist > 0) {
+			
+			var i = 0
+			while (i < MiddleExist) {
+				document.getElementById("ByteFormatMiddle").innerHTML += ("<img src='readme_files/JS_GraphicalBarCalculator_BytePreview/MiddleByte.png'>")
+				i++
+			}
+		}
+		
+		
+		if (RightEndExist != 0) {
+			document.getElementById("ByteFormatRightEnd").innerHTML = ("<img src='readme_files/JS_GraphicalBarCalculator_BytePreview/RightEndByte.png'>")
+		} else {
+			document.getElementById("ByteFormatRightEnd").innerHTML = ("")
+		}
+
 	}
 </script>
