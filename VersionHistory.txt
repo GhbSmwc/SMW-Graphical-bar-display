@@ -1,4 +1,4 @@
-Note: should have 7 (8 during beta) items in main directory or folder in case if any files missing.
+Note: should have 9 items in main directory or folder in case if any files missing.
 
 Note: Date sorted from oldest to newest (M/D/Y). Version number period symbol means
 a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 1.9,
