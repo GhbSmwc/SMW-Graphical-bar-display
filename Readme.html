@@ -181,8 +181,7 @@ the SNES is low-endian when the bytes are adjacent from one another in memory.</
 </ul>
 <hr>
 <h2>ASM Documentation</h2>
-
-Routine information:
+Note: All values here are unsigned. Routine information follows:
 <ol>
 <li>Inside <tt>GraphicalBarELITE.asm</tt></li>
 <ul>
@@ -267,7 +266,10 @@ input here is <tt>$00</tt>:<br><br>
 </tr>
 <tr>
 <td><tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$01</b></nobr></tt> (16-bit)</td>
-<td>The amount of fill in the bar, as in, the total number of pieces filled.</td>
+<td>The amount of fill in the bar, as in, the total number of pieces filled.<br><br>
+
+The total number of pieces (full amount) in the bar is calculated as: <tt>[FullAmount = LeftEndPiece + (MiddlePiece * MiddleLength) + RightEndPiece]</tt>,
+for example: 62 = 3 + (7 * 8) + 3</td>
 </tr>
 </table>
 Result:
@@ -493,6 +495,8 @@ relative address:</td>
 </tr>
 </tr>
 </table><br>
+Of course, I made a <a name="ComputeGraphicalBarData" href="readme_files/JS_GraphicalBarCalculator.html">javascript code page</a> that calculates memory statistics
+without the need of manually calculating the values.
 </li>
 </ul>
 <li>Inside <tt>GraphicalBarConvertToTile.asm</tt></li>
