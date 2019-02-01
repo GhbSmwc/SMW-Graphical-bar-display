@@ -139,7 +139,7 @@ Layout table:
 			var i = 0
 			var MiddleCount = 0
 			if (LeftEndExist != 0) {
-				document.getElementById("Output3").innerHTML += ("$" + (parseInt(RAM_address, 16).toString(16)) + ": Left end tile byte")
+				document.getElementById("Output3").innerHTML += ("$" + (parseInt(RAM_address, 16).toString(16)) + ": <font color='Cyan'>Left end tile byte</font>")
 				i++
 			}
 			if (MiddleExist != 0) {
@@ -148,14 +148,18 @@ Layout table:
 						document.getElementById("Output3").innerHTML += ("<br>")
 						//^Don't linebreak on the first line when left end is disabled.
 					}
-					document.getElementById("Output3").innerHTML += ("$" + ((parseInt(RAM_address, 16) + i).toString(16)) + ": Middle tile byte " + parseInt(MiddleCount + 1))
+					document.getElementById("Output3").innerHTML += ("$" + ((parseInt(RAM_address, 16) + i).toString(16)) + ": <font color=#00FF00>Middle tile byte " + parseInt(MiddleCount + 1) + "</font>")
 					
 					i++
 					MiddleCount++
 				}
 			}
 			if (RightEndExist != 0) {
-				document.getElementById("Output3").innerHTML += ("<br>$" + ((parseInt(RAM_address, 16) + i).toString(16)) + ": Right end tile byte")
+				if (i != 0) {
+					document.getElementById("Output3").innerHTML += ("<br>")
+					//^Don't linebreak on the first line when left end is disabled.
+				}
+				document.getElementById("Output3").innerHTML += ("$" + ((parseInt(RAM_address, 16) + i).toString(16)) + ": <font color='red'>Right end tile byte</font>")
 			}
 		} else {
 			document.getElementById("Output3").innerHTML = ("Error")
