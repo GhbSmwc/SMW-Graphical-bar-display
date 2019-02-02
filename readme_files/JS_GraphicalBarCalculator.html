@@ -17,7 +17,8 @@
 
 <a href="../Readme.html#ComputeGraphicalBarData">Back</a><br><br>
 
-Make sure you enable javascript code in the case this doesn't work.
+Make sure you enable javascript code in the case this doesn't work. Remember that any number displayed here without a prefix
+means that this is a decimal number, a dollar sign (&ldquo;$&rdquo;) means a hexidecimal number.
 
 <table>
 <tr>
@@ -36,8 +37,8 @@ Make sure you enable javascript code in the case this doesn't work.
 <td><tt>!Scratchram_GraphicalBar_TempLength</tt> holds the value:</td>
 <td><input type="number" id="MiddleLength" value="7" min="0" max="255" step="1"> Use decimal integers 0-255 (note: slowdown if this number is large!)</td>
 </tr>
-<td><tt>!Scratchram_GraphicalBar_FillByteTbl</tt> is located at RAM address:</td>
-<td><input type="text" id="RAM_address" value ="7F844A" maxlength="6" size="6"> Enter a hexadecimal RAM address here (don't add a prefix)</td>
+<td><tt>!Scratchram_GraphicalBar_FillByteTbl</tt> is located at RAM address: </td>
+<td>$<input type="text" id="RAM_address" value ="7F844A" maxlength="6" size="3"> Enter a hexadecimal RAM address here (don't add a prefix)</td>
 </table>
 
 <button type="button" onclick="Calculate()">Submit</button><button type="button" onclick="Reset()">Reset</button><br>
@@ -139,7 +140,7 @@ Layout table:
 			var i = 0
 			var MiddleCount = 0
 			if (LeftEndExist != 0) {
-				document.getElementById("Output3").innerHTML += ("$" + (parseInt(RAM_address, 16).toString(16)) + ": <font color='Cyan'>Left end tile byte</font>")
+				document.getElementById("Output3").innerHTML += ("!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i) + " = " + "$" + (parseInt(RAM_address, 16).toString(16)) + ": <font color='Cyan'>Left end tile byte</font>")
 				i++
 			}
 			if (MiddleExist != 0) {
@@ -148,7 +149,7 @@ Layout table:
 						document.getElementById("Output3").innerHTML += ("<br>")
 						//^Don't linebreak on the first line when left end is disabled.
 					}
-					document.getElementById("Output3").innerHTML += ("$" + ((parseInt(RAM_address, 16) + i).toString(16)) + ": <font color=#00FF00>Middle tile byte " + parseInt(MiddleCount + 1) + "</font>")
+					document.getElementById("Output3").innerHTML += ("!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i) + " = " + "$" + ((parseInt(RAM_address, 16) + i).toString(16)) + ": <font color=#00FF00>Middle tile byte " + parseInt(MiddleCount + 1) + "</font>")
 					
 					i++
 					MiddleCount++
@@ -159,7 +160,7 @@ Layout table:
 					document.getElementById("Output3").innerHTML += ("<br>")
 					//^Don't linebreak on the first line when left end is disabled.
 				}
-				document.getElementById("Output3").innerHTML += ("$" + ((parseInt(RAM_address, 16) + i).toString(16)) + ": <font color='red'>Right end tile byte</font>")
+				document.getElementById("Output3").innerHTML += ("!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i) + " = " + "$" + ((parseInt(RAM_address, 16) + i).toString(16)) + ": <font color='red'>Right end tile byte</font>")
 			}
 		} else {
 			document.getElementById("Output3").innerHTML = ("Error")
