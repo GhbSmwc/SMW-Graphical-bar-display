@@ -18,7 +18,8 @@
 <a href="../Readme.html#ComputeGraphicalBarData">Back</a><br><br>
 
 Make sure you enable javascript code in the case this doesn't work. Remember that any number displayed here without a prefix
-means that this is a decimal number, a dollar sign (&ldquo;$&rdquo;) means a hexidecimal number.
+means that this is a decimal number, a dollar sign (&ldquo;$&rdquo;) means a hexidecimal number. If you get <tt>NaN</tt>,
+you have entered an invalid input (entered with a blank input or have invalid characters).
 
 <table>
 <tr>
@@ -35,7 +36,7 @@ means that this is a decimal number, a dollar sign (&ldquo;$&rdquo;) means a hex
 </tr>
 <tr>
 <td><tt>!Scratchram_GraphicalBar_TempLength</tt> holds the value:</td>
-<td><input type="number" id="MiddleLength" value="7" min="0" max="255" step="1"> Use decimal integers 0-255 (note: slowdown if this number is large!)</td>
+<td><input type="number" id="MiddleLength" value="7" min="0" max="255" step="1"> Use decimal integers 0-255, note that this uses loops and lags if this is a large number.</td>
 </tr>
 <td><tt>!Scratchram_GraphicalBar_FillByteTbl</tt> is located at RAM address: </td>
 <td>$<input type="text" id="RAM_address" value ="7F844A" maxlength="6" size="3"> Enter a hexadecimal RAM address here (don't add a prefix)</td>
@@ -84,6 +85,12 @@ Layout table:
 		var MiddlePiece = document.getElementById("MiddlePiece").value
 		var RightEndPiece = document.getElementById("RightEndPiece").value
 		var MiddleLength = document.getElementById("MiddleLength").value
+		
+		if (MiddleLength > 255) {
+			MiddleLength = 255
+			document.getElementById("MiddleLength").value = "255";
+		}
+		
 		var RAM_address =  document.getElementById("RAM_address").value
 		var LeftEndExist = 0
 		var MiddleExist = 0
@@ -106,7 +113,7 @@ Layout table:
 			document.getElementById("Output1").innerHTML = "";
 			document.getElementById("Output2").innerHTML = "";
 		} else {
-			document.getElementById("Output").innerHTML = ("Bytes used:                    " + parseInt(BarBytesTotal) + " bytes (valid indexes from $0 to $" + parseInt((LeftEndExist + MiddleExist + RightEndExist - 1)).toString(16) + ")")
+			document.getElementById("Output").innerHTML = ("Bytes used:                    " + parseInt(BarBytesTotal) + " byte(s) (valid indexes from $0 to $" + parseInt((LeftEndExist + MiddleExist + RightEndExist - 1)).toString(16) + " inclusively)")
 			document.getElementById("Output1").innerHTML = ("Total pieces (for full bar):   " + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)) + " ($" + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)).toString(16) + ")")
 			document.getElementById("Output2").innerHTML = ("RAM address range (inclusive): $" + parseInt(RAM_address, 16).toString(16)) + " to $" + (parseInt(RAM_address, 16) + parseInt(BarBytesTotal, 10) - 1).toString(16)
 		}
