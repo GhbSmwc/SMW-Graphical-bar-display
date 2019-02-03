@@ -13,10 +13,6 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;This is a simple test ASM using the graphical bar.
 ;best tested using uberasm tool.
 
-;Be careful not to have the table shorter than the possible fill value, else glitched
-;tiles will appear. (so there are 3 tile numbers (0/2 to 2/2) in table, and you have
-;a fill value of 3 in the byte, this causes it to use a value past the last valid value
-;in the table).
 main:
 ;Get x position percentage in horizontal level.
 ;This is basically the progress meter.
