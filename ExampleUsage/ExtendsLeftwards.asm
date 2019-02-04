@@ -1,5 +1,9 @@
 ;This is a demonstration on how to have a bar that extends LEFTWARDS as you increase
 ;length of the bar (not to be confused with "leftwards-filling").
+;Normally, without the [JSL GraphicalBarWriteToStatusBar_BarExtendLeft], the bar would
+;would extend rightwards, even when set to fill leftwards. This is useful for bars at proportional
+;lengths towards the maximum values (e.g. higher maximum HP = longer bar) that would be placed on
+;the right side of the screen.
 ;
 ;Sample inputs:
 ;
@@ -55,18 +59,6 @@ main:
 	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
 	
-	;Here, the "origin" or "starting tile" is always the left side, even if the bar is x-flipped.
-	;As the bar extends leftwards, this starting tile must move left. This can be done by taking
-	;the desired position of the last tile (the rightmost tile; right side), subtract it by the
-	;number of tiles -1, and the difference is the starting tile:
-	;
-	;BeginningTilePos = DesiredLastTilePos - (NumberOfTiles - 1)
-	;
-	;However, if you are using a super status bar format or overworld border plus (2 bytes adjacent
-	;for every tile), the formula is this, since you have to move over 2 bytes for every tile:
-	;
-	;BeginningTilePos = DesiredLastTilePos - ((NumberOfTiles - 1)*2)
-	print "bug                      ",pc
 	LDA.b #!Default_GraphicalBarPositionExtendLeftwards		;\Input rightmost tile position
 	STA $00								;|
 	LDA.b #!Default_GraphicalBarPositionExtendLeftwards>>8		;|
@@ -82,7 +74,7 @@ main:
 		LDA.b #!Default_GraphicalBarPropertiesExtendLeftwards>>16	;|
 		STA $05								;/
 	endif
-	JSL GraphicalBarWriteToStatusBar_BarExtendLeft
+	JSL GraphicalBarWriteToStatusBar_BarExtendLeft				;>Extend leftwards bar (modifies the starting tile to move in accordance to the length of the bar, in tiles).
 	if !Default_LeftwardsBar == 0						;\Write to status bar
 		JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;|
 	else									;|

@@ -80,7 +80,8 @@ tiles. Then hit OK and save to apply the changes.
 </li>
 </ol>
 </li>
-<li>Now you are done:
+<li>Now you are done, although there are more examples than provided here, given that you can play up to 3 levels from the get-go without beating them and without editing the overworld.
+Therefore if you want to test <i>all</i> of them the quickest, you can edit the level list mentioned above to use the ASM files not presented here. The examples follows:
 <ul>
 <li>Level 104 (Yoshi's house) is a double-bar, which can display two &ldquo;fills&rdquo; overlapping each other (<img width="96" src="readme_files/DoubleBarFills_AnotherColor.png">). Press and hold right, then
 press and hold up to see. If you're using the Super Status Bar patch (and have modified the defines so that the code adopts to it), it will display 4 hex numbers at the top right, displaying the first column the amount and fill-percentage amount of FirstFill
@@ -734,8 +735,11 @@ to change (Left end have 9 tiles with values 0-8 same as middle's 0-8 but uses a
 <li>You might've noticed the define <nobr><tt>!Settings_GraphicalBar_IndexSize</tt></nobr> found in <tt>GraphicalBarDefines.asm</tt>, I left that there in for some rare cases anyone
 would need a bar that is more than 255 tile bytes long (So a 16-bit addressing was needed).</li>
 <li>Be careful when you call the routine <tt>WriteBarToHUD</tt> (and <tt>WriteBarToHUDLeftwards</tt>), as because this is multi-bytes based, it will write from
-<nobr><tt>!Default_GraphicalBarPosition</tt></nobr> to <nobr><tt>!Default_GraphicalBarPosition+(NumberOfTiles-1)</tt></nobr> address. Thus if you place the bar at RAM address
+<nobr><tt>!Default_GraphicalBarPosition</tt></nobr> to <nobr><tt>!Default_GraphicalBarPosition+((NumberOfTiles-1)*!StatusBarFormat)</tt></nobr> address. Thus if you place the bar at RAM address
 <tt>$0F2F</tt>, the address bytes beyond that (which is non-status-bar-related data, from timer data, scores, then an unused RAM area ($0F3A) and so on) gets overwritten.</li>
+<ul><li>However, if you are using the &ldquo;extend leftwards&rdquo; (not to be confused with a leftwards <b>filling bar</b>; the bar that extends leftwards as you increase the length),
+the address write range is <tt>DesiredLastTilePos-((NumberOfTiles-1)*!StatusBarFormat)</tt> to <tt>DesiredLastTilePos</tt>, so be careful not to have the bar data be written past the starting RAM
+address of the status bar (avoid placing the <tt>DesiredLastTilePos</tt> that would cause placing the tiles before the first byte of the status bar tiles).</li></ul>
 </ul>
 <hr>
 <h2>Credits</h2>
