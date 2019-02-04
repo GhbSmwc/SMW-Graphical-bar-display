@@ -45,11 +45,12 @@ you have entered an invalid input (entered with a blank input or have invalid ch
 <button type="button" onclick="Calculate()">Submit</button><button type="button" onclick="Reset()">Reset</button><br>
 <hr>
 <table onclick="OutputSelect()"><tr><td><pre>
-<span id="Output">Empty</span>
-<span id="Output2"></span>
-<span id="Output1"></span>
+<span id="Output">Bytes used:                    </span>
+<span id="Output2">RAM address range (inclusive): </span>
+<span id="Output1">Total pieces (for full bar):   </span>
 </pre></td></tr></table></table>
-<nobr>Tile byte visual:
+Tile byte visual:<br>
+<nobr>
 <span id="ByteFormatLeftEnd"></span><span id="ByteFormatMiddle"></span><span id="ByteFormatRightEnd"></span>
 </nobr><br><br>
 Layout table:
@@ -67,9 +68,9 @@ Layout table:
 		document.getElementById("MiddleLength").value = "7";
 		document.getElementById("RAM_address").value = "7F844A";
 		
-		document.getElementById("Output").innerHTML = "Empty";
-		document.getElementById("Output1").innerHTML = "";
-		document.getElementById("Output2").innerHTML = "";
+		document.getElementById("Output").innerHTML = "Bytes used:                    ";
+		document.getElementById("Output1").innerHTML = "Total pieces (for full bar):   ";
+		document.getElementById("Output2").innerHTML = "RAM address range (inclusive): ";
 		document.getElementById("Output3").innerHTML = "Empty";
 		
 		document.getElementById("ByteFormatLeftEnd").innerHTML = "";
