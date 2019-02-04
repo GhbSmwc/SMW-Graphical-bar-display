@@ -1,5 +1,5 @@
-;This is a demonstration on how to have a leftwards-filling bar that extends LEFTWARDS as you increase
-;length of the bar.
+;This is a demonstration on how to have a bar that extends LEFTWARDS as you increase
+;length of the bar (not to be confused with "leftwards-filling").
 ;
 ;Sample inputs:
 ;
@@ -66,47 +66,23 @@ main:
 	;for every tile), the formula is this, since you have to move over 2 bytes for every tile:
 	;
 	;BeginningTilePos = DesiredLastTilePos - ((NumberOfTiles - 1)*2)
-	print "bug              ",pc
-	JSL GraphicalBarWriteToStatusBar_CountNumberOfTiles		;>(NumberOfTiles - 1)
-	TXA
-	if !StatusBarFormat == $02
-		ASL							;>*2
-	endif
-	STA $00								;\24-bit subtrahend
-	STZ $01								;|
-	STZ $02								;/
-	LDA.b #!Default_GraphicalBarPositionExtendLeftwards		;\Do 24-bit subtraction
-	SEC								;|
-	SBC $00								;|
+	print "bug                      ",pc
+	LDA.b #!Default_GraphicalBarPositionExtendLeftwards		;\Input rightmost tile position
 	STA $00								;|
 	LDA.b #!Default_GraphicalBarPositionExtendLeftwards>>8		;|
-	SBC $01								;|
 	STA $01								;|
 	LDA.b #!Default_GraphicalBarPositionExtendLeftwards>>16		;|
-	SBC $02								;|
 	STA $02								;/
 	
 	if !StatusBar_UsingCustomProperties != 0
-		;Same as above, but for tile properties
-		JSL GraphicalBarWriteToStatusBar_CountNumberOfTiles		;>(NumberOfTiles - 1)
-		TXA
-		if !StatusBarFormat == $02
-			ASL							;>*2
-		endif
-		STA $03								;\24-bit subtrahend
-		STZ $04								;|
-		STZ $05								;/
-		LDA.b #!Default_GraphicalBarPropertiesExtendLeftwards		;\Do 24-bit subtraction
-		SEC								;|
-		SBC $03								;|
+		LDA.b #!Default_GraphicalBarPropertiesExtendLeftwards		;\Same as above but tile properties
 		STA $03								;|
 		LDA.b #!Default_GraphicalBarPropertiesExtendLeftwards>>8	;|
-		SBC $04								;|
 		STA $04								;|
 		LDA.b #!Default_GraphicalBarPropertiesExtendLeftwards>>16	;|
-		SBC $05								;|
 		STA $05								;/
 	endif
+	JSL GraphicalBarWriteToStatusBar_BarExtendLeft
 	if !Default_LeftwardsBar == 0						;\Write to status bar
 		JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;|
 	else									;|
