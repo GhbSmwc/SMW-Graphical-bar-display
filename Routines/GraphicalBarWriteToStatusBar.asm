@@ -74,7 +74,63 @@ WriteBarToHUDLeftwards:
 	
 	.Done
 	RTL
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;Bar extend leftwards (as the length increases, the final/last/
+;rightmost tile stays on the same position and the left side
+;moves to the left).
+;
+;How this works: When writing the tiles to the status bar, it first
+;uses the "origin" tile, which is the leftmost tile. It is always
+;the leftmost tile even when the bar is x-flipped to fill leftwards.
+;With a bar that extends leftwards, the left tile is no longer at
+;a fixed position, therefore the left tile is calculated by being
+;subtracted by a number of tiles towards the left.
+;
+;Calculates like this:
+; BeginningTilePos = DesiredLastTilePos - (NumberOfTiles - 1)
+;If using the 2-adjacent bytes per 8x8 tile, uses this instead:
+; BeginningTilePos = DesiredLastTilePos - ((NumberOfTiles - 1)*2)
+;
+; Input:
+;  $00-$02: the position of the final/last/rightmost tile would be
+;           at.
+;  $03-$05: Same as above, but for tile properties if applicable.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+BarExtendLeft:
+	JSL CountNumberOfTiles
+	TXA
+	if !StatusBarFormat == $02
+		ASL
+		TAX
+	endif
+	;^A now holds the number of bytes to go back.
+	; This indicates the first tile of the bar to be written.
+	
+	REP #$21				;\-(NumberOfTiles-1)
+	AND #$00FF				;|
+	EOR #$FFFF				;|
+	INC A					;/
+	ADC $00					;>+LastTilePos (we are doing LastTilePos - (NumberOfTiles-1))
+	STA $00					;>Store difference in $00-$01
+	SEP #$20				;\Handle bank byte
+	LDA $02					;|
+	SBC #$00				;|
+	STA $02					;/
+	
+	if !StatusBar_UsingCustomProperties != 0
+		TXA
+		REP #$21				;\-(NumberOfTiles-1)
+		AND #$00FF				;|
+		EOR #$FFFF				;|
+		INC A					;/
+		ADC $03					;>+LastTilePos (we are doing LastTilePos - (NumberOfTiles-1))
+		STA $03					;>Store difference in $00-$01
+		SEP #$20				;\Handle bank byte
+		LDA $05					;|
+		SBC #$00				;|
+		STA $05					;/
+	endif
+	RTL
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Count tiles.
 ;Output:
