@@ -96,13 +96,9 @@ WriteBarToHUDLeftwards:
 ;           at.
 ;  $03-$05: Same as above, but for tile properties if applicable.
 ;
-; Status bar address write range:
-;  DesiredLastTilePos-(NumberOfTiles-1) to DesiredLastTilePos
-;
-; Will be this range instead of above if 2 adjacent bytes/8x8
-; (!StatusBarFormat = $02) was used:
-;  DesiredLastTilePos-((NumberOfTiles-1)*2) to DesiredLastTilePos
-;
+; Status bar address write range (when using this routine and
+; WriteBarToHUD or WriteBarToHUDLeftwards):
+;  [DesiredLastTilePos-((NumberOfTiles-1)*!StatusBarFormat)] to [DesiredLastTilePos]
 ; Same applies to tile properties.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 BarExtendLeft:

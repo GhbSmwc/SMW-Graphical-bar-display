@@ -28,6 +28,8 @@
  ; $0F09|!addr overwrites the word "TIME".
  ; $7FA000 and $404000 takes the top-left corner when using the super status bar patch.
  ;
+ ;These must be 3-bytes long (6 hexadecimal digits long), as they are under a routine that
+ ;uses STA [$00],y to write the tiles to the status bar.
  
  ;This covers all bars that would extend rightwards as you increase the length.
   if !StatusBarFormat == $01
@@ -62,13 +64,15 @@
    ;^Tile properties (only applies to status bar patches that lets you change the properties in-game).
    ; Remember: bit format is [YXPCCCTT].
  ;This is when you are using a bar that would extend towards the left as the length increases.
+ ;!Default_GraphicalBarPositionExtendLeftwards is the position of the rightmost last tile (even when x-flipped to fill leftwards). Therefore
+ ;the status bar write range is [DesiredLastTilePos-((NumberOfTiles-1)*!StatusBarFormat)] to [DesiredLastTilePos].
   if !StatusBarFormat == $01
    if !sa1 == 0
     !Default_GraphicalBarPositionExtendLeftwards       = $7E0F09     ;>SMW's status bar. Replace with "$0C00|!addr" for SMB3 status bar and "$0BF6|!addr" for minimalist status bar.
    else
     !Default_GraphicalBarPositionExtendLeftwards       = $400F09     ;>SMW's status bar (SA-1). Replace with "$0C00|!addr" for SMB3 status bar and "$0BF6|!addr" for minimalist status bar.
    endif
-    ;^Location of the bar when !StatusBarFormat is $01. This is under use of
+    ;^Location of the bar's last tile (rightmost tile, even when set to fill leftwards) when !StatusBarFormat is $01. This is under use of
     ; STA [$00], that is why it needs to be 3-bytes.
   else
    if !sa1 == 0
@@ -92,7 +96,7 @@
    endif
   endif
   
-;Tile settings:
+;Tile settings (length does not apply to [ExtendLeftwards.asm] as that is variable in-game):
  !Default_MiddleLength                = 7             ;>30 = screen-wide (30 + 2 end tiles = 32, all 8x8 tile row in the screen's width)
  !Default_LeftPieces                  = 3             ;\These will by default, set the RAM for the pieces for each section
  !Default_MiddlePieces                = 8             ;|
@@ -125,9 +129,9 @@
   ; Note that end tiles are also mirrored. This only works properly
   ; on any status bar patches that allow editing the tile properties.
   ; Having this set to 1 while using SMW's vanilla status bar causes
-  ; each tiles to fill backwards while advancing to the left. If
-  ; that is the case, flip the tiles in the file bin then or edit
-  ; SMW's status bar table at address $008C81.
+  ; each tiles to fill backwards (rightwards as fill increases) while
+  ; advancing tiles to the left. If that is the case, flip the tiles
+  ; in the file bin then or edit SMW's status bar table at address $008C81.
 
 ;Double bar. Only works with the super status bar patch.
  if !sa1 == 0

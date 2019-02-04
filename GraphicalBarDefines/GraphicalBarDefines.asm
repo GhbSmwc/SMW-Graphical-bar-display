@@ -87,6 +87,16 @@ endif
   ; each byte/tile consumes an index, so if this is 0, and you have both ends
   ; enabled, your actual middle's maximum is 253 (because 253 middle bytes
   ; plus 2 ends = 255 total bytes used up).
+  ;
+  ; Do note that most routines would assume there are no more than 255 tile bytes,
+  ; reasons being:
+  ; -The loops' end uses BPL, so it will end if the index value is #$80-#$FF.
+  ; -If you are using a 2 adjacent bytes per 8x8 tile (!StatusBarFormat = $02),
+  ;  the tile processing uses ASL (multiply index by 2) and therefore "overflow"
+  ;  should the number being multiplyed by 2 be >= #$80. Thus the limit, along
+  ;  above limitation, is 64 tile bytes (indexes $00 to $3F).
+  ;
+  ; But this is highly unlikely as the screen is 32 8x8 tiles wide.
  
  !Setting_GraphicalBar_SNESMathOnly = 0
   ;^Info follows:
