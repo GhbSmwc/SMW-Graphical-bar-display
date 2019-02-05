@@ -16,7 +16,8 @@
 
 <a href="../Readme.html#ComputeGraphicalBarData">Back</a><br><br>
 
-Make sure you enable javascript code in the case this doesn't work. Remember that any number displayed here without a prefix
+Make sure you enable javascript code and use a browser that can handle HTML5 (this document uses <tt>max</tt> and <tt>min</tt> as well as
+<tt>&lt;datalist&gt;</tt>) in the case this doesn't work. Remember that any number displayed here without a prefix
 means that this is a decimal number, a dollar sign (&ldquo;$&rdquo;) means a hexadecimal number. If you get <tt>NaN</tt>,
 you have entered an invalid input (entered with a blank input or have invalid characters).
 
@@ -38,10 +39,24 @@ you have entered an invalid input (entered with a blank input or have invalid ch
 <td><input type="number" id="MiddleLength" value="7" min="0" max="255" step="1"> Use decimal integers 0-255, note that this uses loops and lags if this is a large number.</td>
 </tr>
 <td><tt>!Scratchram_GraphicalBar_FillByteTbl</tt> is located at RAM address: </td>
-<td>$<input type="text" id="BarTileTableRAM" value ="7F844A" maxlength="6" size="3"> Enter a hexadecimal RAM address here (don't add a prefix)</td>
+<td>$<input type="text" list="BarTileTableRAMList" id="BarTileTableRAM" value ="" maxlength="6" size="12"> Enter a hexadecimal RAM address here (don't add a prefix)</td>
+<datalist id="BarTileTableRAMList">
+<option value="7F844A">Default Super status bar RAM address</option>
+<option value="400198">SA-1 version</option>
+</datalist>
+
+
 <tr>
 <td>Status bar write location (<tt>!Default_GraphicalBarPosition</tt> and <tt>!Default_GraphicalBarPositionExtendLeftwards</tt>):</td>
-<td>$<input type="text" id="StatusBarRAMPos" value ="7FA000" maxlength="6" size="3"> Enter a hexadecimal RAM address here (don't add a prefix)<br>
+<td>$<input type="text" list="StatusBarRAMPosList" id="StatusBarRAMPos" value ="" maxlength="6" size="12"> Enter a hexadecimal RAM address here (don't add a prefix)<br>
+
+<datalist id="StatusBarRAMPosList">
+<option value="7FA000">Default Super status bar RAM address</option>
+<option value="7FA03E">Top right corner</option>
+<option value="404000">Same as $7FA000 but for SA-1</option>
+<option value="40403E">Same as $7FA03E but for SA-1</option>
+</datalist>
+
 <input type="checkbox" id="FillLeftwards" name="FillLeftwards" value="FillLeftwards">Bar fills leftwards (x-flipped). Remember that this includes end tiles if applicable, (left end
 will now be the &ldquo;right side&rdquo;, but the fill still &ldquo;goes towards the middle&rdquo;, and the right end is on the &ldquo;left side&rdquo; and &ldquo;fills away from the middle&rdquo;
 as it increases towards the left).<br>
@@ -78,8 +93,8 @@ Layout table:
 		document.getElementById("MiddlePiece").value = "8";
 		document.getElementById("RightEndPiece").value = "3";
 		document.getElementById("MiddleLength").value = "7";
-		document.getElementById("BarTileTableRAM").value = "7F844A";
-		document.getElementById("StatusBarRAMPos").value = "7FA000";
+		document.getElementById("BarTileTableRAM").value = "";
+		document.getElementById("StatusBarRAMPos").value = "";
 		
 		document.getElementById("FillLeftwards").checked = false
 		document.getElementById("ExtendLeftwards").checked = false
@@ -107,8 +122,14 @@ Layout table:
 			if (MiddleLength > 255) {
 				MiddleLength = 255
 				document.getElementById("MiddleLength").value = "255";
+			} else if (MiddleLength < 0) {
+				MiddleLength = 0
+				document.getElementById("MiddleLength").value = "0"
 			}
 		//Obtain the total number of tile bytes
+			if (document.getElementById("BarTileTableRAM").value == "") {
+				document.getElementById("BarTileTableRAM").value = "7F844A"
+			}
 			var BarTileTableRAM =  document.getElementById("BarTileTableRAM").value
 			var LeftEndExist = 0
 			var MiddleExist = 0
@@ -126,6 +147,9 @@ Layout table:
 			
 			var BarBytesTotal = parseInt(LeftEndExist) + parseInt(MiddleExist) + parseInt(RightEndExist)
 		//Obtain values for displaying the status bar RAM addresses
+			if (document.getElementById("StatusBarRAMPos").value == "") {
+				document.getElementById("StatusBarRAMPos").value = "7FA000"
+			}
 			var StatBarAddressBarPos = document.getElementById("StatusBarRAMPos").value
 			
 			var DisplacementExtendLeftwards = 0
