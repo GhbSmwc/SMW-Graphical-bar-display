@@ -13,7 +13,6 @@
 			}
 		</style>
 	</head>
-<body onload = setInterval(Calculate(), 1);>
 
 <a href="../Readme.html#ComputeGraphicalBarData">Back</a><br><br>
 
@@ -39,7 +38,19 @@ you have entered an invalid input (entered with a blank input or have invalid ch
 <td><input type="number" id="MiddleLength" value="7" min="0" max="255" step="1"> Use decimal integers 0-255, note that this uses loops and lags if this is a large number.</td>
 </tr>
 <td><tt>!Scratchram_GraphicalBar_FillByteTbl</tt> is located at RAM address: </td>
-<td>$<input type="text" id="RAM_address" value ="7F844A" maxlength="6" size="3"> Enter a hexadecimal RAM address here (don't add a prefix)</td>
+<td>$<input type="text" id="BarTileTableRAM" value ="7F844A" maxlength="6" size="3"> Enter a hexadecimal RAM address here (don't add a prefix)</td>
+<tr>
+<td>Status bar write location (<tt>!Default_GraphicalBarPosition</tt>):</td>
+<td>$<input type="text" id="StatusBarRAMPos" value ="7FA000" maxlength="6" size="3"> Enter a hexadecimal RAM address here (don't add a prefix)<br>
+<input type="checkbox" id="FillLeftwards" name="FillLeftwards" value="FillLeftwards">Bar fills leftwards (x-flipped). Remember that this includes end tiles if applicable, (left end
+will now be the &ldquo;right side&rdquo;, but the fill still &ldquo;goes towards the middle&rdquo;, and the right end is on the &ldquo;left side&rdquo; and &ldquo;fills away from the middle&rdquo;
+as it increases towards the left).<br>
+<input type="checkbox" id="ExtendLeftwards" name="ExtendLeftwards" value="ExtendLeftwards">Bar extends leftwards as length increases (this will make this address input be the final tile position
+and write tile bytes at and <b>before</b>) this.<br>
+<input type="checkbox" id="RAM2bytesAdjicentStatusbar" name="RAM2bytesAdjicentStatusbar" value="RAM2bytesAdjicentStatusbar" checked>You are using a status bar formated with each 8x8 tile holds
+two adjacent bytes (<tt>[TTTTTTTT, YXPCCCTT]</tt>).</td>
+
+</tr>
 </table>
 
 <button type="button" onclick="Calculate()">Submit</button><button type="button" onclick="Reset()">Reset</button><br>
@@ -66,7 +77,12 @@ Layout table:
 		document.getElementById("MiddlePiece").value = "8";
 		document.getElementById("RightEndPiece").value = "3";
 		document.getElementById("MiddleLength").value = "7";
-		document.getElementById("RAM_address").value = "7F844A";
+		document.getElementById("BarTileTableRAM").value = "7F844A";
+		document.getElementById("StatusBarRAMPos").value = "7FA000";
+		
+		document.getElementById("FillLeftwards").checked = false
+		document.getElementById("ExtendLeftwards").checked = false
+		document.getElementById("RAM2bytesAdjicentStatusbar").checked = true
 		
 		document.getElementById("Output").innerHTML = "Bytes used:                    ";
 		document.getElementById("Output1").innerHTML = "Total pieces (for full bar):   ";
@@ -78,100 +94,134 @@ Layout table:
 		document.getElementById("ByteFormatRightEnd").innerHTML = "";
 	}
 	
-	//setInterval(function(){Calculate()}, 1)
-	//^beta content
-	
-	function Calculate(){
+	function Calculate() {
 		var LeftEndPiece = document.getElementById("LeftEndPiece").value
 		var MiddlePiece = document.getElementById("MiddlePiece").value
 		var RightEndPiece = document.getElementById("RightEndPiece").value
 		var MiddleLength = document.getElementById("MiddleLength").value
-		
-		if (MiddleLength > 255) {
-			MiddleLength = 255
-			document.getElementById("MiddleLength").value = "255";
-		}
-		
-		var RAM_address =  document.getElementById("RAM_address").value
-		var LeftEndExist = 0
-		var MiddleExist = 0
-		var RightEndExist = 0
-		
-		if (LeftEndPiece != 0) {
-			LeftEndExist = 1
-		}
-		if ((MiddlePiece != 0 && MiddleLength != 0)) {
-			MiddleExist = parseInt(document.getElementById("MiddleLength").value)
-		}
-		if (RightEndPiece != 0) {
-			RightEndExist = 1
-		}
-		
-		var BarBytesTotal = parseInt(LeftEndExist) + parseInt(MiddleExist) + parseInt(RightEndExist)
-		
-		if (parseInt(LeftEndExist + MiddleExist + RightEndExist) == 0) {
-			document.getElementById("Output").innerHTML = ("No bytes used, nonexistent bar.")
-			document.getElementById("Output1").innerHTML = "";
-			document.getElementById("Output2").innerHTML = "";
-		} else {
-			document.getElementById("Output").innerHTML = ("Bytes used:                    " + parseInt(BarBytesTotal) + " byte(s) (valid indexes from $0 to $" + parseInt((LeftEndExist + MiddleExist + RightEndExist - 1)).toString(16) + " inclusively)")
-			document.getElementById("Output1").innerHTML = ("Total pieces (for full bar):   " + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)) + " ($" + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)).toString(16) + ")")
-			document.getElementById("Output2").innerHTML = ("RAM address range (inclusive): $" + parseInt(RAM_address, 16).toString(16)) + " to $" + (parseInt(RAM_address, 16) + parseInt(BarBytesTotal, 10) - 1).toString(16)
-		}
-		var TileByteIndexCount = 0
-		
-		if (LeftEndExist != 0) {
-			document.getElementById("ByteFormatLeftEnd").innerHTML = ("<img src='JS_GraphicalBarCalculator_BytePreview/LeftEndByte.png'>")
-		} else {
-			document.getElementById("ByteFormatLeftEnd").innerHTML = ("")
-		}
-		
-		document.getElementById("ByteFormatMiddle").innerHTML = ("")
-		if (MiddleExist > 0) {
-			
-			var i = 0
-			while (i < MiddleExist) {
-				document.getElementById("ByteFormatMiddle").innerHTML += ("<img src='JS_GraphicalBarCalculator_BytePreview/MiddleByte.png'>")
-				i++
+
+		//prevent user from entering a middle length greater than 255.
+			if (MiddleLength > 255) {
+				MiddleLength = 255
+				document.getElementById("MiddleLength").value = "255";
 			}
-		}
-		if (RightEndExist != 0) {
-			document.getElementById("ByteFormatRightEnd").innerHTML = ("<img src='JS_GraphicalBarCalculator_BytePreview/RightEndByte.png'>")
-		} else {
-			document.getElementById("ByteFormatRightEnd").innerHTML = ("")
-		}
-		
-		//below displays memory layout table
-		if (BarBytesTotal >= 1) {
-			document.getElementById("Output3").innerHTML = "";
+		//Obtain the total number of tile bytes
+			var BarTileTableRAM =  document.getElementById("BarTileTableRAM").value
+			var LeftEndExist = 0
+			var MiddleExist = 0
+			var RightEndExist = 0
 			
-			var i = 0
-			var MiddleCount = 0
+			if (LeftEndPiece != 0) {
+				LeftEndExist = 1
+			}
+			if ((MiddlePiece != 0 && MiddleLength != 0)) {
+				MiddleExist = parseInt(document.getElementById("MiddleLength").value)
+			}
+			if (RightEndPiece != 0) {
+				RightEndExist = 1
+			}
+			
+			var BarBytesTotal = parseInt(LeftEndExist) + parseInt(MiddleExist) + parseInt(RightEndExist)
+		//Obtain values for displaying the status bar RAM addresses
+			var StatBarAddressBarPos = document.getElementById("StatusBarRAMPos").value
+			
+			var DisplacementExtendLeftwards = 0
+			if (document.getElementById("ExtendLeftwards").checked == true) {
+				DisplacementExtendLeftwards = (BarBytesTotal - 1)
+			}
+			var StatusBarTileFormat = 1
+			if (document.getElementById("RAM2bytesAdjicentStatusbar").checked == true) {
+				StatusBarTileFormat = 2
+			}
+		//Clear out the output so if the user clicks the calculate button again, doesn't add additional text.
+			if (parseInt(LeftEndExist + MiddleExist + RightEndExist) == 0) {
+				document.getElementById("Output").innerHTML = ("No bytes used, nonexistent bar.")
+				document.getElementById("Output1").innerHTML = "";
+				document.getElementById("Output2").innerHTML = "";
+			} else {
+				document.getElementById("Output").innerHTML = ("Bytes used:                    " + parseInt(BarBytesTotal) + " byte(s) (valid indexes from $0 to $" + parseInt((LeftEndExist + MiddleExist + RightEndExist - 1)).toString(16) + " inclusively)")
+				document.getElementById("Output1").innerHTML = ("Total pieces (for full bar):   " + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)) + " ($" + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)).toString(16) + ")")
+				document.getElementById("Output2").innerHTML = ("RAM address range (inclusive): $" + parseInt(BarTileTableRAM, 16).toString(16)) + " to $" + (parseInt(BarTileTableRAM, 16) + parseInt(BarBytesTotal, 10) - 1).toString(16)
+			}
+		//Display the bytes as repeated image boxes
+			var TileByteIndexCount = 0
+			
 			if (LeftEndExist != 0) {
-				document.getElementById("Output3").innerHTML += ("!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i) + " = " + "$" + (parseInt(RAM_address, 16).toString(16)) + ": <font color='Cyan'>Left end tile byte</font>")
-				i++
+				document.getElementById("ByteFormatLeftEnd").innerHTML = ("<img src='JS_GraphicalBarCalculator_BytePreview/LeftEndByte.png'>")
+			} else {
+				document.getElementById("ByteFormatLeftEnd").innerHTML = ("")
 			}
-			if (MiddleExist != 0) {
-				while (MiddleCount < MiddleExist) {
-					if (i != 0) {
-						document.getElementById("Output3").innerHTML += ("<br>")
-						//^Don't linebreak on the first line when left end is disabled.
-					}
-					document.getElementById("Output3").innerHTML += ("!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i) + " = " + "$" + ((parseInt(RAM_address, 16) + i).toString(16)) + ": <font color=#00FF00>Middle tile byte " + parseInt(MiddleCount + 1) + "</font>")
-					
+			
+			document.getElementById("ByteFormatMiddle").innerHTML = ("")
+			if (MiddleExist > 0) {
+				
+				var i = 0
+				while (i < MiddleExist) {
+					document.getElementById("ByteFormatMiddle").innerHTML += ("<img src='JS_GraphicalBarCalculator_BytePreview/MiddleByte.png'>")
 					i++
-					MiddleCount++
 				}
 			}
 			if (RightEndExist != 0) {
-				if (i != 0) {
-					document.getElementById("Output3").innerHTML += ("<br>")
-					//^Don't linebreak on the first line when left end is disabled.
-				}
-				document.getElementById("Output3").innerHTML += ("!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i) + " = " + "$" + ((parseInt(RAM_address, 16) + i).toString(16)) + ": <font color='red'>Right end tile byte</font>")
+				document.getElementById("ByteFormatRightEnd").innerHTML = ("<img src='JS_GraphicalBarCalculator_BytePreview/RightEndByte.png'>")
+			} else {
+				document.getElementById("ByteFormatRightEnd").innerHTML = ("")
 			}
-		} else {
-			document.getElementById("Output3").innerHTML = ("Error")
-		}
+
+		//below displays memory layout table
+			if (BarBytesTotal >= 1) {
+				document.getElementById("Output3").innerHTML = "";
+				
+				var i = 0
+				var MiddleCount = 0
+				//Left end
+					if (LeftEndExist != 0) {
+						document.getElementById("Output3").innerHTML += ("!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i))
+						document.getElementById("Output3").innerHTML += (" = " + "$" + (parseInt(BarTileTableRAM, 16).toString(16)))
+						document.getElementById("Output3").innerHTML += (": <font color='Cyan'>Left end tile byte</font> - Converted and written (as a status bar) at address $")
+						if (document.getElementById("FillLeftwards").checked == false) {
+							document.getElementById("Output3").innerHTML += ((parseInt(StatBarAddressBarPos, 16) + ((i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16))
+						} else {
+							document.getElementById("Output3").innerHTML += ((parseInt(StatBarAddressBarPos, 16) + (((BarBytesTotal - 1) - i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16))
+						}
+						i++
+					}
+				//Middle
+					if (MiddleExist != 0) {
+						while (MiddleCount < MiddleExist) {
+							if (i != 0) {
+								document.getElementById("Output3").innerHTML += ("<br>")
+								//^Don't linebreak on the first line when left end is disabled.
+							}
+							document.getElementById("Output3").innerHTML += ("!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i))
+							document.getElementById("Output3").innerHTML += (" = " + "$" + ((parseInt(BarTileTableRAM, 16) + i).toString(16)))
+							document.getElementById("Output3").innerHTML += (": <font color=#00FF00>Middle tile byte " + parseInt(MiddleCount + 1) + "</font> - Converted and written (as a status bar) at address $")
+							if (document.getElementById("FillLeftwards").checked == false) {
+								document.getElementById("Output3").innerHTML += ((parseInt(StatBarAddressBarPos, 16) + ((i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16))
+							} else {
+								document.getElementById("Output3").innerHTML += ((parseInt(StatBarAddressBarPos, 16) + (((BarBytesTotal - 1) - i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16))
+							}
+							
+							i++
+							MiddleCount++
+						}
+					}
+				//Right end
+					if (RightEndExist != 0) {
+						if (i != 0) {
+							document.getElementById("Output3").innerHTML += ("<br>")
+							//^Don't linebreak on the first line when left end is disabled.
+						}
+						document.getElementById("Output3").innerHTML += ("!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i))
+						document.getElementById("Output3").innerHTML += (" = " + "$" + ((parseInt(BarTileTableRAM, 16) + i).toString(16)))
+						document.getElementById("Output3").innerHTML += (": <font color='red'>Right end tile byte</font> - Converted and written (as a status bar) at address $")
+						if (document.getElementById("FillLeftwards").checked == false) {
+							document.getElementById("Output3").innerHTML += ((parseInt(StatBarAddressBarPos, 16) + ((i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16))
+						} else {
+							document.getElementById("Output3").innerHTML += ((parseInt(StatBarAddressBarPos, 16) + (((BarBytesTotal - 1) - i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16))
+						}
+					}
+			} else {
+				document.getElementById("Output3").innerHTML = ("Error")
+			}
 	}
 </script>
