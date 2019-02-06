@@ -39,18 +39,20 @@ you have entered an invalid input (entered with a blank input or have invalid ch
 <td><input type="number" id="MiddleLength" value="7" min="0" max="255" step="1"> Use decimal integers 0-255, note that this uses loops and lags if this is a large number.</td>
 </tr>
 <td><tt>!Scratchram_GraphicalBar_FillByteTbl</tt> is located at RAM address: </td>
-<td>$<input type="text" list="BarTileTableRAMList" id="BarTileTableRAM" value ="" maxlength="6" size="12"> Enter a hexadecimal RAM address here (don't add a prefix)</td>
+<td>$<input type="text" list="BarTileTableRAMList" id="BarTileTableRAM" value ="" maxlength="6"> Enter a hexadecimal RAM address here (don't add a prefix)</td>
 <datalist id="BarTileTableRAMList">
-<option value="7F844A">Default Super status bar RAM address</option>
+<option value="7F844A">Default RAM address table</option>
 <option value="400198">SA-1 version</option>
 </datalist>
 
 
 <tr>
 <td>Status bar write location (<tt>!Default_GraphicalBarPosition</tt> and <tt>!Default_GraphicalBarPositionExtendLeftwards</tt>):</td>
-<td>$<input type="text" list="StatusBarRAMPosList" id="StatusBarRAMPos" value ="" maxlength="6" size="12"> Enter a hexadecimal RAM address here (don't add a prefix)<br>
+<td>Status bar <b>tile</b> location: $<input type="text" list="StatusBarRAMTileList" id="StatusBarRAMTilePos" value ="" maxlength="6"> Enter RAM address here (don't add a prefix)<br>
+Status bar <b>properties</b> location: $<input type="text" list="StatBarRAMPropsList" id="StatusBarRAMPropsPos value ="" maxlength="6"> Enter RAM address here (don't add a prefix)<br>
 
-<datalist id="StatusBarRAMPosList">
+<datalist id="StatusBarRAMTileList">
+<option value="7E0F09">SMW's status bar (Writes over &ldquo;TIME&rdquo;)</option>
 <option value="7FA000">Default Super status bar RAM address</option>
 <option value="7FA03E">Top right corner</option>
 <option value="404000">Same as $7FA000 but for SA-1</option>
@@ -70,11 +72,9 @@ two adjacent bytes (<tt>[TTTTTTTT, YXPCCCTT]</tt>).</td>
 
 <button type="button" onclick="Calculate()">Submit</button><button type="button" onclick="Reset()">Reset</button><br>
 <hr>
-<table onclick="OutputSelect()"><tr><td><pre>
-<span id="TotalBytesUsed">Tile bytes used: ----------------------------------------------------- </span>
-<span id="BarTableRange">RAM address <tt>!Scratchram_GraphicalBar_FillByteTbl</tt> range (inclusive): --</span>
-<span id="TotalPieces">Total pieces (for full bar): ----------------------------------------- </span>
-<span id="StatusBarRAMRange">Status bar RAM address range (inclusive): ---------------------------- </span>
+Value and memory range statics:
+<table><tr><td><pre>
+<span id="ValueMemRangeStat">Empty</span>
 </pre></td></tr></table></table>
 Tile byte visual:<br>
 <nobr>
@@ -94,16 +94,14 @@ Layout table:
 		document.getElementById("RightEndPiece").value = "3";
 		document.getElementById("MiddleLength").value = "7";
 		document.getElementById("BarTileTableRAM").value = "";
-		document.getElementById("StatusBarRAMPos").value = "";
+		document.getElementById("StatusBarRAMTilePos").value = "";
 		
 		document.getElementById("FillLeftwards").checked = false
 		document.getElementById("ExtendLeftwards").checked = false
 		document.getElementById("RAM2bytesAdjicentStatusbar").checked = true
 		
-		document.getElementById("TotalBytesUsed").innerHTML = "Tile bytes used: ----------------------------------------------------- ";
-		document.getElementById("TotalPieces").innerHTML = "Total pieces (for full bar): ----------------------------------------- ";
-		document.getElementById("BarTableRange").innerHTML = "RAM address <tt>!Scratchram_GraphicalBar_FillByteTbl</tt> range (inclusive): --";
-		document.getElementById("StatusBarRAMRange").innerHTML = "Status bar RAM address range (inclusive): ---------------------------- ";
+		document.getElementById("ValueMemRangeStat").innerHTML = "Empty";
+		
 		
 		document.getElementById("LayoutTable").innerHTML = "Empty";
 		
@@ -113,19 +111,25 @@ Layout table:
 	}
 	
 	function Calculate() {
-		var LeftEndPiece = document.getElementById("LeftEndPiece").value
-		var MiddlePiece = document.getElementById("MiddlePiece").value
-		var RightEndPiece = document.getElementById("RightEndPiece").value
-		var MiddleLength = document.getElementById("MiddleLength").value
+		//Process input values  for pieces and middlelength on the number textbox
+			var LeftEndPiece = document.getElementById("LeftEndPiece").value
+			var MiddlePiece = document.getElementById("MiddlePiece").value
+			var RightEndPiece = document.getElementById("RightEndPiece").value
+			var MiddleLength = document.getElementById("MiddleLength").value
 
-		//prevent user from entering a middle length greater than 255.
-			if (MiddleLength > 255) {
-				MiddleLength = 255
-				document.getElementById("MiddleLength").value = "255";
-			} else if (MiddleLength < 0) {
-				MiddleLength = 0
-				document.getElementById("MiddleLength").value = "0"
-			}
+		//Prevent invalid inputs of pieces and lengths.
+			LeftEndPiece = Math.floor(clamp(LeftEndPiece, 0, 255))
+			document.getElementById("LeftEndPiece").value = LeftEndPiece
+			
+			MiddlePiece = Math.floor(clamp(MiddlePiece, 0, 255))
+			document.getElementById("MiddlePiece").value = MiddlePiece
+			
+			RightEndPiece = Math.floor(clamp(RightEndPiece, 0, 255))
+			document.getElementById("RightEndPiece").value = RightEndPiece
+			
+			MiddleLength = Math.floor(clamp(MiddleLength, 0, 255))
+			document.getElementById("MiddleLength").value = MiddleLength
+			
 		//Obtain the total number of tile bytes
 			if (document.getElementById("BarTileTableRAM").value == "") {
 				document.getElementById("BarTileTableRAM").value = "7F844A"
@@ -147,10 +151,10 @@ Layout table:
 			
 			var BarBytesTotal = parseInt(LeftEndExist) + parseInt(MiddleExist) + parseInt(RightEndExist)
 		//Obtain values for displaying the status bar RAM addresses
-			if (document.getElementById("StatusBarRAMPos").value == "") {
-				document.getElementById("StatusBarRAMPos").value = "7FA000"
+			if (document.getElementById("StatusBarRAMTilePos").value == "") {
+				document.getElementById("StatusBarRAMTilePos").value = "7FA000"
 			}
-			var StatBarAddressBarPos = document.getElementById("StatusBarRAMPos").value
+			var StatBarAddressBarPos = document.getElementById("StatusBarRAMTilePos").value
 			
 			var DisplacementExtendLeftwards = 0
 			if (document.getElementById("ExtendLeftwards").checked == true) {
@@ -161,19 +165,17 @@ Layout table:
 				StatusBarTileFormat = 2
 			}
 		//Display the memory and pieces statistics
+			document.getElementById("ValueMemRangeStat").innerHTML = ""
 			if (parseInt(LeftEndExist + MiddleExist + RightEndExist) == 0) {
-				document.getElementById("TotalBytesUsed").innerHTML = ("No bytes used, nonexistent bar.")
-				document.getElementById("BarTableRange").innerHTML = "";
-				document.getElementById("TotalPieces").innerHTML = "";
-				document.getElementById("StatusBarRAMRange").innerHTML = ""
+				document.getElementById("ValueMemRangeStat").innerHTML = ("No bytes used, nonexistent bar.")
 			} else {
-				document.getElementById("TotalBytesUsed").innerHTML = ("Tile bytes used: ----------------------------------------------------- " + parseInt(BarBytesTotal) + " tile byte(s) (valid indexes from $0 to $" + parseInt((LeftEndExist + MiddleExist + RightEndExist - 1)).toString(16) + " inclusively)")
-				document.getElementById("BarTableRange").innerHTML = ("RAM address <tt>!Scratchram_GraphicalBar_FillByteTbl</tt> range (inclusive): -- $" + parseInt(BarTileTableRAM, 16).toString(16)) + " to $" + (parseInt(BarTileTableRAM, 16) + parseInt(BarBytesTotal, 10) - 1).toString(16)
-				document.getElementById("TotalPieces").innerHTML = ("Total pieces (for full bar): ----------------------------------------- " + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)) + " ($" + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)).toString(16) + ")")
+				document.getElementById("ValueMemRangeStat").innerHTML += ("Tile bytes used: ----------------------------------------------------- " + parseInt(BarBytesTotal) + " tile byte(s) (indexes from $0 to $" + parseInt((LeftEndExist + MiddleExist + RightEndExist - 1)).toString(16) + " inclusively)<br>")
+				document.getElementById("ValueMemRangeStat").innerHTML += ("RAM address <tt>!Scratchram_GraphicalBar_FillByteTbl</tt> range (inclusive): -- $" + parseInt(BarTileTableRAM, 16).toString(16) + " to $" + (parseInt(BarTileTableRAM, 16) + parseInt(BarBytesTotal, 10) - 1).toString(16) + "<br>")
+				document.getElementById("ValueMemRangeStat").innerHTML += ("Total pieces (for full bar): ----------------------------------------- " + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)) + " ($" + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)).toString(16) + ")<br>")
 				if (document.getElementById("ExtendLeftwards").checked == false) {
-					document.getElementById("StatusBarRAMRange").innerHTML = ("Status bar RAM address range (inclusive): ---------------------------- $" + parseInt(StatBarAddressBarPos, 16).toString(16) + " to $" + (parseInt(StatBarAddressBarPos, 16) + ((BarBytesTotal-1) * StatusBarTileFormat)).toString(16))
+					document.getElementById("ValueMemRangeStat").innerHTML += ("Status bar RAM address range (tile number, inclusive): --------------- $" + parseInt(StatBarAddressBarPos, 16).toString(16) + " to $" + (parseInt(StatBarAddressBarPos, 16) + ((BarBytesTotal-1) * StatusBarTileFormat)).toString(16))
 				} else {
-					document.getElementById("StatusBarRAMRange").innerHTML = ("Status bar RAM address range (inclusive): ---------------------------- $" + (parseInt(StatBarAddressBarPos, 16) - ((BarBytesTotal-1) * StatusBarTileFormat)).toString(16) + " to $" + (parseInt(StatBarAddressBarPos, 16).toString(16)))
+					document.getElementById("ValueMemRangeStat").innerHTML += ("Status bar RAM address range (tile number, inclusive): --------------- $" + (parseInt(StatBarAddressBarPos, 16) - ((BarBytesTotal-1) * StatusBarTileFormat)).toString(16) + " to $" + (parseInt(StatBarAddressBarPos, 16).toString(16)))
 				}
 			}
 		//Display the bytes as repeated image boxes
@@ -256,5 +258,10 @@ Layout table:
 			} else {
 				document.getElementById("LayoutTable").innerHTML = ("Error")
 			}
+	}
+	
+	
+	function clamp(num, min, max) {
+		return num <= min ? min : num >= max ? max : num;
 	}
 </script>
