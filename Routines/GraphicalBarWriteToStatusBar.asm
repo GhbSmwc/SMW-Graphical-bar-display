@@ -95,11 +95,14 @@ WriteBarToHUDLeftwards:
 ;  $00-$02: the position of the final/last/rightmost tile would be
 ;           at.
 ;  $03-$05: Same as above, but for tile properties if applicable.
+; Output:
+;  $00-$02: the position of the first tile would be at.
+;  $03-$05: Same as above, but for tile properties if applicable.
 ;
 ; Status bar address write range (when using this routine and
 ; WriteBarToHUD or WriteBarToHUDLeftwards):
 ;  [DesiredLastTilePos-((NumberOfTiles-1)*!StatusBarFormat)] to [DesiredLastTilePos]
-; Same applies to tile properties.
+;  Same applies to tile properties.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 BarExtendLeft:
 	JSL CountNumberOfTiles
