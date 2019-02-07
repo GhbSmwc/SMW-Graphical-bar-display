@@ -11,6 +11,10 @@
 			border: 1px solid white;
 			border-collapse: collapse;
 			}
+			
+			div.SmallFont {
+				font-size: 11px;
+			}
 		</style>
 	</head>
 
@@ -48,15 +52,28 @@ you have entered an invalid input (entered with a blank input or have invalid ch
 
 <tr>
 <td>Status bar write location (<tt>!Default_GraphicalBarPosition</tt> and <tt>!Default_GraphicalBarPositionExtendLeftwards</tt>):</td>
-<td>Status bar <b>tile</b> location: $<input type="text" list="StatusBarRAMTileList" id="StatusBarRAMTilePos" value ="" maxlength="6"> Enter RAM address here (don't add a prefix)<br>
-Status bar <b>properties</b> location: $<input type="text" list="StatBarRAMPropsList" id="StatusBarRAMPropsPos value ="" maxlength="6"> Enter RAM address here (don't add a prefix)<br>
+<td>Status bar <b>tile</b> location: $<input type="text" list="StatusBarRAMTileList" id="StatusBarRAMTilePos" value ="" maxlength="6"><br>
+<div class="SmallFont">The RAM address that is the tile number.</div><br>
+
+<input type="checkbox" id="RAM2bytesAdjicentStatusbar" name="RAM2bytesAdjicentStatusbar" onclick="DisableEnableTileProps()" value="" checked>You are using a status bar formated two adjacent bytes per tile
+(<tt>[TTTTTTTT, YXPCCCTT]</tt>).<br><br>
+
+Status bar <b>properties</b> location: $<input type="text" list="StatBarRAMPropsList" id="StatusBarRAMPropsPos" value ="" maxlength="6" disabled><br>
+<div class="SmallFont">Note if you are using the two adjacent bytes per tile format (<tt>[TTTTTTTT, YXPCCCTT]</tt>), it will use the status bar tile location, plus 1. (if you set tile location to $7FA000, this will be $7FA001).</div><br><br>
 
 <datalist id="StatusBarRAMTileList">
 <option value="7E0F09">SMW's status bar (Writes over &ldquo;TIME&rdquo;)</option>
-<option value="7FA000">Default Super status bar RAM address</option>
-<option value="7FA03E">Top right corner</option>
+<option value="7FA000">Super status bar RAM address</option>
+<option value="7FA03E">Super status bar RAM address (Top right corner)</option>
 <option value="404000">Same as $7FA000 but for SA-1</option>
 <option value="40403E">Same as $7FA03E but for SA-1</option>
+</datalist>
+
+<datalist id="StatBarRAMPropsList">
+<option value="0C80">SMB3 status bar</option>
+<option value="6C80">SMB3 status bar (SA-1)</option>
+<option value="0C36">Minimalist status bar</option>
+<option value="6C36">Minimalist status bar (SA-1)</option>
 </datalist>
 
 <input type="checkbox" id="FillLeftwards" name="FillLeftwards" value="FillLeftwards">Bar fills leftwards (x-flipped). Remember that this includes end tiles if applicable, (left end
@@ -64,8 +81,7 @@ will now be the &ldquo;right side&rdquo;, but the fill still &ldquo;goes towards
 as it increases towards the left).<br>
 <input type="checkbox" id="ExtendLeftwards" name="ExtendLeftwards" value="ExtendLeftwards">Bar extends leftwards as length increases (this will make this address input be the final tile position
 and write tile bytes at and <b>before</b>) this.<br>
-<input type="checkbox" id="RAM2bytesAdjicentStatusbar" name="RAM2bytesAdjicentStatusbar" value="RAM2bytesAdjicentStatusbar" checked>You are using a status bar formated with each 8x8 tile holds
-two adjacent bytes (<tt>[TTTTTTTT, YXPCCCTT]</tt>).</td>
+</td>
 
 </tr>
 </table>
@@ -95,10 +111,12 @@ Layout table:
 		document.getElementById("MiddleLength").value = "7";
 		document.getElementById("BarTileTableRAM").value = "";
 		document.getElementById("StatusBarRAMTilePos").value = "";
+		document.getElementById("StatusBarRAMPropsPos").value = ""
 		
 		document.getElementById("FillLeftwards").checked = false
 		document.getElementById("ExtendLeftwards").checked = false
 		document.getElementById("RAM2bytesAdjicentStatusbar").checked = true
+		DisableEnableTileProps()
 		
 		document.getElementById("ValueMemRangeStat").innerHTML = "Empty";
 		
@@ -129,7 +147,6 @@ Layout table:
 			
 			MiddleLength = Math.floor(clamp(MiddleLength, 0, 255))
 			document.getElementById("MiddleLength").value = MiddleLength
-			
 		//Obtain the total number of tile bytes
 			if (document.getElementById("BarTileTableRAM").value == "") {
 				document.getElementById("BarTileTableRAM").value = "7F844A"
@@ -156,6 +173,12 @@ Layout table:
 			}
 			var StatBarAddressBarPos = document.getElementById("StatusBarRAMTilePos").value
 			
+			//Display on the input when using 2-adjacent bytes per tile format for tile properties.
+				if (document.getElementById("RAM2bytesAdjicentStatusbar").checked == true) {
+					document.getElementById("StatusBarRAMPropsPos").value = (parseInt(StatBarAddressBarPos, 16) + 1).toString(16)
+				}
+			var StatBarAddressBarPosProps = document.getElementById("StatusBarRAMPropsPos").value
+			
 			var DisplacementExtendLeftwards = 0
 			if (document.getElementById("ExtendLeftwards").checked == true) {
 				DisplacementExtendLeftwards = (BarBytesTotal - 1)
@@ -173,9 +196,16 @@ Layout table:
 				document.getElementById("ValueMemRangeStat").innerHTML += ("RAM address <tt>!Scratchram_GraphicalBar_FillByteTbl</tt> range (inclusive): -- $" + parseInt(BarTileTableRAM, 16).toString(16) + " to $" + (parseInt(BarTileTableRAM, 16) + parseInt(BarBytesTotal, 10) - 1).toString(16) + "<br>")
 				document.getElementById("ValueMemRangeStat").innerHTML += ("Total pieces (for full bar): ----------------------------------------- " + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)) + " ($" + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)).toString(16) + ")<br>")
 				if (document.getElementById("ExtendLeftwards").checked == false) {
-					document.getElementById("ValueMemRangeStat").innerHTML += ("Status bar RAM address range (tile number, inclusive): --------------- $" + parseInt(StatBarAddressBarPos, 16).toString(16) + " to $" + (parseInt(StatBarAddressBarPos, 16) + ((BarBytesTotal-1) * StatusBarTileFormat)).toString(16))
+					document.getElementById("ValueMemRangeStat").innerHTML += ("Status bar RAM address range (tile number, inclusive): --------------- $" + parseInt(StatBarAddressBarPos, 16).toString(16) + " to $" + (parseInt(StatBarAddressBarPos, 16) + ((BarBytesTotal-1) * StatusBarTileFormat)).toString(16) + "<br>")
 				} else {
-					document.getElementById("ValueMemRangeStat").innerHTML += ("Status bar RAM address range (tile number, inclusive): --------------- $" + (parseInt(StatBarAddressBarPos, 16) - ((BarBytesTotal-1) * StatusBarTileFormat)).toString(16) + " to $" + (parseInt(StatBarAddressBarPos, 16).toString(16)))
+					document.getElementById("ValueMemRangeStat").innerHTML += ("Status bar RAM address range (tile number, inclusive): --------------- $" + (parseInt(StatBarAddressBarPos, 16) - ((BarBytesTotal-1) * StatusBarTileFormat)).toString(16) + " to $" + (parseInt(StatBarAddressBarPos, 16).toString(16)) + "<br>")
+				}
+				
+
+				if (document.getElementById("ExtendLeftwards").checked == false) {
+					document.getElementById("ValueMemRangeStat").innerHTML += ("Status bar RAM address range (tile properties, inclusive): ----------- $" + parseInt(StatBarAddressBarPosProps, 16).toString(16) + " to $" + (parseInt(StatBarAddressBarPosProps, 16) + ((BarBytesTotal-1) * StatusBarTileFormat)).toString(16))
+				} else {
+					document.getElementById("ValueMemRangeStat").innerHTML += ("Status bar RAM address range (tile properties, inclusive): ----------- $" + (parseInt(StatBarAddressBarPosProps, 16) - ((BarBytesTotal-1) * StatusBarTileFormat)).toString(16) + " to $" + (parseInt(StatBarAddressBarPosProps, 16).toString(16)))
 				}
 			}
 		//Display the bytes as repeated image boxes
@@ -260,6 +290,15 @@ Layout table:
 			}
 	}
 	
+	function DisableEnableTileProps() {
+		if (document.getElementById("RAM2bytesAdjicentStatusbar").checked == true) {
+			document.getElementById("StatusBarRAMPropsPos").disabled=true;
+			document.getElementById("StatusBarRAMPropsPos").value = ""
+		} else {
+			document.getElementById("StatusBarRAMPropsPos").disabled=false;
+		}
+	
+	}
 	
 	function clamp(num, min, max) {
 		return num <= min ? min : num >= max ? max : num;
