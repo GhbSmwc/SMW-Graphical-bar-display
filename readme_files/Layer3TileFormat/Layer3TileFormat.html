@@ -1,0 +1,42 @@
+<html>
+	<head>
+		<style>
+			html {
+			background-color: #000207;
+			color: white;
+			font-family: sans-serif;
+			}
+			
+			table, th, td {
+			border: 1px solid white;
+			border-collapse: collapse;
+			}
+			
+			div.SmallFont {
+				font-size: 11px;
+			}
+		</style>
+	</head>
+	
+<h1><center>Layer 3 tile data format</center></h1>
+This document explains the tile format of some status bar (and overworld border plus) patches relating to writing on layer 3
+background plane. Because SMW's original status bar, Ladida's SMB3 status bar and Minimalist Status Bars are different formats,
+it is worth explaining how to deal with such patches.<br><br>
+
+It is important to note that even if using SMW's status bar, each tile have their data stored in two bytes, the tile number (<tt>TTTTTTTT</tt>)
+and its tile properties (<tt>YXPCCCTT</tt>):
+<ul>
+<li>SMW's vanilla status bar have only its tile number table stored at address <tt>$7E0EF9</tt> to <tt>$7E0F2F</tt>, while the default tile number
+and properties table stored at ROM address <tt>$008C81</tt> to <tt>$008CFE</tt>.</li>
+<li>Using the Super Status Bar patch, the RAM address differs depending what you set the freeram define (&ldquo;<tt>!RAM_BAR</tt>&rdquo;, which is currently
+<tt>$7FA000</tt> by default on a normal ROM and <tt>$404000</tt> by default on a SA-1 ROM). This address ranges from <tt>!RAM_BAR</tt> to <tt>!RAM_BAR+319</tt>.
+The tile number and properties byte format is the same as SMW's <tt>$008C81</tt> to <tt>$008CFE</tt> but in RAM and can be modified in-game.</li>
+</ul><br>
+
+Both of these patches stores the data like this:<br>
+<center><img src="SuperStatusBarOverworldBorderPlusTileFormat.png"></center><br><br>
+Colored in light-red is the tile number (<tt>TTTTTTTT</tt>) and light-blue for tile properties (<tt>YXPCCCTT</tt>). Both bytes are placed next to one another as a pair for
+an 8x8 tile. Therefore if you want to read or write the next tile, you move <b>2 bytes</b> over as opposed to 1.<br><br>
+
+Ladida's Status bar patches, however have their types be in separate tables, where moving to 1 byte next means the next 8x8 tile:
+<center><img src="LadidaStatusBarFormat.png"></center>
