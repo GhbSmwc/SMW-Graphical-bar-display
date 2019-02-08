@@ -55,11 +55,8 @@ you have entered an invalid input (entered with a blank input or have invalid ch
 <td>Status bar <b>tile</b> location: $<input type="text" list="StatusBarRAMTileList" id="StatusBarRAMTilePos" value ="" maxlength="6"><br>
 <div class="SmallFont">The RAM address that is the tile number.</div><br>
 
-<input type="checkbox" id="RAM2bytesAdjicentStatusbar" name="RAM2bytesAdjicentStatusbar" onclick="DisableEnableTileProps()" value="" checked>You are using a status bar formated two adjacent bytes per tile
+<input type="checkbox" id="RAM2bytesAdjicentStatusbar" name="RAM2bytesAdjicentStatusbar" value="" checked>You are using a status bar formated two adjacent bytes per tile
 (<tt>[TTTTTTTT, YXPCCCTT]</tt>).<br><br>
-
-Status bar <b>properties</b> location: $<input type="text" list="StatBarRAMPropsList" id="StatusBarRAMPropsPos" value ="" maxlength="6" disabled><br>
-<div class="SmallFont">Note if you are using the two adjacent bytes per tile format (<tt>[TTTTTTTT, YXPCCCTT]</tt>), it will use the status bar tile location, plus 1. (if you set tile location to $7FA000, this will be $7FA001).</div><br><br>
 
 <datalist id="StatusBarRAMTileList">
 <option value="7E0F09">SMW's status bar (Writes over &ldquo;TIME&rdquo;)</option>
@@ -96,10 +93,9 @@ Tile byte visual:<br>
 <nobr>
 <span id="ByteFormatLeftEnd"></span><span id="ByteFormatMiddle"></span><span id="ByteFormatRightEnd"></span>
 </nobr><br><br>
-Layout table:
-<table><tr><td><pre>
+
 <span id="LayoutTable">Empty</span>
-</pre></td></tr></table>
+
 
 
 
@@ -121,7 +117,7 @@ Layout table:
 		document.getElementById("ValueMemRangeStat").innerHTML = "Empty";
 		
 		
-		document.getElementById("LayoutTable").innerHTML = "Empty";
+		document.getElementById("LayoutTable").innerHTML = ""
 		
 		document.getElementById("ByteFormatLeftEnd").innerHTML = "";
 		document.getElementById("ByteFormatMiddle").innerHTML = "";
@@ -173,12 +169,6 @@ Layout table:
 			}
 			var StatBarAddressBarPos = document.getElementById("StatusBarRAMTilePos").value
 			
-			//Display on the input when using 2-adjacent bytes per tile format for tile properties.
-				if (document.getElementById("RAM2bytesAdjicentStatusbar").checked == true) {
-					document.getElementById("StatusBarRAMPropsPos").value = (parseInt(StatBarAddressBarPos, 16) + 1).toString(16)
-				}
-			var StatBarAddressBarPosProps = document.getElementById("StatusBarRAMPropsPos").value
-			
 			var DisplacementExtendLeftwards = 0
 			if (document.getElementById("ExtendLeftwards").checked == true) {
 				DisplacementExtendLeftwards = (BarBytesTotal - 1)
@@ -199,13 +189,6 @@ Layout table:
 					document.getElementById("ValueMemRangeStat").innerHTML += ("Status bar RAM address range (tile number, inclusive): --------------- $" + parseInt(StatBarAddressBarPos, 16).toString(16) + " to $" + (parseInt(StatBarAddressBarPos, 16) + ((BarBytesTotal-1) * StatusBarTileFormat)).toString(16) + "<br>")
 				} else {
 					document.getElementById("ValueMemRangeStat").innerHTML += ("Status bar RAM address range (tile number, inclusive): --------------- $" + (parseInt(StatBarAddressBarPos, 16) - ((BarBytesTotal-1) * StatusBarTileFormat)).toString(16) + " to $" + (parseInt(StatBarAddressBarPos, 16).toString(16)) + "<br>")
-				}
-				
-
-				if (document.getElementById("ExtendLeftwards").checked == false) {
-					document.getElementById("ValueMemRangeStat").innerHTML += ("Status bar RAM address range (tile properties, inclusive): ----------- $" + parseInt(StatBarAddressBarPosProps, 16).toString(16) + " to $" + (parseInt(StatBarAddressBarPosProps, 16) + ((BarBytesTotal-1) * StatusBarTileFormat)).toString(16))
-				} else {
-					document.getElementById("ValueMemRangeStat").innerHTML += ("Status bar RAM address range (tile properties, inclusive): ----------- $" + (parseInt(StatBarAddressBarPosProps, 16) - ((BarBytesTotal-1) * StatusBarTileFormat)).toString(16) + " to $" + (parseInt(StatBarAddressBarPosProps, 16).toString(16)))
 				}
 			}
 		//Display the bytes as repeated image boxes
@@ -234,37 +217,46 @@ Layout table:
 
 		//below displays memory layout table
 			if (BarBytesTotal >= 1) {
-				document.getElementById("LayoutTable").innerHTML = "";
 				
 				var i = 0
 				var MiddleCount = 0
+				var MemLayoutTableString = ""
+				//Table header
+				MemLayoutTableString += "<tr>"
+				MemLayoutTableString += "<th>Relative address of <tt>!Scratchram_GraphicalBar_FillByteTbl</tt></th>"
+				MemLayoutTableString += "<th>RAM address relative to <tt>!Scratchram_GraphicalBar_FillByteTbl</tt></th>"
+				MemLayoutTableString += "<th>Tile byte type</th>"
+				MemLayoutTableString += "<th>Status bar tile number location</th>"
+				MemLayoutTableString += "</tr>"
 				//Left end
 					if (LeftEndExist != 0) {
-						document.getElementById("LayoutTable").innerHTML += ("!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i))
-						document.getElementById("LayoutTable").innerHTML += (" = " + "$" + (parseInt(BarTileTableRAM, 16).toString(16)))
-						document.getElementById("LayoutTable").innerHTML += (": <font color='Cyan'>Left end tile byte</font> - Converted and written (as a status bar) at address $")
+						MemLayoutTableString += "<tr>"
+						MemLayoutTableString += ("<td><tt>!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i) + "</tt></td>")
+						MemLayoutTableString += ("<td><tt>$" + (parseInt(BarTileTableRAM, 16).toString(16)) + "</tt></td>")
+						MemLayoutTableString += ("<td><font color='Cyan'>Left end tile byte</font></td>")
 						if (document.getElementById("FillLeftwards").checked == false) {
-							document.getElementById("LayoutTable").innerHTML += ((parseInt(StatBarAddressBarPos, 16) + ((i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16))
+							MemLayoutTableString += ("<td><tt>$" + (parseInt(StatBarAddressBarPos, 16) + ((i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16) + "</tt></td>")
 						} else {
-							document.getElementById("LayoutTable").innerHTML += ((parseInt(StatBarAddressBarPos, 16) + (((BarBytesTotal - 1) - i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16))
+							MemLayoutTableString += ("<td><tt>$" + (parseInt(StatBarAddressBarPos, 16) + (((BarBytesTotal - 1) - i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16) + "</tt></td>")
 						}
+						
+						MemLayoutTableString += "</tr>"
 						i++
 					}
 				//Middle
 					if (MiddleExist != 0) {
 						while (MiddleCount < MiddleExist) {
-							if (i != 0) {
-								document.getElementById("LayoutTable").innerHTML += ("<br>")
-								//^Don't linebreak on the first line when left end is disabled.
-							}
-							document.getElementById("LayoutTable").innerHTML += ("!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i))
-							document.getElementById("LayoutTable").innerHTML += (" = " + "$" + ((parseInt(BarTileTableRAM, 16) + i).toString(16)))
-							document.getElementById("LayoutTable").innerHTML += (": <font color=#00FF00>Middle tile byte " + parseInt(MiddleCount + 1) + "</font> - Converted and written (as a status bar) at address $")
+							MemLayoutTableString += "<tr>"
+							MemLayoutTableString += ("<td><tt>!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i) + "</tt></td>")
+							MemLayoutTableString += ("<td><tt>$" + ((parseInt(BarTileTableRAM, 16) + i).toString(16)) + "</tt></td>")
+							MemLayoutTableString += ("<td><font color=#00FF00>Middle tile byte " + parseInt(MiddleCount + 1) + "</font></td>")
 							if (document.getElementById("FillLeftwards").checked == false) {
-								document.getElementById("LayoutTable").innerHTML += ((parseInt(StatBarAddressBarPos, 16) + ((i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16))
+								MemLayoutTableString += ("<td><tt>$" + (parseInt(StatBarAddressBarPos, 16) + ((i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16) + "</tt></td>")
 							} else {
-								document.getElementById("LayoutTable").innerHTML += ((parseInt(StatBarAddressBarPos, 16) + (((BarBytesTotal - 1) - i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16))
+								MemLayoutTableString += ("<td><tt>$" + (parseInt(StatBarAddressBarPos, 16) + (((BarBytesTotal - 1) - i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16) + "</tt></td>")
 							}
+							
+							MemLayoutTableString += "</tr>"
 							
 							i++
 							MiddleCount++
@@ -272,32 +264,24 @@ Layout table:
 					}
 				//Right end
 					if (RightEndExist != 0) {
-						if (i != 0) {
-							document.getElementById("LayoutTable").innerHTML += ("<br>")
-							//^Don't linebreak on the first line when left end is disabled.
-						}
-						document.getElementById("LayoutTable").innerHTML += ("!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i))
-						document.getElementById("LayoutTable").innerHTML += (" = " + "$" + ((parseInt(BarTileTableRAM, 16) + i).toString(16)))
-						document.getElementById("LayoutTable").innerHTML += (": <font color='red'>Right end tile byte</font> - Converted and written (as a status bar) at address $")
+						MemLayoutTableString += "<tr>"
+						MemLayoutTableString += ("<td><tt>!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i) + "</tt></td>")
+						MemLayoutTableString += ("<td><tt>$" + ((parseInt(BarTileTableRAM, 16) + i).toString(16)) + "</tt></td>")
+						MemLayoutTableString += ("<td><font color='red'>Right end tile byte</font></td>")
 						if (document.getElementById("FillLeftwards").checked == false) {
-							document.getElementById("LayoutTable").innerHTML += ((parseInt(StatBarAddressBarPos, 16) + ((i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16))
+							MemLayoutTableString += ("<td><tt>$" + (parseInt(StatBarAddressBarPos, 16) + ((i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16) + "</tt></td>")
 						} else {
-							document.getElementById("LayoutTable").innerHTML += ((parseInt(StatBarAddressBarPos, 16) + (((BarBytesTotal - 1) - i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16))
+							MemLayoutTableString += ("<td><tt>$" + (parseInt(StatBarAddressBarPos, 16) + (((BarBytesTotal - 1) - i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16) + "</tt></td>")
 						}
+						
+						MemLayoutTableString += "</tr>"
 					}
+				//Table end (every time you use .innerHTML, it automatically closes any unclosed tags, I had to store the entire table code as a
+				//string in MemLayoutTableString).
+					document.getElementById("LayoutTable").innerHTML = "<table>" + MemLayoutTableString + "</table>"
 			} else {
-				document.getElementById("LayoutTable").innerHTML = ("Error")
+				document.getElementById("LayoutTable").innerHTML = ("<table><tr><td>Error</td></tr></table>")
 			}
-	}
-	
-	function DisableEnableTileProps() {
-		if (document.getElementById("RAM2bytesAdjicentStatusbar").checked == true) {
-			document.getElementById("StatusBarRAMPropsPos").disabled=true;
-			document.getElementById("StatusBarRAMPropsPos").value = ""
-		} else {
-			document.getElementById("StatusBarRAMPropsPos").disabled=false;
-		}
-	
 	}
 	
 	function clamp(num, min, max) {
