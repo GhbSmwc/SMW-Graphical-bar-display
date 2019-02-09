@@ -28,7 +28,7 @@ and its tile properties (<tt>YXPCCCTT</tt>):
 <ul>
 <li>SMW's vanilla status bar have only its tile number table stored at address <tt>$7E0EF9</tt> to <tt>$7E0F2F</tt>, while the default tile number
 and properties table stored at ROM address <tt>$008C81</tt> to <tt>$008CFE</tt>.</li>
-<li>Using the Super Status Bar patch, the RAM address differs depending what you set the freeram define (&ldquo;<tt>!RAM_BAR</tt>&rdquo;, which is currently
+<li>Using the Super status bar patch, the RAM address differs depending what you set the freeram define (&ldquo;<tt>!RAM_BAR</tt>&rdquo;, which is currently
 <tt>$7FA000</tt> by default on a normal ROM and <tt>$404000</tt> by default on a SA-1 ROM). This address ranges from <tt>!RAM_BAR</tt> to <tt>!RAM_BAR+319</tt>.
 The tile number and properties byte format is the same as SMW's <tt>$008C81</tt> to <tt>$008CFE</tt> but in RAM and can be modified in-game.</li>
 </ul><br>
@@ -39,4 +39,7 @@ Colored in light-red is the tile number (<tt>TTTTTTTT</tt>) and light-blue for t
 an 8x8 tile. Therefore if you want to read or write the next tile, you move <b>2 bytes</b> over as opposed to 1.<br><br>
 
 Ladida's Status bar patches, however have their types be in separate tables, where moving to 1 byte next means the next 8x8 tile:
-<center><img src="LadidaStatusBarFormat.png"></center>
+<center><img src="LadidaStatusBarFormat.png"></center><br><br>
+
+Thus, loops to write tiles to the status bar is slightly different depending on the byte format, that you should set <tt>!StatusBarFormat</tt> to <tt>$01</tt> for SMW/Ladida's status bar and
+<tt>$02</tt> for Super status bar/Overworld border plus.
