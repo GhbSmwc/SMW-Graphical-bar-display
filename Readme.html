@@ -648,7 +648,12 @@ table to use OW layer 3 tiles).<br><br>
 the bar now fills from right to left. Tiles arranged are flipped so the leftmost tile (including the end tiles) is now the right most, the second leftmost is second rightmost,
 and so on. If you didn't X-flip the tiles via editing the tile properties (YXPCCCTT), each tile won't be X-flipped but are still arranged backwards (when filling up, the rightmost
 tile fills towards the right and advances to the tile towards the left). In vanilla SMW, it is still possible to edit the tile properties (but cannot be changed in-game as the
-data is stored in ROM) at around address <tt>$008C81</tt>.</li>
+data is stored in ROM) at around address <tt>$008C81</tt>.</li><br>
+
+<li><tt>BarExtendLeft</tt>: Normally, without this routine, as the bar's length (not to be confused with the above routine) increases (say, increase the middle length), the
+bar extends rightwards. With this, you call this routine before you call <tt>WriteBarToHUD</tt> or <tt>WriteBarToHUDLeftwards</tt>. What happens is that it calculates
+where the leftmost tile would be at by the length of the bar, so the &ldquo;origin&rdquo; of the position gets moved. This is useful for enemy HP bars that have lengths proportional
+to how much max HP the enemy has instead of always the same length.</li>
 </li>
 </ul>
 </ol>
