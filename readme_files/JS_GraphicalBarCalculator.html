@@ -56,7 +56,7 @@ you have entered an invalid input (entered with a blank input or have invalid ch
 <div class="SmallFont">The RAM address that is the tile number.</div><br>
 
 <input type="checkbox" id="RAM2bytesAdjicentStatusbar" name="RAM2bytesAdjicentStatusbar" value="" checked>You are using a status bar formated two adjacent bytes per tile
-(<tt>[TTTTTTTT, YXPCCCTT]</tt>).<br><br>
+(<tt>[TTTTTTTT, YXPCCCTT]</tt>). <a href="Layer3TileFormat/Layer3TileFormat.html" target="_blank"">See here</a> for more info.<br><br>
 
 <datalist id="StatusBarRAMTileList">
 <option value="7E0F09">SMW's status bar (Writes over &ldquo;TIME&rdquo;)</option>
@@ -221,16 +221,14 @@ Tile byte visual:<br>
 				var MemLayoutTableString = ""
 				//Table header
 				MemLayoutTableString += "<tr>"
-				MemLayoutTableString += "<th>Relative address of <tt>!Scratchram_GraphicalBar_FillByteTbl</tt></th>"
-				MemLayoutTableString += "<th>RAM address relative to <tt>!Scratchram_GraphicalBar_FillByteTbl</tt></th>"
+				MemLayoutTableString += "<th><tt>!Scratchram_GraphicalBar_FillByteTbl area</tt></th>"
 				MemLayoutTableString += "<th>Tile byte type</th>"
 				MemLayoutTableString += "<th>Status bar tile number location</th>"
 				MemLayoutTableString += "</tr>"
 				//Left end
 					if (LeftEndExist != 0) {
 						MemLayoutTableString += "<tr>"
-						MemLayoutTableString += ("<td><tt>!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i) + "</tt></td>")
-						MemLayoutTableString += ("<td><tt>$" + (parseInt(BarTileTableRAM, 16).toString(16)) + "</tt></td>")
+						MemLayoutTableString += ("<td><tt>$" + (parseInt(BarTileTableRAM, 16).toString(16)) + " (!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i) +")</tt></td>")
 						MemLayoutTableString += ("<td><font color='Cyan'>Left end tile byte</font></td>")
 						if (document.getElementById("FillLeftwards").checked == false) {
 							MemLayoutTableString += ("<td><tt>$" + (parseInt(StatBarAddressBarPos, 16) + ((i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16) + "</tt></td>")
@@ -245,8 +243,7 @@ Tile byte visual:<br>
 					if (MiddleExist != 0) {
 						while (MiddleCount < MiddleExist) {
 							MemLayoutTableString += "<tr>"
-							MemLayoutTableString += ("<td><tt>!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i) + "</tt></td>")
-							MemLayoutTableString += ("<td><tt>$" + ((parseInt(BarTileTableRAM, 16) + i).toString(16)) + "</tt></td>")
+							MemLayoutTableString += ("<td><tt>$" + (parseInt(BarTileTableRAM, 16) + i).toString(16) + " (!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i) +")</tt></td>")
 							MemLayoutTableString += ("<td><font color=#00FF00>Middle tile byte " + parseInt(MiddleCount + 1) + "</font></td>")
 							if (document.getElementById("FillLeftwards").checked == false) {
 								MemLayoutTableString += ("<td><tt>$" + (parseInt(StatBarAddressBarPos, 16) + ((i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16) + "</tt></td>")
@@ -263,8 +260,7 @@ Tile byte visual:<br>
 				//Right end
 					if (RightEndExist != 0) {
 						MemLayoutTableString += "<tr>"
-						MemLayoutTableString += ("<td><tt>!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i) + "</tt></td>")
-						MemLayoutTableString += ("<td><tt>$" + ((parseInt(BarTileTableRAM, 16) + i).toString(16)) + "</tt></td>")
+						MemLayoutTableString += ("<td><tt>$" + ((parseInt(BarTileTableRAM, 16) + i).toString(16)) + " (!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i) +")</tt></td>")
 						MemLayoutTableString += ("<td><font color='red'>Right end tile byte</font></td>")
 						if (document.getElementById("FillLeftwards").checked == false) {
 							MemLayoutTableString += ("<td><tt>$" + (parseInt(StatBarAddressBarPos, 16) + ((i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16) + "</tt></td>")
