@@ -28,19 +28,19 @@ you have entered an invalid input (entered with a blank input or have invalid ch
 <table>
 <tr>
 <td><tt>!Scratchram_GraphicalBar_LeftEndPiece</tt> holds the value:</td>
-<td><input type="number" id="LeftEndPiece" value="3" min="0" max="255" step="1"> Use decimal integers 0-255</td>
+<td><input type="number" id="LeftEndPiece" value="3" min="0" max="255" step="1" onchange="LeftEndPiecesChanged()">(<tt>Hex: $<span id="LeftPiecesHexDisplay">3</span></tt>) Use decimal integers 0-255</td>
 </tr>
 <tr>
 <td><tt>!Scratchram_GraphicalBar_MiddlePiece</tt> holds the value:</td>
-<td><input type="number" id="MiddlePiece" value="8" min="0" max="255" step="1"> Use decimal integers 0-255</td>
+<td><input type="number" id="MiddlePiece" value="8" min="0" max="255" step="1" onchange="MiddlePiecesChanged()">(<tt>Hex: $<span id="MiddlePiecesHexDisplay">8</span></tt>) Use decimal integers 0-255</td>
 </tr>
 <tr>
 <td><tt>!Scratchram_GraphicalBar_RightEndPiece</tt> holds the value:</td>
-<td><input type="number" id="RightEndPiece" value="3" min="0" max="255" step="1"> Use decimal integers 0-255</td>
+<td><input type="number" id="RightEndPiece" value="3" min="0" max="255" step="1" onchange="RightPiecesChanged()">(<tt>Hex: $<span id="RightPiecesHexDisplay">3</span></tt>) Use decimal integers 0-255</td>
 </tr>
 <tr>
 <td><tt>!Scratchram_GraphicalBar_TempLength</tt> holds the value:</td>
-<td><input type="number" id="MiddleLength" value="7" min="0" max="255" step="1"> Use decimal integers 0-255, note that this uses loops and lags if this is a large number.</td>
+<td><input type="number" id="MiddleLength" value="7" min="0" max="255" step="1" onchange="LengthChanged()"><tt>(Hex: $<span id="LengthHexDisplay">7</span></tt>) Use decimal integers 0-255, note that this uses loops and lags if this is a large number.</td>
 </tr>
 <td><tt>!Scratchram_GraphicalBar_FillByteTbl</tt> is located at RAM address: </td>
 <td>$<input type="text" list="BarTileTableRAMList" id="BarTileTableRAM" value ="" maxlength="6"> Enter a hexadecimal RAM address here (don't add a prefix)</td>
@@ -100,11 +100,36 @@ Tile byte visual:<br>
 
 
 <script>
+	function LeftEndPiecesChanged() {
+		var LeftEndPiece = Math.floor(clamp(document.getElementById("LeftEndPiece").value, 0, 255))
+		document.getElementById("LeftEndPiece").value = LeftEndPiece
+		document.getElementById("LeftPiecesHexDisplay").innerHTML = parseInt(LeftEndPiece).toString(16)
+	}
+	function MiddlePiecesChanged() {
+		var MiddlePiece = Math.floor(clamp(document.getElementById("MiddlePiece").value, 0, 255))
+		document.getElementById("MiddlePiece").value = MiddlePiece
+		document.getElementById("MiddlePiecesHexDisplay").innerHTML = parseInt(MiddlePiece).toString(16)
+	}
+	function RightPiecesChanged() {
+		var RightPieces = Math.floor(clamp(document.getElementById("RightEndPiece").value, 0, 255))
+		document.getElementById("RightEndPiece").value = RightPieces
+		document.getElementById("RightPiecesHexDisplay").innerHTML = parseInt(RightPieces).toString(16)
+	}
+	function LengthChanged() {
+		var Length = Math.floor(clamp(document.getElementById("MiddleLength").value, 0, 255))
+		document.getElementById("MiddleLength").value = Length
+		document.getElementById("LengthHexDisplay").innerHTML = parseInt(Length).toString(16)
+	}
 	function Reset() {
 		document.getElementById("LeftEndPiece").value = "3";
+		document.getElementById("LeftPiecesHexDisplay").innerHTML = "3"
 		document.getElementById("MiddlePiece").value = "8";
+		document.getElementById("MiddlePiecesHexDisplay").innerHTML = "8"
 		document.getElementById("RightEndPiece").value = "3";
+		document.getElementById("RightPiecesHexDisplay").innerHTML = "3"
 		document.getElementById("MiddleLength").value = "7";
+		document.getElementById("LengthHexDisplay").innerHTML = "7"
+		
 		document.getElementById("BarTileTableRAM").value = "";
 		document.getElementById("StatusBarRAMTilePos").value = "";
 		
@@ -277,7 +302,6 @@ Tile byte visual:<br>
 				document.getElementById("LayoutTable").innerHTML = ("<table><tr><td>Error</td></tr></table>")
 			}
 	}
-	
 	function clamp(num, min, max) {
 		return num <= min ? min : num >= max ? max : num;
 	}
