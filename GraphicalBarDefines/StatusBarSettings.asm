@@ -95,6 +95,8 @@
     !Default_GraphicalBarPropertiesExtendLeftwards      = $7FA03F  ;>Same as above but SA-1
    endif
   endif
+  !Default_GraphicalBarPositionExtendLeftwards_MaxMiddleLength = 30
+  ;^The maximum length of the middle part of the leftward extending bar.
   
 ;Tile settings (length does not apply to [ExtendLeftwards.asm] as that is variable in-game):
  !Default_MiddleLength                = 7             ;>30 = screen-wide (30 + 2 end tiles = 32, all 8x8 tile row in the screen's width)
