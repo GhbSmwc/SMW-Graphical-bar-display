@@ -13,8 +13,31 @@
 incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
+;Don't touch these. This calculates the total length of the bar for end tiles.
+	!LeftEndTile	= 0
+	!RightEndTile	= 0
+	
+	if !Default_LeftPieces != 0
+		!LeftEndTile = 1
+	endif
+	if !Scratchram_GraphicalBar_RightEndPiece != 0
+		!RightEndTile = 1
+	endif
+	
+	!TotalEnds = !LeftEndTile+!RightEndTile
+	!TotalLength = !Default_GraphicalBarPositionExtendLeftwards_MaxMiddleLength+!TotalEnds
+
 ;Again, this is an uberasm tool test file.
 main:
+.ClearBarAreaWhenShorten
+	print "bug here-----------------------------------$",pc
+	LDX.b #(!TotalLength-1)*!StatusBarFormat
+	LDA #$FC							;>Blank tile
+	
+	..Loop
+	STA !Default_GraphicalBarPositionExtendLeftwards-((!TotalLength-1)*!StatusBarFormat),x
+	DEX #!StatusBarFormat
+	BPL ..Loop
 .InputRatio
 	LDA $0DBF|!addr						;\Quantity: coins
 	STA !Scratchram_GraphicalBar_FillByteTbl		;|
@@ -25,14 +48,19 @@ main:
 	LDA #$00						;|
 	STA !Scratchram_GraphicalBar_FillByteTbl+3		;/
 .InputGraphicalBarAttributes
-	LDA.b #!Default_LeftPieces				;\Left end normally have 3 pieces.
-	STA !Scratchram_GraphicalBar_LeftEndPiece		;/
-	LDA.b #!Default_MiddlePieces				;\Number of pieces in each middle byte/8x8 tile
-	STA !Scratchram_GraphicalBar_MiddlePiece		;/
-	LDA.b #!Default_RightPieces				;\Right end
-	STA !Scratchram_GraphicalBar_RightEndPiece		;/
-	LDA $95							;\length (number of middle tiles)
-	STA !Scratchram_GraphicalBar_TempLength			;/
+	LDA.b #!Default_LeftPieces						;\Left end normally have 3 pieces.
+	STA !Scratchram_GraphicalBar_LeftEndPiece				;/
+	LDA.b #!Default_MiddlePieces						;\Number of pieces in each middle byte/8x8 tile
+	STA !Scratchram_GraphicalBar_MiddlePiece				;/
+	LDA.b #!Default_RightPieces						;\Right end
+	STA !Scratchram_GraphicalBar_RightEndPiece				;/
+	LDA $95									;\length (number of middle tiles)
+	CMP.b #!Default_GraphicalBarPositionExtendLeftwards_MaxMiddleLength	;|\Prevent overwriting data that is located before the status bar area.
+	BCC ..LowerThanMax							;||
+	LDA.b #!Default_GraphicalBarPositionExtendLeftwards_MaxMiddleLength	;|/
+
+	..LowerThanMax
+	STA !Scratchram_GraphicalBar_TempLength					;
 .ConvertToBar
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
 	
