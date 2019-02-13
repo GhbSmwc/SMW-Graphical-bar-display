@@ -30,7 +30,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;Again, this is an uberasm tool test file.
 main:
 .ClearBarAreaWhenShorten
-	print "bug here-----------------------------------$",pc
+	;This code removes leftover "ghost tiles" artifact when the bar shortens after being extended.
 	LDX.b #(!TotalLength-1)*!StatusBarFormat
 	LDA #$FC							;>Blank tile
 	
