@@ -1,6 +1,11 @@
 ;This is separate from the main define file "GraphicalBarDefines.asm" because of these reasons:
 ;-This is a preset setting, made for specific bars and not for all of them.
 ;-The main define file covers all stuff using the graphical bar routines.
+;
+; NOTE: the overworld border plus (OWB+) and the super status bar (SSB) patch uses the same tile data
+; format, so make sure you set !StatusBarFormat to $02 and !StatusBar_UsingCustomProperties to 1.
+; I recommend using the SSB along with the OWB+ patch if you want to test both levels and overworld
+; versions all at once.
 
 ;Status bar stuff
  !StatusBarFormat                     = $01
@@ -20,7 +25,10 @@
  !Default_StatusBar_TilePropertiesSetting      = %00111000
   ;^Tile properties (if you enable editing properties in-game). Note: Bit 6 (X-flip) is
   ; forced to be set when !Default_LeftwardsBar is set to 1. If you want this to be x flipped,
-  ; set that aforementioned setting.
+  ; set that aforementioned setting. (YXPCCCTT)
+
+ !Default_Overworld_TilePropertiesSetting      = %00111001
+  ;^Same as above, but overworld map.
  
  ;Tile positions. If you are using other status bar patches other than the Super Status Bar
  ;patch, make sure the RAMs here matches the RAM address those patch are using. By default:
@@ -97,7 +105,17 @@
   endif
   !Default_GraphicalBarPositionExtendLeftwards_MaxMiddleLength = 30
   ;^The maximum length of the middle part of the leftward extending bar.
-  
+ ;Overworld graphical bar:
+  if !sa1 == 0
+   !Default_GraphicalBarPositionOverworldMap = $7FEC00
+  else
+   !Default_GraphicalBarPositionOverworldMap = $41EC00
+  endif
+  if !sa1 == 0
+   !Default_GraphicalBarPropertiesOverworldMap = $7FEC01
+  else
+   !Default_GraphicalBarPropertiesOverworldMap = $41EC01
+  endif
 ;Tile settings (length does not apply to [ExtendLeftwards.asm] as that is variable in-game):
  !Default_MiddleLength                = 7             ;>30 = screen-wide (30 + 2 end tiles = 32, all 8x8 tile row in the screen's width)
  !Default_LeftPieces                  = 3             ;\These will by default, set the RAM for the pieces for each section

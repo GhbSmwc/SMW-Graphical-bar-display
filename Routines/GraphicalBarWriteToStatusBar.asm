@@ -8,7 +8,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;wide and 28 ($1C) 8x8 tiles tall.
 ;
 ;Input:
-; -$00 to $02: The starting byte address of the status bar (tile number).
+; -$00 to $02: The starting byte address location of the status bar (tile number).
 ; --If you're using SA-1 mode here and using vanilla status bar,
 ;   the status bar tilemap table is moved to bank $40.
 ; -!Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
@@ -20,6 +20,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ; -If you are using custom status bar patches that enables editing tile properties in-game,
 ;  and have set "!StatusBar_UsingCustomProperties" to 1, you have another input:
 ; --$03 to $05: Same as $00 to $02 but for tile properties instead of tile numbers.
+; --$06: The tile properties (YXPCCCTT) you want it to be.
 ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 WriteBarToHUD:
@@ -39,7 +40,7 @@ WriteBarToHUD:
 	LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\Write each tile.
 	STA [$00],y					;/
 	if !StatusBar_UsingCustomProperties != 0
-		LDA.b #!Default_StatusBar_TilePropertiesSetting
+		LDA $06
 		STA [$03],y
 	endif
 	

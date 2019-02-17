@@ -214,6 +214,8 @@ main:
 		STA $04
 		LDA.b #!Default_GraphicalBarProperties>>16
 		STA $05
+		LDA.b #!Default_StatusBar_TilePropertiesSetting			;\Properties
+		STA $06								;/
 	endif
 	if !Default_LeftwardsBar == 0
 		JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;>Write to status bar

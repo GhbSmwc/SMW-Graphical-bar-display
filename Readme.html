@@ -631,12 +631,16 @@ Inputs are again, similar to <tt>CalculateGraphicalBarPercentage</tt> with only 
 </tr>
 <tr>
 <td><tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$02</b></nobr></tt> (24-bit)</td>
-<td>The starting address (left end, extends rightwards, even when the bar is set to fill leftwards) to write the tile numbers to the status bar.</td>
+<td>The starting address (left end, extends rightwards, even when the bar is set to fill leftwards) location to write the tile numbers to the status bar.</td>
 </tr>
 <td><tt><nobr><b>$03</b></nobr></tt> to <tt><nobr><b>$05</b></nobr></tt> (24-bit)</td>
-<td>The starting address (left end, extends rightwards, even when the bar is set to fill leftwards) to write the tile properties to the status bar.
-(This only works if you installed status bar patches that enable editing the properties in-game, else this is no longer needed to write values to this input).
-I deliberately used the if statement around this to prevent writing to an arbitrary address (the <nobr><tt>STA [$03],y</tt></nobr> could write to an invalid address).</td>
+<td>The starting address (left end, extends rightwards, even when the bar is set to fill leftwards) location to write the tile properties to the status bar.
+(This only works if you installed status bar patches that enable editing the properties in-game, and set <tt>!StatusBar_UsingCustomProperties</tt> to <tt>1</tt>,
+else this is no longer needed to write values to this input). I deliberately used the if statement around this to prevent writing to an arbitrary address (the <nobr><tt>STA [$03],y</tt></nobr> could write to an invalid address).</td>
+<tr>
+<td><tt><nobr><b>$06</b></nobr></tt> (8-bit)</td>
+<td>The tile properties (YXPCCCTT). Same as above, if you have it disabled, this is not used.</td>
+</tr>
 </table><br>
 Remember that this is low endian (The address $7E0F09, for example are stored in each bytes as
 <pre>$7E0000: $09
