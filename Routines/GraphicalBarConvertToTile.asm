@@ -3,7 +3,13 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Convert fill amount in bar to tile numbers. NOTE: does not work with double-bar.
-;Scroll down for the double-bar version.
+;Scroll down for the double-bar version. This routine checks the gamemode address
+;$0100 to determine which tile table to use for adoption for overworld border plus
+;patch.
+;
+;Note to self about the gamemode values:
+; $0D-$0E covers overworld load and overworld.
+; $13-$14 covers level load and level.
 ;
 ;Input:
 ; -!Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
@@ -15,6 +21,15 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;Output:
 ; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+x:
 ;  converted to tile numbers.
+;Overwritten/Destroyed:
+; -$00 Needed for fast checking if overworld or not (better than
+;  checking $0100 every time using BCC/BCS):
+; --#$00 for level
+; --#$01 for overworld.
+;  I deliberately make it use scratch RAM in the case you have
+;  even more tables (3+ states of graphics) for each graphic.
+;  Feel free to edit the code though.
+; -$01 Needed to convert the middle tiles
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;These are tile numbers. Each number, starting from the
 	;left represent each tile of pieces ordered from empty
@@ -23,104 +38,153 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	
 	;Tiles will glitch out if the number of pieces in the
 	;corresponding type of bar part (left middle and right)
-	;does not equal to the number of tile numbers +1 here.
-	GraphicalBar_LeftEnd8x8s:
-	;    0   1   2   3
-	db $36,$37,$38,$39 ;>Left end fills 0-3 (there are 3 pieces by default)
-	GraphicalBar_Middle8x8s:
-	;    0   1   2   3   4   5   6   7   8
-	db $55,$56,$57,$58,$59,$65,$66,$67,$68 ;>Middle fills 0-8 (there are 8 pieces on each middle tile by default)
-	GraphicalBar_RightEnd8x8s:
-	;    0   1   2   3
-	db $50,$51,$52,$53 ;>Right end fills 0-3 (there are 3 pieces by default)
-	
-	ConvertBarFillAmountToTiles:
-	PHB						;>Preserve bank (so that table indexing work properly)
-	PHK						;>push current bank
-	PLB						;>pull out as regular bank
+	;does not equal to the number of tile numbers +1 here,
+	;when they use invalid indexing that would points to
+	;bytes beyond the table.
+	;This is for level:
+		GraphicalBar_LeftEnd8x8s:
+		;    0   1   2   3
+		db $36,$37,$38,$39 ;>Left end fills 0-3 (there are 3 pieces by default)
+		GraphicalBar_Middle8x8s:
+		;    0   1   2   3   4   5   6   7   8
+		db $55,$56,$57,$58,$59,$65,$66,$67,$68 ;>Middle fills 0-8 (there are 8 pieces on each middle tile by default)
+		GraphicalBar_RightEnd8x8s:
+		;    0   1   2   3
+		db $50,$51,$52,$53 ;>Right end fills 0-3 (there are 3 pieces by default)
+	;These here are the same as above but intended for overworld border.
+		GraphicalBar_LeftEnd8x8s_Ow:
+		db $80,$81,$82,$83
+		GraphicalBar_Middle8x8s_Ow:
+		db $84,$85,$86,$87,$88,$89,$8A,$8B,$8C
+		GraphicalBar_RightEnd8x8s_Ow:
+		db $8D,$8E,$8F,$90
+	;Convert tile code following:
+		ConvertBarFillAmountToTiles:
+		PHB						;>Preserve bank (so that table indexing work properly)
+		PHK						;>push current bank
+		PLB						;>pull out as regular bank
+	;Level or overworld?
+		.WhatTableToUse
+		STZ $00						;>Default to "Level"
+		LDA $0100|!addr					;\If gamemode value is #$0F or higher, that is level
+		CMP #$0F					;|
+		BCS ..Level					;/
+		
+		..Overworld
+		INC $00						;>Otherwise assume its overworld.
+		
+		..Level
+		if !Setting_GraphicalBar_IndexSize == 0
+			LDX #$00
+		else
+			REP #$10								;>16-bit XY
+			LDX #$0000								;>The index for what byte tile position to write.
+		endif
+	;Left end
+		.LeftEndTranslate
+		LDA !Scratchram_GraphicalBar_LeftEndPiece	;\can only be either 0 or the correct number of pieces listed in the table.
+		BEQ .MiddleTranslate				;/
+		if !Setting_GraphicalBar_IndexSize == 0
+			LDA !Scratchram_GraphicalBar_FillByteTbl	;\Y = amount filled byte
+			TAY						;/
+		else
+			REP #$20
+			LDA !Scratchram_GraphicalBar_FillByteTbl
+			AND #$00FF
+			TAY
+			SEP #$20
+		endif
+		LDA $00
+		BEQ ..Level
+		
+		..Overworld
+		LDA GraphicalBar_LeftEnd8x8s_Ow,y
+		BRA ..WriteTable
+		
+		..Level
+		LDA GraphicalBar_LeftEnd8x8s,y				;\Convert byte to tile number byte
+		
+		..WriteTable
+		STA !Scratchram_GraphicalBar_FillByteTbl		;/
+		INX							;>next tile byte
+	;Middle
+		.MiddleTranslate
+		LDA !Scratchram_GraphicalBar_MiddlePiece	;\check if middle exist.
+		BEQ .RightEndTranslate				;|
+		LDA !Scratchram_GraphicalBar_TempLength		;|
+		BEQ .RightEndTranslate				;/
 
-	if !Setting_GraphicalBar_IndexSize == 0
-		LDX #$00
-	else
-		REP #$10								;>16-bit XY
-		LDX #$0000								;>The index for what byte tile position to write.
-	endif
-
-	.LeftEndTranslate
-	LDA !Scratchram_GraphicalBar_LeftEndPiece	;\can only be either 0 or the correct number of pieces listed in the table.
-	BEQ .MiddleTranslate				;/
-	if !Setting_GraphicalBar_IndexSize == 0
-		LDA !Scratchram_GraphicalBar_FillByteTbl	;\Y = amount filled byte
-		TAY						;/
-	else
-		REP #$20
-		LDA !Scratchram_GraphicalBar_FillByteTbl
-		AND #$00FF
-		TAY
+		if !Setting_GraphicalBar_IndexSize == 0
+			LDA !Scratchram_GraphicalBar_TempLength		;\Number of middle tiles to convert
+			STA $01						;/
+		else
+			REP #$20
+			LDA !Scratchram_GraphicalBar_TempLength
+			AND #$00FF
+			STA $01
+		endif
+		..Loop
+		if !Setting_GraphicalBar_IndexSize == 0
+			LDA !Scratchram_GraphicalBar_FillByteTbl,x	;>Y = the fill amount
+			TAY
+		else
+			LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\amount of filled, indexed
+			AND #$00FF					;|
+			TAY						;/
+			SEP #$20
+		endif
+		LDA $00
+		BEQ ..Level
+		
+		..Overworld
+		LDA GraphicalBar_Middle8x8s_Ow,y
+		BRA ..WriteTable
+		
+		..Level
+		LDA GraphicalBar_Middle8x8s,y			;\amount filled as tile graphics
+		
+		..WriteTable
+		STA !Scratchram_GraphicalBar_FillByteTbl,x	;/
+		
+		...Next
+		INX
+		if !Setting_GraphicalBar_IndexSize != 0
+			REP #$20
+		endif
+		DEC $01
+		BNE ..Loop
 		SEP #$20
-	endif
-	LDA GraphicalBar_LeftEnd8x8s,y				;\Convert byte to tile number byte
-	STA !Scratchram_GraphicalBar_FillByteTbl		;/
-	INX							;>next tile byte
-
-	.MiddleTranslate
-	LDA !Scratchram_GraphicalBar_MiddlePiece	;\check if middle exist.
-	BEQ .RightEndTranslate				;|
-	LDA !Scratchram_GraphicalBar_TempLength		;|
-	BEQ .RightEndTranslate				;/
-
-	if !Setting_GraphicalBar_IndexSize == 0
-		LDA !Scratchram_GraphicalBar_TempLength		;\Number of middle tiles to convert
-		STA $00						;/
-	else
-		REP #$20
-		LDA !Scratchram_GraphicalBar_TempLength
-		AND #$00FF
-		STA $00
-	endif
-	..Loop
-	if !Setting_GraphicalBar_IndexSize == 0
-		LDA !Scratchram_GraphicalBar_FillByteTbl,x	;>Y = the fill amount
-		TAY
-	else
-		LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\amount of filled, indexed
-		AND #$00FF					;|
-		TAY						;/
-		SEP #$20
-	endif
-	LDA GraphicalBar_Middle8x8s,y			;\amount filled as tile graphics
-	STA !Scratchram_GraphicalBar_FillByteTbl,x	;/
-	
-	...Next
-	INX
-	if !Setting_GraphicalBar_IndexSize != 0
-		REP #$20
-	endif
-	DEC $00
-	BNE ..Loop
-	
-	SEP #$20
-
-	.RightEndTranslate
-	LDA !Scratchram_GraphicalBar_RightEndPiece
-	BEQ .Done
-	if !Setting_GraphicalBar_IndexSize == 0
-		LDA !Scratchram_GraphicalBar_FillByteTbl,x
-		TAY
-	else
-		REP #$20
-		LDA !Scratchram_GraphicalBar_FillByteTbl,x
-		AND #$00FF
-		TAY
-		SEP #$20
-	endif
-	LDA GraphicalBar_RightEnd8x8s,y
-	STA !Scratchram_GraphicalBar_FillByteTbl,x
-	
-	.Done
-	SEP #$30					;>Just in case
-	PLB						;>Pull bank
-	RTL
+	;Right end
+		.RightEndTranslate
+		LDA !Scratchram_GraphicalBar_RightEndPiece
+		BEQ .Done
+		if !Setting_GraphicalBar_IndexSize == 0
+			LDA !Scratchram_GraphicalBar_FillByteTbl,x
+			TAY
+		else
+			REP #$20
+			LDA !Scratchram_GraphicalBar_FillByteTbl,x
+			AND #$00FF
+			TAY
+			SEP #$20
+		endif
+		LDA $00
+		BEQ ..Level
+		
+		..Overworld
+		LDA GraphicalBar_RightEnd8x8s_Ow,y
+		BRA ..WriteTable
+		
+		..Level
+		LDA GraphicalBar_RightEnd8x8s,y
+		
+		..WriteTable
+		STA !Scratchram_GraphicalBar_FillByteTbl,x
+	;Done
+		.Done
+		SEP #$30					;>Just in case
+		PLB						;>Pull bank
+		RTL
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Convert fill amount in bar to tile numbers, double-bar edition
 ;Inputs and outputs the same as above.
