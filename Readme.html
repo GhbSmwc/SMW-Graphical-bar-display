@@ -497,7 +497,7 @@ relative address:</td>
 </tr>
 </table><br>
 Of course, I made a <a name="ComputeGraphicalBarData" href="readme_files/JS_GraphicalBarCalculator.html">javascript code page</a> that calculates memory statistics
-without the need of manually calculating the values.
+without the need of manually calculating the values.<br><br>
 </li>
 </ul>
 <li>Inside <tt>GraphicalBarConvertToTile.asm</tt></li>
@@ -603,14 +603,18 @@ Result:
 </tr>
 </table><br>
 If you changed the number of pieces in any of the 3 parts of the bar (left, middle, and right), the number of pieces must equal to the number of values +1 (+1 because an empty tile byte is included)
-in the table corresponding to the bar part, for example, by making left end have 4 pieces instead of 3, you must have 5 values in the left end tile table. Else your tiles will glitch.
+in the table corresponding to the bar part, for example, by making left end have 4 pieces instead of 3, you must have 5 values in the left end tile table. Else your tiles will glitch.<br><br>
+
+Note that scratch RAM <tt>$00</tt> and <tt>$01</tt> is overwritten to determine should it use overworld border version and handle a loop that translates the middle tiles.<br><br>
 
 </li>
 <li><tt>ConvertBarFillAmountToTilesDoubleBar</tt>: Same as above, but handles a double-filled bar. Tiles are formated <a href="readme_files/DoubleBarFills.png" target="_blank">like this</a>.
 Also like above, make sure you have the number of pieces equal to <tt>(NumberOfPieces+1)^2</tt> number of values in table (for example, left end have 4 pieces, therefore you must have 25 values;
 <tt>(4+1)^2 = 25</tt>). I recommend to have the table to form a perfect square so that the fill values are visually organized.</li><br>
 
-Of course, the default graphics included here are pixel-column-based, meaning each column of pixels is 1 piece of a bar.
+Of course, the default graphics included here are pixel-column-based, meaning each column of pixels is 1 piece of a bar.<br><br>
+
+Note that this does not support overworld graphics unlike above, as there are even more tiles used than the status bar.<br><br>
 
 </ul><br>
 
