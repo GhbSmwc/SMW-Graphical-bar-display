@@ -23,18 +23,37 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ; --$06: The tile properties (YXPCCCTT) you want it to be.
 ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-WriteBarToHUD:
+	if !OWPlusAndSSBSameFormat == 0
+		WriteBarToHUD:
+		JSL CountNumberOfTiles
+		CPX #$FF				;\If 0-1 = (-1), there is no tile to write.
+		BEQ .Done				;/(non-existent bar)
+		TXY					;>STA [$xx],x does not exist! Only STA [$xx,x] does but functions differently!
+
+		.Loop
+		LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\Write each tile.
+		STA [$00],y					;/
+		if !StatusBar_UsingCustomProperties != 0
+			LDA $06
+			STA [$03],y
+		endif
+		
+		..Next
+		DEX
+		DEY
+		BPL .Loop
+		
+		.Done
+		RTL
+	endif
+	
+	WriteBarToHUDFormat2:
 	JSL CountNumberOfTiles
 	CPX #$FF				;\If 0-1 = (-1), there is no tile to write.
 	BEQ .Done				;/(non-existent bar)
-	
-	if !StatusBarFormat == $01
-		TXY
-	else
-		TXA				;\Have Y = X*2 due to Super Status Bar patch formated for 2 contiguous bytes per tile.
-		ASL				;|
-		TAY				;/
-	endif
+	TXA					;\Have Y = X*2 due to SSB/OWB+ patch formated for 2 contiguous bytes per tile.
+	ASL					;|
+	TAY					;/
 	
 	.Loop
 	LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\Write each tile.
@@ -46,7 +65,7 @@ WriteBarToHUD:
 	
 	..Next
 	DEX
-	DEY #!StatusBarFormat
+	DEY #2
 	BPL .Loop
 	
 	.Done
@@ -54,7 +73,31 @@ WriteBarToHUD:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Same as above, but fills leftwards as opposed to rightwards.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-WriteBarToHUDLeftwards:
+	if !OWPlusAndSSBSameFormat == 0
+		WriteBarToHUDLeftwards:
+		JSL CountNumberOfTiles
+		CPX #$FF
+		BEQ .Done
+		LDY #$00
+		
+		.Loop
+		LDA !Scratchram_GraphicalBar_FillByteTbl,x
+		STA [$00],y
+		if !StatusBar_UsingCustomProperties != 0
+			LDA $06
+			STA [$03],y
+		endif
+		
+		..Next
+		INY
+		DEX
+		BPL .Loop
+		
+		.Done
+		RTL
+	endif
+	
+	WriteBarToHUDLeftwardsFormat2:
 	JSL CountNumberOfTiles
 	CPX #$FF
 	BEQ .Done
@@ -64,12 +107,12 @@ WriteBarToHUDLeftwards:
 	LDA !Scratchram_GraphicalBar_FillByteTbl,x
 	STA [$00],y
 	if !StatusBar_UsingCustomProperties != 0
-		LDA.b #(!Default_StatusBar_TilePropertiesSetting|(!Default_LeftwardsBar<<6))
+		LDA $06
 		STA [$03],y
 	endif
 	
 	..Next
-	INY #!StatusBarFormat
+	INY #2
 	DEX
 	BPL .Loop
 	
@@ -105,12 +148,18 @@ WriteBarToHUDLeftwards:
 ;  [DesiredLastTilePos-((NumberOfTiles-1)*!StatusBarFormat)] to [DesiredLastTilePos]
 ;  Same applies to tile properties.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-BarExtendLeft:
+BarExtendLeftFormat2:
 	JSL CountNumberOfTiles
 	TXA
-	if !StatusBarFormat == $02
-		ASL
-		TAX
+	ASL
+	TAX
+	if !OWPlusAndSSBSameFormat == 0
+		BRA +
+
+		BarExtendLeft:
+		JSL CountNumberOfTiles
+		TXA
+		+
 	endif
 	;^A now holds the number of bytes to go back.
 	; This indicates the first tile of the bar to be written.

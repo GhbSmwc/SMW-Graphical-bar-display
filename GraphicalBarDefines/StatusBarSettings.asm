@@ -7,9 +7,18 @@
 ; I recommend using the SSB along with the OWB+ patch if you want to test both levels and overworld
 ; versions all at once.
 
-;Status bar stuff
- !StatusBarFormat                     = $01
-  ;^Number of grouped bytes per 8x8 tile:
+;Status bar and overworld stuff
+ !OWPlusAndSSBSameFormat              = 1
+  ; 0 = You are using a non-Super Status Bar and
+  ;     Overworld border plus patch (you are using both
+  ;     tile data formats).
+  ; 1 = You are using Super Status Bar and overworld
+  ;     border plus patch, which they both have the
+  ;     same tile bytes format (excludes the redundant
+  ;     routines that writes to the status bar).
+
+ !StatusBarFormat                     = $02
+  ;^Number of grouped bytes per 8x8 tile for the status bar (not the overworld border):
   ; $01 = each 8x8 tile have two bytes each separated into "tile numbers" and "tile properties" group;
   ;       Minimalist/SMB3 [TTTTTTTT, TTTTTTTT]...[YXPCCCTT, YXPCCCTT] or SMW's default ([TTTTTTTT] only).
   ; $02 = each 8x8 tile byte have two bytes located next to each other;

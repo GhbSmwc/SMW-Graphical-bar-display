@@ -169,11 +169,19 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 		endif
 		STA $06								;/
 	endif
-	if !Default_LeftwardsBar == 0						;\Write to status bar
-		JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;|
-	else									;|
-		JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards		;|
-	endif									;/
+	if !Default_LeftwardsBar == 0
+		if !StatusBarFormat = $01
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;>Write to status bar
+		else
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDFormat2		;>Write to status bar
+		endif
+	else
+		if !StatusBarFormat = $01
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards
+		else
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwardsFormat2
+		endif
+	endif
 	RTL</pre></td></tr></table><br>
 Font colored in red is the things you change, while the green, you edit values in the defines via opening up <tt>GraphicalBarDefines/StatusBarSettings.asm</tt>
 and changing those, and yes, you can safely redefine them when you have multiple bars for advanced use. Yellow is the same as green, but it has to be a 3-byte (24-bit) address.
@@ -626,7 +634,8 @@ Note that this does not support overworld graphics unlike above, as there are ev
 </ul><br>
 
 
-<li>Inside <tt>GraphicalBarWriteToStatusBar.asm</tt></li>
+<li>Inside <tt>GraphicalBarWriteToStatusBar.asm</tt>. Note that there are two similar subroutines main labels with one that have &ldquo;<tt>Format2</tt>&rdquo; (such as <tt>WriteBarToHUD</tt> and
+<tt>WriteBarToHUDFormat2</tt>) appended are the same as the other but handles a different status bar/OWB format.</li>
 <ul>
 <li><tt>WriteBarToHUD</tt>: Copies the tile numbers in the table to paste to (writes) the status bar (if you're using the Super Status Bar patch, the if statement and defines will adopt to that).
 Inputs are again, similar to <tt>CalculateGraphicalBarPercentage</tt> with only the attributes being used, but a new input is required:

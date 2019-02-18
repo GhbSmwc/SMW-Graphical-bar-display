@@ -222,9 +222,17 @@ main:
 		STA $06								;/
 	endif
 	if !Default_LeftwardsBar == 0
-		JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;>Write to status bar
+		if !StatusBarFormat = $01
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;>Write to status bar
+		else
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDFormat2		;>Write to status bar
+		endif
 	else
-		JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards
+		if !StatusBarFormat = $01
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards
+		else
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwardsFormat2
+		endif
 	endif
 	;Display both fill percentage when !DoubleBar_DisplayType is 0
 	;due to every other frame, doesn't have the info for both at the same frame.

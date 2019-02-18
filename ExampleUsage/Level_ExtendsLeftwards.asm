@@ -108,10 +108,22 @@ main:
 		endif
 		STA $06								;/
 	endif
-	JSL GraphicalBarWriteToStatusBar_BarExtendLeft				;>Extend leftwards bar (modifies the starting tile to move in accordance to the length of the bar, in tiles).
-	if !Default_LeftwardsBar == 0						;\Write to status bar
-		JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;|
-	else									;|
-		JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards		;|
-	endif									;/
+	if !StatusBarFormat = $01
+		JSL GraphicalBarWriteToStatusBar_BarExtendLeft				;>Extend leftwards bar (modifies the starting tile to move in accordance to the length of the bar, in tiles).
+	else
+		JSL GraphicalBarWriteToStatusBar_BarExtendLeftFormat2			;>Extend leftwards bar (modifies the starting tile to move in accordance to the length of the bar, in tiles).
+	endif
+	if !Default_LeftwardsBar == 0
+		if !StatusBarFormat = $01
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;>Write to status bar
+		else
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDFormat2		;>Write to status bar
+		endif
+	else
+		if !StatusBarFormat = $01
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards
+		else
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwardsFormat2
+		endif
+	endif
 	RTL

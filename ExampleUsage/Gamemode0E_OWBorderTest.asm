@@ -81,9 +81,18 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 		endif
 		STA $06								;/
 	endif
-	if !Default_LeftwardsBar == 0						;\Write to status bar
-		JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;|
-	else									;|
-		JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards		;|
-	endif									;/
+	;Write to Overworld border.
+	if !Default_LeftwardsBar == 0
+		if !StatusBarFormat = $01
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;>Write to status bar
+		else
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDFormat2		;>Write to status bar
+		endif
+	else
+		if !StatusBarFormat = $01
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards
+		else
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwardsFormat2
+		endif
+	endif
 	RTL
