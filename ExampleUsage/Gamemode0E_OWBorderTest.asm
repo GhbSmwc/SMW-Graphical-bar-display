@@ -75,9 +75,9 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 		LDA.b #!Default_GraphicalBarPropertiesOverworldMap>>16		;|
 		STA $05								;/
 		if !Default_LeftwardsBar == 0
-			LDA.b #!Default_StatusBar_TilePropertiesSetting			;\Properties
+			LDA.b #!Default_Overworld_TilePropertiesSetting			;\Properties
 		else
-			LDA.b #(!Default_StatusBar_TilePropertiesSetting|(!Default_LeftwardsBar<<6))
+			LDA.b #(!Default_Overworld_TilePropertiesSetting|(!Default_LeftwardsBar<<6))
 		endif
 		STA $06								;/
 	endif
