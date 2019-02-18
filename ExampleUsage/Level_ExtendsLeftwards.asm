@@ -101,7 +101,11 @@ main:
 		STA $04								;|
 		LDA.b #!Default_GraphicalBarPropertiesExtendLeftwards>>16	;|
 		STA $05								;/
-		LDA.b #!Default_StatusBar_TilePropertiesSetting			;\Properties
+		if !Default_LeftwardsBar == 0
+			LDA.b #!Default_StatusBar_TilePropertiesSetting			;\Properties
+		else
+			LDA.b #(!Default_StatusBar_TilePropertiesSetting|(!Default_LeftwardsBar<<6))
+		endif
 		STA $06								;/
 	endif
 	JSL GraphicalBarWriteToStatusBar_BarExtendLeft				;>Extend leftwards bar (modifies the starting tile to move in accordance to the length of the bar, in tiles).

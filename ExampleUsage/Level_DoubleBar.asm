@@ -214,7 +214,11 @@ main:
 		STA $04
 		LDA.b #!Default_GraphicalBarProperties>>16
 		STA $05
-		LDA.b #!Default_StatusBar_TilePropertiesSetting			;\Properties
+		if !Default_LeftwardsBar == 0
+			LDA.b #!Default_StatusBar_TilePropertiesSetting			;\Properties
+		else
+			LDA.b #(!Default_StatusBar_TilePropertiesSetting|(!Default_LeftwardsBar<<6))
+		endif
 		STA $06								;/
 	endif
 	if !Default_LeftwardsBar == 0
