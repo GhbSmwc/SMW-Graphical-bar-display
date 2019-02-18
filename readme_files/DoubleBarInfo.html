@@ -131,11 +131,19 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 		endif
 		STA $06								;/
 	endif
-	if !Default_LeftwardsBar == 0						;\Write to status bar
-		JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;|
-	else									;|
-		JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards		;|
-	endif									;/
+	if !Default_LeftwardsBar == 0
+		if !StatusBarFormat = $01
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;>Write to status bar
+		else
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDFormat2		;>Write to status bar
+		endif
+	else
+		if !StatusBarFormat = $01
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards
+		else
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwardsFormat2
+		endif
+	endif
 	RTL</pre></td></tr></table>
 Remove the semicolons in front of <nobr><tt>REP #$20</tt></nobr> and <nobr><tt>SEP #$20</tt></nobr> should your quantity amount is a 16-bit number (going over 255)
 The red font is the things you can replace. Note that this does not work with tiles that update other than each and every frame (for example, the Overworld
@@ -211,11 +219,19 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 		endif
 		STA $06								;/
 	endif
-	if !Default_LeftwardsBar == 0						;\Write to status bar
-		JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;|
-	else									;|
-		JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards		;|
-	endif									;/
+	if !Default_LeftwardsBar == 0
+		if !StatusBarFormat = $01
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;>Write to status bar
+		else
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDFormat2		;>Write to status bar
+		endif
+	else
+		if !StatusBarFormat = $01
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards
+		else
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwardsFormat2
+		endif
+	endif
 	RTL
 	
 	GetMaxQuantityPercentage:
