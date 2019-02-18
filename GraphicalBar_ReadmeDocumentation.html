@@ -749,7 +749,22 @@ Result:
 </tr>
 </table>
 The only difference is the FillAmount &rightarrow; TileNumber conversion <tt>ConvertBarFillAmountToTiles</tt> (and the doublebar version) that utilizes the tile number you need
-to change (Left end have 9 tiles with values 0-8 same as middle's 0-8 but uses a different array tiles to display a outlined-left edge and same goes to the right end).
+to change (Left end have 9 tiles with values 0-8 same as middle's 0-8 but uses a different array tiles to display a outlined-left edge and same goes to the right end). However,
+the tile converter does not recognize if the first and last tile are meant to be end tiles to have different graphic than the middle, so just before calling the tile converter,
+set the end tiles to be the same number of pieces for middle, and subtract the number of middle tiles by how many end tiles you are using (say 2) so that the end tiles don't use
+the same table graphic as middle and cause cutoff-ended bar.
+<table><tr><td><pre>	;[...]
+	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
+	LDA #$08							;\Middle tiles first and last replaced with end tiles.
+	STA !Scratchram_GraphicalBar_LeftEndPiece			;|
+	STA !Scratchram_GraphicalBar_RightEndPiece			;|
+	LDA !Scratchram_GraphicalBar_TempLength				;|
+	SEC								;|
+	SBC #$02							;|>Left end + Right end = 2 end tiles
+	STA !Scratchram_GraphicalBar_TempLength				;/
+	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles (end tiles recognized).
+	;[...]</pre></td></tr></table><br><br>
+
 </li>
 <li>You might've noticed the define <nobr><tt>!Settings_GraphicalBar_IndexSize</tt></nobr> found in <tt>GraphicalBarDefines.asm</tt>, I left that there in for some rare cases anyone
 would need a bar that is more than 255 tile bytes long (So a 16-bit addressing was needed).</li>
