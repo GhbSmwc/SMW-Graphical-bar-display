@@ -44,6 +44,7 @@ named <nobr><tt>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</tt></nobr> as opposed t
 <h3>Recommended resources</h3>
 <ul>
 <li><a href="https://www.smwcentral.net/?p=section&a=details&id=16031">Super Status Bar patch</a>, SMW's status bar (or, heads-up display (HUD)) space is really small.</li>
+<li><a href="https://www.smwcentral.net/?p=section&a=details&id=15222">Overworld Border plus</a>, if you want to use the OW graphical bar display.</li>
 </ul>
 <hr>
 <h2>Installation (test run)</h2>
@@ -56,14 +57,14 @@ to <tt>1</tt> so that it displays properly.</li>
 <ul>
 <li><tt>GraphicalBarDefines</tt> (the folder itself) &rightarrow; Uberasm tool's main directory (same area as the .exe)</li>
 <li><tt>GraphicalBarELITE.asm</tt> &rightarrow; Uberasm tool's <tt>library</tt>.</li>
-<li><b>Inside</b> the folder <tt>ExampleUsage</tt>, copy all the ASM files and paste them in Uberasm tool's <tt>level</tt>.</li>
+<li><b>Inside</b> the folder <tt>ExampleUsage</tt>, they go to their respective locations based on their filename.</li>
 </ul></li>
 <li>Open uberasm tool's <tt>list.txt</tt>, and paste these so that the codes get inserted:
 <table><tr><td><pre>; Level list. Valid values: 000-1FF.
 level:
-104		DoubleBar.asm
-105		Simple.asm
-106		RoundAwayFromComplete.asm</pre></td></tr></table><br>
+104		Level_DoubleBar.asm
+105		Level_Simple.asm
+106		Level_RoundAwayFromComplete.asm</pre></td></tr></table><br>
 </li>
 <li>Insert the graphics by:
 <ol>
