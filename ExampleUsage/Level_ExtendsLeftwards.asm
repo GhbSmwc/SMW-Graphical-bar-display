@@ -63,27 +63,7 @@ main:
 	STA !Scratchram_GraphicalBar_TempLength					;
 .ConvertToBar
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
-	
-	..RoundingDetect
-	CPY #$00						;\check rounding flags (Y is only #$00 to #$02)
-	BEQ ..BarWrite						;|
-	CPY #$01						;|
-	BEQ ..RoundedEmpty					;|
-	BRA ..RoundedFull					;/>Of course, if Y cannot be 0 and 1, it has to be 2, so no extra checks.
-	
-	..RoundedEmpty
-	REP #$20
-	INC $00							;>if fill amount is a nonzero less than 0.5, make it display fillvalue = 1 to not display "empty".
-	SEP #$20
-	BRA ..BarWrite						;>and done
-
-	..RoundedFull
-	REP #$20
-	DEC $00							;>if fill amount is at least Max-0.5 and less than Max, make it display fillvalue = max-1 to not display "full".
-	SEP #$20
-	
-	..BarWrite
-	
+	JSL GraphicalBarELITE_RoundAwayEmptyFull
 	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
 	

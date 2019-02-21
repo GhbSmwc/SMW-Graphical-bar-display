@@ -126,27 +126,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	STA !Scratchram_GraphicalBar_TempLength			;/
 .ConvertToBar
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
-	
-	<font color="orange">..RoundingDetect
-	CPY #$00						;\check rounding flags (Y is only #$00 to #$02)
-	BEQ ..BarWrite						;|
-	CPY #$01						;|
-	BEQ ..RoundedEmpty					;|
-	BRA ..RoundedFull					;/>Of course, if Y cannot be 0 and 1, it has to be 2, so no extra checks.
-	
-	..RoundedEmpty
-	REP #$20
-	INC $00							;>if fill amount is a nonzero less than 0.5, make it display fillvalue = 1 to not display "empty".
-	SEP #$20
-	BRA ..BarWrite						;>and done
-
-	..RoundedFull
-	REP #$20
-	DEC $00							;>if fill amount is at least Max-0.5 and less than Max, make it display fillvalue = max-1 to not display "full".
-	SEP #$20
-	
-	..BarWrite</font>
-	
+	<font color="orange">JSL GraphicalBarELITE_RoundAwayEmptyFull</font>
 	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
 	LDA.b <font color="yellow">#!Default_GraphicalBarPosition</font>				;\Setup address to where to draw the bar.
@@ -183,10 +163,10 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 		endif
 	endif
 	RTL</pre></td></tr></table><br>
-Font colored in red is the things you change, while the green, you edit values in the defines via opening up <tt>GraphicalBarDefines/StatusBarSettings.asm</tt>
-and changing those, and yes, you can safely redefine them when you have multiple bars for advanced use. Yellow is the same as green, but it has to be a 3-byte (24-bit) address.
-Orange means you can remove the rounding away code if you want the bar to be able to round towards empty or full. Of course, the <tt>#</tt> symbol means a fixed number
-instead of a RAM address.<br><br>
+Font colored in <font color="red">red</font> is the things you change, while the <font color="green">green</font>, you edit values in the defines via opening up
+<tt>GraphicalBarDefines/StatusBarSettings.asm</tt> and changing those, and yes, you can safely redefine them when you have multiple bars for advanced use. <font color="yellow">Yellow</font>
+is the same as green, but it has to be a 3-byte (24-bit) address. <font color="orange">Orange</font> means you can remove the rounding away code if you want the bar to be able to round
+towards empty or full. Of course, the <tt>#</tt> symbol means a fixed number instead of a RAM address.<br><br>
 
 Also if you are handling 16-bit mode quantity while on 8-bit accumulator, you write the 16-bit number <tt>#$1234</tt> (a fixed value not stored in RAM) as
 storing the <tt>#$34</tt> onto the low byte and <tt>#$12</tt> on the high byte (if it was RAM, it should be obvious, low byte written to low byte and high to high). Remember that
@@ -514,6 +494,10 @@ relative address:</td>
 Of course, I made a <a name="ComputeGraphicalBarData" href="readme_files/JS_GraphicalBarCalculator.html">javascript code page</a> that calculates memory statistics
 without the need of manually calculating the values.<br><br>
 </li>
+
+<li><tt>RoundAwayEmpty</tt>, <tt>RoundAwayFull</tt>, and <tt>RoundAwayEmptyFull</tt>: After getting the Y register value from <tt>CalculateGraphicalBarPercentage</tt>, this increments or
+decrements the fill amount <tt>$00-$01</tt> by 1 so it will display 1 and/or <tt>MaxFill-1</tt> instead of showing 0 and/or <tt>MaxFill</tt> when the value is rounded towards them. The names
+of the routine should be obvious (e.g. <tt>RoundAwayEmpty</tt> means round away from empty)</li><br>
 </ul>
 <li>Inside <tt>GraphicalBarConvertToTile.asm</tt></li>
 <ul>

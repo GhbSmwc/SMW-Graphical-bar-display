@@ -933,3 +933,38 @@ MathMul16_16:	STZ $2250
 		SEP #$20
 		RTL
 endif
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;Round away code
+;Y: rounding status:
+; $00 = not rounded to full or empty
+; $01 = rounded to empty
+; $02 = rounded to full
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+RoundAwayEmpty:
+	CPY #$01
+	BEQ RoundAwayEmptyFull_RoundedEmpty
+	RTL
+RoundAwayFull:
+	CPY #$02
+	BEQ RoundAwayEmptyFull_RoundedFull
+	RTL
+RoundAwayEmptyFull:
+	CPY #$00						;\check rounding flags (Y is only #$00 to #$02)
+	BEQ .NotRounded						;|
+	CPY #$01						;|
+	BEQ .RoundedEmpty					;|
+	BRA .RoundedFull					;/>Of course, if Y cannot be 0 and 1, it has to be 2, so no extra checks.
+	
+	.RoundedEmpty ;>Asar treats this sublabel as [RoundAwayEmptyFull_RoundedEmpty]
+	REP #$20						;\Turn a number rounded to 0 to 1 as the amount filled
+	INC $00							;|
+	SEP #$20						;/
+	BRA .NotRounded						;>and done
+
+	.RoundedFull ;>Asar treats this sublabel as [RoundAwayEmptyFull_RoundedFull]
+	REP #$20						;\Turn a number rounded to full to [FullAmount-1] (so if rounded to 62/62, display 61/62).
+	DEC $00							;|
+	SEP #$20						;/
+	
+	.NotRounded
+	RTL

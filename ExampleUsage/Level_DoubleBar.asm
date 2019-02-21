@@ -156,7 +156,7 @@ main:
 	STA !Scratchram_GraphicalBar_RightEndPiece		;/
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
 	if !DoubleBar_RoundAway != 0
-		JSR RoundAway
+		JSL GraphicalBarELITE_RoundAwayEmptyFull
 	endif
 	if and(notequal(!DoubleBar_DisplayType, 0), equal(!StatusBarFormat, $02))
 		LDA $00								;\every 16th number increments the 1st digit.
@@ -188,7 +188,7 @@ main:
 		JSR GetPercentageQuantity
 		JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
 		if !DoubleBar_RoundAway != 0
-			JSR RoundAway
+			JSL GraphicalBarELITE_RoundAwayEmptyFull
 		endif
 		if !StatusBarFormat == $02
 			LDA $00								;\every 16th number increments the 1st digit.
@@ -243,7 +243,7 @@ main:
 		JSR GetPercentageQuantity
 		JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
 		if !DoubleBar_RoundAway != 0
-			JSR RoundAway
+			JSL GraphicalBarELITE_RoundAwayEmptyFull
 		endif
 		if !StatusBarFormat == $02
 			LDA $00								;\every 16th number increments the 1st digit.
@@ -259,7 +259,7 @@ main:
 		JSR GetPercentageQuantity
 		JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
 		if !DoubleBar_RoundAway != 0
-			JSR RoundAway
+			JSL GraphicalBarELITE_RoundAwayEmptyFull
 		endif
 		if !StatusBarFormat == $02
 			LDA $00								;\every 16th number increments the 1st digit.
@@ -280,27 +280,3 @@ main:
 	LDA #$00						;\High byte above, same format as <Value_high_byte>, so do the same
 	STA !Scratchram_GraphicalBar_FillByteTbl+3		;/as that if your value is 8-bit.
 	RTS
-	if !DoubleBar_RoundAway != 0
-		RoundAway:
-		;output:
-		;$00 = percentage rounded away from empty and full.
-		CPY #$00						;\check rounding flags (Y is only #$00 to #$02)
-		BEQ .Done						;|
-		CPY #$01						;|
-		BEQ .RoundedEmpty					;|
-		BRA .RoundedFull					;/>Of course, if Y cannot be 0 and 1, it has to be 2, so no extra checks.
-		
-		.RoundedEmpty
-		REP #$20
-		INC $00							;>if fill amount is a nonzero less than 0.5, make it display fillvalue = 1 to not display "empty".
-		SEP #$20
-		BRA .Done						;>and done
-
-		.RoundedFull
-		REP #$20
-		DEC $00							;>if fill amount is at least Max-0.5 and less than Max, make it display fillvalue = max-1 to not display "full".
-		SEP #$20
-		
-		.Done
-		RTS
-	endif
