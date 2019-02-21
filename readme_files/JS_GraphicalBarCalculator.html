@@ -51,8 +51,8 @@ you have entered an invalid input (entered with a blank input or have invalid ch
 
 
 <tr>
-<td>Status bar write location (<tt>!Default_GraphicalBarPosition</tt> and <tt>!Default_GraphicalBarPositionExtendLeftwards</tt>):</td>
-<td>Status bar <b>tile</b> location: $<input type="text" list="StatusBarRAMTileList" id="StatusBarRAMTilePos" value ="" maxlength="6"><br>
+<td>Status bar/Overworld border plus write location (<tt>!Default_GraphicalBarPosition</tt> and <tt>!Default_GraphicalBarPositionExtendLeftwards</tt>):</td>
+<td>Status bar/Overworld border plus <b>tile</b> location: $<input type="text" list="StatusBarRAMTileList" id="StatusBarRAMTilePos" value ="" maxlength="6"><br>
 <div class="SmallFont">The RAM address that is the tile number.</div><br>
 
 <input type="checkbox" id="RAM2bytesAdjicentStatusbar" name="RAM2bytesAdjicentStatusbar" value="" checked>You are using a status bar formated two adjacent bytes per tile
@@ -60,10 +60,13 @@ you have entered an invalid input (entered with a blank input or have invalid ch
 
 <datalist id="StatusBarRAMTileList">
 <option value="7E0F09">SMW's status bar (Writes over &ldquo;TIME&rdquo;)</option>
-<option value="7FA000">Super status bar RAM address</option>
-<option value="7FA03E">Super status bar RAM address (Top right corner)</option>
-<option value="404000">Same as $7FA000 but for SA-1</option>
-<option value="40403E">Same as $7FA03E but for SA-1</option>
+<option value="7FA000">Super status bar </option>
+<option value="404000">Super status bar (SA-1)</option>
+<option value="7FA03E">Super status bar (Top right corner)</option>
+<option value="40403E">Super status bar (SA-1, top right corner)</option>
+
+<option value="7FEC00">Overworld border plus</option>
+<option value="41EC00">Overworld border plus (SA-1)</option>
 </datalist>
 
 <datalist id="StatBarRAMPropsList">

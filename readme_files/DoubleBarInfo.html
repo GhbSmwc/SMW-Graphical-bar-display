@@ -88,27 +88,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	LDA <font color="green">#!Default_RightPieces</font>				;\Right end pieces
 	STA !Scratchram_GraphicalBar_RightEndPiece		;/
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
-	
-	<font color="orange">..RoundingDetect
-	CPY #$00						;\check rounding flags (Y is only #$00 to #$02)
-	BEQ ..BarWrite						;|
-	CPY #$01						;|
-	BEQ ..RoundedEmpty					;|
-	BRA ..RoundedFull					;/>Of course, if Y cannot be 0 and 1, it has to be 2, so no extra checks.
-	
-	..RoundedEmpty
-	REP #$20
-	INC $00							;>if fill amount is a nonzero less than 0.5, make it display fillvalue = 1 to not display "empty".
-	SEP #$20
-	BRA ..BarWrite						;>and done
-
-	..RoundedFull
-	REP #$20
-	DEC $00							;>if fill amount is at least Max-0.5 and less than Max, make it display fillvalue = max-1 to not display "full".
-	SEP #$20
-	
-	..BarWrite	</font>
-	
+	<font color="orange">JSL GraphicalBarELITE_RoundAwayEmptyFull</font>
 	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
 	LDA.b <font color="yellow">#!Default_GraphicalBarPosition</font>				;\Setup address to where to draw the bar.
@@ -173,7 +153,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	LDA <font color="green">#!Default_RightPieces</font>				;\Right end pieces
 	STA !Scratchram_GraphicalBar_RightEndPiece		;/
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
-	<font color="orange">JSR RoundAway</font>
+	<font color="orange">JSL GraphicalBarELITE_RoundAwayEmptyFull</font>
 	JSL GraphicalBarELITE_DrawGraphicalBar
 	
 	..TransferFirstFillBar ;>FirstFill will be located just after SecondFill in memory address: <SecondFill_Table><FirstFill_Table>
@@ -194,7 +174,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	STA !Scratchram_GraphicalBar_FillByteTbl+1		;/use [LDA #$00 : STA !Scratchram_GraphicalBar_FillByteTbl+1].
 	JSR GetMaxQuantityPercentage				;>Set !Scratchram_GraphicalBar_FillByteTbl+2 and !Scratchram_GraphicalBar_FillByteTbl+3
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
-	<font color="orange">JSR RoundAway</font>
+	<font color="orange">JSL GraphicalBarELITE_RoundAwayEmptyFull</font>
 	
 .PrepareTile
 	JSL GraphicalBarELITE_DrawGraphicalBar					;>get bar values.
@@ -239,28 +219,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	STA !Scratchram_GraphicalBar_FillByteTbl+2		;/
 	LDA <font color="red">#$00</font>						;\High byte above, same format as you would do for quantity, so do the same
 	STA !Scratchram_GraphicalBar_FillByteTbl+3		;/as that if your value is 8-bit.
-	RTS
-	
-	<font color="orange">RoundAway:
-	CPY #$00						;\check rounding flags (Y is only #$00 to #$02)
-	BEQ .Done						;|
-	CPY #$01						;|
-	BEQ .RoundedEmpty					;|
-	BRA .RoundedFull					;/>Of course, if Y cannot be 0 and 1, it has to be 2, so no extra checks.
-	
-	.RoundedEmpty
-	REP #$20
-	INC $00							;>if fill amount is a nonzero less than 0.5, make it display fillvalue = 1 to not display "empty".
-	SEP #$20
-	BRA .Done						;>and done
-
-	.RoundedFull
-	REP #$20
-	DEC $00							;>if fill amount is at least Max-0.5 and less than Max, make it display fillvalue = max-1 to not display "full".
-	SEP #$20
-	
-	.Done
-	RTS</font></pre></td></tr></table><br>
+	RTS</pre></td></tr></table><br>
 	
 	Thus, assuming you left <nobr><tt>!GraphicalBar_TotalTileUsed</tt></nobr> equal to <tt>32</tt>, both ends set to 3
 	pieces, middle set to 8 pieces, and middle span 7 tile bytes long, the table of values

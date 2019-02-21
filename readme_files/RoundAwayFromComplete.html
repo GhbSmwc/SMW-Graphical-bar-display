@@ -49,66 +49,12 @@ is much bigger than the number of pieces in the whole bar, resulting some of the
 <font color="red">199*62/200 = 61.69 pieces filled &rightarrow; round to 62 (Y=$02)</font>
 200*62/200 = 62.00 pieces filled &rightarrow; round to 62 (Y=$00) - A truly full bar
 201*62/200 = 62.31 pieces filled &rightarrow; round to 62 (Y=$00)
-202*62/200 = 62.62 pieces filled &rightarrow; round to 63 (Y=$00) - will still display 62/62, but filled amount is still 63.</pre></td></tr></table>
+202*62/200 = 62.62 pieces filled &rightarrow; round to 63 (Y=$00) - will still display 62/62 in the table, but filled amount is still 63.</pre></td></tr></table><br>
 
 You may wondering why I rather have the information about the rounding towards empty or full (best to be called &ldquo;complete&rdquo;
 for both empty and full) to be as an output of <tt>CalculateGraphicalBarPercentage</tt> subroutine in Y than directly have $00 (amount of fill) set to #$0001 (the fill
 amount is 16-bit) or <tt>AllPieces-1</tt> be in the routine. This is in case if you want to have <i>certain</i> bar(s) with the rounding <i>away</i> from either full or empty (say a percent
-completion bar ALLOWS rounding down to 0%, but forbids rounding up to 100% when 99.99%, while the HP bar is the other way around). The rounding away code as follows:
-<table><tr><td><pre>	;...
-	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
-	
-	.RoundingDetect
-	CPY #$00						;\check rounding flags (Y is only #$00 to #$02)
-	BEQ .BarWrite						;|
-	CPY #$01						;|
-	BEQ .RoundedEmpty					;|
-	BRA .RoundedFull					;/>Of course, if Y cannot be 0 and 1, it has to be 2, so no extra checks.
-	
-	.RoundedEmpty
-	REP #$20						;\Turn a number rounded to 0 to 1 as the amount filled
-	INC $00							;|
-	SEP #$20						;/
-	BRA .BarWrite						;>and done
-
-	.RoundedFull
-	REP #$20						;\Turn a number rounded to full to [FullAmount-1] (so if rounded to 62/62, display 61/62).
-	DEC $00							;|
-	SEP #$20						;/
-	
-	.BarWrite
-	;...</pre></td></tr></table>
-However, if you only wanted the round away to only apply when empty or full and not the other, you do this:<br><br>
-	
-Only allow rounding towards zero but not full:
-<table><tr><td><pre>	;...
-	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
-	
-	.RoundingDetect
-	CPY #$02
-	BNE .BarWrite
-	
-	.RoundedFull
-	REP #$20						;\Turn a number rounded to full to [FullAmount-1] (so if rounded to 62/62, display 61/62).
-	DEC $00							;|
-	SEP #$20						;/
-	
-	.BarWrite
-	;...</pre></td></tr></table><br>
-	
-	Only allow rounding towards full and not zero:
-<table><tr><td><pre>	;...
-	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
-	
-	.RoundingDetect
-	CPY #$01
-	BNE .BarWrite
-	
-	.RoundedEmpty
-	REP #$20						;\Turn a number rounded to 0 to 1 as the amount filled
-	INC $00							;|
-	SEP #$20						;/
-	BRA .BarWrite						;>and done
-	
-	.BarWrite
-	;...</pre></td></tr></table><br><br>
+completion bar ALLOWS rounding down to 0%, but forbids rounding up to 100% when 99.99%, while the HP bar is the other way around). I present you a JSL subroutines:
+<table><tr><td><pre>JSL GraphicalBarELITE_RoundAwayEmpty			;>Rounds to 1 if attempts to round down to 0.
+JSL GraphicalBarELITE_RoundAwayFull			;>Rounds to MaxFill-1 if attempts to round up to MaxFill.
+JSL GraphicalBarELITE_RoundAwayEmptyFull		;>Rounds to 1 if attempts to round down to 0 AND rounds to MaxFill-1 if attempts to round up to MaxFill.</pre></td></tr></table>
