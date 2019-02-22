@@ -212,16 +212,20 @@ Tile byte visual:<br>
 				document.getElementById("ValueMemRangeStat").innerHTML += ("RAM address <tt>!Scratchram_GraphicalBar_FillByteTbl</tt> range (inclusive): -- $" + parseInt(BarTileTableRAM, 16).toString(16) + " to $" + (parseInt(BarTileTableRAM, 16) + parseInt(BarBytesTotal, 10) - 1).toString(16) + "<br>")
 				document.getElementById("ValueMemRangeStat").innerHTML += ("Total pieces (for full bar): ----------------------------------------- " + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)) + " ($" + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)).toString(16) + ")<br>")
 				if (document.getElementById("ExtendLeftwards").checked == false) {
-					document.getElementById("ValueMemRangeStat").innerHTML += ("Status bar RAM address range (tile number, inclusive): --------------- $" + parseInt(StatBarAddressBarPos, 16).toString(16) + " to $" + (parseInt(StatBarAddressBarPos, 16) + ((BarBytesTotal-1) * StatusBarTileFormat)).toString(16))
+					document.getElementById("ValueMemRangeStat").innerHTML += ("Status bar/Overworld RAM address range (tile number, inclusive): ----- $" + parseInt(StatBarAddressBarPos, 16).toString(16) + " to $" + (parseInt(StatBarAddressBarPos, 16) + ((BarBytesTotal-1) * StatusBarTileFormat)).toString(16))
 				} else {
-					document.getElementById("ValueMemRangeStat").innerHTML += ("Status bar RAM address range (tile number, inclusive): --------------- $" + (parseInt(StatBarAddressBarPos, 16) - ((BarBytesTotal-1) * StatusBarTileFormat)).toString(16) + " to $" + (parseInt(StatBarAddressBarPos, 16).toString(16)))
+					document.getElementById("ValueMemRangeStat").innerHTML += ("Status bar/Overworld RAM address range (tile number, inclusive): ----- $" + (parseInt(StatBarAddressBarPos, 16) - ((BarBytesTotal-1) * StatusBarTileFormat)).toString(16) + " to $" + (parseInt(StatBarAddressBarPos, 16).toString(16)))
 				}
 			}
 		//Display the bytes as repeated image boxes
 			var TileByteIndexCount = 0
 			
 			if (LeftEndExist != 0) {
-				document.getElementById("ByteFormatLeftEnd").innerHTML = ("<img src='JS_GraphicalBarCalculator_BytePreview/LeftEndByte.png'>")
+				if (document.getElementById("FillLeftwards").checked == false) {
+					document.getElementById("ByteFormatLeftEnd").innerHTML = ("<img src='JS_GraphicalBarCalculator_BytePreview/LeftEndByte.png'>")
+				} else {
+					document.getElementById("ByteFormatLeftEnd").innerHTML = ("<img src='JS_GraphicalBarCalculator_BytePreview/RightEndByte.png'>")
+				}
 			} else {
 				document.getElementById("ByteFormatLeftEnd").innerHTML = ("")
 			}
@@ -236,7 +240,11 @@ Tile byte visual:<br>
 				}
 			}
 			if (RightEndExist != 0) {
-				document.getElementById("ByteFormatRightEnd").innerHTML = ("<img src='JS_GraphicalBarCalculator_BytePreview/RightEndByte.png'>")
+				if (document.getElementById("FillLeftwards").checked == false) {
+					document.getElementById("ByteFormatRightEnd").innerHTML = ("<img src='JS_GraphicalBarCalculator_BytePreview/RightEndByte.png'>")
+				} else {
+					document.getElementById("ByteFormatRightEnd").innerHTML = ("<img src='JS_GraphicalBarCalculator_BytePreview/LeftEndByte.png'>")
+				}
 			} else {
 				document.getElementById("ByteFormatRightEnd").innerHTML = ("")
 			}
@@ -251,7 +259,7 @@ Tile byte visual:<br>
 				MemLayoutTableString += "<tr>"
 				MemLayoutTableString += "<th><tt>!Scratchram_GraphicalBar_FillByteTbl area</tt></th>"
 				MemLayoutTableString += "<th>Tile byte type</th>"
-				MemLayoutTableString += "<th>Status bar tile number location</th>"
+				MemLayoutTableString += "<th>Status bar/Overworld tile number location</th>"
 				MemLayoutTableString += "</tr>"
 				//Left end
 					if (LeftEndExist != 0) {
