@@ -188,11 +188,11 @@
    !SecondFillPercentHexValDisplayPos  = $40407C
   endif
 
- ;RAM testing for how much fill in bar.
-  !Freeram_FirstFill = $58
+ ;RAM testing for how much fill in bar for a double bar.
+  !Freeram_FirstQuantity = $58
    ;^[1 byte] The amount of fill for the first fill
 
-  !Freeram_SecondFill = $5C
+  !Freeram_SecondQuantity = $5C
    ;^[1 byte] The amount of fill for the second fill
    
  ;Display type
