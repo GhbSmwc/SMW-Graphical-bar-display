@@ -19,13 +19,13 @@
 <center><h1>Rounding towards &ldquo;Complete&rdquo; detection</h1></center>
 <center><table><tr><td><img src="RoundingAwayComparasions.png"><br>
 <div style="max-width:588px;">A comparison between not having &ldquo;rounding away&rdquo; and having rounding away when displaying values close to 0% and 100%
-on a 62-pieced bar (3 pieces for both ends, and 7 middle tiles with 8 pieces each: <nobr><tt>3+(8*7)+3</tt></nobr>). Note when round-away was applied, the bars' fill are 1-piece off from full and empty.</div></td></tr></table></center><br>
+on a 62-pieced bar (3 pieces for both ends, and 7 middle tiles with 8 pieces each: <nobr><kbd>3+(8*7)+3</kbd></nobr>). Note when round-away was applied, the bars' fill are 1-piece off from full and empty.</div></td></tr></table></center><br>
 
 The purpose of this rounding detection feature is to prevent the bar from misrepresenting the value of something when they get rounded down towards empty or
 upwards to full (I would use the term &ldquo;complete&rdquo; for both of these). Thus, before this was implemented, when used on such things such as a health
 bar, the meter can display &ldquo;empty&rdquo; when the character (player or enemy)'s actual HP isn't 0 (not defeated), due to the bar's fill value (number
 of pieces filled) was calculated to be a nonzero less than 0.5, and when used as a progress meter (say, the percentage completion), the bar could
-display 100% if the resulting number of pieces is at least <tt>MaxFill-1.5</tt> and less than <tt>MaxFill</tt>. This happens if the &ldquo;max quantity&rdquo;
+display 100% if the resulting number of pieces is at least <kbd>MaxFill-1.5</kbd> and less than <kbd>MaxFill</kbd>. This happens if the &ldquo;max quantity&rdquo;
 is much bigger than the number of pieces in the whole bar, resulting some of the quantity values to be assigned to the same number of pieces filled:
 <table><tr><td><pre>!Scratchram_GraphicalBar_LeftEndPiece:      $03
 !Scratchram_GraphicalBar_MiddlePiece:       $08
@@ -52,8 +52,8 @@ is much bigger than the number of pieces in the whole bar, resulting some of the
 202*62/200 = 62.62 pieces filled &rightarrow; round to 63 (Y=$00) - will still display 62/62 in the table, but filled amount is still 63.</pre></td></tr></table><br>
 
 You may wondering why I rather have the information about the rounding towards empty or full (best to be called &ldquo;complete&rdquo;
-for both empty and full) to be as an output of <tt>CalculateGraphicalBarPercentage</tt> subroutine in Y than directly have $00 (amount of fill) set to #$0001 (the fill
-amount is 16-bit) or <tt>AllPieces-1</tt> be in the routine. This is in case if you want to have <i>certain</i> bar(s) with the rounding <i>away</i> from either full or empty (say a percent
+for both empty and full) to be as an output of <kbd>CalculateGraphicalBarPercentage</kbd> subroutine in Y than directly have $00 (amount of fill) set to #$0001 (the fill
+amount is 16-bit) or <kbd>AllPieces-1</kbd> be in the routine. This is in case if you want to have <i>certain</i> bar(s) with the rounding <i>away</i> from either full or empty (say a percent
 completion bar ALLOWS rounding down to 0%, but forbids rounding up to 100% when 99.99%, while the HP bar is the other way around). I present you a JSL subroutines:
 <table><tr><td><pre>JSL GraphicalBarELITE_RoundAwayEmpty			;>Rounds to 1 if attempts to round down to 0.
 JSL GraphicalBarELITE_RoundAwayFull			;>Rounds to MaxFill-1 if attempts to round up to MaxFill.

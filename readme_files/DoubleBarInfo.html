@@ -125,13 +125,13 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 		endif
 	endif
 	RTL</pre></td></tr></table>
-Remove the semicolons in front of <nobr><tt>REP #$20</tt></nobr> and <nobr><tt>SEP #$20</tt></nobr> should your quantity amount is a 16-bit number (going over 255)
+Remove the semicolons in front of <nobr><kbd>REP #$20</kbd></nobr> and <nobr><kbd>SEP #$20</kbd></nobr> should your quantity amount is a 16-bit number (going over 255)
 The red font is the things you can replace. Note that this does not work with tiles that update other than each and every frame (for example, the Overworld
-Border Plus updates tile every other frame), in this case you left shift the <nobr><tt>#%00000001</tt></nobr> to <nobr><tt>#%00000010</tt></nobr> to obtain
+Border Plus updates tile every other frame), in this case you left shift the <nobr><kbd>#%00000001</kbd></nobr> to <nobr><kbd>#%00000010</kbd></nobr> to obtain
 a slower flicker animation to accommodate this (however the flicker distinct frames become much more noticeable).
 </li><br>
-<li><b>Differently colored fill</b>: You actually have to call the graphical bar routines (<tt>DrawGraphicalBar</tt> and maybe
-<tt>CalculateGraphicalBarPercentage</tt>) twice, with the first one's (<tt>FirstQuantity</tt>) table being moved to another location in memory.
+<li><b>Differently colored fill</b>: You actually have to call the graphical bar routines (<kbd>DrawGraphicalBar</kbd> and maybe
+<kbd>CalculateGraphicalBarPercentage</kbd>) twice, with the first one's (<kbd>FirstQuantity</kbd>) table being moved to another location in memory.
 Oh, and because there are repeated codes, they are moved to subroutines to save space:
 <table><tr><td><pre>incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
@@ -221,7 +221,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	STA !Scratchram_GraphicalBar_FillByteTbl+3		;/as that if your value is 8-bit.
 	RTS</pre></td></tr></table><br>
 	
-	Thus, assuming you left <nobr><tt>!GraphicalBar_TotalTileUsed</tt></nobr> equal to <tt>32</tt>, both ends set to 3
+	Thus, assuming you left <nobr><kbd>!GraphicalBar_TotalTileUsed</kbd></nobr> equal to <kbd>32</kbd>, both ends set to 3
 	pieces, middle set to 8 pieces, and middle span 7 tile bytes long, the table of values
 	are laid out like this:
 <table><tr><td><pre>!Scratchram_GraphicalBar_FillByteTbl+0:  (SecondFill left end)
@@ -250,20 +250,20 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 !Scratchram_GraphicalBar_FillByteTbl+38: (FirstFill 6th middle tile)
 !Scratchram_GraphicalBar_FillByteTbl+39: (FirstFill 7th and final middle tile)
 !Scratchram_GraphicalBar_FillByteTbl+40: (FirstFill right end)</pre></td></tr></table>
-Now that both bar tiles are stored, the routine <nobr><tt>ConvertBarFillAmountToTilesDoubleBar</tt></nobr> in
-<nobr><tt>GraphicalBarConvertToTile.asm</tt></nobr> checks the two equivalent tiles (the two left ends, then the two first middle tile, second middles, and so on...) to determine
-what index to use in order to convert the pairs of fill values into tile numbers (this will write to <nobr><tt>!Scratchram_GraphicalBar_FillByteTbl+0</tt></nobr>, not the other table address).<br><br>
+Now that both bar tiles are stored, the routine <nobr><kbd>ConvertBarFillAmountToTilesDoubleBar</kbd></nobr> in
+<nobr><kbd>GraphicalBarConvertToTile.asm</kbd></nobr> checks the two equivalent tiles (the two left ends, then the two first middle tile, second middles, and so on...) to determine
+what index to use in order to convert the pairs of fill values into tile numbers (this will write to <nobr><kbd>!Scratchram_GraphicalBar_FillByteTbl+0</kbd></nobr>, not the other table address).<br><br>
 
-You can set <nobr><tt>!GraphicalBar_TotalTileUsed</tt></nobr> to any number (beware of bank borders though), just be careful not to have your longest bar in your game to exceed this number
-(so if you have a bar that can go higher than 9 tile bytes long, and you set <nobr><tt>!GraphicalBar_TotalTileUsed</tt></nobr> to 9 or lower), else SecondFill will overwrite FirstFill
+You can set <nobr><kbd>!GraphicalBar_TotalTileUsed</kbd></nobr> to any number (beware of bank borders though), just be careful not to have your longest bar in your game to exceed this number
+(so if you have a bar that can go higher than 9 tile bytes long, and you set <nobr><kbd>!GraphicalBar_TotalTileUsed</kbd></nobr> to 9 or lower), else SecondFill will overwrite FirstFill
 and end up with glitched tiles.<br><br>
 
 The table for the tiles to write to the status bar are formated <a href="DoubleBarFills.png"  target="_blank">like this</a>. FirstFill is the fill that is &ldquo;on top&rdquo; (overlaps)
 of SecondFill. The value in SecondFill is not how &ldquo;long&rdquo; the fill between the edge of FirstFill and the right edge of the fill of SecondFill, rather how &ldquo;long&rdquo;
-from the beginning side (left end or first middle tile) of the bar, thus if both FirstFill and SecondFill are a value of <tt>$0001</tt>, will only display FirstFill, while SecondFill
-is actually a nonzero value &ldquo;covered&rdquo; by FirstFill. Should SecondFill be <tt>$0002</tt> and the other is still <tt>$0001</tt>, you see 1 piece of first fill and 1 piece
+from the beginning side (left end or first middle tile) of the bar, thus if both FirstFill and SecondFill are a value of <kbd>$0001</kbd>, will only display FirstFill, while SecondFill
+is actually a nonzero value &ldquo;covered&rdquo; by FirstFill. Should SecondFill be <kbd>$0002</kbd> and the other is still <kbd>$0001</kbd>, you see 1 piece of first fill and 1 piece
 after that SecondFill.
 </li>
 </ul><br>
 
-And thats it, be very careful as the quantity inputs data are loss when calling <tt>GraphicalBarELITE_DrawGraphicalBar</tt> due to the reused scratch RAM to save memory.
+And thats it, be very careful as the quantity inputs data are loss when calling <kbd>GraphicalBarELITE_DrawGraphicalBar</kbd> due to the reused scratch RAM to save memory.
