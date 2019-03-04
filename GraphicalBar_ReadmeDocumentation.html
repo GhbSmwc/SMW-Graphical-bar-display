@@ -31,7 +31,7 @@ something, etc. as opposed to merely displaying digits.<br><br>
 &ldquo;Consolas&rdquo; so it displays properly.</li>
 <li>You must have at least some ASM knowledge. See this ASM tutorial <a href="https://www.smwcentral.net/?p=section&a=details&id=14268">here.</a></li>
 <li>Routines presented here assumes you are using uberasm tool and does not expect you to use on other things like sprites, so routine calls that are outside the routine files are
-named <nobr><tt>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</tt></nobr> as opposed to just <nobr><tt>&lt;RoutineName&gt;</tt></nobr>.</li>
+named <nobr><kbd>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</kbd></nobr> as opposed to just <nobr><kbd>&lt;RoutineName&gt;</kbd></nobr>.</li>
 </ul>
 
 <hr>
@@ -49,17 +49,17 @@ named <nobr><tt>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</tt></nobr> as opposed t
 <hr>
 <h2>Installation (test run)</h2>
 <ol>
-<li>First make any necessary changes to the defines in <tt>GraphicalBarDefines</tt>. Assuming you testing this out on a clean ROM with nothing
+<li>First make any necessary changes to the defines in <kbd>GraphicalBarDefines</kbd>. Assuming you testing this out on a clean ROM with nothing
 else besides LM making modifications, it is likely you don't have to edit anything. However, if you're planning to use the Super Status Bar patch, open
-<tt>StatusBarSettings.asm</tt> and change <nobr><tt>!StatusBarFormat</tt></nobr> to <tt>$02</tt> and <nobr><tt>!StatusBar_UsingCustomProperties</tt></nobr>
-to <tt>1</tt> so that it displays properly.</li>
+<kbd>StatusBarSettings.asm</kbd> and change <nobr><kbd>!StatusBarFormat</kbd></nobr> to <kbd>$02</kbd> and <nobr><kbd>!StatusBar_UsingCustomProperties</kbd></nobr>
+to <kbd>1</kbd> so that it displays properly.</li>
 <li>Now paste the folders:
 <ul>
-<li><tt>GraphicalBarDefines</tt> (the folder itself) &rightarrow; Uberasm tool's main directory (same area as the .exe)</li>
-<li><tt>GraphicalBarELITE.asm</tt> &rightarrow; Uberasm tool's <tt>library</tt>.</li>
-<li><b>Inside</b> the folder <tt>ExampleUsage</tt>, they go to their respective locations based on their filename.</li>
+<li><kbd>GraphicalBarDefines</kbd> (the folder itself) &rightarrow; Uberasm tool's main directory (same area as the .exe)</li>
+<li><kbd>GraphicalBarELITE.asm</kbd> &rightarrow; Uberasm tool's <kbd>library</kbd>.</li>
+<li><b>Inside</b> the folder <kbd>ExampleUsage</kbd>, they go to their respective locations based on their filename.</li>
 </ul></li>
-<li>Open uberasm tool's <tt>list.txt</tt>, and paste these so that the codes get inserted:
+<li>Open uberasm tool's <kbd>list.txt</kbd>, and paste these so that the codes get inserted:
 <table><tr><td><pre>; Level list. Valid values: 000-1FF.
 level:
 104		Level_DoubleBar.asm
@@ -71,7 +71,7 @@ level:
 <li>Create the &ldquo;ExGraphics&rdquo; if you haven't done so by clicking on the blue mushroom in Lunar Magic.</li>
 <li>Paste the graphic bin files (from this package's &ldquo;ExGraphics&rdquo; folder) of your choice (If you want &ldquo;TransperentBackground&rdquo;
 (<img width="96" src="readme_files/TransperentBackground.png">) or &ldquo;BlackBackground&rdquo; (<img width="96" src="readme_files/BlackBackground.png">))
-into the other where your game resides. Then, take out the appended characters after the &ldquo;<tt>ExGFX&lt;number&gt;</tt>&rdquo; but before the &ldquo;<tt>.bin</tt>&rdquo;.<br><br>
+into the other where your game resides. Then, take out the appended characters after the &ldquo;<kbd>ExGFX&lt;number&gt;</kbd>&rdquo; but before the &ldquo;<kbd>.bin</kbd>&rdquo;.<br><br>
 
 This readme assumes you're using &ldquo;TransperentBackground&rdquo;.</li><br>
 <li>Now in your level editor, click on the green poision mushroom to open a dialog about Layer 3 GFX bypass. On LG1, set that
@@ -164,12 +164,12 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	endif
 	RTL</pre></td></tr></table><br>
 Font colored in <font color="red">red</font> is the things you change, while the <font color="green">green</font>, you edit values in the defines via opening up
-<tt>GraphicalBarDefines/StatusBarSettings.asm</tt> and changing those, and yes, you can safely redefine them when you have multiple bars for advanced use. <font color="yellow">Yellow</font>
+<kbd>GraphicalBarDefines/StatusBarSettings.asm</kbd> and changing those, and yes, you can safely redefine them when you have multiple bars for advanced use. <font color="yellow">Yellow</font>
 is the same as green, but it has to be a 3-byte (24-bit) address. <font color="orange">Orange</font> means you can remove the rounding away code if you want the bar to be able to round
-towards empty or full. Of course, the <tt>#</tt> symbol means a fixed number instead of a RAM address.<br><br>
+towards empty or full. Of course, the <kbd>#</kbd> symbol means a fixed number instead of a RAM address.<br><br>
 
-Also if you are handling 16-bit mode quantity while on 8-bit accumulator, you write the 16-bit number <tt>#$1234</tt> (a fixed value not stored in RAM) as
-storing the <tt>#$34</tt> onto the low byte and <tt>#$12</tt> on the high byte (if it was RAM, it should be obvious, low byte written to low byte and high to high). Remember that
+Also if you are handling 16-bit mode quantity while on 8-bit accumulator, you write the 16-bit number <kbd>#$1234</kbd> (a fixed value not stored in RAM) as
+storing the <kbd>#$34</kbd> onto the low byte and <kbd>#$12</kbd> on the high byte (if it was RAM, it should be obvious, low byte written to low byte and high to high). Remember that
 the SNES is low-endian when the bytes are adjacent from one another in memory.</li><br>
 
 <li>Double Bar. See <a name="DoubleBar" href="readme_files/DoubleBarInfo.html">this information</a>. The colored fonts last mentioned above code also applies on codes here as well.</li>
@@ -179,9 +179,9 @@ the SNES is low-endian when the bytes are adjacent from one another in memory.</
 <h2>ASM Documentation</h2>
 Note: All values here are unsigned. Routine information follows:
 <ol>
-<li>Inside <tt>GraphicalBarELITE.asm</tt></li>
+<li>Inside <kbd>GraphicalBarELITE.asm</kbd></li>
 <ul>
-<li><tt>CalculateGraphicalBarPercentage</tt>: Calculates the ratio of Quantity over MaxQuantity to X over the number of pieces (the whole bar).
+<li><kbd>CalculateGraphicalBarPercentage</kbd>: Calculates the ratio of Quantity over MaxQuantity to X over the number of pieces (the whole bar).
 For example: 50/100 on a 62-pieced bar outputs value of 31.</li>
 <table>
 <tr>
@@ -190,33 +190,33 @@ For example: 50/100 on a 62-pieced bar outputs value of 31.</li>
 </tr>
 <tr>
 <td>
-<tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl</b></nobr></tt> to
-<tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+1</b></nobr></tt> (16-bit)
+<kbd><nobr><b>!Scratchram_GraphicalBar_FillByteTbl</b></nobr></kbd> to
+<kbd><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+1</b></nobr></kbd> (16-bit)
 </td>
 <td>The number or amount of something out of the maximum (known as the &ldquo;quantity&rdquo;).</td>
 </tr>
 <tr>
 <td>
-<tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+2</b></nobr></tt> to
-<tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+3</b></nobr></tt> (16-bit)
+<kbd><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+2</b></nobr></kbd> to
+<kbd><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+3</b></nobr></kbd> (16-bit)
 </td>
-<td>The maximum amount something. If this value is <tt>$0000</tt>, will assume
+<td>The maximum amount something. If this value is <kbd>$0000</kbd>, will assume
 the bar is full due to dividing by zero (known as &ldquo;max quantity&rdquo;).</td>
 </tr>
 <tr>
 <td>
-<tt><nobr><b>!Scratchram_GraphicalBar_LeftEndPiece</b></nobr></tt>,
-<tt><nobr><b>!Scratchram_GraphicalBar_MiddlePiece</b></nobr></tt>,
-<tt><nobr><b>!Scratchram_GraphicalBar_RightEndPiece</b></nobr></tt>, and
-<tt><nobr><b>!Scratchram_GraphicalBar_TempLength</b></nobr></tt> (8-bit each)
+<kbd><nobr><b>!Scratchram_GraphicalBar_LeftEndPiece</b></nobr></kbd>,
+<kbd><nobr><b>!Scratchram_GraphicalBar_MiddlePiece</b></nobr></kbd>,
+<kbd><nobr><b>!Scratchram_GraphicalBar_RightEndPiece</b></nobr></kbd>, and
+<kbd><nobr><b>!Scratchram_GraphicalBar_TempLength</b></nobr></kbd> (8-bit each)
 </td>
 <td>Graphical bar attributes. The ones with the word &ldquo;piece&rdquo; refer to the number of pieces
-or units in their respective byte or 8x8 tile. When 0, they are not included in the table. <tt>!Scratchram_GraphicalBar_TempLength</tt>
+or units in their respective byte or 8x8 tile. When 0, they are not included in the table. <kbd>!Scratchram_GraphicalBar_TempLength</kbd>
 is the number of repeated middle tile bytes between the left and right end tile bytes.<br><br>
 
 The reason why the pieces setup is RAM-based is so you can have different number of pieces in any bar part (left, middle, and right), for example,
 <a href="readme_files/LeftEndMorePieces.png" target="_blank"> 6 pieces for left end</a> along with 3 in the same routine. However, you have to have
-both tables in the tile converter in <tt>GraphicalBarConvertToTile.asm</tt> to avoid glitched tiles.</td>
+both tables in the tile converter in <kbd>GraphicalBarConvertToTile.asm</kbd> to avoid glitched tiles.</td>
 </tr>
 <tr>
 </table>
@@ -227,11 +227,11 @@ Result:
 <th>Description</th>
 </tr>
 <tr>
-<td><tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$01</b></nobr></tt> (16-bit)</td>
-<td>The amount of fill as a &ldquo;percentage&rdquo;. Calculated by <tt>FillAmount = RoundHalfUp(Quantity * TotalNumberOfPiecesInBar / MaxQuantity)</tt></td>
+<td><kbd><nobr><b>$00</b></nobr></kbd> to <kbd><nobr><b>$01</b></nobr></kbd> (16-bit)</td>
+<td>The amount of fill as a &ldquo;percentage&rdquo;. Calculated by <kbd>FillAmount = RoundHalfUp(Quantity * TotalNumberOfPiecesInBar / MaxQuantity)</kbd></td>
 </tr>
 <tr>
-<td><tt><nobr><b>Y register</b></nobr></tt></td>
+<td><kbd><nobr><b>Y register</b></nobr></kbd></td>
 <td>Rounding towards empty and full indicator:
 <ul>
 <li>Y = $00 if not rounded to empty or full (if exact empty, rounded to any number besides 0 or maximum, or full (or higher))</li>
@@ -241,19 +241,19 @@ See more information <a name="RoundAwayFromComplete" href="readme_files/RoundAwa
 </ul></td>
 </tr>
 <tr>
-<td><tt><nobr><b>$02</b></nobr></tt> to <tt><nobr><b>$09</b></nobr></tt></td>
+<td><kbd><nobr><b>$02</b></nobr></kbd> to <kbd><nobr><b>$09</b></nobr></kbd></td>
 <td>Overwritten by math routines. Contains garbage values.</td>
 </tr>
 </tr>
 </table>
 
-<li><tt>DrawGraphicalBar</tt>: it takes a value representing how much fill in the bar, and represent them as individual tiles bytes table containing a number of them that is &ldquo;full&rdquo;,
+<li><kbd>DrawGraphicalBar</kbd>: it takes a value representing how much fill in the bar, and represent them as individual tiles bytes table containing a number of them that is &ldquo;full&rdquo;,
 one byte holding the &ldquo;fraction&rdquo; and then a number of &ldquo;empty&rdquo; bytes after if any of them exist. If you were to add up each byte, the total would equal to the value the number of pieces
-you entered. The inputs are similar to the previously mentioned routine (such as requiring the attributes), but you don't write to <nobr><tt>!Scratchram_GraphicalBar_FillByteTbl</tt></nobr> to
-<nobr><tt>!Scratchram_GraphicalBar_FillByteTbl+3</tt></nobr>, as it is no longer needed. Just to keep in mind, the attributes are kept after running this routine, so you don't have to rewrite them again.
-<tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$01</b></nobr></tt> is the number of units (or pieces) filled as the input. It is important to note that this output table isn't tile numbers but rather
+you entered. The inputs are similar to the previously mentioned routine (such as requiring the attributes), but you don't write to <nobr><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd></nobr> to
+<nobr><kbd>!Scratchram_GraphicalBar_FillByteTbl+3</kbd></nobr>, as it is no longer needed. Just to keep in mind, the attributes are kept after running this routine, so you don't have to rewrite them again.
+<kbd><nobr><b>$00</b></nobr></kbd> to <kbd><nobr><b>$01</b></nobr></kbd> is the number of units (or pieces) filled as the input. It is important to note that this output table isn't tile numbers but rather
 <i>fill amounts</i>, to be indexed into tile numbers (to allow different tile graphic locations for the same routine (such as different format on the overworld compared to level)). The only different
-input here is <tt>$00</tt>:<br><br>
+input here is <kbd>$00</kbd>:<br><br>
 
 <table>
 <tr>
@@ -261,10 +261,10 @@ input here is <tt>$00</tt>:<br><br>
 <th>Description</th>
 </tr>
 <tr>
-<td><tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$01</b></nobr></tt> (16-bit)</td>
+<td><kbd><nobr><b>$00</b></nobr></kbd> to <kbd><nobr><b>$01</b></nobr></kbd> (16-bit)</td>
 <td>The amount of fill in the bar, as in, the total number of pieces filled.<br><br>
 
-The total number of pieces (full amount) in the bar is calculated as: <tt>[FullAmount = LeftEndPiece + (MiddlePiece * MiddleLength) + RightEndPiece]</tt>,
+The total number of pieces (full amount) in the bar is calculated as: <kbd>[FullAmount = LeftEndPiece + (MiddlePiece * MiddleLength) + RightEndPiece]</kbd>,
 for example: 62 = 3 + (7 * 8) + 3</td>
 </tr>
 </table>
@@ -276,54 +276,54 @@ Result:
 </tr>
 <tr>
 <td>
-<tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl</b></nobr></tt> to <tt><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+X</b></nobr></tt>
+<kbd><nobr><b>!Scratchram_GraphicalBar_FillByteTbl</b></nobr></kbd> to <kbd><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+X</b></nobr></kbd>
 </td>
 <td>
-The table containing a series of bytes ordered from full, then one containing a fraction byte (it ranges from <tt>0</tt> to <tt>max-1</tt>), then a series of empty bytes.
+The table containing a series of bytes ordered from full, then one containing a fraction byte (it ranges from <kbd>0</kbd> to <kbd>max-1</kbd>), then a series of empty bytes.
 Should the bar be more than full (say, 63 out of 62 pieces), the values stored in this table will act as if the bar is full and does not write higher values nor write
 additional bytes.<br><br>
 
 
 The ending address is
 <table><tr><td><pre>X = (LeftEnd + MiddleLength + RightEnd) - 1</pre></td></tr></table>
-And the number of bytes this table uses is the same formula above but without the &ldquo;<tt>- 1</tt>&rdquo;.<br><br>
+And the number of bytes this table uses is the same formula above but without the &ldquo;<kbd>- 1</kbd>&rdquo;.<br><br>
 where:
 <ul>
-<li><tt>LeftEnd</tt> is 0 if the left end have 0 pieces and 1 if any non-zero number.</li>
-<li><tt>RightEnd</tt> is the same as above but for right end.</li>
-<li><tt>MiddleLength</tt> is equal to <tt>!Scratchram_GraphicalBar_TempLength</tt> (number of middle tiles) if
-<tt>!Scratchram_GraphicalBar_MiddlePiece</tt> is a nonzero number, and 0 otherwise.
+<li><kbd>LeftEnd</kbd> is 0 if the left end have 0 pieces and 1 if any non-zero number.</li>
+<li><kbd>RightEnd</kbd> is the same as above but for right end.</li>
+<li><kbd>MiddleLength</kbd> is equal to <kbd>!Scratchram_GraphicalBar_TempLength</kbd> (number of middle tiles) if
+<kbd>!Scratchram_GraphicalBar_MiddlePiece</kbd> is a nonzero number, and 0 otherwise.
 </ul>
 If you are using &ldquo;DoubleBar&rdquo;, it is the duplicate table of above, just located
-nth bytes after depending on what you set <nobr><tt>!GraphicalBar_TotalTileUsed</tt></nobr>.
+nth bytes after depending on what you set <nobr><kbd>!GraphicalBar_TotalTileUsed</kbd></nobr>.
 See more information ahead on the bytes diagram.
 </td>
 </tr>
 <tr>
 <td>
-<tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$07</b></nobr></tt>
+<kbd><nobr><b>$00</b></nobr></kbd> to <kbd><nobr><b>$07</b></nobr></kbd>
 </td>
 <td>
 Garbage:
 <ul>
-<li><tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$01</b></nobr></tt>:</li>
+<li><kbd><nobr><b>$00</b></nobr></kbd> to <kbd><nobr><b>$01</b></nobr></kbd>:</li>
 <ul>
 <li>If the right end exist without regards of the middle and left end, will contain the right end amount.</li>
 <li>#$00 if right end does not exist and middle exist.</li>
 <li>If the left end only exist and middle and right are not, contains the left end amount.</li>
 </ul>
 
-<li><tt><nobr><b>$02</b></nobr></tt> to <tt><nobr><b>$07</b></nobr></tt>: Needed to move the values to another
+<li><kbd><nobr><b>$02</b></nobr></kbd> to <kbd><nobr><b>$07</b></nobr></kbd>: Needed to move the values to another
 address due to subroutines as well as outputs of the subroutines.</li>
 </ul>
 </td>
 </tr>
 <tr>
 <td>
-<tt><nobr><b>$08</b></nobr></tt> to <tt><nobr><b>$09</b></nobr></tt>
+<kbd><nobr><b>$08</b></nobr></kbd> to <kbd><nobr><b>$09</b></nobr></kbd>
 </td>
 <td>
-The amount of fill that was <tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$01</b></nobr></tt> was originally before calling this routine, the value is not
+The amount of fill that was <kbd><nobr><b>$00</b></nobr></kbd> to <kbd><nobr><b>$01</b></nobr></kbd> was originally before calling this routine, the value is not
 capped, so inputting a number 63 when there are 62 pieces will have this RAM address storing the value 63. Can be used on such things like &ldquo;multi-bars&rdquo; that multiple bars are shown, and the
 fills advances to the next bar: <img src="readme_files/MultiBar.gif"
 </td>
@@ -366,7 +366,10 @@ This is what it looks like as an example:
 <font color=#00C000>!Scratchram_GraphicalBar_FillByteTbl+6</font> ------------------------------/   |   |
 <font color=#00C000>!Scratchram_GraphicalBar_FillByteTbl+7</font> ----------------------------------/   |
 <font color="scarlet">!Scratchram_GraphicalBar_FillByteTbl+8</font> --------------------------------------/
-</pre>
+</pre><br>
+Note: define <kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> is an address, thus the above math (note the <kbd>+x</kbd>) means you add the value of the address to get the relative location
+(so if <kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> is being defined as <kbd>$7F844A</kbd> and you have <kbd>!Scratchram_GraphicalBar_FillByteTbl+1</kbd>, that is <kbd>$7F844A + 1</kbd>
+which is address <kbd>$7F844B</kbd>).
 </td>
 </tr>
 </table><br>
@@ -386,29 +389,29 @@ RAM address $00-$01:                         $0017 (23)</pre>
 
 <table>
 <tr>
-<td><tt>!Scratchram_GraphicalBar_FillByteTbl</tt><br>
+<td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd><br>
 relative address:</td>
-<td bgcolor=#00C000><tt>+0</tt></td>
-<td bgcolor=#00C000><tt>+1</tt></td>
-<td bgcolor=#00C000><tt>+2</tt></td>
-<td bgcolor=#00C000><tt>+3</tt></td>
-<td bgcolor=#00C000><tt>+4</tt></td>
-<td bgcolor=#00C000><tt>+5</tt></td>
-<td bgcolor=#00C000><tt>+6</tt></td>
-<td bgcolor="scarlet"><tt>+7</tt></td>
-<td><tt>+8</tt></td>
+<td bgcolor=#00C000><kbd>+0</kbd></td>
+<td bgcolor=#00C000><kbd>+1</kbd></td>
+<td bgcolor=#00C000><kbd>+2</kbd></td>
+<td bgcolor=#00C000><kbd>+3</kbd></td>
+<td bgcolor=#00C000><kbd>+4</kbd></td>
+<td bgcolor=#00C000><kbd>+5</kbd></td>
+<td bgcolor=#00C000><kbd>+6</kbd></td>
+<td bgcolor="scarlet"><kbd>+7</kbd></td>
+<td><kbd>+8</kbd></td>
 </tr>
 <tr>
 <td>Table values:</td>
-<td bgcolor="orange"><tt>$08</tt></td>
-<td bgcolor="orange"><tt>$08</tt></td>
-<td bgcolor="yellow"><font color="black"><tt>$07</tt></font></td>
-<td bgcolor="grey"><tt>$00</tt></td>
-<td bgcolor="grey"><tt>$00</tt></td>
-<td bgcolor="grey"><tt>$00</tt></td>
-<td bgcolor="grey"><tt>$00</tt></td>
-<td bgcolor="grey"><tt>$00</tt></td>
-<td><tt>(unused, garbage)</tt></td>
+<td bgcolor="orange"><kbd>$08</kbd></td>
+<td bgcolor="orange"><kbd>$08</kbd></td>
+<td bgcolor="yellow"><font color="black"><kbd>$07</kbd></font></td>
+<td bgcolor="grey"><kbd>$00</kbd></td>
+<td bgcolor="grey"><kbd>$00</kbd></td>
+<td bgcolor="grey"><kbd>$00</kbd></td>
+<td bgcolor="grey"><kbd>$00</kbd></td>
+<td bgcolor="grey"><kbd>$00</kbd></td>
+<td><kbd>(unused, garbage)</kbd></td>
 </tr>
 </table>
 </td>
@@ -430,23 +433,23 @@ excludes the middle section.</pre>
 
 <table>
 <tr>
-<td><tt>!Scratchram_GraphicalBar_FillByteTbl</tt><br>
+<td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd><br>
 relative address:</td>
-<td bgcolor="cyan"><font color="black"><tt>+0</tt></font></td>
-<td bgcolor="scarlet"><tt>+1</tt></td>
-<td><tt>+2</tt></td>
-<td><tt>+3</tt></td>
-<td><tt>+4</tt></td>
-<td><tt>+5</tt></td>
-<td><tt>+6</tt></td>
-<td><tt>+7</tt></td>
-<td><tt>+8</tt></td>
+<td bgcolor="cyan"><font color="black"><kbd>+0</kbd></font></td>
+<td bgcolor="scarlet"><kbd>+1</kbd></td>
+<td><kbd>+2</kbd></td>
+<td><kbd>+3</kbd></td>
+<td><kbd>+4</kbd></td>
+<td><kbd>+5</kbd></td>
+<td><kbd>+6</kbd></td>
+<td><kbd>+7</kbd></td>
+<td><kbd>+8</kbd></td>
 </tr>
 <tr>
 <td>Table values:</td>
-<td bgcolor="orange"><tt>$03</tt></td>
-<td bgcolor="yellow"><font color="black"><tt>$01</tt></font></td>
-<td colspan="7"><tt>(unused, garbage)</tt></td>
+<td bgcolor="orange"><kbd>$03</kbd></td>
+<td bgcolor="yellow"><font color="black"><kbd>$01</kbd></font></td>
+<td colspan="7"><kbd>(unused, garbage)</kbd></td>
 </tr>
 </table>
 </td>
@@ -462,29 +465,29 @@ RAM address $00-$01:                         $0017 (23)</pre>
 
 <table>
 <tr>
-<td><tt>!Scratchram_GraphicalBar_FillByteTbl</tt><br>
+<td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd><br>
 relative address:</td>
-<td bgcolor="cyan"><font color="black"><tt>+0</tt></font></td>
-<td bgcolor=#00C000><tt>+1</tt></td>
-<td bgcolor=#00C000><tt>+2</tt></td>
-<td bgcolor=#00C000><tt>+3</tt></td>
-<td bgcolor=#00C000><tt>+4</tt></td>
-<td bgcolor=#00C000><tt>+5</tt></td>
-<td bgcolor=#00C000><tt>+6</tt></td>
-<td bgcolor=#00C000><tt>+7</tt></td>
-<td><tt>+8</tt></td>
+<td bgcolor="cyan"><font color="black"><kbd>+0</kbd></font></td>
+<td bgcolor=#00C000><kbd>+1</kbd></td>
+<td bgcolor=#00C000><kbd>+2</kbd></td>
+<td bgcolor=#00C000><kbd>+3</kbd></td>
+<td bgcolor=#00C000><kbd>+4</kbd></td>
+<td bgcolor=#00C000><kbd>+5</kbd></td>
+<td bgcolor=#00C000><kbd>+6</kbd></td>
+<td bgcolor=#00C000><kbd>+7</kbd></td>
+<td><kbd>+8</kbd></td>
 </tr>
 <tr>
 <td>Table values:</td>
-<td bgcolor="orange"><tt>$03</tt></td>
-<td bgcolor="orange"><tt>$08</tt></td>
-<td bgcolor="orange"><tt>$08</tt></td>
-<td bgcolor="yellow"><font color="black"><tt>$04</tt></font></td>
-<td bgcolor="grey"><tt>$00</tt></td>
-<td bgcolor="grey"><tt>$00</tt></td>
-<td bgcolor="grey"><tt>$00</tt></td>
-<td bgcolor="grey"><tt>$00</tt></td>
-<td><tt>(unused, garbage)</tt></td>
+<td bgcolor="orange"><kbd>$03</kbd></td>
+<td bgcolor="orange"><kbd>$08</kbd></td>
+<td bgcolor="orange"><kbd>$08</kbd></td>
+<td bgcolor="yellow"><font color="black"><kbd>$04</kbd></font></td>
+<td bgcolor="grey"><kbd>$00</kbd></td>
+<td bgcolor="grey"><kbd>$00</kbd></td>
+<td bgcolor="grey"><kbd>$00</kbd></td>
+<td bgcolor="grey"><kbd>$00</kbd></td>
+<td><kbd>(unused, garbage)</kbd></td>
 </tr>
 </table>
 </td>
@@ -495,13 +498,13 @@ Of course, I made a <a name="ComputeGraphicalBarData" href="readme_files/JS_Grap
 without the need of manually calculating the values.<br><br>
 </li>
 
-<li><tt>RoundAwayEmpty</tt>, <tt>RoundAwayFull</tt>, and <tt>RoundAwayEmptyFull</tt>: After getting the Y register value from <tt>CalculateGraphicalBarPercentage</tt>, this increments or
-decrements the fill amount <tt>$00-$01</tt> by 1 so it will display 1 and/or <tt>MaxFill-1</tt> instead of showing 0 and/or <tt>MaxFill</tt> when the value is rounded towards them. The names
-of the routine should be obvious (e.g. <tt>RoundAwayEmpty</tt> means round away from empty).</li><br>
+<li><kbd>RoundAwayEmpty</kbd>, <kbd>RoundAwayFull</kbd>, and <kbd>RoundAwayEmptyFull</kbd>: After getting the Y register value from <kbd>CalculateGraphicalBarPercentage</kbd>, this increments or
+decrements the fill amount <kbd>$00-$01</kbd> by 1 so it will display 1 and/or <kbd>MaxFill-1</kbd> instead of showing 0 and/or <kbd>MaxFill</kbd> when the value is rounded towards them. The names
+of the routine should be obvious (e.g. <kbd>RoundAwayEmpty</kbd> means round away from empty).</li><br>
 </ul>
-<li>Inside <tt>GraphicalBarConvertToTile.asm</tt></li>
+<li>Inside <kbd>GraphicalBarConvertToTile.asm</kbd></li>
 <ul>
-<li><tt>ConvertBarFillAmountToTiles</tt>: converts the bar fill table into tile numbers via indexing (inputs the same as above and don't
+<li><kbd>ConvertBarFillAmountToTiles</kbd>: converts the bar fill table into tile numbers via indexing (inputs the same as above and don't
 need to be rewritten):
 
 <table>
@@ -512,69 +515,69 @@ need to be rewritten):
 </tr>
 <tr>
 <td><ul>
-<li><tt>Fill amount $00 &rightarrow; tile number $36</tt> <img src="readme_files/GraphicalBarFills/LeftEnd_0_of_3.png"></li>
-<li><tt>Fill amount $01 &rightarrow; tile number $37</tt> <img src="readme_files/GraphicalBarFills/LeftEnd_1_of_3.png"></li>
-<li><tt>Fill amount $02 &rightarrow; tile number $38</tt> <img src="readme_files/GraphicalBarFills/LeftEnd_2_of_3.png"></li>
-<li><tt>Fill amount $03 &rightarrow; tile number $39</tt> <img src="readme_files/GraphicalBarFills/LeftEnd_3_of_3.png"></li>
+<li><kbd>Fill amount $00 &rightarrow; tile number $36</kbd> <img src="readme_files/GraphicalBarFills/LeftEnd_0_of_3.png"></li>
+<li><kbd>Fill amount $01 &rightarrow; tile number $37</kbd> <img src="readme_files/GraphicalBarFills/LeftEnd_1_of_3.png"></li>
+<li><kbd>Fill amount $02 &rightarrow; tile number $38</kbd> <img src="readme_files/GraphicalBarFills/LeftEnd_2_of_3.png"></li>
+<li><kbd>Fill amount $03 &rightarrow; tile number $39</kbd> <img src="readme_files/GraphicalBarFills/LeftEnd_3_of_3.png"></li>
 </ul></td>
 <td><ul>
-<li><tt>Fill amount $00 &rightarrow; tile number $55</tt> <img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"></li>
-<li><tt>Fill amount $01 &rightarrow; tile number $56</tt> <img src="readme_files/GraphicalBarFills/Middle_1_of_8.png"></li>
-<li><tt>Fill amount $02 &rightarrow; tile number $57</tt> <img src="readme_files/GraphicalBarFills/Middle_2_of_8.png"></li>
-<li><tt>Fill amount $03 &rightarrow; tile number $58</tt> <img src="readme_files/GraphicalBarFills/Middle_3_of_8.png"></li>
-<li><tt>Fill amount $04 &rightarrow; tile number $59</tt> <img src="readme_files/GraphicalBarFills/Middle_4_of_8.png"></li>
-<li><tt>Fill amount $05 &rightarrow; tile number $65</tt> <img src="readme_files/GraphicalBarFills/Middle_5_of_8.png"></li>
-<li><tt>Fill amount $06 &rightarrow; tile number $66</tt> <img src="readme_files/GraphicalBarFills/Middle_6_of_8.png"></li>
-<li><tt>Fill amount $07 &rightarrow; tile number $67</tt> <img src="readme_files/GraphicalBarFills/Middle_7_of_8.png"></li>
-<li><tt>Fill amount $08 &rightarrow; tile number $68</tt> <img src="readme_files/GraphicalBarFills/Middle_8_of_8.png"></li>
+<li><kbd>Fill amount $00 &rightarrow; tile number $55</kbd> <img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"></li>
+<li><kbd>Fill amount $01 &rightarrow; tile number $56</kbd> <img src="readme_files/GraphicalBarFills/Middle_1_of_8.png"></li>
+<li><kbd>Fill amount $02 &rightarrow; tile number $57</kbd> <img src="readme_files/GraphicalBarFills/Middle_2_of_8.png"></li>
+<li><kbd>Fill amount $03 &rightarrow; tile number $58</kbd> <img src="readme_files/GraphicalBarFills/Middle_3_of_8.png"></li>
+<li><kbd>Fill amount $04 &rightarrow; tile number $59</kbd> <img src="readme_files/GraphicalBarFills/Middle_4_of_8.png"></li>
+<li><kbd>Fill amount $05 &rightarrow; tile number $65</kbd> <img src="readme_files/GraphicalBarFills/Middle_5_of_8.png"></li>
+<li><kbd>Fill amount $06 &rightarrow; tile number $66</kbd> <img src="readme_files/GraphicalBarFills/Middle_6_of_8.png"></li>
+<li><kbd>Fill amount $07 &rightarrow; tile number $67</kbd> <img src="readme_files/GraphicalBarFills/Middle_7_of_8.png"></li>
+<li><kbd>Fill amount $08 &rightarrow; tile number $68</kbd> <img src="readme_files/GraphicalBarFills/Middle_8_of_8.png"></li>
 </ul></td>
 <td><ul>
-<li><tt>Fill amount $00 &rightarrow; tile number $50</tt> <img src="readme_files/GraphicalBarFills/RightEnd_0_of_3.png"></li>
-<li><tt>Fill amount $01 &rightarrow; tile number $51</tt> <img src="readme_files/GraphicalBarFills/RightEnd_1_of_3.png"></li>
-<li><tt>Fill amount $02 &rightarrow; tile number $52</tt> <img src="readme_files/GraphicalBarFills/RightEnd_2_of_3.png"></li>
-<li><tt>Fill amount $03 &rightarrow; tile number $53</tt> <img src="readme_files/GraphicalBarFills/RightEnd_3_of_3.png"></li>
+<li><kbd>Fill amount $00 &rightarrow; tile number $50</kbd> <img src="readme_files/GraphicalBarFills/RightEnd_0_of_3.png"></li>
+<li><kbd>Fill amount $01 &rightarrow; tile number $51</kbd> <img src="readme_files/GraphicalBarFills/RightEnd_1_of_3.png"></li>
+<li><kbd>Fill amount $02 &rightarrow; tile number $52</kbd> <img src="readme_files/GraphicalBarFills/RightEnd_2_of_3.png"></li>
+<li><kbd>Fill amount $03 &rightarrow; tile number $53</kbd> <img src="readme_files/GraphicalBarFills/RightEnd_3_of_3.png"></li>
 </ul></td>
 </tr>
 </table><br>
 
-So if <tt>!Scratchram_GraphicalBar_FillByteTbl</tt> contains these values and gets converted, this happens:
+So if <kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> contains these values and gets converted, this happens:
 <table>
 <tr>
-<td><tt>!Scratchram_GraphicalBar_FillByteTbl</tt><br>
+<td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd><br>
 relative address:</td>
-<td bgcolor="cyan"><font color="black"><tt>+0</tt></font></td>
-<td bgcolor=#00C000><tt>+1</tt></td>
-<td bgcolor=#00C000><tt>+2</tt></td>
-<td bgcolor=#00C000><tt>+3</tt></td>
-<td bgcolor=#00C000><tt>+4</tt></td>
-<td bgcolor=#00C000><tt>+5</tt></td>
-<td bgcolor=#00C000><tt>+6</tt></td>
-<td bgcolor=#00C000><tt>+7</tt></td>
-<td bgcolor="scarlet"><tt>+8</tt></td>
+<td bgcolor="cyan"><font color="black"><kbd>+0</kbd></font></td>
+<td bgcolor=#00C000><kbd>+1</kbd></td>
+<td bgcolor=#00C000><kbd>+2</kbd></td>
+<td bgcolor=#00C000><kbd>+3</kbd></td>
+<td bgcolor=#00C000><kbd>+4</kbd></td>
+<td bgcolor=#00C000><kbd>+5</kbd></td>
+<td bgcolor=#00C000><kbd>+6</kbd></td>
+<td bgcolor=#00C000><kbd>+7</kbd></td>
+<td bgcolor="scarlet"><kbd>+8</kbd></td>
 </tr>
 <tr>
 <td>Table values...:</td>
-<td bgcolor="orange"><tt>$03</tt></td>
-<td bgcolor="orange"><tt>$08</tt></td>
-<td bgcolor="orange"><tt>$08</tt></td>
-<td bgcolor="yellow"><font color="black"><tt>$04</tt></font></td>
-<td bgcolor="grey"><tt>$00</tt></td>
-<td bgcolor="grey"><tt>$00</tt></td>
-<td bgcolor="grey"><tt>$00</tt></td>
-<td bgcolor="grey"><tt>$00</tt></td>
-<td bgcolor="grey"><tt>$00</tt></td>
+<td bgcolor="orange"><kbd>$03</kbd></td>
+<td bgcolor="orange"><kbd>$08</kbd></td>
+<td bgcolor="orange"><kbd>$08</kbd></td>
+<td bgcolor="yellow"><font color="black"><kbd>$04</kbd></font></td>
+<td bgcolor="grey"><kbd>$00</kbd></td>
+<td bgcolor="grey"><kbd>$00</kbd></td>
+<td bgcolor="grey"><kbd>$00</kbd></td>
+<td bgcolor="grey"><kbd>$00</kbd></td>
+<td bgcolor="grey"><kbd>$00</kbd></td>
 </tr>
 <tr>
 <td>...converted to tile number:</td>
-<td bgcolor="orange"><tt>$39</tt></td>
-<td bgcolor="orange"><tt>$68</tt></td>
-<td bgcolor="orange"><tt>$68</tt></td>
-<td bgcolor="yellow"><font color="black"><tt>$59</tt></font></td>
-<td bgcolor="grey"><tt>$55</tt></td>
-<td bgcolor="grey"><tt>$55</tt></td>
-<td bgcolor="grey"><tt>$55</tt></td>
-<td bgcolor="grey"><tt>$55</tt></td>
-<td bgcolor="grey"><tt>$50</tt></td>
+<td bgcolor="orange"><kbd>$39</kbd></td>
+<td bgcolor="orange"><kbd>$68</kbd></td>
+<td bgcolor="orange"><kbd>$68</kbd></td>
+<td bgcolor="yellow"><font color="black"><kbd>$59</kbd></font></td>
+<td bgcolor="grey"><kbd>$55</kbd></td>
+<td bgcolor="grey"><kbd>$55</kbd></td>
+<td bgcolor="grey"><kbd>$55</kbd></td>
+<td bgcolor="grey"><kbd>$55</kbd></td>
+<td bgcolor="grey"><kbd>$50</kbd></td>
 </tr>
 <tr>
 <td>Tile image:</td>
@@ -604,12 +607,12 @@ Result:
 If you changed the number of pieces in any of the 3 parts of the bar (left, middle, and right), the number of pieces must equal to the number of values +1 (+1 because an empty tile byte is included)
 in the table corresponding to the bar part, for example, by making left end have 4 pieces instead of 3, you must have 5 values in the left end tile table. Else your tiles will glitch.<br><br>
 
-Note that scratch RAM <tt>$00</tt> and <tt>$01</tt> is overwritten to determine should it use overworld border version and handle a loop that translates the middle tiles.<br><br>
+Note that scratch RAM <kbd>$00</kbd> and <kbd>$01</kbd> is overwritten to determine should it use overworld border version and handle a loop that translates the middle tiles.<br><br>
 
 </li>
-<li><tt>ConvertBarFillAmountToTilesDoubleBar</tt>: Same as above, but handles a double-filled bar. Tiles are formated <a href="readme_files/DoubleBarFills.png" target="_blank">like this</a>.
-Also like above, make sure you have the number of pieces equal to <tt>(NumberOfPieces+1)^2</tt> number of values in table (for example, left end have 4 pieces, therefore you must have 25 values;
-<tt>(4+1)^2 = 25</tt>). I recommend to have the table to form a perfect square so that the fill values are visually organized.</li><br>
+<li><kbd>ConvertBarFillAmountToTilesDoubleBar</kbd>: Same as above, but handles a double-filled bar. Tiles are formated <a href="readme_files/DoubleBarFills.png" target="_blank">like this</a>.
+Also like above, make sure you have the number of pieces equal to <kbd>(NumberOfPieces+1)^2</kbd> number of values in table (for example, left end have 4 pieces, therefore you must have 25 values;
+<kbd>(4+1)^2 = 25</kbd>). I recommend to have the table to form a perfect square so that the fill values are visually organized.</li><br>
 
 Of course, the default graphics included here are pixel-column-based, meaning each column of pixels is 1 piece of a bar.<br><br>
 
@@ -618,11 +621,11 @@ Note that this does not support overworld graphics unlike above, as there are ev
 </ul><br>
 
 
-<li>Inside <tt>GraphicalBarWriteToStatusBar.asm</tt>. Note that there are two similar subroutines main labels with one that have &ldquo;<tt>Format2</tt>&rdquo; (such as <tt>WriteBarToHUD</tt> and
-<tt>WriteBarToHUDFormat2</tt>) appended are the same as the other but handles a different status bar/OWB format.</li>
+<li>Inside <kbd>GraphicalBarWriteToStatusBar.asm</kbd>. Note that there are two similar subroutines main labels with one that have &ldquo;<kbd>Format2</kbd>&rdquo; (such as <kbd>WriteBarToHUD</kbd> and
+<kbd>WriteBarToHUDFormat2</kbd>) appended are the same as the other but handles a different status bar/OWB format.</li>
 <ul>
-<li><tt>WriteBarToHUD</tt>: Copies the tile numbers in the table to paste to (writes) the status bar (if you're using the Super Status Bar patch, the if statement and defines will adopt to that).
-Inputs are again, similar to <tt>CalculateGraphicalBarPercentage</tt> with only the attributes being used, but a new input is required:
+<li><kbd>WriteBarToHUD</kbd>: Copies the tile numbers in the table to paste to (writes) the status bar (if you're using the Super Status Bar patch, the if statement and defines will adopt to that).
+Inputs are again, similar to <kbd>CalculateGraphicalBarPercentage</kbd> with only the attributes being used, but a new input is required:
 
 <table>
 <tr>
@@ -630,15 +633,15 @@ Inputs are again, similar to <tt>CalculateGraphicalBarPercentage</tt> with only 
 <th>Description</th>
 </tr>
 <tr>
-<td><tt><nobr><b>$00</b></nobr></tt> to <tt><nobr><b>$02</b></nobr></tt> (24-bit)</td>
+<td><kbd><nobr><b>$00</b></nobr></kbd> to <kbd><nobr><b>$02</b></nobr></kbd> (24-bit)</td>
 <td>The starting address (left end, extends rightwards, even when the bar is set to fill leftwards) location to write the tile numbers to the status bar.</td>
 </tr>
-<td><tt><nobr><b>$03</b></nobr></tt> to <tt><nobr><b>$05</b></nobr></tt> (24-bit)</td>
+<td><kbd><nobr><b>$03</b></nobr></kbd> to <kbd><nobr><b>$05</b></nobr></kbd> (24-bit)</td>
 <td>The starting address (left end, extends rightwards, even when the bar is set to fill leftwards) location to write the tile properties to the status bar.
-(This only works if you installed status bar patches that enable editing the properties in-game, and set <tt>!StatusBar_UsingCustomProperties</tt> to <tt>1</tt>,
-else this is no longer needed to write values to this input). I deliberately used the if statement around this to prevent writing to an arbitrary address (the <nobr><tt>STA [$03],y</tt></nobr> could write to an invalid address).</td>
+(This only works if you installed status bar patches that enable editing the properties in-game, and set <kbd>!StatusBar_UsingCustomProperties</kbd> to <kbd>1</kbd>,
+else this is no longer needed to write values to this input). I deliberately used the if statement around this to prevent writing to an arbitrary address (the <nobr><kbd>STA [$03],y</kbd></nobr> could write to an invalid address).</td>
 <tr>
-<td><tt><nobr><b>$06</b></nobr></tt> (8-bit)</td>
+<td><kbd><nobr><b>$06</b></nobr></kbd> (8-bit)</td>
 <td>The tile properties (YXPCCCTT). Same as above, if you have it disabled, this is not used.</td>
 </tr>
 </table><br>
@@ -649,17 +652,17 @@ $7E0002: $7E</pre>
 
 so be careful on that.).
 Of course, because the <a href="https://www.smwcentral.net/?p=section&a=details&id=15222">Overworld Border Plus</a> patch have the same format as the Super Status Bar patch,
-it will work on that as well (if <tt>!StatusBarFormat</tt> set to $02 and you make a different version of the routine <tt>ConvertBarFillAmountToTiles</tt> to use a different
+it will work on that as well (if <kbd>!StatusBarFormat</kbd> set to $02 and you make a different version of the routine <kbd>ConvertBarFillAmountToTiles</kbd> to use a different
 table to use OW layer 3 tiles).<br><br>
 
-<li><tt>WriteBarToHUDLeftwards</tt>: Same as above, but only works properly if you managed to set bit 6 of YXPCCCTT properties byte. This will write a X-flipped version that
+<li><kbd>WriteBarToHUDLeftwards</kbd>: Same as above, but only works properly if you managed to set bit 6 of YXPCCCTT properties byte. This will write a X-flipped version that
 the bar now fills from right to left. Tiles arranged are flipped so the leftmost tile (including the end tiles) is now the right most, the second leftmost is second rightmost,
 and so on. If you didn't X-flip the tiles via editing the tile properties (YXPCCCTT), each tile won't be X-flipped but are still arranged backwards (when filling up, the rightmost
 tile fills towards the right and advances to the tile towards the left). In vanilla SMW, it is still possible to edit the tile properties (but cannot be changed in-game as the
-data is stored in ROM) at around address <tt>$008C81</tt>.</li><br>
+data is stored in ROM) at around address <kbd>$008C81</kbd>.</li><br>
 
-<li><tt>BarExtendLeft</tt>: Normally, without this routine, as the bar's length (not to be confused with the above routine) increases (say, increase the middle length), the
-bar extends rightwards. With this, you call this routine before you call <tt>WriteBarToHUD</tt> or <tt>WriteBarToHUDLeftwards</tt>. What happens is that it calculates
+<li><kbd>BarExtendLeft</kbd>: Normally, without this routine, as the bar's length (not to be confused with the above routine) increases (say, increase the middle length), the
+bar extends rightwards. With this, you call this routine before you call <kbd>WriteBarToHUD</kbd> or <kbd>WriteBarToHUDLeftwards</kbd>. What happens is that it calculates
 where the leftmost tile would be at by the length of the bar, so the &ldquo;origin&rdquo; of the position gets moved. This is useful for enemy HP bars that have lengths proportional
 to how much max HP the enemy has instead of always the same length.</li>
 </li>
@@ -674,9 +677,9 @@ to how much max HP the enemy has instead of always the same length.</li>
 <center><img src="readme_files/MultiPartiallyFilled.png"></center><br>
 You have to check the tile byte adjacent to the fraction byte to determine to show the &ldquo;second half&rdquo; of the fill edge. The logic on this is very complex and therefore
 a tutorial for that is not included.</li>
-<li>You don't have to call the routine <tt>CalculateGraphicalBarPercentage</tt> to use <tt>DrawGraphicalBar</tt>, this means you can make an icon-based HP system that each
+<li>You don't have to call the routine <kbd>CalculateGraphicalBarPercentage</kbd> to use <kbd>DrawGraphicalBar</kbd>, this means you can make an icon-based HP system that each
 tile byte holds a set amount of HP, for example, in the <i>Legend of Zelda</i> series starting in <i>Ocarina of Time</i>, you can have each heart containing 4 pieces representing each 1 HP.</li>
-<li>It is best to avoid having any end tiles holding the same number of pieces as the middle, although it still works, it is less optimized as the routine <tt>DrawGraphicalBar</tt>
+<li>It is best to avoid having any end tiles holding the same number of pieces as the middle, although it still works, it is less optimized as the routine <kbd>DrawGraphicalBar</kbd>
 only takes a value and represent them as each bytes capped at their maximum. Therefore if you're planning to have 8 pieces for both left and right ends, and have 7 middle bytes also
 having 8 pieces at the max, it is better to have both end tiles set to 0 pieces and have 9 middle tiles holding 8 pieces, here is what it looks like on a full bar:<br><br>
 
@@ -689,26 +692,26 @@ RAM address $00-$01:                         $0048 (72)</pre></td></tr></table>
 Result:
 <table>
 <tr>
-<td bgcolor="cyan"><font color="black"><tt>+0</tt></font></td>
-<td bgcolor=#00C000><tt>+1</tt></td>
-<td bgcolor=#00C000><tt>+2</tt></td>
-<td bgcolor=#00C000><tt>+3</tt></td>
-<td bgcolor=#00C000><tt>+4</tt></td>
-<td bgcolor=#00C000><tt>+5</tt></td>
-<td bgcolor=#00C000><tt>+6</tt></td>
-<td bgcolor=#00C000><tt>+7</tt></td>
-<td bgcolor="scarlet"><tt>+8</tt></td>
+<td bgcolor="cyan"><font color="black"><kbd>+0</kbd></font></td>
+<td bgcolor=#00C000><kbd>+1</kbd></td>
+<td bgcolor=#00C000><kbd>+2</kbd></td>
+<td bgcolor=#00C000><kbd>+3</kbd></td>
+<td bgcolor=#00C000><kbd>+4</kbd></td>
+<td bgcolor=#00C000><kbd>+5</kbd></td>
+<td bgcolor=#00C000><kbd>+6</kbd></td>
+<td bgcolor=#00C000><kbd>+7</kbd></td>
+<td bgcolor="scarlet"><kbd>+8</kbd></td>
 </tr>
 <tr>
-<td bgcolor="orange"><tt>$08</tt></td>
-<td bgcolor="orange"><tt>$08</tt></td>
-<td bgcolor="orange"><tt>$08</tt></td>
-<td bgcolor="orange"><tt>$08</tt></td>
-<td bgcolor="orange"><tt>$08</tt></td>
-<td bgcolor="orange"><tt>$08</tt></td>
-<td bgcolor="orange"><tt>$08</tt></td>
-<td bgcolor="orange"><tt>$08</tt></td>
-<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><kbd>$08</kbd></td>
+<td bgcolor="orange"><kbd>$08</kbd></td>
+<td bgcolor="orange"><kbd>$08</kbd></td>
+<td bgcolor="orange"><kbd>$08</kbd></td>
+<td bgcolor="orange"><kbd>$08</kbd></td>
+<td bgcolor="orange"><kbd>$08</kbd></td>
+<td bgcolor="orange"><kbd>$08</kbd></td>
+<td bgcolor="orange"><kbd>$08</kbd></td>
+<td bgcolor="orange"><kbd>$08</kbd></td>
 </tr>
 </table>
 Vs optimized:
@@ -720,29 +723,29 @@ RAM address $00-$01:                         $0048 (72)</pre></td></tr></table>
 Result:
 <table>
 <tr>
-<td bgcolor=#00C000><tt>+0</tt></td>
-<td bgcolor=#00C000><tt>+1</tt></td>
-<td bgcolor=#00C000><tt>+2</tt></td>
-<td bgcolor=#00C000><tt>+3</tt></td>
-<td bgcolor=#00C000><tt>+4</tt></td>
-<td bgcolor=#00C000><tt>+5</tt></td>
-<td bgcolor=#00C000><tt>+6</tt></td>
-<td bgcolor=#00C000><tt>+7</tt></td>
-<td bgcolor=#00C000><tt>+8</tt></td>
+<td bgcolor=#00C000><kbd>+0</kbd></td>
+<td bgcolor=#00C000><kbd>+1</kbd></td>
+<td bgcolor=#00C000><kbd>+2</kbd></td>
+<td bgcolor=#00C000><kbd>+3</kbd></td>
+<td bgcolor=#00C000><kbd>+4</kbd></td>
+<td bgcolor=#00C000><kbd>+5</kbd></td>
+<td bgcolor=#00C000><kbd>+6</kbd></td>
+<td bgcolor=#00C000><kbd>+7</kbd></td>
+<td bgcolor=#00C000><kbd>+8</kbd></td>
 </tr>
 <tr>
-<td bgcolor="orange"><tt>$08</tt></td>
-<td bgcolor="orange"><tt>$08</tt></td>
-<td bgcolor="orange"><tt>$08</tt></td>
-<td bgcolor="orange"><tt>$08</tt></td>
-<td bgcolor="orange"><tt>$08</tt></td>
-<td bgcolor="orange"><tt>$08</tt></td>
-<td bgcolor="orange"><tt>$08</tt></td>
-<td bgcolor="orange"><tt>$08</tt></td>
-<td bgcolor="orange"><tt>$08</tt></td>
+<td bgcolor="orange"><kbd>$08</kbd></td>
+<td bgcolor="orange"><kbd>$08</kbd></td>
+<td bgcolor="orange"><kbd>$08</kbd></td>
+<td bgcolor="orange"><kbd>$08</kbd></td>
+<td bgcolor="orange"><kbd>$08</kbd></td>
+<td bgcolor="orange"><kbd>$08</kbd></td>
+<td bgcolor="orange"><kbd>$08</kbd></td>
+<td bgcolor="orange"><kbd>$08</kbd></td>
+<td bgcolor="orange"><kbd>$08</kbd></td>
 </tr>
 </table>
-The only difference is the FillAmount &rightarrow; TileNumber conversion <tt>ConvertBarFillAmountToTiles</tt> (and the doublebar version) that utilizes the tile number you need
+The only difference is the FillAmount &rightarrow; TileNumber conversion <kbd>ConvertBarFillAmountToTiles</kbd> (and the doublebar version) that utilizes the tile number you need
 to change (Left end have 9 tiles with values 0-8 same as middle's 0-8 but uses a different array tiles to display a outlined-left edge and same goes to the right end). However,
 the tile converter does not recognize if the first and last tile are meant to be end tiles to have different graphic than the middle, so just before calling the tile converter,
 set the end tiles to be the same number of pieces for middle, and subtract the number of middle tiles by how many end tiles you are using (say 2) so that the end tiles don't use
@@ -760,14 +763,14 @@ the same table graphic as middle and cause cutoff-ended bar.
 	;[...]</pre></td></tr></table><br><br>
 
 </li>
-<li>You might've noticed the define <nobr><tt>!Settings_GraphicalBar_IndexSize</tt></nobr> found in <tt>GraphicalBarDefines.asm</tt>, I left that there in for some rare cases anyone
+<li>You might've noticed the define <nobr><kbd>!Settings_GraphicalBar_IndexSize</kbd></nobr> found in <kbd>GraphicalBarDefines.asm</kbd>, I left that there in for some rare cases anyone
 would need a bar that is more than 255 tile bytes long (So a 16-bit addressing was needed).</li>
-<li>Be careful when you call the routine <tt>WriteBarToHUD</tt> (and <tt>WriteBarToHUDLeftwards</tt>), as because this is multi-bytes based, it will write from
-<nobr><tt>!Default_GraphicalBarPosition</tt></nobr> to <nobr><tt>!Default_GraphicalBarPosition+((NumberOfTiles-1)*!StatusBarFormat)</tt></nobr> address. Thus if you place the bar at RAM address
-<tt>$0F2F</tt>, the address bytes beyond that (which is non-status-bar-related data, from timer data, scores, then an unused RAM area ($0F3A) and so on) gets overwritten.</li>
+<li>Be careful when you call the routine <kbd>WriteBarToHUD</kbd> (and <kbd>WriteBarToHUDLeftwards</kbd>), as because this is multi-bytes based, it will write from
+<nobr><kbd>!Default_GraphicalBarPosition</kbd></nobr> to <nobr><kbd>!Default_GraphicalBarPosition+((NumberOfTiles-1)*!StatusBarFormat)</kbd></nobr> address. Thus if you place the bar at RAM address
+<kbd>$0F2F</kbd>, the address bytes beyond that (which is non-status-bar-related data, from timer data, scores, then an unused RAM area ($0F3A) and so on) gets overwritten.</li>
 <ul><li>However, if you are using the &ldquo;extend leftwards&rdquo; (not to be confused with a leftwards <b>filling bar</b>; the bar that extends leftwards as you increase the length),
-the address write range is <tt>DesiredLastTilePos-((NumberOfTiles-1)*!StatusBarFormat)</tt> to <tt>DesiredLastTilePos</tt>, so be careful not to have the bar data be written past the starting RAM
-address of the status bar (avoid placing the <tt>DesiredLastTilePos</tt> that would cause placing the tiles before the first byte of the status bar tiles).</li></ul>
+the address write range is <kbd>DesiredLastTilePos-((NumberOfTiles-1)*!StatusBarFormat)</kbd> to <kbd>DesiredLastTilePos</kbd>, so be careful not to have the bar data be written past the starting RAM
+address of the status bar (avoid placing the <kbd>DesiredLastTilePos</kbd> that would cause placing the tiles before the first byte of the status bar tiles).</li></ul>
 </ul>
 <hr>
 <h2>Credits</h2>
