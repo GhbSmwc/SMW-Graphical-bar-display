@@ -221,7 +221,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	STA !Scratchram_GraphicalBar_FillByteTbl+3		;/as that if your value is 8-bit.
 	RTS</pre></td></tr></table><br>
 	
-	Thus, assuming you left <nobr><kbd>!GraphicalBar_TotalTileUsed</kbd></nobr> equal to <kbd>32</kbd>, both ends set to 3
+	<a name="SecondTable">Thus, assuming you left <nobr><kbd>!GraphicalBar_TotalTileUsed</kbd></nobr> equal to <kbd>32</kbd>, both ends set to 3
 	pieces, middle set to 8 pieces, and middle span 7 tile bytes long, the table of values
 	are laid out like this:
 <table><tr><td><pre>!Scratchram_GraphicalBar_FillByteTbl+0:  (SecondFill left end)
@@ -249,7 +249,10 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 !Scratchram_GraphicalBar_FillByteTbl+37: (FirstFill 5th middle tile)
 !Scratchram_GraphicalBar_FillByteTbl+38: (FirstFill 6th middle tile)
 !Scratchram_GraphicalBar_FillByteTbl+39: (FirstFill 7th and final middle tile)
-!Scratchram_GraphicalBar_FillByteTbl+40: (FirstFill right end)</pre></td></tr></table>
+!Scratchram_GraphicalBar_FillByteTbl+40: (FirstFill right end)
+!Scratchram_GraphicalBar_FillByteTbl+41: (unused garbage)
+!Scratchram_GraphicalBar_FillByteTbl+42: (unused garbage)
+...</pre></td></tr></table>
 Now that both bar tiles are stored, the routine <nobr><kbd>ConvertBarFillAmountToTilesDoubleBar</kbd></nobr> in
 <nobr><kbd>GraphicalBarConvertToTile.asm</kbd></nobr> checks the two equivalent tiles (the two left ends, then the two first middle tile, second middles, and so on...) to determine
 what index to use in order to convert the pairs of fill values into tile numbers (this will write to <nobr><kbd>!Scratchram_GraphicalBar_FillByteTbl+0</kbd></nobr>, not the other table address).<br><br>
