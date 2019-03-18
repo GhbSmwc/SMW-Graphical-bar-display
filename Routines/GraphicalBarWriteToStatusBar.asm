@@ -164,16 +164,16 @@ BarExtendLeftFormat2:
 	;^A now holds the number of bytes to go back.
 	; This indicates the first tile of the bar to be written.
 	
-	REP #$21				;\-(NumberOfTiles-1)
+	REP #$21				;\A: -(NumberOfTiles-1)...
 	AND #$00FF				;|
 	EOR #$FFFF				;|
 	INC A					;/
-	ADC $00					;>+LastTilePos (we are doing LastTilePos - (NumberOfTiles-1))
+	ADC $00					;>...+ LastTilePos (we are doing LastTilePos - (NumberOfTiles-1))
 	STA $00					;>Store difference in $00-$01
-	SEP #$20				;\Handle bank byte
-	LDA $02					;|
-	SBC #$00				;|
-	STA $02					;/
+	SEP #$20				;
+;	LDA $02					;\Handle bank byte (commented out because carry doesn't work like SBC if subtrahend is 0)
+;	SBC #$00				;|[RAM_00+(-A)]
+;	STA $02					;/
 	
 	if !StatusBar_UsingCustomProperties != 0
 		TXA
@@ -183,10 +183,10 @@ BarExtendLeftFormat2:
 		INC A					;/
 		ADC $03					;>+LastTilePos (we are doing LastTilePos - (NumberOfTiles-1))
 		STA $03					;>Store difference in $00-$01
-		SEP #$20				;\Handle bank byte
-		LDA $05					;|
-		SBC #$00				;|
-		STA $05					;/
+		SEP #$20				;
+;		LDA $05					;\Handle bank byte
+;		SBC #$00				;|
+;		STA $05					;/
 	endif
 	RTL
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
