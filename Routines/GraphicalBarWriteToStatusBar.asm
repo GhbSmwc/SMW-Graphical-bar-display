@@ -135,13 +135,14 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;If using the 2-adjacent bytes per 8x8 tile, uses this instead:
 ; BeginningTilePos = DesiredLastTilePos - ((NumberOfTiles - 1)*2)
 ;
-;Be careful since this uses Akaginite's simple 8bitNum - 16bitNumb
-;code that does not work with the carry flag when 8bitNum is #$00,
-;in which there is no safe way to handle bank border crosses
-;(a bank is the highest byte of the 24-bit address: $XX****, the
-;XX, so avoid things like going from $7EFFFF to $7F0000 (made up
-;example)). So avoid having status bar positions that would be
-;at different banks.
+;Be careful since this uses Akaginite's simple 16bitNum - 8bitNumb
+;it does ((-8bitNumb)+16bitNum) code that does not work with the
+;carry flag when 8bitNum is $00, in which there is no safe way
+;to handle bank border crosses (a bank is the highest byte of
+;the 24-bit address: $XX****, the XX, so avoid things like going
+;from $7EFFFF to $7F0000 (made up example)). So avoid having
+;status bar positions that would be at different banks. This is
+;unlikely though.
 ;
 ; Input:
 ;  $00-$02: the position of the final/last/rightmost tile would be
@@ -180,7 +181,7 @@ BarExtendLeftFormat2:
 	STA $00					;>Store difference in $00-$01
 	SEP #$20				;
 ;	LDA $02					;\Handle bank byte (commented out because carry doesn't work like SBC if subtrahend is 0)
-;	SBC #$00				;|[RAM_00+(-A)]
+;	SBC #$00				;|[(-A) + RAM_00]
 ;	STA $02					;/
 	
 	if !StatusBar_UsingCustomProperties != 0
