@@ -20,6 +20,9 @@
 <a href="../GraphicalBar_ReadmeDocumentation.html#TopJSLink">Back to top</a><br>
 <a href="../GraphicalBar_ReadmeDocumentation.html#ComputeGraphicalBarData">Back to info table</a><br><br>
 
+This is a javascript html calculator tool to find out how much memory and the range of byte addresses are taken due to the amount of memory stored
+varies based on how long you set the bar.<br><br>
+
 Make sure you enable javascript code and use a browser that can handle HTML5 (this document uses <kbd>max</kbd> and <kbd>min</kbd> as well as
 <kbd>&lt;datalist&gt;</kbd>) in the case this doesn't work. Remember that any number displayed here without a prefix
 means that this is a decimal number, a dollar sign (&ldquo;$&rdquo;) means a hexadecimal number. If you get <kbd>NaN</kbd>,
@@ -132,14 +135,7 @@ and write tile bytes at and <b>before</b>) this.<br>
 		document.getElementById("ExtendLeftwards").checked = false
 		document.getElementById("RAM2bytesAdjicentStatusbar").checked = true
 		
-		document.getElementById("ValueMemRangeStat").innerHTML = "Empty";
-		
-		
-		document.getElementById("LayoutTable").innerHTML = ""
-		
-		document.getElementById("ByteFormatLeftEnd").innerHTML = "";
-		document.getElementById("ByteFormatMiddle").innerHTML = "";
-		document.getElementById("ByteFormatRightEnd").innerHTML = "";
+		document.getElementById("Output").innerHTML = "Empty"
 	}
 	
 	function Calculate() {
