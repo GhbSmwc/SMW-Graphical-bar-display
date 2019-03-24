@@ -665,9 +665,9 @@ tile fills towards the right and advances to the tile towards the left). In vani
 data is stored in ROM) at around address <kbd>$008C81</kbd>.</li><br>
 
 <li><kbd>BarExtendLeft</kbd>: Normally, without this routine, as the bar's length (not to be confused with the above routine) increases (say, increase the middle length), the
-bar extends rightwards. With this, you call this routine before you call <kbd>WriteBarToHUD</kbd> or <kbd>WriteBarToHUDLeftwards</kbd>. What happens is that it calculates
-where the leftmost tile would be at by the length of the bar, so the &ldquo;origin&rdquo; of the position gets moved. This is useful for enemy HP bars that have lengths proportional
-to how much max HP the enemy has instead of always the same length.<br><br>
+bar always extends rightwards. With this, you call this routine before you call <kbd>WriteBarToHUD</kbd> or <kbd>WriteBarToHUDLeftwards</kbd> to make it extend leftwards. What
+happens is that it calculates where the leftmost tile would be at depending on the length of the bar, so the &ldquo;origin tile &rdquo; of the position gets moved.
+This is useful for displaying enemy HP bars that are &ldquo;right aligned&rdquo; that have lengths proportional to how much max HP the enemy has and extend leftwards.<br><br>
 
 Be careful with bank borders crossing (don't have status bar tile tables that goes from <kbd>$7EFFFF</kbd> to <kbd>$7F0000</kbd>, for a made-up example), as I discovered that
 Akaginite's <kbd>16Bit - 8Bit</kbd> (done by <kbd>((-8Bit) + 16Bit</kbd>)) does not work with bank borders if <kbd>8Bit</kbd> is <kbd>$00</kbd> because that causes the carry flag
