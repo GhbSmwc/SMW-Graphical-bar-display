@@ -10,7 +10,7 @@
 ;Status bar and overworld stuff
  !OWPlusAndSSBSameFormat              = 1
   ; 0 = You are using a non-Super Status Bar and
-  ;     Overworld border plus patch (you are using both
+  ;     Overworld border plus patch (you are using different
   ;     tile data formats).
   ; 1 = You are using Super Status Bar and overworld
   ;     border plus patch, which they both have the
