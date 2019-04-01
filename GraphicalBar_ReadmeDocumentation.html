@@ -45,7 +45,8 @@ named <nobr><kbd>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</kbd></nobr> as opposed
 <h3>Recommended resources</h3>
 <ul>
 <li><a href="https://www.smwcentral.net/?p=section&a=details&id=16031">Super Status Bar patch</a>, SMW's status bar (or, heads-up display (HUD)) space is really small.</li>
-<li><a href="https://www.smwcentral.net/?p=section&a=details&id=15222">Overworld Border plus</a>, if you want to use the OW graphical bar display.</li>
+<li><a href="https://www.smwcentral.net/?p=section&a=details&id=15222">Overworld Border plus</a>, required if you want to display a graphical bar on the overworld border
+(i.e <kbd>ExampleUsage/Gamemode0E_OWBorderTest.asm</kbd>)</li>
 </ul>
 <h2>Javascript tools</h2>
 <ul><li><a name="TopJSLink" href="readme_files/JS_GraphicalBarCalculator.html">Link to javascript memory usage calculator</a>.</li></ul>
@@ -55,7 +56,15 @@ named <nobr><kbd>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</kbd></nobr> as opposed
 <li>First make any necessary changes to the defines in <kbd>GraphicalBarDefines</kbd>. Assuming you testing this out on a clean ROM with nothing
 else besides LM making modifications, it is likely you don't have to edit anything. However, if you're planning to use the Super Status Bar patch, open
 <kbd>StatusBarSettings.asm</kbd> and change <nobr><kbd>!StatusBarFormat</kbd></nobr> to <kbd>$02</kbd> and <nobr><kbd>!StatusBar_UsingCustomProperties</kbd></nobr>
-to <kbd>1</kbd> so that it displays properly.</li>
+to <kbd>1</kbd> so that it displays properly.<br><br>
+<ul>
+<li>Don't forget, if you want to display a graphical bar on the overworld, you need to install the Overworld Border Plus patch. Remember that this have the same tile
+data format as the super status bar patch, don't worry about <kbd>!StatusBarFormat</kbd> (this only influences the status bar-related code and not the border) as the
+routines support hybrid tile formats (you can have status bar's &ldquo;each next tile is next byte&rdquo; format and OWB+'s &ldquo;each next tile is next 2 bytes over,
+provided you have set <kbd>!OWPlusAndSSBSameFormat</kbd> to <kbd>0</kbd>).</li>
+</ul>
+
+</li>
 <li>Now paste the folders:
 <ul>
 <li><kbd>GraphicalBarDefines</kbd> (the folder itself) &rightarrow; Uberasm tool's main directory (same area as the .exe)</li>
@@ -67,7 +76,13 @@ to <kbd>1</kbd> so that it displays properly.</li>
 level:
 104		Level_DoubleBar.asm
 105		Level_Simple.asm
-106		Level_RoundAwayFromComplete.asm</pre></td></tr></table><br>
+106		Level_RoundAwayFromComplete.asm
+
+;[...]
+
+gamemode:
+; Insert files here
+;0E		Gamemode0E_OWBorderTest.asm ;>Need OWB+ patch to function!</pre></td></tr></table><br>
 </li>
 <li>Insert the graphics by:
 <ol>
@@ -93,6 +108,7 @@ and the other column for SecondFill.</li>
 <li>Level 105 (Yoshi's island 1) is a progress meter, keep heading right to see it fills up.</li>
 <li>Level 106 (Yoshi's island 2) is a coin meter, once 99 is reached, it should be full. It also avoids displaying 0% if if not 0 coins and 100% less than 99 coins,
 a failsafe measure to avoid misleading value displays.</li>
+<li>On the overworld border, measures Mario's Bonus Stars (does not measure Luigi's if 2-player mode).</li>
 </ul>
 
 If you're not using the Super Status Bar patch, the bar will be displayed over the word &ldquo;TIME&rdquo; and the coin symbol. The palette will be yellow on some areas,
