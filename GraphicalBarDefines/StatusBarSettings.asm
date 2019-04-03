@@ -31,7 +31,8 @@
   ; This define is needed to prevent writing what it assumes tile properties into invalid
   ; RAM addresses.
   ;
-  ; NOTE: This also applies to overworld border plus write as well. But thankfully most
+  ; NOTE: This also applies to overworld border plus write as well (both writes to status
+  ; bar and overworld border plus share the same "tile writer" code). But thankfully most
   ; status bar patches that are layer 3-based enables you to edit tile properties,
   ; therefore its likely you are going to set this to 1.
  
