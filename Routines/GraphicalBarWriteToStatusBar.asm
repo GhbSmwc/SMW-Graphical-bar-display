@@ -1,11 +1,13 @@
 incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;This routine directly writes the tile to the status bar.
+;This routine directly writes the tile to the status bar or
+;overworld border plus.
+;
 ;Note: This only writes up to 128 (64 if using super status
-;bar format) tiles. But it is unlikely you would ever need that
-;much tiles, considering that the screen is 32 ($20) 8x8 tiles
-;wide and 28 ($1C) 8x8 tiles tall.
+;bar and OWB+ format) tiles. But it is unlikely you would ever
+;need that much tiles, considering that the screen is 32 ($20)
+;8x8 tiles wide.
 ;
 ;Input:
 ; -$00 to $02: The starting byte address location of the status bar (tile number).

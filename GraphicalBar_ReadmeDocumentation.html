@@ -58,10 +58,14 @@ else besides LM making modifications, it is likely you don't have to edit anythi
 <kbd>StatusBarSettings.asm</kbd> and change <nobr><kbd>!StatusBarFormat</kbd></nobr> to <kbd>$02</kbd> and <nobr><kbd>!StatusBar_UsingCustomProperties</kbd></nobr>
 to <kbd>1</kbd> so that it displays properly.<br><br>
 <ul>
-<li>Don't forget, if you want to display a graphical bar on the overworld, you need to install the Overworld Border Plus patch. Remember that this have the same tile
-data format as the super status bar patch, don't worry about <kbd>!StatusBarFormat</kbd> (this only influences the status bar-related code and not the border) as the
-routines support hybrid tile formats (you can have status bar's &ldquo;each next tile is next byte&rdquo; format and OWB+'s &ldquo;each next tile is next 2 bytes over,
-provided you have set <kbd>!OWPlusAndSSBSameFormat</kbd> to <kbd>0</kbd>).</li>
+<li>Don't forget, if you want to display a graphical bar on the overworld, you need to install the Overworld Border Plus patch (using the vanilla OWB is very difficult
+to modify, and that codes here only supports the OWB+ patch). Remember that this have the same tile data format as the super status bar patch, don't worry about
+<kbd>!StatusBarFormat</kbd> (this only influences the status bar-related code and not the border) as the routines support hybrid tile formats (you can have status
+bar's &ldquo;each next tile is next byte&rdquo; format and OWB+'s &ldquo;each next tile is next 2 bytes over, provided you have set <kbd>!OWPlusAndSSBSameFormat</kbd> to <kbd>0</kbd>).</li><br>
+
+<li>Another thing to note is the define <kbd>!StatusBar_UsingCustomProperties</kbd>, this applies to <b>both</b> the status bar and the overworld border plus patch. This is because both
+writes to the status bar and the border reuses the same &ldquo;write tile&rdquo; routine to save space. Thankfully, most status bar patches that are layer 3-based,
+regardless of the formats, will likely enable you to edit their tile properties, so its more likely you have to set this define to 1 (its 0 by default).</li><br>
 </ul>
 
 </li>
