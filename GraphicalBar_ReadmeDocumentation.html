@@ -11,6 +11,10 @@
 			border: 1px solid white;
 			border-collapse: collapse;
 			}
+			
+			span.NoLineBreak {
+				white-space: nowrap;
+			}
 		</style>
 	</head>
 <body>
@@ -32,7 +36,7 @@ something, etc. as opposed to merely displaying digits.<br><br>
 &ldquo;Consolas&rdquo; so it displays properly.</li>
 <li>You must have at least some ASM knowledge. See this ASM tutorial <a href="https://www.smwcentral.net/?p=section&a=details&id=14268">here.</a></li>
 <li>Routines presented here assumes you are using uberasm tool and does not expect you to use on other things like sprites, so routine calls that are outside the routine files are
-named <nobr><kbd>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</kbd></nobr> as opposed to just <nobr><kbd>&lt;RoutineName&gt;</kbd></nobr>.</li>
+named <span class="NoLineBreak"><kbd>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</kbd></span> as opposed to just <span class="NoLineBreak"><kbd>&lt;RoutineName&gt;</kbd></span>.</li>
 </ul>
 
 <hr>
@@ -55,7 +59,7 @@ named <nobr><kbd>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</kbd></nobr> as opposed
 <ol>
 <li>First make any necessary changes to the defines in <kbd>GraphicalBarDefines</kbd>. Assuming you testing this out on a clean ROM with nothing
 else besides LM making modifications, it is likely you don't have to edit anything. However, if you're planning to use the Super Status Bar patch, open
-<kbd>StatusBarSettings.asm</kbd> and change <nobr><kbd>!StatusBarFormat</kbd></nobr> to <kbd>$02</kbd> and <nobr><kbd>!StatusBar_UsingCustomProperties</kbd></nobr>
+<kbd>StatusBarSettings.asm</kbd> and change <span class="NoLineBreak"><kbd>!StatusBarFormat</kbd></span> to <kbd>$02</kbd> and <span class="NoLineBreak"><kbd>!StatusBar_UsingCustomProperties</kbd></span>
 to <kbd>1</kbd> so that it displays properly.<br><br>
 <ul>
 <li>Don't forget, if you want to display a graphical bar on the overworld, you need to install the Overworld Border Plus patch (using the vanilla OWB is very difficult
@@ -213,25 +217,25 @@ For example: 50/100 on a 62-pieced bar outputs value of 31.</li>
 </tr>
 <tr>
 <td>
-<kbd><nobr><b>!Scratchram_GraphicalBar_FillByteTbl</b></nobr></kbd> to
-<kbd><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+1</b></nobr></kbd> (16-bit)
+<kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl</b></span></kbd> to
+<kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl+1</b></span></kbd> (16-bit)
 </td>
 <td>The number or amount of something out of the maximum (known as the &ldquo;quantity&rdquo;).</td>
 </tr>
 <tr>
 <td>
-<kbd><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+2</b></nobr></kbd> to
-<kbd><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+3</b></nobr></kbd> (16-bit)
+<kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl+2</b></span></kbd> to
+<kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl+3</b></span></kbd> (16-bit)
 </td>
 <td>The maximum amount something. If this value is <kbd>$0000</kbd>, will assume
 the bar is full due to dividing by zero (known as &ldquo;max quantity&rdquo;).</td>
 </tr>
 <tr>
 <td>
-<kbd><nobr><b>!Scratchram_GraphicalBar_LeftEndPiece</b></nobr></kbd>,
-<kbd><nobr><b>!Scratchram_GraphicalBar_MiddlePiece</b></nobr></kbd>,
-<kbd><nobr><b>!Scratchram_GraphicalBar_RightEndPiece</b></nobr></kbd>, and
-<kbd><nobr><b>!Scratchram_GraphicalBar_TempLength</b></nobr></kbd> (8-bit each)
+<kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_LeftEndPiece</b></span></kbd>,
+<kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_MiddlePiece</b></span></kbd>,
+<kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_RightEndPiece</b></span></kbd>, and
+<kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_TempLength</b></span></kbd> (8-bit each)
 </td>
 <td>Graphical bar attributes. The ones with the word &ldquo;piece&rdquo; refer to the number of pieces
 or units in their respective byte or 8x8 tile. When 0, they are not included in the table. <kbd>!Scratchram_GraphicalBar_TempLength</kbd>
@@ -250,11 +254,11 @@ Result:
 <th>Description</th>
 </tr>
 <tr>
-<td><kbd><nobr><b>$00</b></nobr></kbd> to <kbd><nobr><b>$01</b></nobr></kbd> (16-bit)</td>
+<td><kbd><span class="NoLineBreak"><b>$00</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$01</b></span></kbd> (16-bit)</td>
 <td>The amount of fill as a &ldquo;percentage&rdquo;. Calculated by <kbd>FillAmount = RoundHalfUp(Quantity * TotalNumberOfPiecesInBar / MaxQuantity)</kbd></td>
 </tr>
 <tr>
-<td><kbd><nobr><b>Y register</b></nobr></kbd></td>
+<td><kbd><span class="NoLineBreak"><b>Y register</b></span></kbd></td>
 <td>Rounding towards empty and full indicator:
 <ul>
 <li>Y = $00 if not rounded to empty or full (if exact empty, rounded to any number besides 0 or maximum, or full (or higher))</li>
@@ -264,7 +268,7 @@ See more information <a name="RoundAwayFromComplete" href="readme_files/RoundAwa
 </ul></td>
 </tr>
 <tr>
-<td><kbd><nobr><b>$02</b></nobr></kbd> to <kbd><nobr><b>$09</b></nobr></kbd></td>
+<td><kbd><span class="NoLineBreak"><b>$02</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$09</b></span></kbd></td>
 <td>Overwritten by math routines. Contains garbage values.</td>
 </tr>
 </tr>
@@ -272,9 +276,9 @@ See more information <a name="RoundAwayFromComplete" href="readme_files/RoundAwa
 
 <li><kbd>DrawGraphicalBar</kbd>: it takes a value representing how much fill in the bar, and represent them as individual tiles bytes table containing a number of them that is &ldquo;full&rdquo;,
 one byte holding the &ldquo;fraction&rdquo; and then a number of &ldquo;empty&rdquo; bytes after if any of them exist. If you were to add up each byte, the total would equal to the value the number of pieces
-you entered. The inputs are similar to the previously mentioned routine (such as requiring the attributes), but you don't write to <nobr><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd></nobr> to
-<nobr><kbd>!Scratchram_GraphicalBar_FillByteTbl+3</kbd></nobr>, as it is no longer needed. Just to keep in mind, the attributes are kept after running this routine, so you don't have to rewrite them again.
-<kbd><nobr><b>$00</b></nobr></kbd> to <kbd><nobr><b>$01</b></nobr></kbd> is the number of units (or pieces) filled as the input. It is important to note that this output table isn't tile numbers but rather
+you entered. The inputs are similar to the previously mentioned routine (such as requiring the attributes), but you don't write to <span class="NoLineBreak"><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd></span> to
+<span class="NoLineBreak"><kbd>!Scratchram_GraphicalBar_FillByteTbl+3</kbd></span>, as it is no longer needed. Just to keep in mind, the attributes are kept after running this routine, so you don't have to rewrite them again.
+<kbd><span class="NoLineBreak"><b>$00</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$01</b></span></kbd> is the number of units (or pieces) filled as the input. It is important to note that this output table isn't tile numbers but rather
 <i>fill amounts</i>, to be indexed into tile numbers (to allow different tile graphic locations for the same routine (such as different format on the overworld compared to level)). The only different
 input here is <kbd>$00</kbd>:<br><br>
 
@@ -284,7 +288,7 @@ input here is <kbd>$00</kbd>:<br><br>
 <th>Description</th>
 </tr>
 <tr>
-<td><kbd><nobr><b>$00</b></nobr></kbd> to <kbd><nobr><b>$01</b></nobr></kbd> (16-bit)</td>
+<td><kbd><span class="NoLineBreak"><b>$00</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$01</b></span></kbd> (16-bit)</td>
 <td>The amount of fill in the bar, as in, the total number of pieces filled.<br><br>
 
 The total number of pieces (full amount) in the bar is calculated as: <kbd>[FullAmount = LeftEndPiece + (MiddlePiece * MiddleLength) + RightEndPiece]</kbd>,
@@ -299,7 +303,7 @@ Result:
 </tr>
 <tr>
 <td>
-<kbd><nobr><b>!Scratchram_GraphicalBar_FillByteTbl</b></nobr></kbd> to <kbd><nobr><b>!Scratchram_GraphicalBar_FillByteTbl+X</b></nobr></kbd>
+<kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl</b></span></kbd> to <kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl+X</b></span></kbd>
 </td>
 <td>
 The table containing a series of bytes ordered from full, then one containing a fraction byte (it ranges from <kbd>0</kbd> to <kbd>max-1</kbd>), then a series of empty bytes.
@@ -318,35 +322,35 @@ where:
 <kbd>!Scratchram_GraphicalBar_MiddlePiece</kbd> is a nonzero number, and 0 otherwise.
 </ul>
 If you are using &ldquo;DoubleBar&rdquo;, it is the duplicate table of above, just located
-nth bytes after depending on what you set <nobr><kbd>!GraphicalBar_TotalTileUsed</kbd></nobr>.
+nth bytes after depending on what you set <span class="NoLineBreak"><kbd>!GraphicalBar_TotalTileUsed</kbd></span>.
 See <a href="readme_files/DoubleBarInfo.html#SecondTable" target="_blank">this information</a> for what I mean.
 </td>
 </tr>
 <tr>
 <td>
-<kbd><nobr><b>$00</b></nobr></kbd> to <kbd><nobr><b>$07</b></nobr></kbd>
+<kbd><span class="NoLineBreak"><b>$00</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$07</b></span></kbd>
 </td>
 <td>
 Garbage:
 <ul>
-<li><kbd><nobr><b>$00</b></nobr></kbd> to <kbd><nobr><b>$01</b></nobr></kbd>:</li>
+<li><kbd><span class="NoLineBreak"><b>$00</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$01</b></span></kbd>:</li>
 <ul>
 <li>If the right end exist without regards of the middle and left end, will contain the right end amount.</li>
 <li>#$00 if right end does not exist and middle exist.</li>
 <li>If the left end only exist and middle and right are not, contains the left end amount.</li>
 </ul>
 
-<li><kbd><nobr><b>$02</b></nobr></kbd> to <kbd><nobr><b>$07</b></nobr></kbd>: Needed to move the values to another
+<li><kbd><span class="NoLineBreak"><b>$02</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$07</b></span></kbd>: Needed to move the values to another
 address due to subroutines as well as outputs of the subroutines.</li>
 </ul>
 </td>
 </tr>
 <tr>
 <td>
-<kbd><nobr><b>$08</b></nobr></kbd> to <kbd><nobr><b>$09</b></nobr></kbd>
+<kbd><span class="NoLineBreak"><b>$08</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$09</b></span></kbd>
 </td>
 <td>
-The amount of fill that was <kbd><nobr><b>$00</b></nobr></kbd> to <kbd><nobr><b>$01</b></nobr></kbd> was originally before calling this routine, the value is not
+The amount of fill that was <kbd><span class="NoLineBreak"><b>$00</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$01</b></span></kbd> was originally before calling this routine, the value is not
 capped, so inputting a number 63 when there are 62 pieces will have this RAM address storing the value 63. Can be used on such things like &ldquo;multi-bars&rdquo; that multiple bars are shown, and the
 fills advances to the next bar: <img src="readme_files/MultiBar.gif"
 </td>
@@ -620,9 +624,9 @@ Result:
 </td>
 <td colspan="9">
 <center>
-<nobr>
+<span class="NoLineBreak">
 <img src="readme_files/GraphicalBarFills/LeftEnd_3_of_3.png"><img src="readme_files/GraphicalBarFills/Middle_8_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_8_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_4_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"><img src="readme_files/GraphicalBarFills/Middle_0_of_8.png"><img src="readme_files/GraphicalBarFills/RightEnd_0_of_3.png">
-</nobr>
+</span>
 </center>
 </td>
 </tr>
@@ -656,19 +660,19 @@ Inputs are again, similar to <kbd>CalculateGraphicalBarPercentage</kbd> with onl
 <th>Description</th>
 </tr>
 <tr>
-<td><kbd><nobr><b>$00</b></nobr></kbd> to <kbd><nobr><b>$02</b></nobr></kbd> (24-bit)</td>
+<td><kbd><span class="NoLineBreak"><b>$00</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$02</b></span></kbd> (24-bit)</td>
 <td>The starting address (left end, extends rightwards, even when the bar is set to fill leftwards) location to write the tile numbers to the status bar.</td>
 </tr>
-<td><kbd><nobr><b>$03</b></nobr></kbd> to <kbd><nobr><b>$05</b></nobr></kbd> (24-bit)</td>
+<td><kbd><span class="NoLineBreak"><b>$03</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$05</b></span></kbd> (24-bit)</td>
 <td>The starting address (left end, extends rightwards, even when the bar is set to fill leftwards) location to write the tile properties to the status bar.
 (This only works if you installed status bar patches that enable editing the properties in-game, and set <kbd>!StatusBar_UsingCustomProperties</kbd> to <kbd>1</kbd>,
-else this is no longer needed to write values to this input). I deliberately used the if statement around this to prevent writing to an arbitrary address (the <nobr><kbd>STA [$03],y</kbd></nobr> could write to an invalid address).</td>
+else this is no longer needed to write values to this input). I deliberately used the if statement around this to prevent writing to an arbitrary address (the <span class="NoLineBreak"><kbd>STA [$03],y</kbd></span> could write to an invalid address).</td>
 <tr>
-<td><kbd><nobr><b>$06</b></nobr></kbd> (8-bit)</td>
+<td><kbd><span class="NoLineBreak"><b>$06</b></span></kbd> (8-bit)</td>
 <td>The tile properties (YXPCCCTT). Same as above, if you have it disabled, this is not used.</td>
 </tr>
 </table><br>
-Remember that this is low endian (The address $7E0F09, for example are stored in each bytes as
+Remember that this is little endian (The address $7E0F09, for example are stored in each bytes as
 <pre>$7E0000: $09
 $7E0001: $0F
 $7E0002: $7E</pre>
@@ -790,10 +794,10 @@ the same table graphic as middle and cause cutoff-ended bar.
 	;[...]</pre></td></tr></table><br><br>
 
 </li>
-<li>You might've noticed the define <nobr><kbd>!Settings_GraphicalBar_IndexSize</kbd></nobr> found in <kbd>GraphicalBarDefines.asm</kbd>, I left that there in for some rare cases anyone
+<li>You might've noticed the define <span class="NoLineBreak"><kbd>!Settings_GraphicalBar_IndexSize</kbd></span> found in <kbd>GraphicalBarDefines.asm</kbd>, I left that there in for some rare cases anyone
 would need a bar that is more than 255 tile bytes long (So a 16-bit addressing was needed).</li>
 <li>Be careful when you call the routine <kbd>WriteBarToHUD</kbd> (and <kbd>WriteBarToHUDLeftwards</kbd>), as because this is multi-bytes based, it will write from
-<nobr><kbd>!Default_GraphicalBarPosition</kbd></nobr> to <nobr><kbd>!Default_GraphicalBarPosition+((NumberOfTiles-1)*!StatusBarFormat)</kbd></nobr> address. Thus if you place the bar at RAM address
+<span class="NoLineBreak"><kbd>!Default_GraphicalBarPosition</kbd></span> to <span class="NoLineBreak"><kbd>!Default_GraphicalBarPosition+((NumberOfTiles-1)*!StatusBarFormat)</kbd></span> address. Thus if you place the bar at RAM address
 <kbd>$0F2F</kbd>, the address bytes beyond that (which is non-status-bar-related data, from timer data, scores, then an unused RAM area ($0F3A) and so on) gets overwritten.</li>
 <ul><li>However, if you are using the &ldquo;extend leftwards&rdquo; (not to be confused with a leftwards <b>filling bar</b>; the bar that extends leftwards as you increase the length),
 the address write range is <kbd>DesiredLastTilePos-((NumberOfTiles-1)*!StatusBarFormat)</kbd> to <kbd>DesiredLastTilePos</kbd>, so be careful not to have the bar data be written past the starting RAM
