@@ -15,6 +15,10 @@
 			div.SmallFont {
 				font-size: 11px;
 			}
+			
+			div.StatisticsTable {
+				max-width:900px;
+			}
 		</style>
 	</head>
 <a href="../GraphicalBar_ReadmeDocumentation.html#TopJSLink">Back to top</a><br>
@@ -198,9 +202,9 @@ and write tile bytes at and <b>before</b>) this.<br>
 			if (BarBytesTotal == 0) {
 				OutputDisplay += "No bytes used, nonexistent bar."
 			} else {
-				OutputDisplay += "<table>"
+				OutputDisplay += "<div class='StatisticsTable'><table>"
 				OutputDisplay += "<tr>"
-				OutputDisplay += "<td>Tile bytes used:</td>"
+				OutputDisplay += "<td>Tile bytes used: <br>(<kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> and tiles on status bar.)</td>"
 				OutputDisplay += "<td><kbd>" + parseInt(BarBytesTotal) + "</kbd> (<kbd>$" + parseInt(BarBytesTotal).toString(16) + "</kbd>) tile byte(s) (indexes <kbd>$0</kbd> to <kbd>$" + parseInt(LeftEndExist + MiddleExist + RightEndExist - 1).toString(16) + "</kbd>)</td>"
 				OutputDisplay += "</tr>"
 				OutputDisplay += "<tr>"
@@ -230,7 +234,7 @@ and write tile bytes at and <b>before</b>) this.<br>
 				
 				OutputDisplay += "</td>"
 				OutputDisplay += "</tr>"
-				OutputDisplay += "</table><br><br>"
+				OutputDisplay += "</table><br><br></div>"
 			
 				//below displays memory layout table
 					var i = 0
