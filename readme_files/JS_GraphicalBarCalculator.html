@@ -165,7 +165,7 @@ and write tile bytes at and <b>before</b>) this.<br>
 			MiddleLength = Math.floor(clamp(MiddleLength, 0, 255))
 			document.getElementById("MiddleLength").value = MiddleLength
 		//Obtain the total number of tile bytes
-			if (document.getElementById("BarTileTableRAM").value == "") {
+			if (isNaN(parseInt(document.getElementById("BarTileTableRAM").value, 16)) == true) {
 				document.getElementById("BarTileTableRAM").value = "7F844A"
 			}
 			var BarTileTableRAM =  document.getElementById("BarTileTableRAM").value
@@ -185,7 +185,7 @@ and write tile bytes at and <b>before</b>) this.<br>
 			
 			var BarBytesTotal = parseInt(LeftEndExist) + parseInt(MiddleExist) + parseInt(RightEndExist)
 		//Obtain values for displaying the status bar RAM addresses
-			if (document.getElementById("StatusBarRAMTilePos").value == "") {
+			if (isNaN(parseInt(document.getElementById("StatusBarRAMTilePos").value, 16)) == true) {
 				document.getElementById("StatusBarRAMTilePos").value = "7FA000"
 			}
 			var StatBarAddressBarPos = document.getElementById("StatusBarRAMTilePos").value
