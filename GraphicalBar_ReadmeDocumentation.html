@@ -275,8 +275,37 @@ See more information <a name="RoundAwayFromComplete" href="readme_files/RoundAwa
 </table>
 
 <li><kbd>DrawGraphicalBar</kbd>: it takes a value representing how much fill in the bar, and represent them as individual tiles bytes table containing a number of them that is &ldquo;full&rdquo;,
-one byte holding the &ldquo;fraction&rdquo; and then a number of &ldquo;empty&rdquo; bytes after if any of them exist. If you were to add up each byte, the total would equal to the value the number of pieces
-you entered. The inputs are similar to the previously mentioned routine (such as requiring the attributes), but you don't write to <span class="NoLineBreak"><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd></span> to
+one byte holding the &ldquo;fraction&rdquo; and then a number of &ldquo;empty&rdquo; bytes after if any of them exist. Because of this, the sum of all the bytes should total to the amount of pieces
+filled. Here are the formulas on how each are calculated:<br><br>
+</ul>
+
+<ul>
+<li>Left end:</li>
+<ul>
+<kbd>LeftEndFill = clamp(TotalFilled, 0, LeftEndMax)</kbd>
+</ul>
+<li>Middle:</li>
+<ul>
+<li><kbd>TotalMiddleMax = MiddleLength * MiddleMaxEachTile</kbd> (total number of pieces in the middle part of the bar)</li>
+<li><kbd>MiddleFill = clamp((TotalFilled - LeftEndMax), 0, TotalMiddleMax)</kbd> (excluding the left end, how many pieces filled in the whole middle)</li>
+<li><kbd>NumberOfFullMiddleTiles = clamp(floor(MiddleFill/MiddleMaxEachTile), 0, MiddleLength)</kbd> (<a href="https://en.wikipedia.org/wiki/Euclidean_division">euclidean division</a>)</li>
+<li><kbd>MiddleFractionFill = MiddleFill MOD MiddleMaxEachTile</kbd> (<a href="https://en.wikipedia.org/wiki/Euclidean_division">euclidean division</a>, placed just after the last full middle tile or
+on the first middle tile if there are no full middle tiles, if the entire middle tiles is full, fraction is not written at all)</li>
+</ul>
+<li>Right end:</li>
+<ul>
+<li><kbd>RightEndFill = clamp((TotalFilled - (LeftEndMax + TotalMiddleMax)), 0, RightEndMax)</kbd></li>
+</ul><br><br>
+<li>functions explanation:</li>
+<ul>
+<li><kbd>clamp(x, min, max)</kbd> returns x in between <kbd>min</kbd> and <kbd>max</kbd>, but returns <kbd>min</kbd> if at or below that number and <kbd>max</kbd> if at or above that number</li>
+<li><kbd>floor(x)</kbd> returns the highest integer that is &le; x. Essentially this round down an integer (7/8 = 0.875 &rarr; 0, 9/8 = 1.125 &rarr; 1).</li>
+</ul>
+</ul><br><br>
+
+
+
+The inputs are similar to the previously mentioned routine (such as requiring the attributes), but you don't write to <span class="NoLineBreak"><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd></span> to
 <span class="NoLineBreak"><kbd>!Scratchram_GraphicalBar_FillByteTbl+3</kbd></span>, as it is no longer needed. Just to keep in mind, the attributes are kept after running this routine, so you don't have to rewrite them again.
 <kbd><span class="NoLineBreak"><b>$00</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$01</b></span></kbd> is the number of units (or pieces) filled as the input. It is important to note that this output table isn't tile numbers but rather
 <i>fill amounts</i>, to be indexed into tile numbers (to allow different tile graphic locations for the same routine (such as different format on the overworld compared to level)). The only different
