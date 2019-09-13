@@ -258,6 +258,8 @@ db $7B,$7B,$7C,$7D    ;>(1;0), (1;1), (1;2), (1;3)
 db $7E,$7E,$7E,$7F    ;>(2;0), (2;1), (2;2), (2;3)
 db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 
+;^Just realized, this is called a "two-dimensional array".
+
 	ConvertBarFillAmountToTilesDoubleBar:
 	PHB									;>Save bank
 	PHK									;\Switch bank
