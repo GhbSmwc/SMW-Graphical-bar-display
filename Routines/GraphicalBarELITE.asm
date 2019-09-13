@@ -274,7 +274,8 @@ CalculateGraphicalBarPercentage:
 ;Convert amount of fill to each fill per byte.
 ;
 ;This basically breaks up the amount of fill in the whole bar into each
-;bytes having their capacity.
+;bytes having their capacity. It works similar to euclidean division, but
+;the end tiles may have different max amounts.
 ;
 ;Notes:
 ; -This routine output only have 1 partially filled (non-full and non-empty)
