@@ -58,7 +58,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ; *Note that this value isn't capped (mainly Quantity > MaxQuantity), the
 ;  "DrawGraphicalBar" subroutine will detect and will not display over max,
 ;  just in case if you somehow want to use the over-the-max-value on advance
-;  use (such as filling 2 seperate bars, filling up the 2nd one after the 1st
+;  use (such as filling 2 separate bars, filling up the 2nd one after the 1st
 ;  is full).
 ;*TotalMaxPieces = the number of pieces of the whole bar when full.
 ;
@@ -275,7 +275,30 @@ CalculateGraphicalBarPercentage:
 ;
 ;This basically breaks up the amount of fill in the whole bar into each
 ;bytes having their capacity. It works similar to euclidean division, but
-;the end tiles may have different max amounts.
+;the end tiles may have different max amounts. Fill amounts are formatted
+;in this order like this:
+;
+; [Full bytes...], [Fraction byte (contains 0 to (Max-1))], [Empty bytes...]
+;
+; Where "..." indicates there can be any number of those bytes, including 0
+; of those bytes (when the bar is full or not a single byte is full, so
+; first tile is fraction). Note that this data is always stored in this
+; order, even on a leftwards bar (its up to the write tile routine to
+; invert the order)
+;
+; Example:
+; -Left and right end tiles have 3 pieces
+; -Middle each tile have 8 pieces
+; -Middle tile length set to 7.
+; -Fill amount = 17 ($0023)
+;
+; Stored:
+;  M,  M,  M,  F,  E,  E,  E,  E,  E
+; $03,$08,$08,$04,$00,$00,$00,$00,$00
+;
+; M = full
+; F = fraction
+; E = empty
 ;
 ;Notes:
 ; -This routine output only have 1 partially filled (non-full and non-empty)
@@ -295,27 +318,20 @@ CalculateGraphicalBarPercentage:
 ; -!Scratchram_GraphicalBar_TempLength: The length of the bar (only counts
 ;   middle bytes)
 ;Output:
-; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+x:
-;  A table containing the amount of fill for each byte. Table formated like this:
-;  1) Nth number of maxed bytes.
-;  2) 1 "fraction" byte that contains a value ranging from 0 to max-1 inclusively.
-;  3) Nth number of empty bytes.
+; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+EndAddress:
+;  A table array containing the amount of fill for each byte, explained previously.
+;
 ;  The numbers of each byte should total equal to the value stored in ram address
 ;  $00 prior. Should the bar be more than full, the table will act as if the bar
-;  full and will not store higher values nor write additional bytes.
+;  full and will not store higher values nor write additional bytes beyond table.
 ; -$08 to $09 are used for handling fill for each of the 3 groups of bytes
 ;  (left, middle, and right). Once the routine is done, it's the amount of
 ;  fill you have input for $00 to $01 (not capped to the value to be full
 ;  if greater than).
 ;
-;  Should the total amount of fill of the bar be greater than than the amount
-;  needed to be full, the table act as if the bar is EXACTLY full (not exceeding);
-;  capping the fill table from writing more values. Example: trying to input 63/62
-;  pieces filled would have the table saying 62/62.
-;
 ;  The end of the address going to be used is this:
 ;
-;  X = (LeftEnd + MiddleLength + RightEnd) - 1
+;  EndAddress = (LeftEnd + MiddleLength + RightEnd) - 1
 ;
 ;  LeftEnd and/or RightEnd are 0 if there are no pieces for each of them,
 ;  MiddleLength is basically !Scratchram_GraphicalBar_TempLength. If that or
@@ -324,7 +340,7 @@ CalculateGraphicalBarPercentage:
 ;Overwritten/Destroyed:
 ; -$00 to $07: garbage:
 ; --$00 to $01: will be when this routine is finished:
-; ---The amount right end contains if right end exist and no reguards to left
+; ---The amount right end contains if right end exist and no regards to left
 ;    end and middle.
 ; ---#$00 if no right end exist but middle exist.
 ; ---The amount left end contains when middle and right end doesn't exist.
