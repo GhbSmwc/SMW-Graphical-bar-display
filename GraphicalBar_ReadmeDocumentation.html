@@ -274,9 +274,12 @@ See more information <a name="RoundAwayFromComplete" href="readme_files/RoundAwa
 </tr>
 </table>
 
-<li><kbd>DrawGraphicalBar</kbd>: it takes a value representing how much fill in the bar, and represent them as individual tiles bytes table containing a number of them that is &ldquo;full&rdquo;,
-one byte holding the &ldquo;fraction&rdquo; and then a number of &ldquo;empty&rdquo; bytes after if any of them exist. Because of this, the sum of all the bytes should total to the amount of pieces
-filled. Here are the formulas on how each are calculated:<br><br>
+<li><kbd>DrawGraphicalBar</kbd>: it takes a value representing how much fill in the entire bar, and divides them into &ldquo;tile bytes&rdquo; capped at their own maximum. Each
+byte will contain a value that is a &ldquo;sub-quantity&rdquo; making up the whole fill amount. Ordered from any number of them (including zero) that is a full, a single or none
+(if the bar is full) that is a fraction, and then any number of them (including none) that are empty. Adding all the numbers should equal to the total quantity:
+<img src="readme_files/FillAmountDividedUnevenlyToTileBytes.png"><br><br>
+
+Here are the formulas on how each are calculated:<br><br>
 </ul>
 
 <ul>
@@ -664,6 +667,8 @@ If you changed the number of pieces in any of the 3 parts of the bar (left, midd
 in the table corresponding to the bar part, for example, by making left end have 4 pieces instead of 3, you must have 5 values in the left end tile table. Else your tiles will glitch.<br><br>
 
 Note that scratch RAM <kbd>$00</kbd> and <kbd>$01</kbd> is overwritten to determine should it use overworld border version and handle a loop that translates the middle tiles.<br><br>
+
+The table of tile numbers in the routine are ordered from empty to full in the tile array, I left the comments on there to show what fill amount for every byte for easier editing.
 
 </li>
 <li><kbd>ConvertBarFillAmountToTilesDoubleBar</kbd>: Same as above, but handles a double-filled bar. Tiles are formated <a href="readme_files/DoubleBarFills.png" target="_blank">like this</a>.
