@@ -273,18 +273,15 @@ CalculateGraphicalBarPercentage:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Convert amount of fill to each fill per byte.
 ;
-;This basically breaks up the amount of fill in the whole bar into each
-;bytes having their capacity. It works similar to euclidean division, but
-;the end tiles may have different max amounts. Fill amounts are formatted
-;in this order like this:
+;This basically divides the amount of fill in the whole bar into each
+;addends of the amount of fill stored in every byte in the table,
+;with bytes at their set maximums (if any), a fraction byte (if the bar
+;isn't full), and then empty (if any), in that order. It works similar to
+;euclidean division, but the end tiles may have different max amounts.
 ;
-; [Full bytes...], [Fraction byte (contains 0 to (Max-1))], [Empty bytes...]
-;
-; Where "..." indicates there can be any number of those bytes, including 0
-; of those bytes (when the bar is full or not a single byte is full, so
-; first tile is fraction). Note that this data is always stored in this
+; Note that this data is always stored in this
 ; order, even on a leftwards bar (its up to the write tile routine to
-; invert the order)
+; invert the order).
 ;
 ; Example:
 ; -Left and right end tiles have 3 pieces

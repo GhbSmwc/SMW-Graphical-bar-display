@@ -274,9 +274,8 @@ See more information <a name="RoundAwayFromComplete" href="readme_files/RoundAwa
 </tr>
 </table>
 
-<li><kbd>DrawGraphicalBar</kbd>: it takes a value representing how much fill in the entire bar, and divides them into &ldquo;tile bytes&rdquo; capped at their own maximum. Each
-byte will contain a value that is a &ldquo;sub-quantity&rdquo; making up the whole fill amount. Ordered from any number of them (including zero) that is a full, a single or none
-(if the bar is full) that is a fraction, and then any number of them (including none) that are empty. Adding all the numbers should equal to the total quantity:
+<li><kbd>DrawGraphicalBar</kbd>: it takes a value representing how much fill in the entire bar, and divides them into a byte-array of numbers that are addends of the fill amount,
+in the format of bytes being at their set maximums (full bytes, if any), a single fraction byte (if the bar isn't full), and then empty bytes (if any):
 <img src="readme_files/FillAmountDividedUnevenlyToTileBytes.png"><br><br>
 
 Here are the formulas on how each are calculated:<br><br>
