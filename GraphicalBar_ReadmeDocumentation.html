@@ -275,7 +275,8 @@ See more information <a name="RoundAwayFromComplete" href="readme_files/RoundAwa
 </table>
 
 <li><kbd>DrawGraphicalBar</kbd>: it takes a value representing how much fill in the entire bar, and divides them into a byte-array of numbers that are addends of the fill amount,
-in the format of bytes being at their set maximums (full bytes, if any), a single fraction byte (if the bar isn't full), and then empty bytes (if any):
+in the format of bytes being at their set maximums (full bytes, if any), a single fraction byte (no fraction if bar is full), and then empty bytes (if any), while keeping the order of
+their maximums (3, 8, 8, 8, 8...):<br>
 <img src="readme_files/FillAmountDividedUnevenlyToTileBytes.png"><br><br>
 
 Here are the formulas on how each are calculated:<br><br>
