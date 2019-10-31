@@ -275,8 +275,8 @@ CalculateGraphicalBarPercentage:
 ;
 ;This basically divides the amount of fill in the whole bar into each
 ;addends of the amount of fill stored in each byte in the table, in
-;the order of bytes being maxed out (if any), a fraction byte (none if bar
-;is full), and then empty (if any), in that order, keeping the order of
+;this order: [n] byte(s) being maxed out, [none or 1] fraction byte,
+;and then [n] empty (if any), in that order, keeping the order of
 ;the maximums of each byte unchanged. It works similar to euclidean
 ;division, but the end tiles may have different max amounts.
 ;
@@ -296,6 +296,10 @@ CalculateGraphicalBarPercentage:
 ; M = full
 ; F = fraction
 ; E = empty
+;
+; An analogy is you fill a cup of water until it's full, then the next
+; cup until it's full, until you got all the cups full or have run out
+; of water.
 ;
 ;Notes:
 ; -This routine output only have 1 partially filled (non-full and non-empty)
