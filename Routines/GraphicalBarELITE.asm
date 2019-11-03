@@ -361,6 +361,7 @@ DrawGraphicalBar:
 		STA $08						;/and in case if any of the 3 parts gets disabled.
 	endif
 .LeftEnd
+	;LeftendFill = Clamp(InputFill, 0, LeftMax)
 	LDA !Scratchram_GraphicalBar_LeftEndPiece	;\check if the left end was present
 	AND #$00FF					;|
 	BEQ .Middle					;/
@@ -376,6 +377,11 @@ DrawGraphicalBar:
 	STA !Scratchram_GraphicalBar_FillByteTbl	;/
 	INX
 .Middle
+	;MiddleFill = InputFill - LeftMax
+	;NumberOfFullMiddles = clamp(floor(MiddleFill/InputMiddlePiecesEachMax), 0, InputMiddleLength)
+	;MiddleFractionLocation = NumberOfFullMiddles + 1 (indexes the fraction tile after the last full middle), if all middles are full,
+	; it is not written.
+	;MiddleFractionAmount = MiddleFill % InputMiddlePiecesEachMax (% is the modulo operator).
 	LDA !Scratchram_GraphicalBar_MiddlePiece	;\Both of these have to be nonzero to include middle.
 	BNE +						;|
 	JMP .RightEnd					;|
@@ -517,6 +523,7 @@ DrawGraphicalBar:
 	STA $08						;/
 	SEP #$20
 .RightEnd
+	;RightEndFill = clamp((InputFill - (LeftMax + (InputMiddlePiecesEachMax * InputMiddleLength))), 0, RightMax)
 	LDA !Scratchram_GraphicalBar_RightEndPiece	;\check if right end exist
 	BEQ .Done					;/
 	
