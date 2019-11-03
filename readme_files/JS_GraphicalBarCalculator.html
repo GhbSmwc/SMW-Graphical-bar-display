@@ -50,7 +50,7 @@ you have entered an invalid input (entered with a blank input or have invalid ch
 <td><input type="number" id="MiddleLength" value="7" min="0" max="255" step="1" onchange="LengthChanged()">(<kbd>Hex: $<span id="LengthHexDisplay">7</span></kbd>) Use decimal integers 0-255, note that this uses loops and lags if this is a large number.</td>
 </tr>
 <td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> is located at RAM address: </td>
-<td>$<input type="text" list="BarTileTableRAMList" id="BarTileTableRAM" value ="" maxlength="6" onchange="Calculate()"><button type="button" onclick="FillByteTblAddress_increase()">+</button><button type="button" onclick="FillByteTblAddress_decrease()">-</button> Enter a hexadecimal RAM address here (don't add a prefix)</td>
+<td>$<input type="text" list="BarTileTableRAMList" id="BarTileTableRAM" value ="" maxlength="6" onchange="FillByteTableFunction()"><button type="button" onclick="FillByteTblAddress_increase()">+</button><button type="button" onclick="FillByteTblAddress_decrease()">-</button> Enter a hexadecimal RAM address here (don't add a prefix)</td>
 <datalist id="BarTileTableRAMList">
 <option value="7F844A">Default RAM address table</option>
 <option value="400198">SA-1 version</option>
@@ -59,7 +59,7 @@ you have entered an invalid input (entered with a blank input or have invalid ch
 
 <tr>
 <td>Status bar/Overworld border plus write location (<kbd>!Default_GraphicalBarPosition</kbd> and <kbd>!Default_GraphicalBarPositionExtendLeftwards</kbd>):</td>
-<td>Status bar/Overworld border plus <b>tile</b> location: $<input type="text" list="StatusBarRAMTileList" id="StatusBarRAMTilePos" value ="" maxlength="6" onchange="Calculate()"><button type="button" onclick="StatusBarPosAddress_increase()">+</button><button type="button" onclick="StatusBarPosAddress_decrease()">-</button><button type="button" onclick="StatusBarPosAddress_increase2()">+2</button><button type="button" onclick="StatusBarPosAddress_decrease2()">-2</button><br>
+<td>Status bar/Overworld border plus <b>tile</b> location: $<input type="text" list="StatusBarRAMTileList" id="StatusBarRAMTilePos" value ="" maxlength="6" onchange="StatusBarOwBorderPosFunction()"><button type="button" onclick="StatusBarPosAddress_increase()">+</button><button type="button" onclick="StatusBarPosAddress_decrease()">-</button><button type="button" onclick="StatusBarPosAddress_increase2()">+2</button><button type="button" onclick="StatusBarPosAddress_decrease2()">-2</button><br>
 
 <input type="checkbox" id="RAM2bytesAdjicentStatusbar" name="RAM2bytesAdjicentStatusbar" value="" onchange="Calculate()" checked>You are using a status bar formated two adjacent bytes per tile
 (<kbd>[TTTTTTTT, YXPCCCTT]</kbd>). <a href="Layer3TileFormat/Layer3TileFormat.html" target="_blank">See here</a> for more info.<br><br>
@@ -104,41 +104,47 @@ and write tile bytes at and <b>before</b>) this.<br>
 	function FillByteTblAddress_increase() {
 		var FillByteTblAddress = parseInt(document.getElementById("BarTileTableRAM").value, 16)
 		FillByteTblAddress++
-		document.getElementById("BarTileTableRAM").value = FillByteTblAddress.toString(16).toUpperCase()
+		document.getElementById("BarTileTableRAM").value = clamp(FillByteTblAddress, 0, parseInt("FFFFFF", 16)).toString(16).toUpperCase()
 		Calculate()
 	}
 	
 	function FillByteTblAddress_decrease() {
 		var FillByteTblAddress = parseInt(document.getElementById("BarTileTableRAM").value, 16)
-		if (FillByteTblAddress > 0) {
-			FillByteTblAddress--
-			document.getElementById("BarTileTableRAM").value = FillByteTblAddress.toString(16).toUpperCase()
-		}
+		FillByteTblAddress--
+		document.getElementById("BarTileTableRAM").value = clamp(FillByteTblAddress, 0, parseInt("FFFFFF", 16)).toString(16).toUpperCase()
+		Calculate()
+	}
+	function FillByteTableFunction() {
+		document.getElementById("BarTileTableRAM").value = clamp(parseInt(document.getElementById("BarTileTableRAM").value, 16), 0, parseInt("FFFFFF", 16)).toString(16).toUpperCase()
+		Calculate()
+	}
+	function StatusBarOwBorderPosFunction() {
+		document.getElementById("StatusBarRAMTilePos").value = clamp(parseInt(document.getElementById("StatusBarRAMTilePos").value, 16), 0, parseInt("FFFFFF", 16)).toString(16).toUpperCase()
 		Calculate()
 	}
 	
 	function StatusBarPosAddress_increase() {
 		var StatusBarPosAddress = parseInt(document.getElementById("StatusBarRAMTilePos").value, 16)
 		StatusBarPosAddress++
-		document.getElementById("StatusBarRAMTilePos").value = StatusBarPosAddress.toString(16).toUpperCase()
+		document.getElementById("StatusBarRAMTilePos").value = clamp(StatusBarPosAddress, 0, parseInt("FFFFFF", 16)).toString(16).toUpperCase()
 		Calculate()
 	}
 	function StatusBarPosAddress_decrease() {
 		var StatusBarPosAddress = parseInt(document.getElementById("StatusBarRAMTilePos").value, 16)
 		StatusBarPosAddress--
-		document.getElementById("StatusBarRAMTilePos").value = StatusBarPosAddress.toString(16).toUpperCase()
+		document.getElementById("StatusBarRAMTilePos").value = clamp(StatusBarPosAddress, 0, parseInt("FFFFFF", 16)).toString(16).toUpperCase()
 		Calculate()
 	}
 	function StatusBarPosAddress_increase2() {
 		var StatusBarPosAddress = parseInt(document.getElementById("StatusBarRAMTilePos").value, 16)
 		StatusBarPosAddress = StatusBarPosAddress + 2
-		document.getElementById("StatusBarRAMTilePos").value = StatusBarPosAddress.toString(16).toUpperCase()
+		document.getElementById("StatusBarRAMTilePos").value = clamp(StatusBarPosAddress, 0, parseInt("FFFFFF", 16)).toString(16).toUpperCase()
 		Calculate()
 	}
 	function StatusBarPosAddress_decrease2() {
 		var StatusBarPosAddress = parseInt(document.getElementById("StatusBarRAMTilePos").value, 16)
 		StatusBarPosAddress = StatusBarPosAddress - 2
-		document.getElementById("StatusBarRAMTilePos").value = StatusBarPosAddress.toString(16).toUpperCase()
+		document.getElementById("StatusBarRAMTilePos").value = clamp(StatusBarPosAddress, 0, parseInt("FFFFFF", 16)).toString(16).toUpperCase()
 		Calculate()
 	}
 	function LeftEndPiecesChanged() {
