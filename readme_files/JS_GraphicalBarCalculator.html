@@ -61,8 +61,8 @@ you have entered an invalid input (entered with a blank input or have invalid ch
 <td>Status bar/Overworld border plus write location (<kbd>!Default_GraphicalBarPosition</kbd> and <kbd>!Default_GraphicalBarPositionExtendLeftwards</kbd>):</td>
 <td>Status bar/Overworld border plus <b>tile</b> location: $<input type="text" list="StatusBarRAMTileList" id="StatusBarRAMTilePos" value ="" maxlength="6" onchange="StatusBarOwBorderPosFunction()"><button type="button" onclick="StatusBarPosAddress_increase()">+</button><button type="button" onclick="StatusBarPosAddress_decrease()">-</button><button type="button" onclick="StatusBarPosAddress_increase2()">+2</button><button type="button" onclick="StatusBarPosAddress_decrease2()">-2</button><br>
 
-<input type="checkbox" id="RAM2bytesAdjicentStatusbar" name="RAM2bytesAdjicentStatusbar" value="" onchange="Calculate()" checked>You are using a status bar formated two adjacent bytes per tile
-(<kbd>[TTTTTTTT, YXPCCCTT]</kbd>). <a href="Layer3TileFormat/Layer3TileFormat.html" target="_blank">See here</a> for more info.<br><br>
+<input type="checkbox" id="RAM2bytesAdjicentStatusbar" name="RAM2bytesAdjicentStatusbar" value="" onchange="Calculate()" checked><label for="RAM2bytesAdjicentStatusbar">You are using a status bar formated two adjacent bytes per tile
+(<kbd>[TTTTTTTT, YXPCCCTT]</kbd>).</label> <a href="Layer3TileFormat/Layer3TileFormat.html" target="_blank">See here</a> <label for="RAM2bytesAdjicentStatusbar">for more info.</label><br><br>
 
 <datalist id="StatusBarRAMTileList">
 <option value="7E0F09">SMW's status bar (Writes over &ldquo;TIME&rdquo;)</option>
@@ -82,11 +82,11 @@ you have entered an invalid input (entered with a blank input or have invalid ch
 <option value="6C36">Minimalist status bar (SA-1)</option>
 </datalist>
 
-<input type="checkbox" id="FillLeftwards" name="FillLeftwards" value="FillLeftwards" onchange="Calculate()">Bar fills leftwards (x-flipped). Remember that this includes end tiles if applicable, (left end
+<input type="checkbox" id="FillLeftwards" name="FillLeftwards" value="FillLeftwards" onchange="Calculate()"><label for="FillLeftwards">Bar fills leftwards (x-flipped). Remember that this includes end tiles if applicable, (left end
 will now be the &ldquo;right side&rdquo;, but the fill still &ldquo;goes towards the middle&rdquo;, and the right end is on the &ldquo;left side&rdquo; and &ldquo;fills away from the middle&rdquo;
-as it increases towards the left).<br>
-<input type="checkbox" id="ExtendLeftwards" name="ExtendLeftwards" value="ExtendLeftwards"  onchange="Calculate()">Bar extends leftwards as length increases (this will make this address input be the final tile position
-and write tile bytes at and <b>before</b>) this.<br>
+as it increases towards the left).</label><br>
+<input type="checkbox" id="ExtendLeftwards" name="ExtendLeftwards" value="ExtendLeftwards"  onchange="Calculate()"><label for="ExtendLeftwards">Bar extends leftwards as length increases (this will make this address input be the final tile position
+and write tile bytes at and <b>before</b>) this.</label><br>
 </td>
 
 </tr>
@@ -303,9 +303,9 @@ and write tile bytes at and <b>before</b>) this.<br>
 							OutputDisplay += ("<td><kbd>$" + (parseInt(BarTileTableRAM, 16).toString(16).toUpperCase()) + " (!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i) +")</kbd></td>")
 							OutputDisplay += ("<td><font color='Cyan'>Left end tile byte</font></td>")
 							if (document.getElementById("FillLeftwards").checked == false) {
-								OutputDisplay += ("<td><kbd>$" + (parseInt(StatBarAddressBarPos, 16) + ((i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16).toUpperCase() + "</kbd></td>")
+								OutputDisplay += ("<td><kbd>" + DisplaySignedHexString(parseInt(StatBarAddressBarPos, 16) + ((i - DisplacementExtendLeftwards) * StatusBarTileFormat)) + "</kbd></td>")
 							} else {
-								OutputDisplay += ("<td><kbd>$" + (parseInt(StatBarAddressBarPos, 16) + (((BarBytesTotal - 1) - i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16).toUpperCase() + "</kbd></td>")
+								OutputDisplay += ("<td><kbd>" + DisplaySignedHexString(parseInt(StatBarAddressBarPos, 16) + (((BarBytesTotal - 1) - i - DisplacementExtendLeftwards) * StatusBarTileFormat)) + "</kbd></td>")
 							}
 							
 							OutputDisplay += "</tr>"
@@ -318,9 +318,9 @@ and write tile bytes at and <b>before</b>) this.<br>
 								OutputDisplay += ("<td><kbd>$" + (parseInt(BarTileTableRAM, 16) + i).toString(16).toUpperCase() + " (!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i) +")</kbd></td>")
 								OutputDisplay += ("<td><font color=#00FF00>Middle tile byte " + parseInt(MiddleCount + 1) + "</font></td>")
 								if (document.getElementById("FillLeftwards").checked == false) {
-									OutputDisplay += ("<td><kbd>$" + (parseInt(StatBarAddressBarPos, 16) + ((i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16).toUpperCase() + "</kbd></td>")
+									OutputDisplay += ("<td><kbd>" + DisplaySignedHexString(parseInt(StatBarAddressBarPos, 16) + ((i - DisplacementExtendLeftwards) * StatusBarTileFormat)) + "</kbd></td>")
 								} else {
-									OutputDisplay += ("<td><kbd>$" + (parseInt(StatBarAddressBarPos, 16) + (((BarBytesTotal - 1) - i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16).toUpperCase() + "</kbd></td>")
+									OutputDisplay += ("<td><kbd>" + DisplaySignedHexString(parseInt(StatBarAddressBarPos, 16) + (((BarBytesTotal - 1) - i - DisplacementExtendLeftwards) * StatusBarTileFormat)) + "</kbd></td>")
 								}
 								
 								OutputDisplay += "</tr>"
@@ -335,9 +335,9 @@ and write tile bytes at and <b>before</b>) this.<br>
 							OutputDisplay += ("<td><kbd>$" + ((parseInt(BarTileTableRAM, 16) + i).toString(16).toUpperCase()) + " (!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i) +")</kbd></td>")
 							OutputDisplay += ("<td><font color='red'>Right end tile byte</font></td>")
 							if (document.getElementById("FillLeftwards").checked == false) {
-								OutputDisplay += ("<td><kbd>$" + (parseInt(StatBarAddressBarPos, 16) + ((i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16).toUpperCase() + "</kbd></td>")
+								OutputDisplay += ("<td><kbd>" + DisplaySignedHexString(parseInt(StatBarAddressBarPos, 16) + ((i - DisplacementExtendLeftwards) * StatusBarTileFormat)) + "</kbd></td>")
 							} else {
-								OutputDisplay += ("<td><kbd>$" + (parseInt(StatBarAddressBarPos, 16) + (((BarBytesTotal - 1) - i - DisplacementExtendLeftwards) * StatusBarTileFormat)).toString(16).toUpperCase() + "</kbd></td>")
+								OutputDisplay += ("<td><kbd>" + DisplaySignedHexString(parseInt(StatBarAddressBarPos, 16) + (((BarBytesTotal - 1) - i - DisplacementExtendLeftwards) * StatusBarTileFormat)) + "</kbd></td>")
 							}
 							
 							OutputDisplay += "</tr>"
@@ -348,7 +348,14 @@ and write tile bytes at and <b>before</b>) this.<br>
 			}
 			document.getElementById("Output").innerHTML += OutputDisplay
 	}
-
+	function DisplaySignedHexString(num) {
+		if (num >= 0) {
+			num = "$"+ num.toString(16).toUpperCase()
+		} else {
+			num = "-$" + Math.abs(num).toString(16).toUpperCase() + " (position goes beyond the first address)"
+		}
+		return num
+	}
 	function clamp(num, min, max) {
 		return num <= min ? min : num >= max ? max : num;
 	}
