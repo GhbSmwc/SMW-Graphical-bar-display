@@ -707,7 +707,9 @@ else this is no longer needed to write values to this input). I deliberately use
 <td>The tile properties (YXPCCCTT). Same as above, if you have it disabled, this is not used.</td>
 </tr>
 </table><br>
-Remember that this is little endian (The address $7E0F09, for example are stored in each bytes as
+Once the routine is completed, it will write tile data from <kbd>RAMAddressIn00</kbd> to <kbd>RAMAddressIn00 + (NumberOfTiles-1)</kbd> (or <kbd>RAMAddressIn00 + ((NumberOfTiles-1)*2)</kbd> if you are using SSB-styled format).
+The same thing applies to tile properties as well.
+Remember that all numbers are little endians (The address $7E0F09, for example are stored in each bytes as
 <pre>$7E0000: $09
 $7E0001: $0F
 $7E0002: $7E</pre>
@@ -726,7 +728,10 @@ data is stored in ROM) at around address <kbd>$008C81</kbd>.</li><br>
 <li><kbd>BarExtendLeft</kbd>: Normally, without this routine, as the bar's length (not to be confused with the above routine) increases (say, increase the middle length), the
 bar always extends rightwards. With this, you call this routine before you call <kbd>WriteBarToHUD</kbd> or <kbd>WriteBarToHUDLeftwards</kbd> to make it extend leftwards. What
 happens is that it calculates where the leftmost tile would be at depending on the length of the bar, so the &ldquo;origin tile &rdquo; of the position gets moved.
-This is useful for displaying enemy HP bars that are &ldquo;right aligned&rdquo; that have lengths proportional to how much max HP the enemy has and extend leftwards.<br><br>
+This is useful for displaying enemy HP bars that are &ldquo;right aligned&rdquo; that have lengths proportional to how much max HP the enemy has and extend leftwards:
+<img src="readme_files/BarExtendLeftTiles.png"><br>
+It is calculated by: <kbd>StartingTilePosition = UserEnteredPosition - (NumberOfTiles - 1)</kbd>, therefore, taking the position, subtract to get a new position, and then write from
+there in between the original and new position.<br>
 
 Be careful with bank borders crossing (don't have status bar tile tables that goes from <kbd>$7EFFFF</kbd> to <kbd>$7F0000</kbd>, for a made-up example), as I discovered that
 Akaginite's <kbd>16Bit - 8Bit</kbd> (done by <kbd>((-8Bit) + 16Bit</kbd>)) does not work with bank borders if <kbd>8Bit</kbd> is <kbd>$00</kbd> because that causes the carry flag
