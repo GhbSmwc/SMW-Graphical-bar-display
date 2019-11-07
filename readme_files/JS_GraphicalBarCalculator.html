@@ -272,13 +272,13 @@ and write tile bytes at and <b>before</b>) this.</label><br>
 				if (document.getElementById("ExtendLeftwards").checked == false) {
 					OutputDisplay += ("<kbd>$" + parseInt(StatBarAddressBarPos, 16).toString(16).toUpperCase() + "</kbd> to <kbd>$" + (parseInt(StatBarAddressBarPos, 16) + ((BarBytesTotal-1) * StatusBarTileFormat)).toString(16).toUpperCase() + "</kbd>")
 				} else {
-					OutputDisplay += ("<kbd>$" + (parseInt(StatBarAddressBarPos, 16) - ((BarBytesTotal-1) * StatusBarTileFormat)).toString(16).toUpperCase() + "</kbd> to <kbd>$" + (parseInt(StatBarAddressBarPos, 16).toString(16).toUpperCase()) + "</kbd>")
+					OutputDisplay += ("<kbd>" + DisplaySignedHexString(parseInt(StatBarAddressBarPos, 16) - ((BarBytesTotal-1) * StatusBarTileFormat)) + "</kbd> to <kbd>$" + (parseInt(StatBarAddressBarPos, 16).toString(16).toUpperCase()) + "</kbd>")
 				}
 				if (document.getElementById("RAM2bytesAdjicentStatusbar").checked == true) {
 					if (document.getElementById("ExtendLeftwards").checked == false) {
 						OutputDisplay += (" (tile properties are <kbd>$" + (parseInt(StatBarAddressBarPos, 16) + 1).toString(16).toUpperCase() + "</kbd> to <kbd>$" + ((parseInt(StatBarAddressBarPos, 16) + ((BarBytesTotal-1) * StatusBarTileFormat)) + 1).toString(16).toUpperCase() + "</kbd>)")
 					} else {
-						OutputDisplay += (" (tile properties are <kbd>$" + ((parseInt(StatBarAddressBarPos, 16) - ((BarBytesTotal-1) * StatusBarTileFormat)) + 1).toString(16).toUpperCase() + "</kbd> to <kbd>$" + (parseInt(StatBarAddressBarPos, 16) + 1).toString(16).toUpperCase() + "</kbd>)")
+						OutputDisplay += (" (tile properties are <kbd>" + DisplaySignedHexString((parseInt(StatBarAddressBarPos, 16) - ((BarBytesTotal-1) * StatusBarTileFormat)) + 1) + "</kbd> to <kbd>$" + (parseInt(StatBarAddressBarPos, 16) + 1).toString(16).toUpperCase() + "</kbd>)")
 					}
 				}
 				
@@ -352,7 +352,7 @@ and write tile bytes at and <b>before</b>) this.</label><br>
 		if (num >= 0) {
 			num = "$"+ num.toString(16).toUpperCase()
 		} else {
-			num = "-$" + Math.abs(num).toString(16).toUpperCase() + " (position goes beyond the first address)"
+			num = "(-$" + Math.abs(num).toString(16).toUpperCase() + ")"
 		}
 		return num
 	}
