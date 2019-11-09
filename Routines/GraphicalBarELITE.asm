@@ -382,6 +382,10 @@ DrawGraphicalBar:
 	;MiddleFractionLocation = NumberOfFullMiddles + 1 (indexes the fraction tile after the last full middle), if all middles are full,
 	; it is not written.
 	;MiddleFractionAmount = MiddleFill % InputMiddlePiecesEachMax (% is the modulo operator).
+	;NumberOfMiddleEmpties = clamp(InputMiddleLength - (NumberOfFullMiddles + 1), 0, InputMiddleLength)
+	; ^Note: This writes $00 to all the remaining middles when there are 2+ less full tiles than InputMiddleLength
+	;  (A fraction tile can also be $00, thus the first number that is not maxed in the table is always a fraction,
+	;  i.e: [$03,$08,$08,$00,$00] <- the first $00 after the $08 is reguarded as a fraction.
 	LDA !Scratchram_GraphicalBar_MiddlePiece	;\Both of these have to be nonzero to include middle.
 	BNE +						;|
 	JMP .RightEnd					;|
@@ -396,7 +400,11 @@ DrawGraphicalBar:
 	CMP $00						;>compares with amount filled
 	SEP #$20					;
 	BCC ..ReachesMiddle				;>If maximum < filled (filled >= maximum)
-	
+	;The gimmick here is that the Y acts as a counter of how many middle tiles to process.
+	;Each time you write a tile (full, fraction, or empty), it subtracts Y by 1 after, and once
+	;that is zero, tells it to stop writing any additional tiles. So no worries that it
+	;would write additional bytes beyond the expected right end if the fill amount is
+	;bigger than the bar's maximum value (or total pieces).
 	..EmptyMiddle
 	if !Setting_GraphicalBar_IndexSize == 0
 		LDA !Scratchram_GraphicalBar_TempLength
@@ -566,7 +574,7 @@ DrawGraphicalBar:
 	STA $04						;/
 	LDA $08						;\RightEndFillOnly = TotalFilled - (MiddlePieceTotal+LeftEnd)
 	SEC						;|this result should be less than or equal to 255
-	SBC $04						;/>SBC clears the carry should an unsigned underflow occurs ($00 -> $FF) from borrowing. Value should be < 255
+	SBC $04						;/>SBC clears the carry should an unsigned underflow occurs ($00 -> $FF) from borrowing (small - bigger). Value should be < 255
 	BCC ..EmptyRightEnd				;>carry clear means that the total filled is less than the amount needed to reach the right end.
 	STA $00						;>Store right end fill to $00-$01 (still 16-bit to prevent right end from randomly overflowing)
 	LDA !Scratchram_GraphicalBar_RightEndPiece	;\RightEnd's maximum (8-bit)
