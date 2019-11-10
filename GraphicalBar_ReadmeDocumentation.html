@@ -197,7 +197,7 @@ towards empty or full. Of course, the <kbd>#</kbd> symbol means a fixed number i
 
 Also if you are handling 16-bit mode quantity while on 8-bit accumulator, you write the 16-bit number <kbd>#$1234</kbd> (a fixed value not stored in RAM) as
 storing the <kbd>#$34</kbd> onto the low byte and <kbd>#$12</kbd> on the high byte (if it was RAM, it should be obvious, low byte written to low byte and high to high). Remember that
-the SNES is little-endian when the bytes are adjacent from one another in memory.</li><br>
+the SNES is <a href="https://en.wikipedia.org/wiki/Endianness">little-endian</a> when the bytes are adjacent from one another in memory.</li><br>
 
 <li>Double Bar. See <a name="DoubleBar" href="readme_files/DoubleBarInfo.html">this information</a>. The colored fonts last mentioned above code also applies on codes here as well.</li>
 
@@ -336,7 +336,7 @@ Result:
 </tr>
 <tr>
 <td>
-<kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl</b></span></kbd> to <kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl+X</b></span></kbd>
+<kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl</b></span></kbd> to <kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl + EndOfAddress</b></span></kbd>
 </td>
 <td>
 The table containing a series of bytes ordered from full, then one containing a fraction byte (it ranges from <kbd>0</kbd> to <kbd>max-1</kbd>), then a series of empty bytes.
@@ -345,7 +345,7 @@ additional bytes.<br><br>
 
 
 The ending address is
-<table><tr><td><pre>X = (LeftEnd + MiddleLength + RightEnd) - 1</pre></td></tr></table>
+<table><tr><td><pre>EndOfAddress = (LeftEnd + MiddleLength + RightEnd) - 1</pre></td></tr></table>
 And the number of bytes this table uses is the same formula above but without the &ldquo;<kbd>- 1</kbd>&rdquo;.<br><br>
 where:
 <ul>
@@ -565,7 +565,7 @@ of the routine should be obvious (e.g. <kbd>RoundAwayEmpty</kbd> means round awa
 <li>Inside <kbd>GraphicalBarConvertToTile.asm</kbd></li>
 <ul>
 <li><kbd>ConvertBarFillAmountToTiles</kbd>: converts the bar fill table into tile numbers via indexing (inputs the same as above and don't
-need to be rewritten):
+need to be rewritten). Note that this DOES modifies the values in <kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd>:
 
 <table>
 <tr>
@@ -664,12 +664,28 @@ Result:
 </td>
 </tr>
 </table><br>
-If you changed the number of pieces in any of the 3 parts of the bar (left, middle, and right), the number of pieces must equal to the number of values +1 (+1 because an empty tile byte is included)
-in the table corresponding to the bar part, for example, by making left end have 4 pieces instead of 3, you must have 5 values in the left end tile table. Else your tiles will glitch.<br><br>
+If you changed the number of pieces in any tile bytes (left, middle (each middle), and right), the number of pieces must equal to the number of values, plus 1.
+For example, by making left end have 4 pieces instead of 3, you must have 5 values in the left end tile table. Else your tiles will glitch:
+<table><tr><td><pre>
+;This is an example, therefore the numbers in this table may
+;be different to you.
+
+	;3 pieces, therefore include 4 values 0-3:
+		GraphicalBar_LeftEnd8x8s:
+		;    0   1   2   3
+		db $36,$37,$38,$39
+
+	;4 pieces, now values are 0-4:
+		GraphicalBar_LeftEnd8x8s:
+		;    0   1   2   3   4
+		db $36,$37,$38,$39,<u>$xx</u>
+</pre></td></tr></table>
+
+<br><br>
 
 Note that scratch RAM <kbd>$00</kbd> and <kbd>$01</kbd> is overwritten to determine should it use overworld border version and handle a loop that translates the middle tiles.<br><br>
 
-The table of tile numbers in the routine are ordered from empty to full in the tile array, I left the comments on there to show what fill amount for every byte for easier editing.
+The table of tile numbers in the routine are ordered from empty to full in the tile array, I left the comments on there to show what fill amount for every byte for easier editing.<br>
 
 </li>
 <li><kbd>ConvertBarFillAmountToTilesDoubleBar</kbd>: Same as above, but handles a double-filled bar. Tiles are formated <a href="readme_files/DoubleBarFills.png" target="_blank">like this</a>.
@@ -684,7 +700,8 @@ Note that this does not support overworld graphics unlike above, as there are ev
 
 
 <li>Inside <kbd>GraphicalBarWriteToStatusBar.asm</kbd>. Note that there are two similar subroutines main labels with one that have &ldquo;<kbd>Format2</kbd>&rdquo; (such as <kbd>WriteBarToHUD</kbd> and
-<kbd>WriteBarToHUDFormat2</kbd>) appended are the same as the other but handles a different status bar/OWB format.</li>
+<kbd>WriteBarToHUDFormat2</kbd>) appended are the same as the other but handles a different status bar/OWB format. See <a href="readme_files/Layer3TileFormat/Layer3TileFormat.html" target="_blank">this information</a>
+regarding the tile formats.</li>
 <ul>
 <li><kbd>WriteBarToHUD</kbd>: Copies the tile numbers in the table to paste to (writes) the status bar (if you're using the Super Status Bar patch, the if statement and defines will adopt to that).
 Inputs are again, similar to <kbd>CalculateGraphicalBarPercentage</kbd> with only the attributes being used, but a new input is required:
@@ -707,9 +724,19 @@ else this is no longer needed to write values to this input). I deliberately use
 <td>The tile properties (YXPCCCTT). Same as above, if you have it disabled, this is not used.</td>
 </tr>
 </table><br>
-Once the routine is completed, it will write tile data from <kbd>RAMAddressIn00</kbd> to <kbd>RAMAddressIn00 + (NumberOfTiles-1)</kbd> (or <kbd>RAMAddressIn00 + ((NumberOfTiles-1)*2)</kbd> if you are using SSB-styled format).
-The same thing applies to tile properties as well.
-Remember that all numbers are little endians (The address $7E0F09, for example are stored in each bytes as
+<table>
+<tr><th>Output</th><th>Description</th></tr>
+<tr>
+<td><kbd><b>RAMAddressIn00</b></kbd> to <span class="NoLineBreak"><kbd><b>RAMAddressIn00 + ((NumberOfTiles-1)*<a href="readme_files/Layer3TileFormat/Layer3TileFormat.html" target="_blank">TileFormat</a>)</b></kbd></span></td>
+<td>Location to write to the status bar/OWB+ patch(es). Note: if using SSB-format, will write every other tile, starting at <kbd>RAMAddressIn00</kbd>, otherwise all the bytes in between
+are written.</td>
+</tr>
+<tr>
+<td><kbd><b>RAMAddressIn03</b></kbd> to <span class="NoLineBreak"><kbd><b>RAMAddressIn03 + ((NumberOfTiles-1)*TileFormat)</b></kbd></span></td>
+<td>Same as above, but for tile properties (should you enable the tile properties to be writable via <span class="NoLineBreak"><kbd>!StatusBar_UsingCustomProperties</kbd></span>)</td>
+</tr>
+</table>
+Remember that all numbers are little endians (The address <kbd>$7E0F09</kbd>, for example are stored in each bytes as
 <pre>$7E0000: $09
 $7E0001: $0F
 $7E0002: $7E</pre>
@@ -736,6 +763,24 @@ there in between the original and new position.<br>
 Be careful with bank borders crossing (don't have status bar tile tables that goes from <kbd>$7EFFFF</kbd> to <kbd>$7F0000</kbd>, for a made-up example), as I discovered that
 Akaginite's <kbd>16Bit - 8Bit</kbd> (done by <kbd>((-8Bit) + 16Bit</kbd>)) does not work with bank borders if <kbd>8Bit</kbd> is <kbd>$00</kbd> because that causes the carry flag
 to be clear, unlike the normal SBC. However, this is very unlikely as no status bar tile tables would ever do that.</li>
+
+<table>
+<tr><th>Input</th><th>Description</th></tr>
+<tr><td><kbd><b>$00</b></kbd> to <kbd><b>$02</b></kbd> (24-bit)</td><td>Status bar tile location to write on this and before (this represent the position of the last tile).</td></tr>
+<tr><td><kbd><b>$03</b></kbd> to <kbd><b>$05</b></kbd> (24-bit)</td><td>Same as above, but for tile properties (if you have enabled tile properties write).</td></tr>
+</table><br>
+ExtendLeftwards write range:
+<table>
+<tr><th>Output</th><th>Description</th></tr>
+<tr>
+<td><kbd><span class="NoLineBreak"><b>RAMAddressIn00ThatYouEntered - ((NumberOfTiles-1) * TileFormat)</b></span></kbd> to <span class="NoLineBreak"><kbd><b>RAMAddressIn00ThatYouEntered</b></kbd></span></td>
+<td>Same as <kbd>WriteBarToHUD</kbd>.</td>
+</tr>
+<tr>
+<td><kbd><span class="NoLineBreak"><b>RAMAddressIn03ThatYouEntered - ((NumberOfTiles-1) * TileFormat)</b></span></kbd> to <span class="NoLineBreak"><kbd><b>RAMAddressIn03ThatYouEntered</b></kbd></span></td>
+<td>Same as <kbd>WriteBarToHUD</kbd>.</td>
+</tr>
+</table>
 </li>
 </ul>
 </ol>

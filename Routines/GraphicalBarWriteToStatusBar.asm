@@ -156,7 +156,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;
 ; Status bar address write range (when using this routine and
 ; WriteBarToHUD or WriteBarToHUDLeftwards):
-;  [DesiredLastTilePos-((NumberOfTiles-1)*!StatusBarFormat)] to [DesiredLastTilePos]
+;  [RAMAddressIn00ThatYouEntered -((NumberOfTiles-1)*!StatusBarFormat)] to [RAMAddressIn00ThatYouEntered]
 ;  Same applies to tile properties.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 BarExtendLeftFormat2:
