@@ -26,20 +26,24 @@ it is worth explaining how to deal with such patches.<br><br>
 It is important to note that even if using SMW's status bar, each tile have their data stored in two bytes, the tile number (<kbd>TTTTTTTT</kbd>)
 and its tile properties (<kbd>YXPCCCTT</kbd>):
 <ul>
-<li>SMW's vanilla status bar have only its tile number table stored at address <kbd>$7E0EF9</kbd> to <kbd>$7E0F2F</kbd>, while the default tile number
-and properties table stored at ROM address <kbd>$008C81</kbd> to <kbd>$008CFE</kbd>.</li>
-<li>Using the Super status bar patch, the RAM address differs depending what you set the freeram define (&ldquo;<kbd>!RAM_BAR</kbd>&rdquo;, which is currently
-<kbd>$7FA000</kbd> by default on a normal ROM and <kbd>$404000</kbd> by default on a SA-1 ROM). This address ranges from <kbd>!RAM_BAR</kbd> to <kbd>!RAM_BAR+319</kbd>.
-The tile number and properties byte format is the same as SMW's <kbd>$008C81</kbd> to <kbd>$008CFE</kbd> but in RAM and can be modified in-game.</li>
+<li>SMW's vanilla status bar have only its tile number table stored at address <kbd>$7E0EF9</kbd> to <kbd>$7E0F2F</kbd> ([<kbd>[TTTTTTTT, TTTTTTTT, ...]</kbd>]), while the default tile number
+and properties table stored at ROM address <kbd>$008C81</kbd> to <kbd>$008CFE</kbd> (<kbd>[TTTTTTTT, YXPCCCTT, TTTTTTTT, YXPCCCTT, ...]</kbd>).</li>
+<li>Using the Super status bar patch, the format is the same as SMW's <kbd>$008C81-$008CFE</kbd>, but where this table is located can be customized via a define
+(&ldquo;<kbd>!RAM_BAR</kbd>&rdquo;, which is currently <kbd>$7FA000</kbd> by default on a normal ROM and <kbd>$404000</kbd> by default on a SA-1 ROM).
+This address ranges from <kbd>!RAM_BAR</kbd> to <kbd>!RAM_BAR+319</kbd>. The only difference is that this entire table is in RAM (can be modified in-game) and have way more customizable tiles
+than SMW.</li>
 </ul><br>
 
-Both of these patches stores the data like this:<br>
+SMW's <kbd>$008C81-$008CFE</kbd>, SSB patch, and the OWB+ patch's tile format stores the data like this:<br>
 <center><img src="SuperStatusBarOverworldBorderPlusTileFormat.png"></center><br><br>
 Colored in light-red is the tile number (<kbd>TTTTTTTT</kbd>) and light-blue for tile properties (<kbd>YXPCCCTT</kbd>). Both bytes are placed next to one another as a pair for
-an 8x8 tile. Therefore if you want to read or write the next tile, you move <b>2 bytes</b> over as opposed to 1.<br><br>
+an 8x8 tile. Therefore if you want to read or write the next tile, you move <b>2 bytes</b> over as opposed to 1. This format is when you assume the variable <kbd>TileFormat</kbd>
+equals to <kbd>$02</kbd> when finding the tile write range in the formulas in the main readme file.<br><br>
 
-Ladida's Status bar patches, however have their types be in separate tables, where moving to 1 byte next means the next 8x8 tile:
-<center><img src="LadidaStatusBarFormat.png"></center><br><br>
+Ladida's Status bar patches, however have their types be in separate tables, where moving 1 byte over means the next 8x8 tile:
+<center><img src="LadidaStatusBarFormat.png"></center><br>
+On this format, assume <kbd>TileFormat</kbd> is <kbd>$01</kbd> when used in a formula in the main readme file.<br><br>
 
-Thus, loops to write tiles to the status bar is slightly different depending on the byte format, that you should set <kbd>!StatusBarFormat</kbd> to <kbd>$01</kbd> for SMW/Ladida's status bar and
-<kbd>$02</kbd> for Super status bar/Overworld border plus.
+Thus, loops and other codes to write to the status bar  is slightly different depending on the byte format, that you
+should set <kbd>!StatusBarFormat</kbd> to <kbd>$01</kbd> for SMW/Ladida's status bar and <kbd>$02</kbd> for Super status bar/Overworld border plus. Currently, at the time of writing
+this, there is no other OWB patches besides OWB+, make sure you check any future patch's tile format before making changes here.
