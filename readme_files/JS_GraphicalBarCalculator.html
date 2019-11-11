@@ -35,7 +35,7 @@ you have entered an invalid input (entered with a blank input or have invalid ch
 <table>
 <tr>
 <td>Fill amount:</td>
-<td><input type="number" id="FillAmount" value="0" min="0" max="65535" step="1" onchange="FillAmountChanged()">(<kbd>Hex: $<span id="FillAmountHexDisplay">3</span></kbd>) Use decimal integers 0-65535</td>
+<td><input type="number" id="FillAmount" value="0" min="0" max="65535" step="1" onchange="FillAmountChanged()">(<kbd>Hex: $<span id="FillAmountHexDisplay">0</span></kbd>) Use decimal integers 0-65535</td>
 </tr>
 <tr>
 <td><kbd>!Scratchram_GraphicalBar_LeftEndPiece</kbd> holds the value:</td>
@@ -161,30 +161,28 @@ and write tile bytes at and <b>before</b>) this.</label><br></td>
 	}
 	
 	function LeftEndPiecesChanged() {
-		var LeftEndPiece = Math.floor(clamp(document.getElementById("LeftEndPiece").value, 0, 255))
-		document.getElementById("LeftEndPiece").value = LeftEndPiece
-		document.getElementById("LeftPiecesHexDisplay").innerHTML = parseInt(LeftEndPiece).toString(16).toUpperCase()
+		document.getElementById("LeftEndPiece").value = clamp(parseInt(document.getElementById("LeftEndPiece").value, 10), 0, 255)
+		document.getElementById("LeftPiecesHexDisplay").innerHTML = parseInt(document.getElementById("LeftEndPiece").value).toString(16).toUpperCase()
 		Calculate()
 	}
 	function MiddlePiecesChanged() {
-		var MiddlePiece = Math.floor(clamp(document.getElementById("MiddlePiece").value, 0, 255))
-		document.getElementById("MiddlePiece").value = MiddlePiece
-		document.getElementById("MiddlePiecesHexDisplay").innerHTML = parseInt(MiddlePiece).toString(16).toUpperCase()
+		document.getElementById("MiddlePiece").value = clamp(parseInt(document.getElementById("MiddlePiece").value, 10), 0, 255)
+		document.getElementById("MiddlePiecesHexDisplay").innerHTML = parseInt(document.getElementById("MiddlePiece").value).toString(16).toUpperCase()
 		Calculate()
 	}
 	function RightPiecesChanged() {
-		var RightPieces = Math.floor(clamp(document.getElementById("RightEndPiece").value, 0, 255))
-		document.getElementById("RightEndPiece").value = RightPieces
-		document.getElementById("RightPiecesHexDisplay").innerHTML = parseInt(RightPieces).toString(16).toUpperCase()
+		document.getElementById("RightEndPiece").value = clamp(parseInt(document.getElementById("RightEndPiece").value, 10), 0, 255)
+		document.getElementById("RightPiecesHexDisplay").innerHTML = parseInt(document.getElementById("RightEndPiece").value).toString(16).toUpperCase()
 		Calculate()
 	}
 	function LengthChanged() {
-		var Length = Math.floor(clamp(document.getElementById("MiddleLength").value, 0, 255))
-		document.getElementById("MiddleLength").value = Length
-		document.getElementById("LengthHexDisplay").innerHTML = parseInt(Length).toString(16).toUpperCase()
+		document.getElementById("MiddleLength").value = clamp(parseInt(document.getElementById("MiddleLength").value, 10), 0, 255)
+		document.getElementById("LengthHexDisplay").innerHTML = parseInt(document.getElementById("MiddleLength").value).toString(16).toUpperCase()
 		Calculate()
 	}
 	function Reset() {
+		document.getElementById("FillAmount").value = "0"
+		document.getElementById("FillAmountHexDisplay").innerHTML = "0"
 		document.getElementById("LeftEndPiece").value = "3";
 		document.getElementById("LeftPiecesHexDisplay").innerHTML = "3"
 		document.getElementById("MiddlePiece").value = "8";
@@ -210,23 +208,12 @@ and write tile bytes at and <b>before</b>) this.</label><br></td>
 			document.getElementById("Output").innerHTML = "";
 		//Variable that contains the entire data (also prevents concatenations).
 			var OutputDisplay = ""
-		//Process input values  for pieces and middlelength on the number textbox
-			var LeftEndPiece = document.getElementById("LeftEndPiece").value
-			var MiddlePiece = document.getElementById("MiddlePiece").value
-			var RightEndPiece = document.getElementById("RightEndPiece").value
-			var MiddleLength = document.getElementById("MiddleLength").value
-		//Prevent invalid inputs of pieces and lengths.
-			LeftEndPiece = Math.floor(clamp(LeftEndPiece, 0, 255))
-			document.getElementById("LeftEndPiece").value = LeftEndPiece
-			
-			MiddlePiece = Math.floor(clamp(MiddlePiece, 0, 255))
-			document.getElementById("MiddlePiece").value = MiddlePiece
-			
-			RightEndPiece = Math.floor(clamp(RightEndPiece, 0, 255))
-			document.getElementById("RightEndPiece").value = RightEndPiece
-			
-			MiddleLength = Math.floor(clamp(MiddleLength, 0, 255))
-			document.getElementById("MiddleLength").value = MiddleLength
+		//Process input values  for pieces and middlelength on the number textbox (also prevent invalid inputs)
+			var FillAmount =  clamp(parseInt(document.getElementById("FillAmount").value, 10), 0, 65535)
+			var LeftEndPiece = clamp(parseInt(document.getElementById("LeftEndPiece").value, 10), 0, 255)
+			var MiddlePiece = clamp(parseInt(document.getElementById("MiddlePiece").value, 10), 0, 255)
+			var RightEndPiece = clamp(parseInt(document.getElementById("RightEndPiece").value, 10), 0, 255)
+			var MiddleLength = clamp(parseInt(document.getElementById("MiddleLength").value, 10), 0, 255)
 		//Obtain the total number of tile bytes
 			if (isNaN(parseInt(document.getElementById("BarTileTableRAM").value, 16)) == true) {
 				document.getElementById("BarTileTableRAM").value = "7F844A"
@@ -298,7 +285,69 @@ and write tile bytes at and <b>before</b>) this.</label><br></td>
 				OutputDisplay += "</td>"
 				OutputDisplay += "</tr>"
 				OutputDisplay += "</table><br><br></div>"
-			
+				//Calculate the array of values (simulates the !Scratchram_GraphicalBar_FillByteTbl after running DrawGrap)
+				//Since javascript cannot have variable array length, I had to choose the maximum possible: 257 (255 middle tiles + 2 end tiles;
+				//index up to 256).
+					var Scratchram_GraphicalBar_FillByteTbl = [
+				//      0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15
+					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //0-15
+					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //16-31
+					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //32-47
+					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //48-63
+					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //64-79
+					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //80-95
+					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //96-111
+					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //112-127
+					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //128-143
+					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //144-159
+					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //160-175
+					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //176-191
+					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //192-207
+					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //208-223
+					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //224-239
+					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //240-255
+					0, 0                                            //256-257
+					]
+					//Initalize indexer
+						var Scratchram_GraphicalBar_FillByteTbl_Index = 0
+					//Handle left end
+						if (LeftEndExist == 1) {
+							Scratchram_GraphicalBar_FillByteTbl[Scratchram_GraphicalBar_FillByteTbl_Index] = clamp(FillAmount, 0, LeftEndPiece)
+							Scratchram_GraphicalBar_FillByteTbl_Index++
+						}
+					//Handle middle
+						if (MiddleExist != 0) {
+							var MiddleFillAmount = clamp(FillAmount - LeftEndPiece, 0, 65535)
+							var NumberOfFullMiddle = Math.floor(MiddleFillAmount/MiddlePiece)
+							var MiddleFraction = (MiddleFillAmount % MiddlePiece)
+							var Countdown_RemainingFullMiddle = NumberOfFullMiddle
+							var Countdown_RemainingMiddle = MiddleLength
+							var MiddleDone = false
+							//Write full middles:
+								while ((Countdown_RemainingFullMiddle != 0) && (Countdown_RemainingMiddle != 0)) {
+									Scratchram_GraphicalBar_FillByteTbl[Scratchram_GraphicalBar_FillByteTbl_Index] = MiddlePiece
+									Scratchram_GraphicalBar_FillByteTbl_Index++
+									Countdown_RemainingFullMiddle--
+									Countdown_RemainingMiddle--
+								}
+							//Write fraction:
+								if (Countdown_RemainingMiddle != 0) {
+									Scratchram_GraphicalBar_FillByteTbl[Scratchram_GraphicalBar_FillByteTbl_Index] = MiddleFraction
+									Scratchram_GraphicalBar_FillByteTbl_Index++
+									Countdown_RemainingMiddle--
+								}
+							//Write empty:
+								while (Countdown_RemainingMiddle != 0) {
+									Scratchram_GraphicalBar_FillByteTbl[Scratchram_GraphicalBar_FillByteTbl_Index] = 0
+									Scratchram_GraphicalBar_FillByteTbl_Index++
+									Countdown_RemainingMiddle--
+								}
+						}
+					//Handle right end
+						if (RightEndExist == 1) {
+							Scratchram_GraphicalBar_FillByteTbl[Scratchram_GraphicalBar_FillByteTbl_Index] = clamp((FillAmount - (LeftEndPiece + (MiddleExist * MiddlePiece))), 0, RightEndPiece)
+						}
+
 				//below displays memory layout table
 					var i = 0
 					var MiddleCount = 0
@@ -307,6 +356,7 @@ and write tile bytes at and <b>before</b>) this.</label><br></td>
 					//Table header
 						OutputDisplay += "<tr>"
 						OutputDisplay += "<th><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> area</th>"
+						OutputDisplay += "<th><kbd>Fill amount stored</kbd></th>"
 						OutputDisplay += "<th>Tile byte type</th>"
 						OutputDisplay += "<th>Status bar/Overworld tile number location</th>"
 						OutputDisplay += "</tr>"
@@ -314,6 +364,7 @@ and write tile bytes at and <b>before</b>) this.</label><br></td>
 						if (LeftEndExist != 0) {
 							OutputDisplay += "<tr>"
 							OutputDisplay += ("<td><kbd>$" + (parseInt(BarTileTableRAM, 16).toString(16).toUpperCase()) + " (!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i) +")</kbd></td>")
+							OutputDisplay += ("<td><kbd>$" + (parseInt(Scratchram_GraphicalBar_FillByteTbl[i], 10).toString(16).toUpperCase()) + " (" + (parseInt(Scratchram_GraphicalBar_FillByteTbl[i], 10).toString(10)) + ")</kbd></td>")
 							OutputDisplay += ("<td><font color='Cyan'>Left end tile byte</font></td>")
 							OutputDisplay += "<td><kbd>"
 							if (document.getElementById("FillLeftwards").checked == false) {
@@ -336,6 +387,7 @@ and write tile bytes at and <b>before</b>) this.</label><br></td>
 							while (MiddleCount < MiddleExist) {
 								OutputDisplay += "<tr>"
 								OutputDisplay += ("<td><kbd>$" + (parseInt(BarTileTableRAM, 16) + i).toString(16).toUpperCase() + " (!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i) +")</kbd></td>")
+								OutputDisplay += ("<td><kbd>$" + (parseInt(Scratchram_GraphicalBar_FillByteTbl[i], 10).toString(16).toUpperCase()) + " (" + (parseInt(Scratchram_GraphicalBar_FillByteTbl[i], 10).toString(10)) + ")</kbd></td>")
 								OutputDisplay += ("<td><font color=#00FF00>Middle tile byte " + parseInt(MiddleCount + 1) + "</font></td>")
 								OutputDisplay += "<td><kbd>"
 								if (document.getElementById("FillLeftwards").checked == false) {
@@ -360,6 +412,7 @@ and write tile bytes at and <b>before</b>) this.</label><br></td>
 						if (RightEndExist != 0) {
 							OutputDisplay += "<tr>"
 							OutputDisplay += ("<td><kbd>$" + ((parseInt(BarTileTableRAM, 16) + i).toString(16).toUpperCase()) + " (!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i) +")</kbd></td>")
+							OutputDisplay += ("<td><kbd>$" + (parseInt(Scratchram_GraphicalBar_FillByteTbl[i], 10).toString(16).toUpperCase()) + " (" + (parseInt(Scratchram_GraphicalBar_FillByteTbl[i], 10).toString(10)) + ")</kbd></td>")
 							OutputDisplay += ("<td><font color='red'>Right end tile byte</font></td>")
 							OutputDisplay += "<td><kbd>"
 							if (document.getElementById("FillLeftwards").checked == false) {
@@ -391,6 +444,9 @@ and write tile bytes at and <b>before</b>) this.</label><br></td>
 		return num
 	}
 	function clamp(num, min, max) {
+		if (isNaN(num) == true) {
+			num = 0
+		}
 		return num <= min ? min : num >= max ? max : num;
 	}
 </script>
