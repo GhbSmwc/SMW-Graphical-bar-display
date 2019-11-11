@@ -746,8 +746,8 @@ Of course, because the <a href="https://www.smwcentral.net/?p=section&a=details&
 it will work on that as well (if <kbd>!StatusBarFormat</kbd> set to $02 and you make a different version of the routine <kbd>ConvertBarFillAmountToTiles</kbd> to use a different
 table to use OW layer 3 tiles).<br><br>
 
-<li><kbd>WriteBarToHUDLeftwards</kbd>: Same as above, but only works properly if you managed to set bit 6 of YXPCCCTT properties byte. This will write a X-flipped version that
-the bar now fills from right to left. Tiles arranged are flipped so the leftmost tile (including the end tiles) is now the right most, the second leftmost is second rightmost,
+<li><kbd>WriteBarToHUDLeftwards</kbd>: Same as above, but writes an X-flipped version (<img width="96" src="readme_files/TransperentBackgroundXFlipped.png">). Note that it only works properly
+if you managed to set bit 6 of YXPCCCTT properties byte. Tiles arranged are flipped so the leftmost tile (including the end tiles) is now the right most, the second leftmost is second rightmost,
 and so on. If you didn't X-flip the tiles via editing the tile properties (YXPCCCTT), each tile won't be X-flipped but are still arranged backwards (when filling up, the rightmost
 tile fills towards the right and advances to the tile towards the left). In vanilla SMW, it is still possible to edit the tile properties (but cannot be changed in-game as the
 data is stored in ROM) at around address <kbd>$008C81</kbd>.</li><br>
@@ -757,8 +757,9 @@ bar always extends rightwards. With this, you call this routine before you call 
 happens is that it calculates where the leftmost tile would be at depending on the length of the bar, so the &ldquo;origin tile &rdquo; of the position gets moved.
 This is useful for displaying enemy HP bars that are &ldquo;right aligned&rdquo; that have lengths proportional to how much max HP the enemy has and extend leftwards:
 <img src="readme_files/BarExtendLeftTiles.png"><br>
-It is calculated by: <kbd>StartingTilePosition = UserEnteredPosition - (NumberOfTiles - 1)</kbd>, therefore, taking the position, subtract to get a new position, and then write from
-there in between the original and new position.<br>
+Example (using super status bar patch):<br>
+<img src="readme_files/BarExtendLeftTiles_OnStatBar.png"><br>
+And yes, you can combine the X-flipped with extend-leftwards if you want a truly mirrored bar.<br><br>
 
 Be careful with bank borders crossing (don't have status bar tile tables that goes from <kbd>$7EFFFF</kbd> to <kbd>$7F0000</kbd>, for a made-up example), as I discovered that
 Akaginite's <kbd>16Bit - 8Bit</kbd> (done by <kbd>((-8Bit) + 16Bit</kbd>)) does not work with bank borders if <kbd>8Bit</kbd> is <kbd>$00</kbd> because that causes the carry flag
