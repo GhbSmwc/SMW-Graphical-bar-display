@@ -156,14 +156,18 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;
 ; Status bar address write range (when using this routine and
 ; WriteBarToHUD or WriteBarToHUDLeftwards):
-;  [RAMAddressIn00ThatYouEntered -((NumberOfTiles-1)*!StatusBarFormat)] to [RAMAddressIn00ThatYouEntered]
+;  [RAMAddressIn00ThatYouEntered - ((NumberOfTiles-1)*TileFormat)]
+;  to [RAMAddressIn00ThatYouEntered].
+;
+;  TileFormat is 1 if [TTTTTTTT, TTTTTTTT, ...] and 2 otherwise,
+;  similar to !StatusBarFormat, but this also applies to OWB+.
 ;  Same applies to tile properties.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 BarExtendLeftFormat2:
 	JSL CountNumberOfTiles
 	TXA
-	ASL
-	TAX
+	ASL					;>Multiply by 2 due to tile format
+	TAX					;>Transfer to X
 	if !OWPlusAndSSBSameFormat == 0
 		BRA +
 
@@ -179,7 +183,7 @@ BarExtendLeftFormat2:
 	AND #$00FF				;|
 	EOR #$FFFF				;|
 	INC A					;/
-	ADC $00					;>...+ LastTilePos (we are doing LastTilePos - (NumberOfTiles-1))
+	ADC $00					;>...+ LastTilePos (we are doing LastTilePos - ((NumberOfTiles-1)*TileFormat))
 	STA $00					;>Store difference in $00-$01
 	SEP #$20				;
 ;	LDA $02					;\Handle bank byte (commented out because carry doesn't work like SBC if subtrahend is 0)
@@ -204,9 +208,8 @@ BarExtendLeftFormat2:
 ;Count tiles.
 ;Output:
 ; X = Number of bytes or 8x8 tiles the bar takes up of minus 1
-;     (if there is left and right ends in existent and one middle
-;     tile, will be 3 tiles, this routine outputs X=$02). Returns
-;     X=$FF should not a single tile exist.
+;     For example: 9 total bytes, this routine would output X=$08.
+;     Returns X=$FF should not a single tile exist.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 CountNumberOfTiles:
 	LDX #$00
