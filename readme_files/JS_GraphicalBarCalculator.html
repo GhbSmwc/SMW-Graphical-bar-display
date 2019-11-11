@@ -34,6 +34,10 @@ you have entered an invalid input (entered with a blank input or have invalid ch
 
 <table>
 <tr>
+<td>Fill amount:</td>
+<td><input type="number" id="FillAmount" value="0" min="0" max="65535" step="1" onchange="FillAmountChanged()">(<kbd>Hex: $<span id="FillAmountHexDisplay">3</span></kbd>) Use decimal integers 0-65535</td>
+</tr>
+<tr>
 <td><kbd>!Scratchram_GraphicalBar_LeftEndPiece</kbd> holds the value:</td>
 <td><input type="number" id="LeftEndPiece" value="3" min="0" max="255" step="1" onchange="LeftEndPiecesChanged()">(<kbd>Hex: $<span id="LeftPiecesHexDisplay">3</span></kbd>) Use decimal integers 0-255</td>
 </tr>
@@ -150,6 +154,12 @@ and write tile bytes at and <b>before</b>) this.</label><br></td>
 		document.getElementById("StatusBarRAMTilePos").value = clamp(StatusBarPosAddress, 0, parseInt("FFFFFF", 16)).toString(16).toUpperCase()
 		Calculate()
 	}
+	function FillAmountChanged() {
+		document.getElementById("FillAmount").value = clamp(parseInt(document.getElementById("FillAmount").value, 10), 0, 65535)
+		document.getElementById("FillAmountHexDisplay").innerHTML = parseInt(document.getElementById("FillAmount").value, 10).toString(16).toUpperCase()
+		Calculate()
+	}
+	
 	function LeftEndPiecesChanged() {
 		var LeftEndPiece = Math.floor(clamp(document.getElementById("LeftEndPiece").value, 0, 255))
 		document.getElementById("LeftEndPiece").value = LeftEndPiece
