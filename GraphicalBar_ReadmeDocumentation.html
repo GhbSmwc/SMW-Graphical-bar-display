@@ -753,18 +753,9 @@ tile fills towards the right and advances to the tile towards the left). In vani
 data is stored in ROM) at around address <kbd>$008C81</kbd>.</li><br>
 
 <li><kbd>BarExtendLeft</kbd>: Normally, without this routine, as the bar's length (not to be confused with the above routine) increases (say, increase the middle length), the
-bar always extends rightwards. With this, you call this routine before you call <kbd>WriteBarToHUD</kbd> or <kbd>WriteBarToHUDLeftwards</kbd> to make it extend leftwards. What
-happens is that it calculates where the leftmost tile would be at depending on the length of the bar, so the &ldquo;origin tile &rdquo; of the position gets moved.
-This is useful for displaying enemy HP bars that are &ldquo;right aligned&rdquo; that have lengths proportional to how much max HP the enemy has and extend leftwards:
-<img src="readme_files/BarExtendLeftTiles.png"><br>
-Example (using super status bar patch):<br>
-<img src="readme_files/BarExtendLeftTiles_OnStatBar.png"><br>
-And yes, you can combine the X-flipped with extend-leftwards if you want a truly mirrored bar.<br><br>
-
-Be careful with bank borders crossing (don't have status bar tile tables that goes from <kbd>$7EFFFF</kbd> to <kbd>$7F0000</kbd>, for a made-up example), as I discovered that
-Akaginite's <kbd>16Bit - 8Bit</kbd> (done by <kbd>((-8Bit) + 16Bit</kbd>)) does not work with bank borders if <kbd>8Bit</kbd> is <kbd>$00</kbd> because that causes the carry flag
-to be clear, unlike the normal SBC. However, this is very unlikely as no status bar tile tables would ever do that.</li>
-
+bar always extends rightwards (leftmost tile stays in place while the rightmost moves rightwards). With this, you call this routine before you call <kbd>WriteBarToHUD</kbd>
+or <kbd>WriteBarToHUDLeftwards</kbd> (use the latter if you want a truly mirrored bar) to make it extend leftwards (the leftmost tile moves left while the rightmost tile
+stays in place). This is useful for displaying enemy HP bars that are &ldquo;right aligned&rdquo; that have lengths proportional to how much max HP the enemy has and extend leftwards.<br>
 <table>
 <tr><th>Input</th><th>Description</th></tr>
 <tr><td><kbd><b>$00</b></kbd> to <kbd><b>$02</b></kbd> (24-bit)</td><td>Status bar tile location to write on this and before (this represent the position of the last tile).</td></tr>
@@ -773,15 +764,27 @@ to be clear, unlike the normal SBC. However, this is very unlikely as no status 
 ExtendLeftwards write range:
 <table>
 <tr><th>Output</th><th>Description</th></tr>
+<tr><td><kbd><b>$00</b></kbd> to <kbd><b>$02</b></kbd> (24-bit)</td><td>The tile location where to write the starting starting (leftmost) tile, calculated via subtracting what you have inputed by
+the number of tiles, minus 1 (<kbd>LeftmostTilePosition = RAMAddressIn00 - ((NumberOfTiles-1) * TileFormat)</kbd>, where <kbd>RAMAddressIn00</kbd> is the RAM address prior calling this routine),
+then writes back to <kbd>$00</kbd>.</td></tr><tr><td><kbd><b>$03</b></kbd> to <kbd><b>$05</b></kbd> (24-bit)</td><td>Same as above, but for tile properties (if you have enabled tile properties write).</td></tr>
+</table><br>
+After executing this subroutine, then calling <kbd>WriteBarToHUD</kbd> or <kbd>WriteBarToHUDLeftwards</kbd> now have their tile write range be modified:
+<table>
+<tr><th><kbd>WriteBarToHUD</kbd> and <kbd>WriteBarToHUDLeftwards</kbd>'s modified tile write range:</th><th>Description</th></tr>
 <tr>
-<td><kbd><span class="NoLineBreak"><b>RAMAddressIn00ThatYouEntered - ((NumberOfTiles-1) * TileFormat)</b></span></kbd> to <span class="NoLineBreak"><kbd><b>RAMAddressIn00ThatYouEntered</b></kbd></span></td>
-<td>Same as <kbd>WriteBarToHUD</kbd>.</td>
+<td><kbd><span class="NoLineBreak"><b>RAMAddressIn00 - ((NumberOfTiles-1) * TileFormat)</b></span></kbd> to <span class="NoLineBreak"><kbd><b>RAMAddressIn00</b></kbd></span></td>
+<td rowspan="2">Same as <kbd>WriteBarToHUD</kbd>.</td>
 </tr>
 <tr>
-<td><kbd><span class="NoLineBreak"><b>RAMAddressIn03ThatYouEntered - ((NumberOfTiles-1) * TileFormat)</b></span></kbd> to <span class="NoLineBreak"><kbd><b>RAMAddressIn03ThatYouEntered</b></kbd></span></td>
-<td>Same as <kbd>WriteBarToHUD</kbd>.</td>
+<td><kbd><span class="NoLineBreak"><b>RAMAddressIn03 - ((NumberOfTiles-1) * TileFormat)</b></span></kbd> to <span class="NoLineBreak"><kbd><b>RAMAddressIn03</b></kbd></span></td>
 </tr>
-</table>
+</table><br>
+<img src="readme_files/BarExtendLeftTiles.png"><br>
+Example when using the super status bar patch:<br>
+<img src="readme_files/BarExtendLeftTiles_OnStatBar.png"><br>
+Be careful with bank borders crossing (don't have status bar tile tables that goes from <kbd>$7EFFFF</kbd> to <kbd>$7F0000</kbd>, for a made-up example), as I discovered that
+Akaginite's <kbd>16Bit - 8Bit</kbd> (done by <kbd>((-8Bit) + 16Bit</kbd>)) does not work with bank borders if <kbd>8Bit</kbd> is <kbd>$00</kbd> because that causes the carry flag
+to be clear, unlike the normal SBC. However, this is very unlikely as no status bar tile tables would ever do that.</li>
 </li>
 </ul>
 </ol>
