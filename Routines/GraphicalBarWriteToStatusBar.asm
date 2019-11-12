@@ -156,8 +156,11 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;
 ; Status bar address write range (when using this routine and
 ; WriteBarToHUD or WriteBarToHUDLeftwards):
-;  [RAMAddressIn00ThatYouEntered - ((NumberOfTiles-1)*TileFormat)]
-;  to [RAMAddressIn00ThatYouEntered].
+;  [RAMAddressIn00 - ((NumberOfTiles-1)*TileFormat)]
+;  to [RAMAddressIn00]. 
+;
+;  Where RAMAddressIn00 is the address you enter before calling
+;  this routine.
 ;
 ;  TileFormat is 1 if [TTTTTTTT, TTTTTTTT, ...] and 2 otherwise,
 ;  similar to !StatusBarFormat, but this also applies to OWB+.
