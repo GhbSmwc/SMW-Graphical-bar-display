@@ -356,7 +356,8 @@ and write tile bytes at and <b>before</b>) this.</label><br></td>
 					//Table header
 						OutputDisplay += "<tr>"
 						OutputDisplay += "<th><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> area</th>"
-						OutputDisplay += "<th><kbd>Fill amount stored</kbd></th>"
+						OutputDisplay += "<th>Fill amount stored</th>"
+						OutputDisplay += "<th>Maximum value</th>"
 						OutputDisplay += "<th>Tile byte type</th>"
 						OutputDisplay += "<th>Status bar/Overworld tile number location</th>"
 						OutputDisplay += "</tr>"
@@ -368,6 +369,7 @@ and write tile bytes at and <b>before</b>) this.</label><br></td>
 							OutputDisplay += "<tr>"
 							OutputDisplay += ("<td><kbd>$" + (parseInt(BarTileTableRAM, 16).toString(16).toUpperCase()) + " (!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i) +")</kbd></td>")
 							OutputDisplay += ("<td bgcolor='" + ColorCodeFillStatusBGCol(Scratchram_GraphicalBar_FillByteTbl[i], LeftEndPiece, FractionTileProcessed) + "'><kbd><font color='" + ColorCodeFillStatusFontCol(Scratchram_GraphicalBar_FillByteTbl[i], LeftEndPiece, FractionTileProcessed) + "'>$" + (parseInt(Scratchram_GraphicalBar_FillByteTbl[i], 10).toString(16).toUpperCase()) + " (" + (parseInt(Scratchram_GraphicalBar_FillByteTbl[i], 10).toString(10)) + ")</kbd></td>")
+							OutputDisplay += ("<td><kbd>$" + LeftEndPiece.toString(16).toUpperCase() + " (" + LeftEndPiece.toString(10).toUpperCase() + ")</kbd></td>")
 							OutputDisplay += ("<td><font color='Cyan'>Left end tile byte</font></td>")
 							OutputDisplay += "<td><kbd>"
 							if (document.getElementById("FillLeftwards").checked == false) {
@@ -396,6 +398,7 @@ and write tile bytes at and <b>before</b>) this.</label><br></td>
 								OutputDisplay += "<tr>"
 								OutputDisplay += ("<td><kbd>$" + (parseInt(BarTileTableRAM, 16) + i).toString(16).toUpperCase() + " (!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i) +")</kbd></td>")
 								OutputDisplay += ("<td bgcolor='" + ColorCodeFillStatusBGCol(Scratchram_GraphicalBar_FillByteTbl[i], MiddlePiece, FractionTileProcessed) + "'><kbd><font color='" + ColorCodeFillStatusFontCol(Scratchram_GraphicalBar_FillByteTbl[i], MiddlePiece, FractionTileProcessed) + "'>$" + (parseInt(Scratchram_GraphicalBar_FillByteTbl[i], 10).toString(16).toUpperCase()) + " (" + (parseInt(Scratchram_GraphicalBar_FillByteTbl[i], 10).toString(10)) + ")</kbd></td>")
+								OutputDisplay += ("<td><kbd>$" + MiddlePiece.toString(16).toUpperCase() + " (" + MiddlePiece.toString(10).toUpperCase() + ")</kbd></td>")
 								OutputDisplay += ("<td><font color=#00FF00>Middle tile byte " + parseInt(MiddleCount + 1) + "</font></td>")
 								OutputDisplay += "<td><kbd>"
 								if (document.getElementById("FillLeftwards").checked == false) {
@@ -426,6 +429,7 @@ and write tile bytes at and <b>before</b>) this.</label><br></td>
 							OutputDisplay += "<tr>"
 							OutputDisplay += ("<td><kbd>$" + ((parseInt(BarTileTableRAM, 16) + i).toString(16).toUpperCase()) + " (!Scratchram_GraphicalBar_FillByteTbl+" + parseInt(i) +")</kbd></td>")
 							OutputDisplay += ("<td bgcolor='" + ColorCodeFillStatusBGCol(Scratchram_GraphicalBar_FillByteTbl[i], RightEndPiece, FractionTileProcessed) + "'><kbd><font color='" + ColorCodeFillStatusFontCol(Scratchram_GraphicalBar_FillByteTbl[i], RightEndPiece, FractionTileProcessed) + "'>$" + (parseInt(Scratchram_GraphicalBar_FillByteTbl[i], 10).toString(16).toUpperCase()) + " (" + (parseInt(Scratchram_GraphicalBar_FillByteTbl[i], 10).toString(10)) + ")</kbd></td>")
+							OutputDisplay += ("<td><kbd>$" + RightEndPiece.toString(16).toUpperCase() + " (" + RightEndPiece.toString(10).toUpperCase() + ")</kbd></td>")
 							OutputDisplay += ("<td><font color='red'>Right end tile byte</font></td>")
 							OutputDisplay += "<td><kbd>"
 							if (document.getElementById("FillLeftwards").checked == false) {
