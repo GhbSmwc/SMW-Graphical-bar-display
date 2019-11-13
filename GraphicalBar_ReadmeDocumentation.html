@@ -53,7 +53,7 @@ named <span class="NoLineBreak"><kbd>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</kb
 (i.e <kbd>ExampleUsage/Gamemode0E_OWBorderTest.asm</kbd>)</li>
 </ul>
 <h2>Javascript tools</h2>
-<ul><li><a name="TopJSLink" href="readme_files/JS_GraphicalBarCalculator.html">Link to javascript memory usage calculator</a>.</li></ul>
+<ul><li><a id="TopJSLink" href="readme_files/JS_GraphicalBarCalculator.html">Link to javascript memory usage calculator</a>.</li></ul>
 <hr>
 <h2>Installation (test run)</h2>
 <ol>
@@ -199,7 +199,7 @@ Also if you are handling 16-bit mode quantity while on 8-bit accumulator, you wr
 storing the <kbd>#$34</kbd> onto the low byte and <kbd>#$12</kbd> on the high byte (if it was RAM, it should be obvious, low byte written to low byte and high to high). Remember that
 the SNES is <a href="https://en.wikipedia.org/wiki/Endianness">little-endian</a> when the bytes are adjacent from one another in memory.</li><br>
 
-<li>Double Bar. See <a name="DoubleBar" href="readme_files/DoubleBarInfo.html">this information</a>. The colored fonts last mentioned above code also applies on codes here as well.</li>
+<li>Double Bar. See <a id="DoubleBar" href="readme_files/DoubleBarInfo.html">this information</a>. The colored fonts last mentioned above code also applies on codes here as well.</li>
 
 </ul>
 <hr>
@@ -264,7 +264,7 @@ Result:
 <li>Y = $00 if not rounded to empty or full (if exact empty, rounded to any number besides 0 or maximum, or full (or higher))</li>
 <li>Y = $01 if rounded to empty.</li>
 <li>Y = $02 if rounded to full.</li>
-See more information <a name="RoundAwayFromComplete" href="readme_files/RoundAwayFromComplete.html">here</a>.
+See more information <a id="RoundAwayFromComplete" href="readme_files/RoundAwayFromComplete.html">here</a>.
 </ul></td>
 </tr>
 <tr>
@@ -434,7 +434,7 @@ that is <kbd>$7F844A + 1</kbd> which is address <kbd>$7F844B</kbd>).
 </tr>
 </table><br>
 
-If any maximum was set to $00, they are excluded from the table and are skipped (no longer uses the ASCII lookup table for smaller display):
+If any maximum was set to $00, they are excluded from the table and are skipped:
 <table>
 <tr>
 <td>
@@ -487,7 +487,7 @@ RAM address $00-$01:                         $0004 (4)
 
 Note: !Scratchram_GraphicalBar_MiddlePiece <u>and/or</u>
 !Scratchram_GraphicalBar_TempLength is set to zero,
-excludes the middle section.</pre>
+excludes the entire middle section.</pre>
 </td>
 <td>
 
@@ -554,7 +554,13 @@ relative address:</td>
 </tr>
 </tr>
 </table><br>
-Of course, I made a <a name="ComputeGraphicalBarData" href="readme_files/JS_GraphicalBarCalculator.html">javascript code page</a> that calculates memory statistics
+
+Because of this, it also means that the <a href="#ConvertFillToTile"><kbd>FillAmount &rightarrow; TileNumber</kbd></a> and <a href="#StatusBarWrite"><kbd>tile write</kbd></a> routines <b>will not write static
+tiles as end tiles</b> (static tiles are tiles that don't change regardless of the fill amount; not part of the fill), only the changeable tiles, here is what I mean as an example:<br>
+<img src="readme_files/StaticEndTiles.png"><br>
+<br>
+
+Of course, I made a <a id="ComputeGraphicalBarData" href="readme_files/JS_GraphicalBarCalculator.html">javascript code page</a> that calculates memory statistics
 without the need of manually calculating the values.<br><br>
 </li>
 
@@ -562,7 +568,7 @@ without the need of manually calculating the values.<br><br>
 decrements the fill amount <kbd>$00-$01</kbd> by 1 so it will display 1 and/or <kbd>MaxFill-1</kbd> instead of showing 0 and/or <kbd>MaxFill</kbd> when the value is rounded towards them. The names
 of the routine should be obvious (e.g. <kbd>RoundAwayEmpty</kbd> means round away from empty).</li><br>
 </ul>
-<li>Inside <kbd>GraphicalBarConvertToTile.asm</kbd></li>
+<li><span id="ConvertFillToTile">Inside <kbd>GraphicalBarConvertToTile.asm</kbd></span></li>
 <ul>
 <li><kbd>ConvertBarFillAmountToTiles</kbd>: converts the bar fill table into tile numbers via indexing (inputs the same as above and don't
 need to be rewritten). Note that this DOES modifies the values in <kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd>:
@@ -699,7 +705,7 @@ Note that this does not support overworld graphics unlike above, as there are ev
 </ul><br>
 
 
-<li>Inside <kbd>GraphicalBarWriteToStatusBar.asm</kbd>. Note that there are two similar subroutines main labels with one that have &ldquo;<kbd>Format2</kbd>&rdquo; (such as <kbd>WriteBarToHUD</kbd> and
+<li><span id="StatusBarWrite">Inside <kbd>GraphicalBarWriteToStatusBar.asm</kbd>. Note that there are two similar subroutines main labels with one that have &ldquo;<kbd>Format2</kbd>&rdquo; (such as <kbd>WriteBarToHUD</kbd> and
 <kbd>WriteBarToHUDFormat2</kbd>) appended are the same as the other but handles a different status bar/OWB format. See <a href="readme_files/Layer3TileFormat/Layer3TileFormat.html" target="_blank">this information</a>
 regarding the tile formats.</li>
 <ul>
