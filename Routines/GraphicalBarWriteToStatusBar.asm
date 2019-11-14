@@ -12,18 +12,23 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;Input:
 ; -$00 to $02: The starting byte address location of the status bar (tile number).
 ; --If you're using SA-1 mode here and using vanilla status bar,
-;   the status bar tilemap table is moved to bank $40.
+;  the status bar tilemap table is moved to bank $40.
 ; -!Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
 ;  the maximum amount of fill for this byte itself. If 0, it's not included in table.
 ; -!Scratchram_GraphicalBar_MiddlePiece: Same as above but each middle byte.
 ; -!Scratchram_GraphicalBar_RightEndPiece: Same as above but for right end.
 ; -!Scratchram_GraphicalBar_TempLength: The length of the bar (only counts
-;   middle bytes)
+;  middle bytes)
 ; -If you are using custom status bar patches that enables editing tile properties in-game,
 ;  and have set "!StatusBar_UsingCustomProperties" to 1, you have another input:
 ; --$03 to $05: Same as $00 to $02 but for tile properties instead of tile numbers.
 ; --$06: The tile properties (YXPCCCTT) you want it to be.
-;
+;Output:
+; -[RAMAddressIn00] to [RAMAddressIn00 + ((NumberOfTiles-1)*TileFormat]: the status bar/OWB+
+;  RAM write range.
+; -If using SB/OWB+ patch that allows editing YXPCCCTT in-game and have set !StatusBar_UsingCustomProperties
+;  to 1:
+; --[RAMAddressIn03] to [RAMAddressIn03 + ((NumberOfTiles-1)*TileFormat]: same as above but YXPCCCTT
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	if !OWPlusAndSSBSameFormat == 0
 		WriteBarToHUD:
@@ -209,6 +214,12 @@ BarExtendLeftFormat2:
 	RTL
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Count tiles.
+;Input:
+;-!Scratchram_GraphicalBar_LeftEndPiece,
+; !Scratchram_GraphicalBar_MiddlePiece,
+; !Scratchram_GraphicalBar_TempLength, and
+; !Scratchram_GraphicalBar_RightEndPiece: used to find how many
+; tiles.
 ;Output:
 ; X = Number of bytes or 8x8 tiles the bar takes up of minus 1
 ;     For example: 9 total bytes, this routine would output X=$08.
