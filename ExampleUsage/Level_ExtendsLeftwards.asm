@@ -1,3 +1,7 @@
+;NOTE: to be used on uberasm tool on any level code as "main" (not init). Also have
+;all files in the routine folder in the library folder for this to work (unless you edit the
+;JSLs not to call a routine that doesn't have a destination label here).
+
 ;This is a demonstration on how to have a bar that extends LEFTWARDS as you increase
 ;length of the bar (not to be confused with "leftwards-filling").
 ;Normally, without the [JSL GraphicalBarWriteToStatusBar_BarExtendLeft], the bar would
