@@ -244,3 +244,116 @@ CountNumberOfTiles:
 	+
 	DEX					;>Subtract by 1 because index 0 exists.
 	RTL
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;Write static end tiles.
+;
+;This routine is meant to be used if you have variable-length
+;(and position) bar (length and/or position of bar changes in-game)
+;as this routine is designed to handle where to position the
+;static end tile(s). If you have a fixed-length bar, it is better
+;for you to simply write the tiles directly at a fixed location:
+;
+;	LDA #<TileNumber>
+;	STA <StatusBarRAMAddr_TileNumb>
+;	LDA #<TileProperties>			;\If you can edit the properties.
+;	STA <StatusBarRAMAddr_TileProps>	;/
+;
+;Where StatusBarRAMAddr_TileNumb and StatusBarRAMAddr_TileProps is
+;a RAM location of a tile 1 tile before the left side of the bar
+;or 1 tile after the right side of the bar. Repeat this code if you
+;wanted both ends.
+;
+;Note: "Leftside" and "Rightside" terms are literal positions rather
+;than the term being inverted when using a leftwards bar, meaning
+;if you have the bar X-flipped to fill leftwards, leftside refer
+;to the leftside of the bar as opposed to "Leftend" (which is flipped
+;to the right).
+;
+;Input:
+;$00 to $02: Same as WriteBarToHUD
+;$03 to $05: Same as WriteBarToHUD
+;$06: same as WriteBarToHUD (writes tile properties)
+;$07: The tile number to write as the static tile.
+;
+;Note:
+; -If not using the extend-left routine:
+; --Leftside tile is written at [RAMAddressIn00 - TileFormat]
+; --Rightside tile is written at [RAMAddressIn00 + (NumberOfTiles*TileFormat)]
+;  otherwise (using extend left, assuming value in RAMAddressIn00 is BEFORE
+;  using BarExtendLeft):
+; --Leftside tile is written at [RAMAddressIn00 - (NumberOfTiles*TileFormat)]
+; --Rightside tile is written at [RAMAddressIn00 + TileFormat]
+;
+; -If you use this routine with the end tiles being set to non-zero number
+;  of pieces, the static tiles are written "past" the end tiles:
+;
+;   <[===]>
+;
+;   < and > are static end tiles.
+;   [ and ] are fillable end tiles.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	if !OWPlusAndSSBSameFormat == 0
+		WriteBarStaticTileToHUDLeftside:
+		REP #$20
+		DEC $00			;\Go to a location 1 tile to the left from the leftside tile.
+		if !StatusBar_UsingCustomProperties != 0
+			DEC $03			;/
+		endif
+		SEP #$20
+		LDA $07 : STA [$00]		;>Tile number for leftside
+		if !StatusBar_UsingCustomProperties != 0
+			LDA $06 : STA [$03]		;>Tile properties
+		endif
+		REP #$20
+		INC $00			;\Restore
+		if !StatusBar_UsingCustomProperties != 0
+			INC $03			;/
+		endif
+		SEP #$20
+		RTL
+	endif
+	
+	WriteBarStaticTileToHUDLeftsideFormat2:
+	REP #$20
+	DEC $00			;\Go to a location 1 tile to the left from the leftside tile.
+	DEC $00			;>DEC twice due to that you have to move 2 bytes over to move over by 1 tile.
+	if !StatusBar_UsingCustomProperties != 0
+		DEC $03			;/
+		DEC $03
+	endif
+	SEP #$20
+	LDA $07 : STA [$00]		;>Tile number for leftside
+	if !StatusBar_UsingCustomProperties != 0
+		LDA $06 : STA [$03]		;>Tile properties
+	endif
+	REP #$20
+	INC $00			;\Restore
+	INC $00
+	if !StatusBar_UsingCustomProperties != 0
+		INC $03			;/
+		INC $03
+	endif
+		SEP #$20
+	RTL
+	if !OWPlusAndSSBSameFormat == 0
+		WriteBarStaticTileToHUDRightside:
+		JSL CountNumberOfTiles
+		INX							;After last middle tile.
+		TXY
+		LDA $07 : STA [$00],y					;>Tile number for rightside
+		if !StatusBar_UsingCustomProperties != 0
+			LDA.b $06 : STA [$03],y				;>Tile properties 
+		endif
+		RTL
+	endif
+WriteBarStaticTileToHUDRightsideFormat2:
+	JSL CountNumberOfTiles
+	INX							;After last middle tile.
+	TXA
+	ASL
+	TAY
+	LDA $07 : STA [$00],y					;>Tile number for rightside
+	if !StatusBar_UsingCustomProperties != 0
+		LDA.b $06 : STA [$03],y				;>Tile properties 
+	endif
+	RTL

@@ -7,8 +7,29 @@
 ;-Write blank tiles prior this routine so if the bar extends and contract, don't leave behind duplicate tiles.
 ;-Write a static end tile on the side of the bar that doesn't move
 
-!GraphicalBarExampleTest_StaticEnd_ExtendLeft = 1
-
+;0 to not write static end tiles, otherwise set to 1 (don't set to any other number.).
+ !GraphicalBarExampleTest_StaticLeft = 1
+ !GraphicalBarExampleTest_StaticRight = 1
+;other settings:
+!GraphicalBarExampleTest_StaticEnd_ExtendLeft = 0
+!GraphicalBarExampleTest_Length = 30
+ ;^Maximum middle length (this alone excludes the static end tiles.).
+;Some tile number, properties, and positioning settings:
+!GraphicalBarExampleTest_LeftSideTileNum = $00
+!GraphicalBarExampleTest_LeftSideTileProps = %00111000
+!GraphicalBarExampleTest_RightSideTileNum = $01
+!GraphicalBarExampleTest_RightSideTileProps = %00111000
+if !sa1 == 0
+ !GraphicalBarExampleTest_NoExtendLeftBarPos = $7FA002
+ !GraphicalBarExampleTest_NoExtendLeftBarPropsPos = $7FA003
+ !GraphicalBarExampleTest_ExtendLeftBarPos = $7fA03C
+ !GraphicalBarExampleTest_ExtendLeftBarPropsPos = $7fA0BD
+else
+ !GraphicalBarExampleTest_NoExtendLeftBarPos = $404002
+ !GraphicalBarExampleTest_NoExtendLeftBarPropsPos = $404003
+ !GraphicalBarExampleTest_ExtendLeftBarPos = $40403C
+ !GraphicalBarExampleTest_ExtendLeftBarPropsPos = $40403C
+endif
 
 incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
@@ -18,6 +39,19 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
 main:
 ;^These are needed so the defines relating to the graphical bars work.
+.ClearTiles
+	;NOTE: when length of bar is 0, the tile clearer may not
+	;clear out the end tiles that are beyond the 
+	LDX.b #(((!GraphicalBarExampleTest_Length+!GraphicalBarExampleTest_StaticLeft+!GraphicalBarExampleTest_StaticRight)-1)*!StatusBarFormat) ;> clear ALL tiles
+	LDA #$FC
+	..Loop
+	if !GraphicalBarExampleTest_StaticEnd_ExtendLeft == 0
+		STA.l !GraphicalBarExampleTest_NoExtendLeftBarPos-(!GraphicalBarExampleTest_StaticLeft*!StatusBarFormat),x ;>[-!GraphicalBarExampleTest_StaticLeft*!StatusBarFormat] to also remove the lefside
+	else
+		STA.l !GraphicalBarExampleTest_ExtendLeftBarPos-(((!GraphicalBarExampleTest_Length+!GraphicalBarExampleTest_StaticLeft)-1)*!StatusBarFormat),x
+	endif
+	DEX #!StatusBarFormat
+	BPL ..Loop
 
 .InputRatio
 	LDA $14							;\Frame counter as quantity
@@ -36,24 +70,25 @@ main:
 	STA !Scratchram_GraphicalBar_MiddlePiece		;/
 	LDA.b $95						;\Screen number = number of middle tiles.
 	STA !Scratchram_GraphicalBar_TempLength			;/
+	BEQ .Done						;>Check if the bar is 0 length (middle), to see if the tile clearing routine clears only all the tiles that it needs to clear.
 .ConvertToBar
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
 	JSL GraphicalBarELITE_RoundAwayEmptyFull
 	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
 	if !GraphicalBarExampleTest_StaticEnd_ExtendLeft == 0
-		LDA.b #!Default_GraphicalBarPosition				;\Setup address to where to draw the bar.
+		LDA.b #!GraphicalBarExampleTest_NoExtendLeftBarPos		;\Setup address to where to draw the bar.
 		STA $00								;|
-		LDA.b #!Default_GraphicalBarPosition>>8				;|
+		LDA.b #!GraphicalBarExampleTest_NoExtendLeftBarPos>>8		;|
 		STA $01								;|
-		LDA.b #!Default_GraphicalBarPosition>>16			;|
+		LDA.b #!GraphicalBarExampleTest_NoExtendLeftBarPos>>16		;|
 		STA $02								;/
 		if !StatusBar_UsingCustomProperties != 0
-			LDA.b #!Default_GraphicalBarProperties				;\Same as above but properties
+			LDA.b #!GraphicalBarExampleTest_NoExtendLeftBarPropsPos		;\Same as above but properties
 			STA $03								;|
-			LDA.b #!Default_GraphicalBarProperties>>8			;|
+			LDA.b #!GraphicalBarExampleTest_NoExtendLeftBarPropsPos>>8	;|
 			STA $04								;|
-			LDA.b #!Default_GraphicalBarProperties>>16			;|
+			LDA.b #!GraphicalBarExampleTest_NoExtendLeftBarPropsPos>>16	;|
 			STA $05								;/
 			if !Default_LeftwardsBar == 0
 				LDA.b #!Default_StatusBar_TilePropertiesSetting			;\Properties
@@ -63,19 +98,19 @@ main:
 			STA $06								;/
 		endif
 	else
-		LDA.b #!Default_GraphicalBarPositionExtendLeftwards		;\Input rightmost tile position
+		LDA.b #!GraphicalBarExampleTest_ExtendLeftBarPos		;\Input rightmost tile position
 		STA $00								;|
-		LDA.b #!Default_GraphicalBarPositionExtendLeftwards>>8		;|
+		LDA.b #!GraphicalBarExampleTest_ExtendLeftBarPos>>8		;|
 		STA $01								;|
-		LDA.b #!Default_GraphicalBarPositionExtendLeftwards>>16		;|
+		LDA.b #!GraphicalBarExampleTest_ExtendLeftBarPos>>16		;|
 		STA $02								;/
 		
 		if !StatusBar_UsingCustomProperties != 0
-			LDA.b #!Default_GraphicalBarPropertiesExtendLeftwards		;\Same as above but tile properties
+			LDA.b #!GraphicalBarExampleTest_ExtendLeftBarPos		;\Same as above but tile properties
 			STA $03								;|
-			LDA.b #!Default_GraphicalBarPropertiesExtendLeftwards>>8	;|
+			LDA.b #!GraphicalBarExampleTest_ExtendLeftBarPos>>8		;|
 			STA $04								;|
-			LDA.b #!Default_GraphicalBarPropertiesExtendLeftwards>>16	;|
+			LDA.b #!GraphicalBarExampleTest_ExtendLeftBarPos>>16		;|
 			STA $05								;/
 			if !Default_LeftwardsBar == 0
 				LDA.b #!Default_StatusBar_TilePropertiesSetting			;\Properties
@@ -94,47 +129,23 @@ main:
 		endif
 	endif
 	;Write static end tile that moves based on the length of the bar:
-	if !GraphicalBarExampleTest_StaticEnd_ExtendLeft == 0
-		JSL GraphicalBarWriteToStatusBar_CountNumberOfTiles
-		INX							;After last middle tile.
-		if !StatusBarFormat != $01
-			TXA
-			ASL
-			TAY
-		else
-			TXY
-		endif
-		LDA #$00 : STA [$00],y						;>Tile number for rightside
-			LDA.b #!Default_StatusBar_TilePropertiesSetting : STA [$03],y	;>Tile properties 
+	LDA #!GraphicalBarExampleTest_LeftSideTileNum
+	STA $07
+	LDA.b #!GraphicalBarExampleTest_LeftSideTileProps
+	STA $06
+	if !StatusBarFormat == 1
+		JSL GraphicalBarWriteToStatusBar_WriteBarStaticTileToHUDLeftside
 	else
-		REP #$20
-		DEC $00			;\Go to a location 1 tile to the left from the leftside tile.
-		if !StatusBarFormat != 0
-			DEC $00			;>DEC twice due to that you have to move 2 bytes over to move over by 1 tile.
-		endif
-		if !StatusBar_UsingCustomProperties != 0
-			DEC $03			;/
-			if !StatusBarFormat
-				DEC $03
-			endif
-		endif
-		SEP #$20
-		LDA #$00 : STA [$00]		;>Tile number for leftside
-		if !StatusBar_UsingCustomProperties != 0
-			LDA #$00 : STA [$03]		;>Tile properties
-		endif
-		REP #$20
-		INC $00			;\Restore
-		if !StatusBarFormat != 0
-			INC $00
-		endif
-		if !StatusBar_UsingCustomProperties != 0
-			INC $03			;/
-			if !StatusBarFormat != 0
-				INC $03
-			endif
-		endif
-		SEP #$20
+		JSL GraphicalBarWriteToStatusBar_WriteBarStaticTileToHUDLeftsideFormat2
+	endif
+	LDA #!GraphicalBarExampleTest_RightSideTileNum
+	STA $07
+	LDA.b #!GraphicalBarExampleTest_RightSideTileProps
+	STA $06
+	if !StatusBarFormat == 1
+		JSL GraphicalBarWriteToStatusBar_WriteBarStaticTileToHUDRightside
+	else
+		JSL GraphicalBarWriteToStatusBar_WriteBarStaticTileToHUDRightsideFormat2
 	endif
 	;Write to status bar
 	if !Default_LeftwardsBar == 0
@@ -150,4 +161,5 @@ main:
 			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwardsFormat2
 		endif
 	endif
+	.Done
 	RTL
