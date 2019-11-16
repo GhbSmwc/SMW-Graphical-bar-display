@@ -47,8 +47,10 @@ main:
 	..Loop
 	if !GraphicalBarExampleTest_StaticEnd_ExtendLeft == 0
 		STA.l !GraphicalBarExampleTest_NoExtendLeftBarPos-(!GraphicalBarExampleTest_StaticLeft*!StatusBarFormat),x ;>[-!GraphicalBarExampleTest_StaticLeft*!StatusBarFormat] to also remove the lefside
+		print "Tile range (tile numbers only): $", hex(!GraphicalBarExampleTest_NoExtendLeftBarPos-(!GraphicalBarExampleTest_StaticLeft*!StatusBarFormat)), " to $", hex((!GraphicalBarExampleTest_NoExtendLeftBarPos-(!GraphicalBarExampleTest_StaticLeft*!StatusBarFormat))+(((!GraphicalBarExampleTest_Length+!GraphicalBarExampleTest_StaticLeft+!GraphicalBarExampleTest_StaticRight)-1)*!StatusBarFormat))
 	else
 		STA.l !GraphicalBarExampleTest_ExtendLeftBarPos-(((!GraphicalBarExampleTest_Length+!GraphicalBarExampleTest_StaticLeft)-1)*!StatusBarFormat),x
+		print "Tile range (tile numbers only): $", hex(!GraphicalBarExampleTest_ExtendLeftBarPos-(((!GraphicalBarExampleTest_Length+!GraphicalBarExampleTest_StaticLeft)-1)), " to $", hex(!GraphicalBarExampleTest_ExtendLeftBarPos-(((!GraphicalBarExampleTest_Length+!GraphicalBarExampleTest_StaticLeft)-1))+(((!GraphicalBarExampleTest_StaticLeft+!GraphicalBarExampleTest_StaticRight)-1)*!StatusBarFormat))
 	endif
 	DEX #!StatusBarFormat
 	BPL ..Loop
@@ -70,6 +72,11 @@ main:
 	STA !Scratchram_GraphicalBar_MiddlePiece		;/
 	LDA.b $95						;\Screen number = number of middle tiles.
 	STA !Scratchram_GraphicalBar_TempLength			;/
+	CMP.b #!GraphicalBarExampleTest_Length			;\Length (capped).
+	BCC +							;|
+	LDA.b #!GraphicalBarExampleTest_Length			;|
+	STA !Scratchram_GraphicalBar_TempLength			;/
+	+
 	BEQ .Done						;>Check if the bar is 0 length (middle), to see if the tile clearing routine clears only all the tiles that it needs to clear.
 .ConvertToBar
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
