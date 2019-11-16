@@ -156,18 +156,18 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	<font color="orange">JSL GraphicalBarELITE_RoundAwayEmptyFull</font>
 	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
-	LDA.b <font color="yellow">#!Default_GraphicalBarPosition</font>				;\Setup address to where to draw the bar.
+	LDA.b <font color="yellow">#!Default_GraphicalBar_Pos_Tile</font>				;\Setup address to where to draw the bar.
 	STA $00								;|
-	LDA.b <font color="yellow">#!Default_GraphicalBarPosition>>8</font>				;|
+	LDA.b <font color="yellow">#!Default_GraphicalBar_Pos_Tile>>8</font>			;|
 	STA $01								;|
-	LDA.b <font color="yellow">#!Default_GraphicalBarPosition>>16</font>			;|
+	LDA.b <font color="yellow">#!Default_GraphicalBar_Pos_Tile>>16</font>			;|
 	STA $02								;/
 	if !StatusBar_UsingCustomProperties != 0
-		LDA.b <font color="yellow">#!Default_GraphicalBarProperties</font>				;\Same as above but properties
+		LDA.b <font color="yellow">#!Default_GraphicalBar_Pos_Properties</font>				;\Same as above but properties
 		STA $03								;|
-		LDA.b <font color="yellow">#!Default_GraphicalBarProperties>>8</font>			;|
+		LDA.b <font color="yellow">#!Default_GraphicalBar_Pos_Properties>>8</font>			;|
 		STA $04								;|
-		LDA.b <font color="yellow">#!Default_GraphicalBarProperties>>16</font>			;|
+		LDA.b <font color="yellow">#!Default_GraphicalBar_Pos_Properties>>16</font>			;|
 		STA $05								;/
 		if !Default_LeftwardsBar == 0
 			LDA.b <font color="green">#!Default_StatusBar_TilePropertiesSetting</font>			;\Properties
