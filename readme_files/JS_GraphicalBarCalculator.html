@@ -95,7 +95,11 @@ as it increases towards the left).</label><br>
 <input type="checkbox" id="ExtendLeftwards" name="ExtendLeftwards" value="ExtendLeftwards"  onchange="Calculate()"><label for="ExtendLeftwards">Bar extends leftwards as length increases (this will make this address input be the final tile position
 and write tile bytes at and <b>before</b>) this.</label><br></td>
 </td>
-
+</tr>
+<tr>
+<td>Static end tiles:</td>
+<td><input type="checkbox" id="LeftsideStaticTile" name="LeftsideStaticTile" onchange="Calculate()"><label for="LeftsideStaticTile">Using static left end tile.</label><br>
+<input type="checkbox" id="RightsideStaticTile" name="RightsideStaticTile" onchange="Calculate()"><label for="RightsideStaticTile">Using static right end tile.</label></td>
 </tr>
 </table>
 <button type="button" onclick="Reset()">Reset</button><br>
@@ -200,6 +204,8 @@ and write tile bytes at and <b>before</b>) this.</label><br></td>
 		document.getElementById("RAM2bytesAdjicentStatusbar").checked = true
 		
 		document.getElementById("Output").innerHTML = ""
+		document.getElementById("LeftsideStaticTile").checked = false
+		document.getElementById("RightsideStaticTile").checked = false
 		Calculate()
 	}
 	
@@ -276,14 +282,41 @@ and write tile bytes at and <b>before</b>) this.</label><br></td>
 				}
 				if (document.getElementById("RAM2bytesAdjicentStatusbar").checked == true) {
 					if (document.getElementById("ExtendLeftwards").checked == false) {
-						OutputDisplay += (" (tile properties are <kbd>$" + (parseInt(StatBarAddressBarPos, 16) + 1).toString(16).toUpperCase() + "</kbd> to <kbd>$" + ((parseInt(StatBarAddressBarPos, 16) + ((BarBytesTotal-1) * StatusBarTileFormat)) + 1).toString(16).toUpperCase() + "</kbd>)")
+						OutputDisplay += (" (tile properties: <kbd>$" + (parseInt(StatBarAddressBarPos, 16) + 1).toString(16).toUpperCase() + "</kbd> to <kbd>$" + ((parseInt(StatBarAddressBarPos, 16) + ((BarBytesTotal-1) * StatusBarTileFormat)) + 1).toString(16).toUpperCase() + "</kbd>)")
 					} else {
-						OutputDisplay += (" (tile properties are <kbd>" + DisplaySignedHexString((parseInt(StatBarAddressBarPos, 16) - ((BarBytesTotal-1) * StatusBarTileFormat)) + 1) + "</kbd> to <kbd>$" + (parseInt(StatBarAddressBarPos, 16) + 1).toString(16).toUpperCase() + "</kbd>)")
+						OutputDisplay += (" (tile properties: <kbd>" + DisplaySignedHexString((parseInt(StatBarAddressBarPos, 16) - ((BarBytesTotal-1) * StatusBarTileFormat)) + 1) + "</kbd> to <kbd>$" + (parseInt(StatBarAddressBarPos, 16) + 1).toString(16).toUpperCase() + "</kbd>)")
 					}
 				}
 				
 				OutputDisplay += "</td>"
-				OutputDisplay += "</tr>"
+				if ((document.getElementById("LeftsideStaticTile").checked == true) || (document.getElementById("RightsideStaticTile").checked == true)) {
+					OutputDisplay += "</tr>"
+					OutputDisplay += "<td>Static end tiles status bar/Overworld write location:</td>"
+					OutputDisplay += "<td>"
+					if (document.getElementById("LeftsideStaticTile").checked == true) {
+						OutputDisplay += "Leftside tile: <kbd>" + DisplaySignedHexString((parseInt(StatBarAddressBarPos, 16) - StatusBarTileFormat) - (DisplacementExtendLeftwards*StatusBarTileFormat)) + "</kbd>"
+						if (StatusBarTileFormat == 2) {
+							OutputDisplay += " (tile properties: <kbd>" + DisplaySignedHexString((parseInt(StatBarAddressBarPos, 16) - StatusBarTileFormat) - (DisplacementExtendLeftwards*StatusBarTileFormat) + 1) + "</kbd>)"
+						}
+					}
+					if (document.getElementById("RightsideStaticTile").checked == true) {
+						if (document.getElementById("ExtendLeftwards").checked == false) {
+							OutputDisplay += "<br>Rightside tile: <kbd>" + DisplaySignedHexString((parseInt(StatBarAddressBarPos, 16)) + (BarBytesTotal)*StatusBarTileFormat) + "</kbd>"
+						} else {
+							OutputDisplay += "<br>Rightside tile: <kbd>" + DisplaySignedHexString((parseInt(StatBarAddressBarPos, 16)) + StatusBarTileFormat) + "</kbd>"
+						}
+						if (StatusBarTileFormat == 2) {
+							if (document.getElementById("ExtendLeftwards").checked == false) {
+								OutputDisplay += " (tile properties: <kbd>" + DisplaySignedHexString(((parseInt(StatBarAddressBarPos, 16)) + (BarBytesTotal)*StatusBarTileFormat)+1) + "</kbd>)"
+							} else {
+								OutputDisplay += " (tile properties: <kbd>" + DisplaySignedHexString(((parseInt(StatBarAddressBarPos, 16)) + StatusBarTileFormat)+1) + "</kbd>)"
+							}
+						}
+					}
+					OutputDisplay += "</td>"
+					OutputDisplay += "<tr>"
+				}
+					OutputDisplay += "</tr>"
 				OutputDisplay += "</table><br><br></div>"
 				//Calculate the array of values (simulates the !Scratchram_GraphicalBar_FillByteTbl after running DrawGrap)
 				//Since javascript cannot have variable array length, I had to choose the maximum possible: 257 (255 middle tiles + 2 end tiles;
