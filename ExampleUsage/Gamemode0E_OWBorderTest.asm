@@ -38,18 +38,18 @@ main:
 	
 	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
-	LDA.b #!Default_GraphicalBarPositionOverworldMap		;\Setup address to where to draw the bar.
+	LDA.b #!Default_GraphicalBar_Pos_Tile_OverworldMap		;\Setup address to where to draw the bar.
 	STA $00								;|
-	LDA.b #!Default_GraphicalBarPositionOverworldMap>>8		;|
+	LDA.b #!Default_GraphicalBar_Pos_Tile_OverworldMap>>8		;|
 	STA $01								;|
-	LDA.b #!Default_GraphicalBarPositionOverworldMap>>16		;|
+	LDA.b #!Default_GraphicalBar_Pos_Tile_OverworldMap>>16		;|
 	STA $02								;/
 	if !StatusBar_UsingCustomProperties != 0
-		LDA.b #!Default_GraphicalBarPropertiesOverworldMap		;\Same as above but properties
+		LDA.b #!Default_GraphicalBar_Pos_Properties_OverworldMap	;\Same as above but properties
 		STA $03								;|
-		LDA.b #!Default_GraphicalBarPropertiesOverworldMap>>8		;|
+		LDA.b #!Default_GraphicalBar_Pos_Properties_OverworldMap>>8	;|
 		STA $04								;|
-		LDA.b #!Default_GraphicalBarPropertiesOverworldMap>>16		;|
+		LDA.b #!Default_GraphicalBar_Pos_Properties_OverworldMap>>16	;|
 		STA $05								;/
 		if !Default_LeftwardsBar == 0
 			LDA.b #!Default_Overworld_TilePropertiesSetting			;\Properties

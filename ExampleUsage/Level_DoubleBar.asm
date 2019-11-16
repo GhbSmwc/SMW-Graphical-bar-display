@@ -201,18 +201,18 @@ main:
 		JSL GraphicalBarELITE_DrawGraphicalBar					;>Get amount of fill.
 		JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTilesDoubleBar
 	endif
-	LDA.b #!Default_GraphicalBarPosition
+	LDA.b #!Default_GraphicalBar_Pos_Tile
 	STA $00
-	LDA.b #!Default_GraphicalBarPosition>>8
+	LDA.b #!Default_GraphicalBar_Pos_Tile>>8
 	STA $01
-	LDA.b #!Default_GraphicalBarPosition>>16
+	LDA.b #!Default_GraphicalBar_Pos_Tile>>16
 	STA $02
 	if !StatusBar_UsingCustomProperties != 0
-		LDA.b #!Default_GraphicalBarProperties
+		LDA.b #!Default_GraphicalBar_Pos_Properties
 		STA $03
-		LDA.b #!Default_GraphicalBarProperties>>8
+		LDA.b #!Default_GraphicalBar_Pos_Properties>>8
 		STA $04
-		LDA.b #!Default_GraphicalBarProperties>>16
+		LDA.b #!Default_GraphicalBar_Pos_Properties>>16
 		STA $05
 		if !Default_LeftwardsBar == 0
 			LDA.b #!Default_StatusBar_TilePropertiesSetting			;\Properties

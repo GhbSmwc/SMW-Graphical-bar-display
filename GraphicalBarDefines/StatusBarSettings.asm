@@ -27,7 +27,7 @@
  !StatusBar_UsingCustomProperties           = 0
   ;^Set this to 0 if you are using the vanilla SMW status bar or any status bar patches
   ; that doesn't enable editing the tile properties, otherwise set this to 1 (you may
-  ; have to edit "!Default_GraphicalBarProperties" in order for it to work though.).
+  ; have to edit "!Default_GraphicalBar_Pos_Properties" in order for it to work though.).
   ; This define is needed to prevent writing what it assumes tile properties into invalid
   ; RAM addresses.
   ;
@@ -56,79 +56,79 @@
  ;This covers all bars that would extend rightwards as you increase the length.
   if !StatusBarFormat == $01
    if !sa1 == 0
-    !Default_GraphicalBarPosition                      = $7E0F09     ;>SMW's status bar. Replace with "$0C00|!addr" for SMB3 status bar and "$0BF6|!addr" for minimalist status bar.
+    !Default_GraphicalBar_Pos_Tile                      = $7E0F09     ;>SMW's status bar. Replace with "$0C00|!addr" for SMB3 status bar and "$0BF6|!addr" for minimalist status bar.
    else
-    !Default_GraphicalBarPosition                      = $400F09     ;>SMW's status bar (SA-1). Replace with "$0C00|!addr" for SMB3 status bar and "$0BF6|!addr" for minimalist status bar.
+    !Default_GraphicalBar_Pos_Tile                      = $400F09     ;>SMW's status bar (SA-1). Replace with "$0C00|!addr" for SMB3 status bar and "$0BF6|!addr" for minimalist status bar.
    endif
    ;^Location of the bar when !StatusBarFormat is $01. This is under use of
    ; STA [$00], that is why it needs to be 3-bytes.
   else
    if !sa1 == 0
-    !Default_GraphicalBarPosition                     = $7FA000      ;>Status bar RAM data.
+    !Default_GraphicalBar_Pos_Tile                     = $7FA000      ;>Status bar RAM data.
    else
-    !Default_GraphicalBarPosition                     = $404000      ;>Status bar RAM data (SA-1).
+    !Default_GraphicalBar_Pos_Tile                     = $404000      ;>Status bar RAM data (SA-1).
    endif
    ;^Same as above, but for a format that each 8x8 tile contains 2 bytes next to each other.
   endif
   if !StatusBarFormat == $01
    if !sa1 == 0
-    !Default_GraphicalBarProperties      = $0C80|!addr  ;>SMB3 status bar properties, change to "$0C36|!base" for minimalist.
+    !Default_GraphicalBar_Pos_Properties      = $0C80|!addr  ;>SMB3 status bar properties, change to "$0C36|!base" for minimalist.
    else
-    !Default_GraphicalBarProperties      = $0C80|!addr  ;>SMB3 status bar properties, change to "$0C36|!base" for minimalist.
+    !Default_GraphicalBar_Pos_Properties      = $0C80|!addr  ;>SMB3 status bar properties, change to "$0C36|!base" for minimalist.
    endif
   else
    if !sa1 == 0
-    !Default_GraphicalBarProperties      = $7FA001  ;>Super status bar
+    !Default_GraphicalBar_Pos_Properties      = $7FA001  ;>Super status bar
    else
-    !Default_GraphicalBarProperties      = $404001  ;>Same as above but SA-1
+    !Default_GraphicalBar_Pos_Properties      = $404001  ;>Same as above but SA-1
    endif
   endif
    ;^Tile properties (only applies to status bar patches that lets you change the properties in-game).
    ; Remember: bit format is [YXPCCCTT].
  ;This is when you are using a bar that would extend towards the left as the length increases.
- ;!Default_GraphicalBarPositionExtendLeftwards is the position of the rightmost last tile (even when x-flipped to fill leftwards). Therefore
+ ;!Default_GraphicalBar_Pos_Tile_ExtendLeftwards is the position of the rightmost last tile (even when x-flipped to fill leftwards). Therefore
  ;the status bar write range is [DesiredLastTilePos-((NumberOfTiles-1)*!StatusBarFormat)] to [DesiredLastTilePos].
   if !StatusBarFormat == $01
    if !sa1 == 0
-    !Default_GraphicalBarPositionExtendLeftwards       = $7E0F09     ;>SMW's status bar. Replace with "$0C00|!addr" for SMB3 status bar and "$0BF6|!addr" for minimalist status bar.
+    !Default_GraphicalBar_Pos_Tile_ExtendLeftwards       = $7E0F09     ;>SMW's status bar. Replace with "$0C00|!addr" for SMB3 status bar and "$0BF6|!addr" for minimalist status bar.
    else
-    !Default_GraphicalBarPositionExtendLeftwards       = $400F09     ;>SMW's status bar (SA-1). Replace with "$0C00|!addr" for SMB3 status bar and "$0BF6|!addr" for minimalist status bar.
+    !Default_GraphicalBar_Pos_Tile_ExtendLeftwards       = $400F09     ;>SMW's status bar (SA-1). Replace with "$0C00|!addr" for SMB3 status bar and "$0BF6|!addr" for minimalist status bar.
    endif
     ;^Location of the bar's last tile (rightmost tile, even when set to fill leftwards) when !StatusBarFormat is $01. This is under use of
     ; STA [$00], that is why it needs to be 3-bytes.
   else
    if !sa1 == 0
-    !Default_GraphicalBarPositionExtendLeftwards      = $7FA03E      ;>Status bar RAM data.
+    !Default_GraphicalBar_Pos_Tile_ExtendLeftwards      = $7FA03E      ;>Status bar RAM data.
    else
-    !Default_GraphicalBarPositionExtendLeftwards      = $40403E      ;>Status bar RAM data (SA-1).
+    !Default_GraphicalBar_Pos_Tile_ExtendLeftwards      = $40403E      ;>Status bar RAM data (SA-1).
    endif
     ;^Same as above, but for a format that each 8x8 tile contains 2 bytes next to each other.
   endif
   if !StatusBarFormat == $01
    if !sa1 == 0
-    !Default_GraphicalBarPropertiesExtendLeftwards      = $0C80|!addr  ;>SMB3 status bar properties, change to "$0C36|!base" for minimalist.
+    !Default_GraphicalBar_Pos_Properties_ExtendLeftwards      = $0C80|!addr  ;>SMB3 status bar properties, change to "$0C36|!base" for minimalist.
    else
-    !Default_GraphicalBarPropertiesExtendLeftwards      = $0C80|!addr  ;>SMB3 status bar properties, change to "$0C36|!base" for minimalist.
+    !Default_GraphicalBar_Pos_Properties_ExtendLeftwards      = $0C80|!addr  ;>SMB3 status bar properties, change to "$0C36|!base" for minimalist.
    endif
   else
    if !sa1 == 0
-    !Default_GraphicalBarPropertiesExtendLeftwards      = $7FA03F  ;>Super status bar
+    !Default_GraphicalBar_Pos_Properties_ExtendLeftwards      = $7FA03F  ;>Super status bar
    else
-    !Default_GraphicalBarPropertiesExtendLeftwards      = $7FA03F  ;>Same as above but SA-1
+    !Default_GraphicalBar_Pos_Properties_ExtendLeftwards      = $7FA03F  ;>Same as above but SA-1
    endif
   endif
-  !Default_GraphicalBarPositionExtendLeftwards_MaxMiddleLength = 30
+  !Default_GraphicalBar_Pos_Tile_ExtendLeftwards_MaxMiddleLength = 30
   ;^The maximum length of the middle part of the leftward extending bar.
  ;Overworld graphical bar:
   if !sa1 == 0
-   !Default_GraphicalBarPositionOverworldMap = $7FEC00
+   !Default_GraphicalBar_Pos_Tile_OverworldMap = $7FEC00
   else
-   !Default_GraphicalBarPositionOverworldMap = $41EC00
+   !Default_GraphicalBar_Pos_Tile_OverworldMap = $41EC00
   endif
   if !sa1 == 0
-   !Default_GraphicalBarPropertiesOverworldMap = $7FEC01
+   !Default_GraphicalBar_Pos_Properties_OverworldMap = $7FEC01
   else
-   !Default_GraphicalBarPropertiesOverworldMap = $41EC01
+   !Default_GraphicalBar_Pos_Properties_OverworldMap = $41EC01
   endif
 ;Tile settings (length does not apply to [ExtendLeftwards.asm] as that is variable in-game):
  !Default_MiddleLength                = 7             ;>30 = screen-wide (30 + 2 end tiles = 32, all 8x8 tile row in the screen's width)

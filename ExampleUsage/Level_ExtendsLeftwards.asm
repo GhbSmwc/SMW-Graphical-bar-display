@@ -29,7 +29,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	endif
 	
 	!TotalEnds = !LeftEndTile+!RightEndTile
-	!TotalLength = !Default_GraphicalBarPositionExtendLeftwards_MaxMiddleLength+!TotalEnds
+	!TotalLength = !Default_GraphicalBar_Pos_TileExtendLeftwards_MaxMiddleLength+!TotalEnds
 
 ;Again, this is an uberasm tool test file.
 main:
@@ -39,7 +39,7 @@ main:
 	LDA #$FC							;>Blank tile
 	
 	..Loop
-	STA !Default_GraphicalBarPositionExtendLeftwards-((!TotalLength-1)*!StatusBarFormat),x
+	STA !Default_GraphicalBar_Pos_TileExtendLeftwards-((!TotalLength-1)*!StatusBarFormat),x
 	DEX #!StatusBarFormat
 	BPL ..Loop
 .InputRatio
@@ -59,9 +59,9 @@ main:
 	LDA.b #!Default_RightPieces						;\Right end
 	STA !Scratchram_GraphicalBar_RightEndPiece				;/
 	LDA $95									;\length (number of middle tiles)
-	CMP.b #!Default_GraphicalBarPositionExtendLeftwards_MaxMiddleLength	;|\Prevent overwriting data that is located before the status bar area.
+	CMP.b #!Default_GraphicalBar_Pos_TileExtendLeftwards_MaxMiddleLength	;|\Prevent overwriting data that is located before the status bar area.
 	BCC ..LowerThanMax							;||
-	LDA.b #!Default_GraphicalBarPositionExtendLeftwards_MaxMiddleLength	;|/
+	LDA.b #!Default_GraphicalBar_Pos_TileExtendLeftwards_MaxMiddleLength	;|/
 
 	..LowerThanMax
 	STA !Scratchram_GraphicalBar_TempLength					;
@@ -71,19 +71,19 @@ main:
 	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
 	
-	LDA.b #!Default_GraphicalBarPositionExtendLeftwards		;\Input rightmost tile position
+	LDA.b #!Default_GraphicalBar_Pos_TileExtendLeftwards		;\Input rightmost tile position
 	STA $00								;|
-	LDA.b #!Default_GraphicalBarPositionExtendLeftwards>>8		;|
+	LDA.b #!Default_GraphicalBar_Pos_TileExtendLeftwards>>8		;|
 	STA $01								;|
-	LDA.b #!Default_GraphicalBarPositionExtendLeftwards>>16		;|
+	LDA.b #!Default_GraphicalBar_Pos_TileExtendLeftwards>>16		;|
 	STA $02								;/
 	
 	if !StatusBar_UsingCustomProperties != 0
-		LDA.b #!Default_GraphicalBarPropertiesExtendLeftwards		;\Same as above but tile properties
+		LDA.b #!Default_GraphicalBar_Pos_Properties_ExtendLeftwards		;\Same as above but tile properties
 		STA $03								;|
-		LDA.b #!Default_GraphicalBarPropertiesExtendLeftwards>>8	;|
+		LDA.b #!Default_GraphicalBar_Pos_Properties_ExtendLeftwards>>8	;|
 		STA $04								;|
-		LDA.b #!Default_GraphicalBarPropertiesExtendLeftwards>>16	;|
+		LDA.b #!Default_GraphicalBar_Pos_Properties_ExtendLeftwards>>16	;|
 		STA $05								;/
 		if !Default_LeftwardsBar == 0
 			LDA.b #!Default_StatusBar_TilePropertiesSetting			;\Properties
