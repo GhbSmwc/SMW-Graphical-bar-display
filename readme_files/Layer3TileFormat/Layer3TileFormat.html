@@ -46,4 +46,25 @@ On this format, assume <kbd>TileFormat</kbd> is <kbd>$01</kbd> when used in a fo
 
 Thus, loops and other codes to write to the status bar  is slightly different depending on the byte format, that you
 should set <kbd>!StatusBarFormat</kbd> to <kbd>$01</kbd> for SMW/Ladida's status bar and <kbd>$02</kbd> for Super status bar/Overworld border plus. Currently, at the time of writing
-this, there is no other OWB patches besides OWB+, make sure you check any future patch's tile format before making changes here.
+this, there is no other OWB patches besides OWB+, make sure you check any future patch's tile format before making changes here.<br>
+<hr>
+<h1>Status bar patches data locations</h1>
+Note: Because patches can update, this information presented may be out of date should the format and RAM location gets changed in the future. Not to mention, the patches themselves may include
+showing the address locations in the future as well.<br>
+
+<h2>Minimalist status bar patch<h2>
+<table>
+<tr><th>Patch</th><th>RAM address location</th><th>Description</th></tr>
+<tr><td rowspan="4"><kbd>status_double.asm</kbd></td><td><kbd>$0B05-$0B24</kbd></td><td>Tile number top row</td></tr>
+<tr><td><kbd>$0B25-$0B44</kbd></td><td>Tile number bottom row</td></tr>
+<tr><td><kbd>$0B45-$0B64</kbd></td><td>Tile properties top row</td></tr>
+<tr><td><kbd>$0B65-$0B84</kbd></td><td>Tile properties bottom row</td></tr>
+<tr><td rowspan="2"><kbd>status_top.asm</kbd> and <kbd>status_bottom.asm</kbd></td><td><kbd>$0B05-$0B24</kbd></td><td>Tile number row</td></tr>
+<tr><td><kbd>$0B45-$0B64</kbd></td><td>Tile properties row</td></tr>
+<tr><td colspan="3"><kbd>TileLocation = StartingAddress + X</kbd><br>
+<ul>
+<li>where <kbd>X</kbd> is the horizontal position, in tiles, ranging 0-31, increasing left to right.</li>
+<li>Where <kbd>StartingAddress</kbd> is the starting address of the range ($0B25, $0B45, and $0B65).</li>
+</ul>
+</tr>
+</table>
