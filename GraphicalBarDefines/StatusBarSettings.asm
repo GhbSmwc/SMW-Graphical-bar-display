@@ -52,13 +52,37 @@
  ;
  ;These must be 3-bytes long (6 hexadecimal digits long), as they are under a routine that
  ;uses STA [$00],y to write the tiles to the status bar.
+ ;
+ ;Additional notes:
+ ;
+ ;Minimalist status bar patch RAM address location:
+ ; -status_double.asm:
+ ; --$0B05-$0B24: Tile number top row
+ ; --$0B25-$0B44: Tile number bottom row
+ ; --$0B45-$0B64: Tile properties top row
+ ; --$0B65-$0B84: Tile properties bottom row
+ ; -status_top.asm and status_bottom.asm:
+ ; --$0B05-$0B24: Tile number row
+ ; --$0B45-$0B64: Tile properties row
+ ; -^To calculate position: TileLocation = StartingAddress + X (x ranges from 0-31)
+ ;
+ ;Positions I recommend, assuming you don't make other changes on the defines and positions:
+ ;Super status bar patch:
+ ;-$7FA000/$7FA001 (extend rightwards) and $7FA03E/$7fA03F (extend leftwards): Top row
+ ; is entirely not used by any info display.
+ ;Minimalist status bar (using status_double.asm):
+ ;-$0B2D/$0B6D (extend rightwards) and $0B3C/$0B7C (extend leftwards): The "middle" space
+ ; between the coin display and the score. When placed in a define, make sure you
+ ; add "|!addr" for sa-1.
+ ;Note that these information may be out of date should the patches be updated with the
+ ;formats and RAM address be changed.
  
  ;This covers all bars that would extend rightwards as you increase the length.
   if !StatusBarFormat == $01
    if !sa1 == 0
-    !Default_GraphicalBar_Pos_Tile                      = $7E0F09     ;>SMW's status bar. Replace with "$0C00|!addr" for SMB3 status bar and "$0BF6|!addr" for minimalist status bar.
+    !Default_GraphicalBar_Pos_Tile                      = $7E0F09     ;>SMW's status bar.
    else
-    !Default_GraphicalBar_Pos_Tile                      = $400F09     ;>SMW's status bar (SA-1). Replace with "$0C00|!addr" for SMB3 status bar and "$0BF6|!addr" for minimalist status bar.
+    !Default_GraphicalBar_Pos_Tile                      = $400F09     ;>SMW's status bar.
    endif
    ;^Location of the bar when !StatusBarFormat is $01. This is under use of
    ; STA [$00], that is why it needs to be 3-bytes.
@@ -72,9 +96,9 @@
   endif
   if !StatusBarFormat == $01
    if !sa1 == 0
-    !Default_GraphicalBar_Pos_Properties      = $0C80|!addr  ;>SMB3 status bar properties, change to "$0C36|!base" for minimalist.
+    !Default_GraphicalBar_Pos_Properties      = $0C80|!addr  ;>SMB3 status bar properties.
    else
-    !Default_GraphicalBar_Pos_Properties      = $0C80|!addr  ;>SMB3 status bar properties, change to "$0C36|!base" for minimalist.
+    !Default_GraphicalBar_Pos_Properties      = $0C80|!addr  ;>SMB3 status bar properties.
    endif
   else
    if !sa1 == 0
