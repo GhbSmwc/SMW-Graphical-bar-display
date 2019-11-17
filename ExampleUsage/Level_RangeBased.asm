@@ -49,20 +49,13 @@ main:
 	LDA !Freeram_RangeBasedValue                           ;|Starts at the last index, compares 
 	CMP RangeTable,x                                       ;|if quantity >= to the number in the table
 	BCS ..IntervalFound                                    ;|and found if true, will have that index.
-	DEX #2                                                 ;|$00 = RangeIndex * 2
+	DEX #2                                                 ;|
 	BPL ..Loop                                             ;|
-
-	..FirstRange
-	;X = $FFFE
-	STZ $14B0|!addr                                        ;|
-	LDA #$0000                                             ;|\Minimum at the first item (if quantity is less than the first number in table)
-	STA $02                                                ;|/
-	BRA +
+	INX #2                                                 ;|>Failsafe
 
 	..IntervalFound                                        ;|
-	TXA                                                    ;|\Map intevals number 1 and beyond indexes +2 since the first number in table is different.
-	INC #2                                                 ;|/
-	STA $14B0|!addr                                        ;|
+	TXA                                                    ;|\Store index*2 here
+	STA $14B0|!addr                                        ;|/
 	CPX.w #((RangeTableEnd-RangeTable)-4)                  ;|\Check if the range is on the second-last and last value in table
 	BCC ..ValidRange                                       ;|/to avoid having another range as last number being the minimum and max being an invalid number.
 	LDX.w #((RangeTableEnd-RangeTable)-4)                  ;|>Cap the range if last number reached. (will also display 100% bar once this range be full, as all others will 0 out when at these intervals)
@@ -146,12 +139,13 @@ main:
 	;-Make sure the numbers are in increasing order and no duplicates.
 	;-Make sure all your numbers are in between "RangeTable" and
 	; "RangeTableEnd".
-	;-The first number must be nonzero.
+	;-The first number must be zero.
 	RangeTable:
-	dw 10                                  ;>item number 0 ($00)
-	dw 30                                  ;>item number 1 ($02)
-	dw 60                                  ;>item number 2 ($04)
-	dw 100                                 ;>item number 3 ($06)
-	dw 150                                 ;>item number 4 ($08)
-	dw 210                                 ;>item number 5 ($0A)
+	dw 0                                   ;>item number 0 ($00)
+	dw 10                                  ;>item number 1 ($02)
+	dw 30                                  ;>item number 2 ($04)
+	dw 60                                  ;>item number 3 ($06)
+	dw 100                                 ;>item number 4 ($08)
+	dw 150                                 ;>item number 5 ($0A)
+	dw 210                                 ;>item number 6 ($0C)
 	RangeTableEnd:
