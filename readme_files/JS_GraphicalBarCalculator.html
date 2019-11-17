@@ -298,12 +298,13 @@ and write tile bytes at and <b>before</b>) this.</label><br></td>
 						if (StatusBarTileFormat == 2) {
 							OutputDisplay += " (tile properties: <kbd>" + DisplaySignedHexString((parseInt(StatBarAddressBarPos, 16) - StatusBarTileFormat) - (DisplacementExtendLeftwards*StatusBarTileFormat) + 1) + "</kbd>)"
 						}
+						OutputDisplay += "<br>"
 					}
 					if (document.getElementById("RightsideStaticTile").checked == true) {
 						if (document.getElementById("ExtendLeftwards").checked == false) {
-							OutputDisplay += "<br>Rightside tile: <kbd>" + DisplaySignedHexString((parseInt(StatBarAddressBarPos, 16)) + (BarBytesTotal)*StatusBarTileFormat) + "</kbd>"
+							OutputDisplay += "Rightside tile: <kbd>" + DisplaySignedHexString((parseInt(StatBarAddressBarPos, 16)) + (BarBytesTotal)*StatusBarTileFormat) + "</kbd>"
 						} else {
-							OutputDisplay += "<br>Rightside tile: <kbd>" + DisplaySignedHexString((parseInt(StatBarAddressBarPos, 16)) + StatusBarTileFormat) + "</kbd>"
+							OutputDisplay += "Rightside tile: <kbd>" + DisplaySignedHexString((parseInt(StatBarAddressBarPos, 16)) + StatusBarTileFormat) + "</kbd>"
 						}
 						if (StatusBarTileFormat == 2) {
 							if (document.getElementById("ExtendLeftwards").checked == false) {
