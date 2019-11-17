@@ -573,7 +573,7 @@ You have to manually write the tiles at either side of the bar yourself:
 	;Remove any line with the words &ldquo;props&rdquo; if the status bar
 	;you're working on does not allow modifying the tile properties.
 </pre></td></tr></table>
-If you have variable-length bar, I've <a href="#StaticEndRoutine">provided routines</a> that would automatically calculate where to write the end tiles. Also note that this readme
+If you have variable-length bar, I've <a href="#StaticEndRoutine">provided routines</a> that would automatically calculate where to write the static end tiles. Also note that this readme
 assumes you never used static end tiles, most of the info provided about status bar write ranges only include the tiles affected based on fill amount, not static end tiles.
 <br><br>
 
@@ -815,7 +815,8 @@ to be clear, unlike the normal SBC. However, this is very unlikely as no status 
 <ul>
 <li><kbd>WriteBarStaticTileToHUDLeftside</kbd>: Writes tile for the left side of the bar (a tile just before the bar's leftmost tile).</li>
 <li><kbd>WriteBarStaticTileToHUDRightside</kbd>: Same as above but for the rightside.</li><br>
-</ul>
+</ul><br>
+If you use <kbd>BarExtendLeft</kbd>, execute that routine, and then this static end tile handler, as that routine modifies the area where to write the bar.
 
 Note that this is unaffected by <kbd>WriteBarToHUDLeftwards</kbd>, meaning that static end tiles don't automatically flip. Inputs are:
 
