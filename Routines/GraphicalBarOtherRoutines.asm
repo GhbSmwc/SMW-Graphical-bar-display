@@ -63,6 +63,7 @@
 ; -$04-$05 (16-bit): The maximal quantity
 ;Output:
 ; -$00-$01 (16-bit): The quantity, after subtracted by minimal quantity
+;                    (If quantity is < MIN, then return 0).
 ; -$02-$03 (16-bit): The minimal quantity (same number as entered before)
 ; -$04-$05 (16-bit): The maximal quantity (subtracted by minimal quantity).
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -73,6 +74,9 @@ MapRangeToStartAt0:
 	LDA $00			;\Map quantity to be zero-based
 	SEC			;|
 	SBC $02			;|
+	BCS +			;|>SBC clears carry if unsigned underflow, check if Quantity - MIN results in a negative, then
+	LDA #$0000		;| bottom out at 0 instead.
+	+
 	STA $00			;/
 	LDA $04			;\Same goes with max.
 	SEC			;|
