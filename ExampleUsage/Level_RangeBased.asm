@@ -3,8 +3,7 @@
 ;JSLs not to call a routine that doesn't have a destination label here).
 
 ;This code tests out a range-based bar, where MIN is mapped to 0 and MAX is mapped to
-;(MAX-MIN); utilizing my MapRangeToStartAt0 routine. The coin counter acts as an interval
-;number.
+;(MAX-MIN); utilizing my MapRangeToStartAt0 routine.
 
 
 incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
@@ -35,7 +34,7 @@ main:
 	..Up                                                    ;|
 	REP #$30                                                ;|
 	LDA !Freeram_RangeBasedValue                            ;|
-	CMP.w #210                                              ;|
+	CMP.w RangeTableEnd-2                                   ;|>Get last number in the table (# would pull out an address instead the number in the address)
 	BCS +                                                   ;|
 	INC A                                                   ;|
 	STA !Freeram_RangeBasedValue                            ;/
@@ -55,7 +54,7 @@ main:
 
 	..IntervalFound                                        ;|
 	TXA                                                    ;|\Store index*2 here
-	STA $14B0|!addr                                        ;|/
+	STA !Scratchram_WhatRange                              ;|/
 	CPX.w #((RangeTableEnd-RangeTable)-4)                  ;|\Check if the range is on the second-last and last value in table
 	BCC ..ValidRange                                       ;|/to avoid having another range as last number being the minimum and max being an invalid number.
 	LDX.w #((RangeTableEnd-RangeTable)-4)                  ;|>Cap the range if last number reached. (will also display 100% bar once this range be full, as all others will 0 out when at these intervals)
@@ -65,10 +64,10 @@ main:
 	STA $02                                                ;|/
 	+
 	..WriteIntervalNumber
-	SEP #$20                                               ;|\Take 16-bit interval number, take only the low byte, and write to coin count
-	LDA $14B0|!addr                                        ;||(SEP #$20 instead of #$30 to keep X and Y register's high bytes intact)
-	LSR                                                    ;||
-	STA $0DBF|!addr                                        ;||
+	SEP #$20                                               ;|\Take 16-bit interval number, take only the low byte, and write to status bar (up to 9 is displayed)
+	LDA !Scratchram_WhatRange                              ;||(SEP #$20 instead of #$30 to keep X and Y register's high bytes intact)
+	LSR                                                    ;||To display more than 9, consider using hexdec routine.
+	STA !Interval_Write_Pos_Tile                           ;||
 	REP #$20                                               ;|/
 	
 	..InsertMinMax
