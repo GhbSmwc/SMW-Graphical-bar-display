@@ -2,9 +2,36 @@
 ;all files in the routine folder in the library folder for this to work (unless you edit the
 ;JSLs not to call a routine that doesn't have a destination label here).
 
-;This code tests out a range-based bar, where MIN is mapped to 0 and MAX is mapped to
-;(MAX-MIN); utilizing my MapRangeToStartAt0 routine.
-
+;This code tests out a range-based bar, where the bar measures a value within a specified range,
+;therefore acting like HTML's "meter" tag where MIN is mapped to display 0 and MAX is displayed
+;as (MAX-MIN), this uses my MapRangeToStartAt0 routine. This example test functions like a:
+;-boss's phase-based HP bar, when the bar gets depleted, it refills
+; and decrements a number next to it, therefore the boss switches phase.
+;-EXP progress bar: as you gain EXP, the bar fills up, once full, the number next to it
+; increments and the bar will wrap back to 0 and fills up the remaining increase since
+; the previous bar
+;
+;Unlike storing only the quantity as 0 to Max per range individually (the next bar is 0-Max
+;instead of continuing from Max), the quantity is total-based and handles all the ranges.
+;Addition and subtraction of the quantity can carry over to the next range instead of
+;stopping at the end of each ranges, for example:
+;
+;The boss have 200 HP:
+;-Phase 1: 101 to 200 HP
+;-Phase 2: 1 to 100 HP
+;When the boss have 105 HP and takes 10 damage, HP will now be 95 HP instead of 100,
+;thus the damage have carried over to phase 2. Unlike having this:
+;HP starts at 100 on phase 1, and a counter stored indicating the phase number, later
+;in the boss fight, with 5 HP left and takes 10 damage, phase 2 triggers (update the
+;phase number) and HP is guaranteed to fully refill back to 100, regardless of how much
+;HP that is less than damage, which means 5 remaining damage have been nullified.
+;
+;Same goes with EXP, but filling upwards at it progress. After leveling up, you may still
+;have remaining EXP, so the EXP increase will continue on that next level instead of always
+;stopping the increase once the next level is reached.
+;
+;Cave story, for example, do not carry EXP over to the next level, thus the next bar to
+;fill up is always empty: https://cavestory.fandom.com/wiki/Game_objects#Experience
 
 incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
@@ -50,7 +77,7 @@ main:
 	BCS ..IntervalFound                                    ;|and found if true, will have that index.
 	DEX #2                                                 ;|
 	BPL ..Loop                                             ;|
-	INX #2                                                 ;|>Failsafe
+	INX #2                                                 ;|>Don't use index-2! 0 is the lowest that is valid.
 
 	..IntervalFound                                        ;|
 	TXA                                                    ;|\Store index*2 here
@@ -78,7 +105,7 @@ main:
 	STA $00                                                ;//
 	SEP #$30
 	
-	JSL GraphicalBarOtherRoutines_MapRangeToStartAt0       ;>Convert range
+	JSL GraphicalBarOtherRoutines_MapRangeToStartAt0       ;>Convert range to where MIN is 0.
 	REP #$20                                               ;\Insert mapped range and value.
 	LDA $00                                                ;|
 	STA !Scratchram_GraphicalBar_FillByteTbl               ;|
@@ -86,6 +113,7 @@ main:
 	STA !Scratchram_GraphicalBar_FillByteTbl+2             ;|
 	SEP #$20                                               ;/
 
+	;Process graphical bar.
 	.ProcessGraphicalBar
 	LDA.b #!Default_LeftPieces					;\Input amount of pieces in each of the 3 types of sections.
 	STA !Scratchram_GraphicalBar_LeftEndPiece			;|

@@ -49,9 +49,9 @@
 ; 105 out of 200 HP -> (105-100) out of (200-100) HP -> 5 out of 100
 ; 95 out of 200 HP -> 95 out of (200-100) HP -> 95 out of 100
 ;
-;Note that this routine handles ONE range at a time, you have to
-;make tables and check if the boss's HP is between two numbers
-;in a table.
+;Note that this routine itself handles ONE range at a time, you have to
+;make tables and store two values in the table and check if the boss's
+;HP is between two numbers in a table to determine a phase.
 ;
 ;Another note is that if you have equal range sizes (2100, 200, 300)
 ;you can use division and the remainder is the fill amount while the
@@ -63,9 +63,11 @@
 ; -$04-$05 (16-bit): The maximal quantity
 ;Output:
 ; -$00-$01 (16-bit): The quantity, after subtracted by minimal quantity
-;                    (If quantity is < MIN, then return 0).
+;                    (If quantity is < MIN, then return 0). Essentially
+;                    how much from the minimum
 ; -$02-$03 (16-bit): The minimal quantity (same number as entered before)
 ; -$04-$05 (16-bit): The maximal quantity (subtracted by minimal quantity).
+;                    This will represent how big the range is.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 MapRangeToStartAt0:
 	REP #$20
