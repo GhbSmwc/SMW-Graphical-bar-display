@@ -48,7 +48,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 !GraphicalBar_RangeBased_RangeSize = 5
  ;^How big each range is. Only used when 
  ; !GraphicalBar_RangeBased_EvenDistribution = 1.
-!GraphicalBar_RangeBased_Segment = 25
+!GraphicalBar_RangeBased_HighestSegment = 5
  ;^The maximum segment when !GraphicalBar_RangeBased_EvenDistribution = 1.
  ; Once reached, displays a full bar.
 
@@ -79,13 +79,16 @@ main:
 	STA !Freeram_RangeBasedValue                            ;|
 	BRA +                                                   ;|
 
+	;Here is what limits the quantity from exceeding a certain value
 	..Up                                                    ;|
 	REP #$30                                                ;|
 	LDA !Freeram_RangeBasedValue                            ;|
 	if !GraphicalBar_RangeBased_EvenDistribution == 0
 		CMP.w RangeTableEnd-2                           ;|>Get last number in the table (# would pull out an address instead the number in the address)
-		BCS +                                           ;|
+	else
+		CMP.w #(!GraphicalBar_RangeBased_RangeSize*!GraphicalBar_RangeBased_HighestSegment)
 	endif
+	BCS +                                                   ;|
 	INC A                                                   ;|
 	STA !Freeram_RangeBasedValue                            ;/
 	
@@ -104,11 +107,12 @@ main:
 		INX #2                                                 ;|>Don't use index-2! 0 is the lowest that is valid.
 
 		..IntervalFound                                        ;|
+		;Prevent index from exceeding beyond table.
 		TXA                                                    ;|\Store index*2 here
 		STA !Scratchram_WhatRange                              ;|/
-		CPX.w #((RangeTableEnd-RangeTable)-4)                  ;|\Check if X is not pointing to areas beyond the table
-		BCC ..ValidRange                                       ;|/to avoid having another range as last number being the minimum and max being an invalid number.
-		LDX.w #((RangeTableEnd-RangeTable)-4)                  ;|>Cap the range if last number reached. (will also display 100% bar once this range be full, as all others will 0 out when at these intervals), note that index will increment with fill bar.
+		CPX.w #((RangeTableEnd-RangeTable)-4)                  ;|
+		BCC ..ValidRange                                       ;|
+		LDX.w #((RangeTableEnd-RangeTable)-4)                  ;|
 		
 		..ValidRange
 		LDA RangeTable,x                                       ;|\Miminum
@@ -141,6 +145,7 @@ main:
 		STA !Scratchram_GraphicalBar_FillByteTbl+2             ;|
 		SEP #$20                                               ;/
 	else
+		.EachSegmentSameSize
 		LDA !Freeram_RangeBasedValue                           ;\Quantity/RangeSize
 		STA $00                                                ;|$00 Quotent = what range
 		LDA.w #!GraphicalBar_RangeBased_RangeSize              ;|$02 Remainder = amount in bar.
@@ -148,10 +153,28 @@ main:
 		SEP #$30                                               ;|
 		JSL GraphicalBarELITE_MathDiv                          ;/
 		REP #$20
-		LDA $02
+		
+		;Prevents range "index" from exceeding max.
+		LDA $00
+		CMP.w #!GraphicalBar_RangeBased_HighestSegment
+		BCC ..NotHighestSegment
+
+		..HighestSegment
+		LDA.w #(!GraphicalBar_RangeBased_HighestSegment*!GraphicalBar_RangeBased_RangeSize)
 		STA !Scratchram_GraphicalBar_FillByteTbl
+		BRA ..WriteMaxRange                                    ;>Tell it to display QuantityAtHighest*5 out of 5 (beyond full bar but displays 100% anyways).
+		
+		;process handling the remainder as fill in bar and quotient
+		;to display as a single-digit number.
+		..NotHighestSegment
+		LDA $02                                                ;\Remainder as fill in bar
+		STA !Scratchram_GraphicalBar_FillByteTbl               ;/
+		
+		..WriteMaxRange
 		LDA.w #!GraphicalBar_RangeBased_RangeSize
 		STA !Scratchram_GraphicalBar_FillByteTbl+2
+		
+		..WriteQuotient
 		SEP #$20
 		LDA $00
 		STA !Interval_Write_Pos_Tile
