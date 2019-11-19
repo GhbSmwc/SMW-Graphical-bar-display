@@ -244,7 +244,7 @@ main:
 	;-If you are using this as a phase-based boss health bar, be aware that as the boss
 	; starts with full HP, this value will equal to the last number in the table.
 	; Since that last number is "separate" and not part of the previous index number
-	; (because all numbers are minimums to that index),  you'll have an additional
+	; (because all numbers are minimums to that index, not max),  you'll have an additional
 	; index that last for 1 HP.
 	;
 	; This means you have a first phase that is very short, lasting until the boss
@@ -254,6 +254,16 @@ main:
 	; in this case, if index_x is >= $04, then cap it to $02. This will cause the
 	; full HP amount to be included in the intended first phase at index_x = $02.
 	; See the comments to the right of the table.
+	;
+	; This NumberOfSegmentIndexes+1 range also applies to fixed range size as well
+	; (GraphicalBar_RangeBased_EvenDistribution = 1), due to the fact that the MODULO
+	; operations with integers results an output in the range of 0 to Divisor-1 (example:
+	; Y = X MOD 5 results Y to only be 0, 1, 2, 3 and 4 but not 5). Again limit the index
+	; should the quantity be equal (or greater than as a failsafe; BCS) to the last number.
+	;
+	;--Although you could simply have it so the last number in table is +1 from
+	;  the maximum HP (boss starts at 200 HP, however the table have 201 as the last
+	;  number), however it would cause the bar to never be 100% full (display 1-less from max).
 	;
 	;-When used as a level progression bar, thanks to the above information,
 	; it can be treated as the maximum exp and the last level up in which you can
