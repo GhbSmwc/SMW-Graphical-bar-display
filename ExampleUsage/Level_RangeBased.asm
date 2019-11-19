@@ -39,13 +39,31 @@
 incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
+!GraphicalBar_RangeBased_EvenDistribution = 0
+ ;^0 = Each range can have different sizes, based on a table
+ ;     defining the sizes.
+ ; 1 = Each range have the same sizes, and the bar advances
+ ;     every N amount.
+
+!GraphicalBar_RangeBased_RangeSize = 5
+ ;^How big each range is. Only used when 
+ ; !GraphicalBar_RangeBased_EvenDistribution = 1.
+!GraphicalBar_RangeBased_Segment = 25
+ ;^The maximum segment when !GraphicalBar_RangeBased_EvenDistribution = 1.
+ ; Once reached, displays a full bar.
+
+!ControlerToChangeQuantity = $15
+;^$15 = press and hold
+; $16 = 1-frame presses (tap repeatedly)
+
+
 ;This is a simple test ASM using the graphical bar.
 ;best tested using uberasm tool.
 
 main:
 ;Increment or decrement quantity based on up/down controls:
 .Control
-	LDA $15                                                 ;\Control quantity based on tapping up and down.
+	LDA !ControlerToChangeQuantity                          ;\Control quantity based on tapping up and down.
 	BIT.b #%00000100                                        ;|
 	BNE ..Down                                              ;|
 	BIT.b #%00001000                                        ;|
@@ -64,57 +82,84 @@ main:
 	..Up                                                    ;|
 	REP #$30                                                ;|
 	LDA !Freeram_RangeBasedValue                            ;|
-	CMP.w RangeTableEnd-2                                   ;|>Get last number in the table (# would pull out an address instead the number in the address)
-	BCS +                                                   ;|
+	if !GraphicalBar_RangeBased_EvenDistribution == 0
+		CMP.w RangeTableEnd-2                           ;|>Get last number in the table (# would pull out an address instead the number in the address)
+		BCS +                                           ;|
+	endif
 	INC A                                                   ;|
 	STA !Freeram_RangeBasedValue                            ;/
 	
 	+
-	;This here is where it calculate what interval and how much fill
-	;in between two numbers starting from the lower number of the two.
-	.IntervalRange
-	LDX.w #(RangeTableEnd-RangeTable)-2                    ;\Search what range quantity is on.
-	..Loop                                                 ;|
-	LDA !Freeram_RangeBasedValue                           ;|Starts at the last index, compares 
-	CMP RangeTable,x                                       ;|if quantity >= to the number in the table
-	BCS ..IntervalFound                                    ;|and found if true, will have that index.
-	DEX #2                                                 ;|
-	BPL ..Loop                                             ;|
-	INX #2                                                 ;|>Don't use index-2! 0 is the lowest that is valid.
+	if !GraphicalBar_RangeBased_EvenDistribution == 0
+		;This here is where it calculate what interval and how much fill
+		;in between two numbers starting from the lower number of the two.
+		.IntervalRange
+		LDX.w #(RangeTableEnd-RangeTable)-2                    ;\Search what range quantity is on.
+		..Loop                                                 ;|
+		LDA !Freeram_RangeBasedValue                           ;|Starts at the last index, compares 
+		CMP RangeTable,x                                       ;|if quantity >= to the number in the table
+		BCS ..IntervalFound                                    ;|and found if true, will have that index.
+		DEX #2                                                 ;|
+		BPL ..Loop                                             ;|
+		INX #2                                                 ;|>Don't use index-2! 0 is the lowest that is valid.
 
-	..IntervalFound                                        ;|
-	TXA                                                    ;|\Store index*2 here
-	STA !Scratchram_WhatRange                              ;|/
-	CPX.w #((RangeTableEnd-RangeTable)-4)                  ;|\Check if X is not pointing to areas beyond the table
-	BCC ..ValidRange                                       ;|/to avoid having another range as last number being the minimum and max being an invalid number.
-	LDX.w #((RangeTableEnd-RangeTable)-4)                  ;|>Cap the range if last number reached. (will also display 100% bar once this range be full, as all others will 0 out when at these intervals), note that index will increment with fill bar.
-	
-	..ValidRange
-	LDA RangeTable,x                                       ;|\Miminum
-	STA $02                                                ;|/
-	+
-	..WriteIntervalNumber
-	SEP #$20                                               ;|\Take 16-bit interval number, take only the low byte, and write to status bar (up to 9 is displayed)
-	LDA !Scratchram_WhatRange                              ;||(SEP #$20 instead of #$30 to keep X and Y register's high bytes intact)
-	LSR                                                    ;||To display more than 9, consider using hexdec routine.
-	STA !Interval_Write_Pos_Tile                           ;||
-	REP #$20                                               ;|/
-	
-	..InsertMinMax
-	INX #2                                                 ;|>Next number in table (minimum X=$0000 after this).
-	LDA RangeTable,x                                       ;|\Maximum
-	STA $04                                                ;|/
-	LDA !Freeram_RangeBasedValue                           ;|\Quantity
-	STA $00                                                ;//
-	SEP #$30
-	
-	JSL GraphicalBarOtherRoutines_MapRangeToStartAt0       ;>Convert range to where MIN is 0.
-	REP #$20                                               ;\Insert mapped range and value.
-	LDA $00                                                ;|
-	STA !Scratchram_GraphicalBar_FillByteTbl               ;|
-	LDA $04                                                ;|
-	STA !Scratchram_GraphicalBar_FillByteTbl+2             ;|
-	SEP #$20                                               ;/
+		..IntervalFound                                        ;|
+		TXA                                                    ;|\Store index*2 here
+		STA !Scratchram_WhatRange                              ;|/
+		CPX.w #((RangeTableEnd-RangeTable)-4)                  ;|\Check if X is not pointing to areas beyond the table
+		BCC ..ValidRange                                       ;|/to avoid having another range as last number being the minimum and max being an invalid number.
+		LDX.w #((RangeTableEnd-RangeTable)-4)                  ;|>Cap the range if last number reached. (will also display 100% bar once this range be full, as all others will 0 out when at these intervals), note that index will increment with fill bar.
+		
+		..ValidRange
+		LDA RangeTable,x                                       ;|\Miminum
+		STA $02                                                ;|/
+		+
+		..WriteIntervalNumber
+		SEP #$20                                               ;|\Take 16-bit interval number, take only the low byte, and write to status bar (up to 9 is displayed)
+		LDA !Scratchram_WhatRange                              ;||(SEP #$20 instead of #$30 to keep X and Y register's high bytes intact)
+		LSR                                                    ;||To display more than 9, consider using hexdec routine.
+		STA !Interval_Write_Pos_Tile                           ;||
+		if !StatusBar_UsingCustomProperties != 0
+			LDA.b #!Default_StatusBar_TilePropertiesSetting
+			STA !Interval_Write_Pos_Properties
+		endif
+		REP #$20                                               ;|/
+		
+		..InsertMinMax
+		INX #2                                                 ;|>Next number in table (minimum X=$0000 after this).
+		LDA RangeTable,x                                       ;|\Maximum
+		STA $04                                                ;|/
+		LDA !Freeram_RangeBasedValue                           ;|\Quantity
+		STA $00                                                ;//
+		SEP #$30
+		
+		JSL GraphicalBarOtherRoutines_MapRangeToStartAt0       ;>Convert range to where MIN is 0.
+		REP #$20                                               ;\Insert mapped range and value.
+		LDA $00                                                ;|
+		STA !Scratchram_GraphicalBar_FillByteTbl               ;|
+		LDA $04                                                ;|
+		STA !Scratchram_GraphicalBar_FillByteTbl+2             ;|
+		SEP #$20                                               ;/
+	else
+		LDA !Freeram_RangeBasedValue                           ;\Quantity/RangeSize
+		STA $00                                                ;|$00 Quotent = what range
+		LDA.w #!GraphicalBar_RangeBased_RangeSize              ;|$02 Remainder = amount in bar.
+		STA $02                                                ;|
+		SEP #$30                                               ;|
+		JSL GraphicalBarELITE_MathDiv                          ;/
+		REP #$20
+		LDA $02
+		STA !Scratchram_GraphicalBar_FillByteTbl
+		LDA.w #!GraphicalBar_RangeBased_RangeSize
+		STA !Scratchram_GraphicalBar_FillByteTbl+2
+		SEP #$20
+		LDA $00
+		STA !Interval_Write_Pos_Tile
+		if !StatusBar_UsingCustomProperties != 0
+			LDA.b #!Default_StatusBar_TilePropertiesSetting
+			STA !Interval_Write_Pos_Properties
+		endif
+	endif
 
 	;Process graphical bar.
 	.ProcessGraphicalBar
@@ -206,8 +251,10 @@ main:
 	; -Therefore, you can have 16,384 ($4000) items in table on a 16-bit index and 16-bit table numbers.
 	
 	;Table comments here assumes you're using it as a phase-based boss HP bar.
-	RangeTable:
-	dw 0                   ;>item number 0 (index_x = $00) (quantity: 0-100)
-	dw 101                 ;>item number 1 (index_x = $02) (quantity: 101-199 (supposed to be 101-200, but all numbers, even the last, are minimums), the intended first phase)
-	dw 200                 ;>item number 2 (index_x = $04) (quantity: 200 (max health), the unintended "full health phase")
-	RangeTableEnd:
+	if !GraphicalBar_RangeBased_EvenDistribution == 0
+		RangeTable:
+		dw 0                   ;>item number 0 (index_x = $00) (quantity: 0-100)
+		dw 101                 ;>item number 1 (index_x = $02) (quantity: 101-199 (supposed to be 101-200, but all numbers, even the last, are minimums), the intended first phase)
+		dw 200                 ;>item number 2 (index_x = $04) (quantity: 200 (max health), the unintended "full health phase")
+		RangeTableEnd:
+	endif

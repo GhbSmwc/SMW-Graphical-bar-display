@@ -24,7 +24,7 @@
 		endif
 	endif
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;Convert range of two numbers as a percentage
+;Convert range of two numbers to a zero-based range.
 ;Basically this is the same as HTML's "meter" tag, allowing you to map
 ;MIN number to 0 on the bar and MAX to a full bar. If the number is out
 ;of range, would either display empty on the bar or full. This is useful
@@ -53,7 +53,7 @@
 ;make tables and store two values in the table and check if the boss's
 ;HP is between two numbers in a table to determine a phase.
 ;
-;Another note is that if you have equal range sizes (2100, 200, 300)
+;Another note is that if you have equal range sizes (100, 200, 300)
 ;you can use division and the remainder is the fill amount while the
 ;quotient is what bar the HP number is on.
 ;

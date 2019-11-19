@@ -223,7 +223,25 @@
 
   !Freeram_SecondQuantity = $5C
    ;^[1 byte] The amount of fill for the second fill
-   
+
+ ;RAM testing for Range-based bar:
+  !Freeram_RangeBasedValue = $0DDB|!addr
+   ;^[2 bytes] The value to test what range it is in (quantity).
+  !Scratchram_WhatRange = $14B0|!addr
+   ;^[2 bytes] Range number of what interval the quantity is in.
+  if !sa1 == 0
+   !Interval_Write_Pos_Tile = $7FA014
+  else
+   !Interval_Write_Pos_Tile = $404014
+  endif
+   ;^Where to write a single-digit number on the status bar indicating what
+   ; range the quantity is in.
+  if !sa1 == 0
+   !Interval_Write_Pos_Properties = $7FA015
+  else
+   !Interval_Write_Pos_Properties = $404015
+  endif
+   ;^Same as above but tile properties.
  ;Display type
   !DoubleBar_DisplayType = 1
    ;0 = Use alternating frames (rapid flicker). Must use
