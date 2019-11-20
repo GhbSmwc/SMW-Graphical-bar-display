@@ -13,7 +13,8 @@
 ;other settings:
 !GraphicalBarExampleTest_StaticEnd_ExtendLeft = 0
 !GraphicalBarExampleTest_Length = 30
- ;^Maximum middle length (this alone excludes the static end tiles.).
+ ;^Maximum middle length (this alone excludes the static end tiles.). Also used to write blank tiles
+ ; prior to drawing the bar to remove "ghost tiles" (duplicate tiles when the bar shortens).
 ;Some tile number, properties, and positioning settings:
 !GraphicalBarExampleTest_LeftSideTileNum = $29
 !GraphicalBarExampleTest_LeftSideTileProps = %00111000
