@@ -296,7 +296,7 @@ Here are the formulas on how each are calculated:<br><br>
 <li><kbd>TotalMiddleMax = MiddleLength * MiddleMaxEachTile</kbd> (total number of pieces in the middle part of the bar)</li>
 <li><kbd>MiddleFill = clamp((TotalFilled - LeftEndMax), 0, TotalMiddleMax)</kbd> (excluding the left end, how many pieces filled in the whole middle)</li>
 <li><kbd>NumberOfFullMiddleTiles = clamp(floor(MiddleFill/MiddleMaxEachTile), 0, MiddleLength)</kbd> (<a href="https://en.wikipedia.org/wiki/Euclidean_division">euclidean division</a>)</li>
-<li><kbd>MiddleFractionFill = MiddleFill MOD MiddleMaxEachTile</kbd> (<a href="https://en.wikipedia.org/wiki/Euclidean_division">euclidean division</a>, placed just after the last full middle tile or
+<li><kbd>MiddleFractionFill = MiddleFill MOD MiddleMaxEachTile</kbd> (euclidean division), placed just after the last full middle tile or
 on the first middle tile if there are no full middle tiles, if the entire middle tiles is full, fraction is not written at all)</li>
 </ul>
 <li>Right end:</li>
@@ -816,8 +816,10 @@ Akaginite's <kbd>16Bit - 8Bit</kbd> (done by <kbd>((-8Bit) + 16Bit</kbd>)) does 
 to be clear, unlike the normal SBC. However, this is very unlikely as no status bar tile tables would ever do that.</li><br>
 <li><span id="StaticEndRoutine">Static end tiles handlers (this calculates where to write the static end tiles based on the length of the bar and also writes to tile number and properties).
 <ul>
-<li><kbd>WriteBarStaticTileToHUDLeftside</kbd>: Writes tile for the left side of the bar (a tile just before the bar's leftmost tile).</li>
-<li><kbd>WriteBarStaticTileToHUDRightside</kbd>: Same as above but for the rightside.</li><br>
+<li><kbd>WriteBarStaticTileToHUDLeftside</kbd>: Writes tile for the left side of the bar (a tile just before the bar's leftmost tile). Writes at <kbd>RAMAddressIn00 - TileFormat</kbd> for
+a bar that extend rightwards and <kbd>RAMAddressIn00 - (NumberOfTiles*TileFormat)</kbd> for leftwards.</li>
+<li><kbd>WriteBarStaticTileToHUDRightside</kbd>: Same as above but for the rightside. Writes at <kbd>RAMAddressIn00 + (NumberOfTiles*TileFormat)</kbd> for extend-right bars and
+<kbd>RAMAddressIn00 + TileFormat</kbd> for extend-left.</li><br>
 </ul><br>
 If you use <kbd>BarExtendLeft</kbd>, execute that routine, and then this static end tile handler, as that routine modifies the area where to write the bar.
 
