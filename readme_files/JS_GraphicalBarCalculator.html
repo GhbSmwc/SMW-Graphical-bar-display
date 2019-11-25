@@ -287,20 +287,21 @@ and write tile bytes at and <b>before</b>) this.</label><br></td>
 						OutputDisplay += (" (tile properties: <kbd>" + DisplaySignedHexString((parseInt(StatBarAddressBarPos, 16) - ((BarBytesTotal-1) * StatusBarTileFormat)) + 1) + "</kbd> to <kbd>$" + (parseInt(StatBarAddressBarPos, 16) + 1).toString(16).toUpperCase() + "</kbd>)")
 					}
 				}
-				
 				OutputDisplay += "</td>"
+				OutputDisplay += "</tr>"
 				if ((document.getElementById("LeftsideStaticTile").checked == true) || (document.getElementById("RightsideStaticTile").checked == true)) {
-					OutputDisplay += "</tr>"
-					OutputDisplay += "<td>Static end tiles status bar/Overworld write location:</td>"
-					OutputDisplay += "<td>"
+					OutputDisplay += "<tr>"
+					OutputDisplay += "<td rowspan='2'>Static end tiles status bar/Overworld write location:</td>"
 					if (document.getElementById("LeftsideStaticTile").checked == true) {
+						OutputDisplay += "<td>"
 						OutputDisplay += "Leftside tile: <kbd>" + DisplaySignedHexString((parseInt(StatBarAddressBarPos, 16) - StatusBarTileFormat) - (DisplacementExtendLeftwards*StatusBarTileFormat)) + "</kbd>"
 						if (StatusBarTileFormat == 2) {
 							OutputDisplay += " (tile properties: <kbd>" + DisplaySignedHexString((parseInt(StatBarAddressBarPos, 16) - StatusBarTileFormat) - (DisplacementExtendLeftwards*StatusBarTileFormat) + 1) + "</kbd>)"
 						}
-						OutputDisplay += "<br>"
+						OutputDisplay += "</td></tr>"
 					}
 					if (document.getElementById("RightsideStaticTile").checked == true) {
+						OutputDisplay += "<tr><td>"
 						if (document.getElementById("ExtendLeftwards").checked == false) {
 							OutputDisplay += "Rightside tile: <kbd>" + DisplaySignedHexString((parseInt(StatBarAddressBarPos, 16)) + (BarBytesTotal)*StatusBarTileFormat) + "</kbd>"
 						} else {
@@ -313,11 +314,10 @@ and write tile bytes at and <b>before</b>) this.</label><br></td>
 								OutputDisplay += " (tile properties: <kbd>" + DisplaySignedHexString(((parseInt(StatBarAddressBarPos, 16)) + StatusBarTileFormat)+1) + "</kbd>)"
 							}
 						}
+						OutputDisplay += "</td></tr>"
 					}
-					OutputDisplay += "</td>"
-					OutputDisplay += "<tr>"
-				}
 					OutputDisplay += "</tr>"
+				}
 				OutputDisplay += "</table><br><br></div>"
 				//Calculate the array of values (simulates the !Scratchram_GraphicalBar_FillByteTbl after running DrawGrap)
 				//Since javascript cannot have variable array length, I had to choose the maximum possible: 257 (255 middle tiles + 2 end tiles;
