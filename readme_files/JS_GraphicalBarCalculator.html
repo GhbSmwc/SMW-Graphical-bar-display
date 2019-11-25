@@ -260,7 +260,7 @@ and write tile bytes at and <b>before</b>) this.</label><br></td>
 			} else {
 				OutputDisplay += "<div class='StatisticsTable'><table>"
 				OutputDisplay += "<tr>"
-				OutputDisplay += "<td>Tile bytes used: <br>(<kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> and tiles on status bar.)</td>"
+				OutputDisplay += "<td>Tile bytes used (excluding static end tiles): <br>(<kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> and tiles on status bar.)</td>"
 				OutputDisplay += "<td><kbd>" + parseInt(BarBytesTotal) + "</kbd> (<kbd>$" + parseInt(BarBytesTotal).toString(16).toUpperCase() + "</kbd>) tile byte(s) (indexes <kbd>$0</kbd> to <kbd>$" + parseInt(LeftEndExist + MiddleExist + RightEndExist - 1).toString(16).toUpperCase() + "</kbd>)</td>"
 				OutputDisplay += "</tr>"
 				OutputDisplay += "<tr>"
@@ -272,7 +272,7 @@ and write tile bytes at and <b>before</b>) this.</label><br></td>
 				OutputDisplay += "<td><kbd>" + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)) + "</kbd> (<kbd>$" + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)).toString(16).toUpperCase() + "</kbd>)</td>"
 				OutputDisplay += "</tr>"
 				OutputDisplay += "<tr>"
-				OutputDisplay += "<td>Status bar/Overworld RAM address range (tile number, limits included):</td>"
+				OutputDisplay += "<td>Status bar/Overworld RAM address range (tile number, limits included, excluding static end tiles):</td>"
 				OutputDisplay += "<td>"
 				
 				if (document.getElementById("ExtendLeftwards").checked == false) {
