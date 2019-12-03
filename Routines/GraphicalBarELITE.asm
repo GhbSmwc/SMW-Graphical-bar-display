@@ -309,7 +309,7 @@ CalculateGraphicalBarPercentage:
 ;
 ; (2.b) Otherwise [CupAmount[n] = FillAmount], and then FillAmount is exhausted (FillAmount = 0).
 ;
-; Then move on to the next cup (n increments by 1) and repeat back to (1)
+; Then move on to the next cup (n increments by 1) and repeat back to (1) until n equals to NumberOfCups.
 ;
 ;Notes:
 ; -This routine output only have 1 partially filled (non-full and non-empty)
