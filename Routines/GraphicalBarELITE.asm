@@ -299,7 +299,7 @@ CalculateGraphicalBarPercentage:
 ;
 ; An analogy is you fill a cup of water until it's full, then the next
 ; cup until it's full, until you got all the cups full or have run out
-; of water:
+; of water (repeated subtraction until no more is left):
 ;
 ; (1) FillAmount compares with the capacity of the cup.
 ;
