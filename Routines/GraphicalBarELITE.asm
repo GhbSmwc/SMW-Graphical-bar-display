@@ -281,7 +281,7 @@ CalculateGraphicalBarPercentage:
 ;division, but the end tiles may have different max amounts.
 ;
 ; Note that this data is always stored in this order, even on a leftwards
-;bar (its up to the write tile routine to  invert the order).
+; bar (its up to the write tile routine to  invert the order).
 ;
 ; Example:
 ; -Left and right end tiles have 3 pieces (therefore ends are 3-max)
@@ -299,7 +299,17 @@ CalculateGraphicalBarPercentage:
 ;
 ; An analogy is you fill a cup of water until it's full, then the next
 ; cup until it's full, until you got all the cups full or have run out
-; of water.
+; of water:
+;
+; (1) FillAmount compares with the capacity of the cup.
+;
+; (2.a) If FillAmount is greater or equal: Then [CupAmount[n] = CupCapicity[n]] (full cup) and
+; then [FillAmount = FillAmount - CupCapicity[n]] (amount taken out of FillAmount and then
+; added into the cup).
+;
+; (2.b) Otherwise [CupAmount[n] = FillAmount], and then FillAmount is exhausted (FillAmount = 0).
+;
+; Then move on to the next cup (n increments by 1) and repeat back to (1)
 ;
 ;Notes:
 ; -This routine output only have 1 partially filled (non-full and non-empty)
