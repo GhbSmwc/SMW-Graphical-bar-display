@@ -235,7 +235,7 @@ and write tile bytes at and <b>before</b>) this.</label><br></td>
 				OutputDisplay += "<td><kbd>$" + parseInt(BarTileTableRAM, 16).toString(16).toUpperCase() + "</kbd> to <kbd>$" + (parseInt(BarTileTableRAM, 16) + parseInt(BarBytesTotal, 10) - 1).toString(16).toUpperCase() + "</kbd></td>"
 				OutputDisplay += "</tr>"
 				OutputDisplay += "<tr>"
-				OutputDisplay += "<td>Total pieces (for full bar):</td>"
+				OutputDisplay += "<td>Total pieces (maximum amount, for full bar):</td>"
 				OutputDisplay += "<td><kbd>" + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)) + "</kbd> (<kbd>$" + parseInt(parseInt(LeftEndPiece) + (parseInt(MiddlePiece)*parseInt(MiddleLength)) + parseInt(RightEndPiece)).toString(16).toUpperCase() + "</kbd>)</td>"
 				OutputDisplay += "</tr>"
 				OutputDisplay += "<tr>"
