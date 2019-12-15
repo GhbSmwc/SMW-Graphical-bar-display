@@ -608,6 +608,129 @@ DrawGraphicalBar:
 	.Done
 	SEP #$30					;>8-bit AXY
 	RTL
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;Convert amount of fill to each fill per byte, repeated subtraction edition.
+;
+;Same as the other version, however does not use multiplication and division
+;routines. 
+;
+;Input:
+; -$00 to $01: The amount of fill for the WHOLE bar.
+; -!Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
+;  the maximum amount of fill for this byte itself. If 0, it's not included in table.
+; -!Scratchram_GraphicalBar_MiddlePiece: Same as above but each middle byte.
+; -!Scratchram_GraphicalBar_RightEndPiece: Same as above but for right end.
+; -!Scratchram_GraphicalBar_TempLength: The length of the bar (only counts
+;   middle bytes)
+;Output:
+; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+EndAddress:
+;  A table array containing the amount of fill for each byte, explained previously.
+; -$00 to $01: The leftover fill amount. If bar isn't full, it will be #$0000, otherwise its
+;  [RemainingFill = OriginalFill - EntireBarCapicity].
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+DrawGraphicalBarSubtractionLoopEdition:
+	LDX #$00
+.Leftend
+	LDA !Scratchram_GraphicalBar_LeftEndPiece       ;\If left end does not exist, skip
+	BEQ .Middle                                     ;/
+	LDA $00                                         ;\Fillamount = Fillamount - MaxAmount (without writing to $00)
+	SEC                                             ;|(SBC clears carry if an unsigned underflow occurs (x < 0))
+	SBC !Scratchram_GraphicalBar_LeftEndPiece       ;|
+	LDA $01                                         ;|
+	SBC #$00                                        ;/
+	BCC ..NotFull                                   ;>If Fillamount < MaxAmount, use all remaining $00.
+	
+	..Full
+	LDA !Scratchram_GraphicalBar_LeftEndPiece       ;\Full left end.
+	STA !Scratchram_GraphicalBar_FillByteTbl        ;/
+	LDA $00                                         ;\Fill amount deducted.
+	SEC                                             ;|
+	SBC !Scratchram_GraphicalBar_LeftEndPiece       ;|
+	STA $00                                         ;|
+	LDA $01                                         ;|
+	SBC #$00                                        ;|
+	STA $01                                         ;/
+	BRA ..NextByte
+	
+	..NotFull
+	LDA $00                                         ;\Take all the rest of $00.
+	STA !Scratchram_GraphicalBar_FillByteTbl        ;|
+	STZ $00                                         ;|
+	STZ $01                                         ;/
+	
+	..NextByte
+	INX                                             ;>Next tile byte
+.Middle
+	LDA !Scratchram_GraphicalBar_MiddlePiece        ;\If middle does not exist, skip
+	BEQ .RightEnd                                   ;|
+	LDA !Scratchram_GraphicalBar_TempLength         ;|
+	BEQ .RightEnd                                   ;/
+	
+	LDA !Scratchram_GraphicalBar_TempLength         ;\Loop counter for number of middle tiles.
+	TAY                                             ;/
+	
+	..LoopMiddleTiles
+	LDA $00                                         ;\Fillamount = Fillamount - MaxAmount (without writing to $00)
+	SEC                                             ;|(SBC clears carry if an unsigned underflow occurs (x < 0))
+	SBC !Scratchram_GraphicalBar_MiddlePiece        ;|
+	LDA $01                                         ;|
+	SBC #$00                                        ;/
+	BCC ..NotFull                                   ;>If Fillamount < MaxAmount, use all remaining $00.
+	
+	..Full
+	LDA !Scratchram_GraphicalBar_MiddlePiece        ;\Full middle tile.
+	STA !Scratchram_GraphicalBar_FillByteTbl,x      ;/
+	LDA $00                                         ;\Fill amount deducted.
+	SEC                                             ;|
+	SBC !Scratchram_GraphicalBar_MiddlePiece        ;|
+	STA $00                                         ;|
+	LDA $01                                         ;|
+	SBC #$00                                        ;|
+	STA $01                                         ;/
+	BRA ..NextByte
+	
+	..NotFull
+	LDA $00                                         ;\Take all the rest of $00.
+	STA !Scratchram_GraphicalBar_FillByteTbl,x      ;|
+	STZ $00                                         ;|
+	STZ $01                                         ;/
+	
+	..NextByte
+	INX                                             ;>Next middle tile or to the right end.
+	DEY                                             ;\Loop till all middle tiles done.
+	BNE ..LoopMiddleTiles                           ;/
+.RightEnd
+	LDA !Scratchram_GraphicalBar_RightEndPiece      ;\If right end does not exist, skip
+	BEQ .Done                                       ;/
+
+	LDA $00                                         ;\Fillamount = Fillamount - MaxAmount (without writing to $00)
+	SEC                                             ;|(SBC clears carry if an unsigned underflow occurs (x < 0))
+	SBC !Scratchram_GraphicalBar_RightEndPiece      ;|
+	LDA $01                                         ;|
+	SBC #$00                                        ;/
+	BCC ..NotFull                                   ;>If Fillamount < MaxAmount, use all remaining $00.
+	
+	..Full
+	LDA !Scratchram_GraphicalBar_RightEndPiece      ;\Full right end.
+	STA !Scratchram_GraphicalBar_FillByteTbl,x      ;/
+	LDA $00                                         ;\Fill amount deducted.
+	SEC                                             ;|
+	SBC !Scratchram_GraphicalBar_RightEndPiece      ;|
+	STA $00                                         ;|
+	LDA $01                                         ;|
+	SBC #$00                                        ;|
+	STA $01                                         ;/
+	BRA .Done
+	
+	..NotFull
+	LDA $00                                         ;\Take all the rest of $00.
+	STA !Scratchram_GraphicalBar_FillByteTbl,x      ;|
+	STZ $00                                         ;|
+	STZ $01                                         ;/
+.Done
+	RTL
+
+;Other subroutines use by the outer subroutines.
 if !Setting_Beta32bitMultiplication != 0
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Unsigned 32bit * 32bit Multiplication
