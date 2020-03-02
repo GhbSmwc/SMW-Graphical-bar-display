@@ -2,6 +2,8 @@
 ;-This is a preset setting, made for specific bars and not for all of them.
 ;-The main define file covers all stuff using the graphical bar routines.
 ;
+;This also contains many defines for example code testing.
+;
 ; NOTE: the overworld border plus (OWB+) and the super status bar (SSB) patch uses the same tile data
 ; format, so make sure you set !StatusBarFormat to $02 and !StatusBar_UsingCustomProperties to 1.
 ; I recommend using the SSB along with the OWB+ patch if you want to test both levels and overworld
@@ -194,8 +196,8 @@
 ;Double bar. Only works with the super status bar patch.
 	!Setting_DoubleBar_FillMode = 0
 		;^0 = manually control how much fill for both bars.
-		; 1 = Control only firstfill with secondfill gradually follows
-		;     the firstfill.
+		; 1-255 = Control only firstfill with secondfill gradually follows
+		;  the firstfill, this also acts as how much delay (in frames).
 
 	if !sa1 == 0
 		!FirstFillHexValDisplayPos           = $7FA036

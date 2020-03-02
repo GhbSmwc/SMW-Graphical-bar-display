@@ -15,6 +15,10 @@
 ;For easy testing, up and down on the D-pad adjust FirstFill, left and right adjusts
 ;SecondFill.
 ;
+;If you set !Setting_DoubleBar_FillMode = 0, you can control both fills individually,
+;otherwise if 1, then secondfill acts as a trailing bar to represent the previous value
+;of firstfill.
+;
 ;Notes:
 ;
 ; -Be very careful, that since layer tiles cannot overlap each other, they are merged
@@ -54,49 +58,85 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
 main:
 .IncrementDecrementTest
-..Vertical
+..HandleFirstFill
 	LDA $15				;\Pressing up and down to adjust firstfill value
 	BIT.b #%00001000		;|
 	BNE ...Up			;|
 	BIT.b #%00000100		;|
 	BNE ...Down			;/
-	BRA ..Horizontal		
+	BRA ..HandleSecondFill		
 	
 	...Up
 	LDA !Freeram_FirstQuantity
 	CMP #!DoubleBar_MaxQuantity
-	BEQ ..Horizontal
+	BEQ ..HandleSecondFill
 	INC A
 	STA !Freeram_FirstQuantity
-	BRA ..Horizontal
+	if !Setting_DoubleBar_FillMode != 0
+		LDA.b #!Setting_DoubleBar_FillMode
+		STA !Freeram_SecondQuantityDelay
+	endif
+	BRA ..HandleSecondFill
 	
 	...Down
 	LDA !Freeram_FirstQuantity
-	BEQ ..Horizontal
+	BEQ ..HandleSecondFill
 	DEC A
 	STA !Freeram_FirstQuantity
+	if !Setting_DoubleBar_FillMode != 0
+		LDA.b #!Setting_DoubleBar_FillMode
+		STA !Freeram_SecondQuantityDelay
+	endif
 	
-	..Horizontal
-	LDA $15				;\SecondFill control
-	BIT.b #%00000010		;|
-	BNE ...Left			;|
-	BIT.b #%00000001		;|
-	BNE ...Right			;/
-	BRA .DisplayFillAmount
-	
-	...Left
-	LDA !Freeram_SecondQuantity
-	BEQ .DisplayFillAmount
-	DEC A
-	STA !Freeram_SecondQuantity
-	BRA .DisplayFillAmount
-	
-	...Right
-	LDA !Freeram_SecondQuantity
-	CMP #!DoubleBar_MaxQuantity
-	BEQ .DisplayFillAmount
-	INC A
-	STA !Freeram_SecondQuantity
+	..HandleSecondFill
+	if !Setting_DoubleBar_FillMode == 0
+		LDA $15				;\SecondFill control
+		BIT.b #%00000010		;|
+		BNE ...Left			;|
+		BIT.b #%00000001		;|
+		BNE ...Right			;/
+		BRA .DisplayFillAmount
+		
+		...Left
+		LDA !Freeram_SecondQuantity
+		BEQ .DisplayFillAmount
+		DEC A
+		STA !Freeram_SecondQuantity
+		BRA .DisplayFillAmount
+		
+		...Right
+		LDA !Freeram_SecondQuantity
+		CMP #!DoubleBar_MaxQuantity
+		BEQ .DisplayFillAmount
+		INC A
+		STA !Freeram_SecondQuantity
+	else
+		LDA !Freeram_SecondQuantityDelay
+		BEQ ...ChangeTowardsFirstQuantity
+		DEC
+		STA !Freeram_SecondQuantityDelay
+		BRA ...StayFrozen
+		
+		...ChangeTowardsFirstQuantity
+		LDA !Freeram_SecondQuantity
+		CMP !Freeram_FirstQuantity
+		BEQ ...Same
+		BCC ...Increment
+		
+		...Decrement
+		DEC A
+		BRA ...Write
+		
+		...Increment
+		INC A
+		BRA ...Write
+		
+		...Write
+		STA !Freeram_SecondQuantity
+		
+		...StayFrozen
+		...Same
+	endif
 	
 .DisplayFillAmount
 	;This displays the hex numbers representing the two fills in the bar.
@@ -118,6 +158,9 @@ main:
 	endif
 
 .GraphicalDoubleBarTest
+;;;;;;;;;;;;
+;Firstfill
+;;;;;;;;;;;;
 	if !DoubleBar_DisplayType == 0
 		LDA !Freeram_SecondQuantity		;\If secondfill is less than firstfill, don't show secondfill.
 		CMP !Freeram_FirstQuantity		;|over firstfill
@@ -167,15 +210,18 @@ main:
 		STA !FirstFillPercentHexValDisplayPos+(1*!StatusBarFormat)	;/
 	endif
 	JSL GraphicalBarELITE_DrawGraphicalBar
+;;;;;;;;;;;;
+;SecondFill
+;;;;;;;;;;;;
 	if !DoubleBar_DisplayType == 0
 		JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles
 	else
 		...TransferFirstFillBar ;>FirstFill will be located just after SecondFill in memory address: <SecondFill_Table><FirstFill_Table>
 		PHB
 		REP #$30
-		LDA.w #!GraphicalBar_TotalTileUsed-1									;>Number of bytes to transfer, -1 (because byte 0 is included)
+		LDA.w #!GraphicalBar_TotalTileUsed-1								;>Number of bytes to transfer, -1 (because byte 0 is included)
 		LDX.w #!Scratchram_GraphicalBar_FillByteTbl							;>Source address
-		LDY.w #!Scratchram_GraphicalBar_FillByteTbl+!GraphicalBar_TotalTileUsed					;>Destination address
+		LDY.w #!Scratchram_GraphicalBar_FillByteTbl+!GraphicalBar_TotalTileUsed				;>Destination address
 		MVN (!Scratchram_GraphicalBar_FillByteTbl>>16), (!Scratchram_GraphicalBar_FillByteTbl>>16)	;>Move them
 		SEP #$30
 		PLB
@@ -185,7 +231,7 @@ main:
 		;you only need to set them once.
 		LDA !Freeram_SecondQuantity					;\Amount of fill for second fill
 		STA !Scratchram_GraphicalBar_FillByteTbl		;/
-		JSR GetPercentageQuantity
+		JSR GetPercentageQuantity				;>Rewrite the values used for the percentage.
 		JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
 		if !DoubleBar_RoundAway != 0
 			JSL GraphicalBarELITE_RoundAwayEmptyFull
@@ -201,6 +247,9 @@ main:
 		JSL GraphicalBarELITE_DrawGraphicalBar					;>Get amount of fill.
 		JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTilesDoubleBar
 	endif
+;;;;;;;;;;;;;;;;;;;;;;;;
+;Write to HUD
+;;;;;;;;;;;;;;;;;;;;;;;;
 	LDA.b #!Default_GraphicalBar_Pos_Tile
 	STA $00
 	LDA.b #!Default_GraphicalBar_Pos_Tile>>8
