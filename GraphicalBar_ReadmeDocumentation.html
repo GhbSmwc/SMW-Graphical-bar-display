@@ -21,7 +21,7 @@
 <center><h1>Graphical Bar ELITE</h1><br>
 By <a href="https://www.smwcentral.net/?p=profile&id=18802">GreenHammerBro</a><br>
 See <a href="https://github.com/GhbSmwc/SMW-Graphical-bar-display">github</a>.</center>
-<hr>
+
 <h2>Introduction</h2>
 This is a guide on how to setup a display of a value of something as a graphical bar that you see in many games. Unlike some hacks like SMWCP2 and
 brutal Mario (both as health bars), which are 1-unit (or piece) per tile being displayed, this package contains code to display multiple units per tile
@@ -38,7 +38,17 @@ something, etc. as opposed to merely displaying digits.<br><br>
 <li>Routines presented here assumes you are using uberasm tool and does not expect you to use on other things like sprites, so routine calls that are outside the routine files are
 named <span class="NoLineBreak"><kbd>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</kbd></span> as opposed to just <span class="NoLineBreak"><kbd>&lt;RoutineName&gt;</kbd></span>.</li>
 </ul>
+<hr>
+<h2>Quick jumps:</h2>
+<ul>
+<li><a href="#Installation" id="InstallationBack">Installation (test run)</a></li>
+<li><a href="#OwnGraphicalBar" id="OwnGraphicalBarBack">Displaying your own value as a graphical bar</a></li>
+<li><a href="#AsmDocumentation" id="AsmDocumentationBack">ASM Documentation</a></li>
+<li><a href="#Notes" id="NotesBack">Notes</a></li>
+<li><a href="#Credits" id="CreditsBack">Credits</a></li>
 
+
+</ul>
 <hr>
 <h2>The resources you need</h2>
 <ul>
@@ -55,7 +65,7 @@ named <span class="NoLineBreak"><kbd>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</kb
 <h2>Javascript tools</h2>
 <ul><li><a id="TopJSLink" href="readme_files/JS_GraphicalBarCalculator.html">Link to javascript memory usage calculator</a>.</li></ul>
 <hr>
-<h2>Installation (test run)</h2>
+<h2><a href="#InstallationBack" id="Installation">^</a>Installation (test run)</h2>
 <ol>
 <li>First make any necessary changes to the defines in <kbd>GraphicalBarDefines</kbd>. Assuming you testing this out on a clean ROM with nothing
 else besides LM making modifications, it is likely you don't have to edit anything. However, if you're planning to use the Super Status Bar patch, open
@@ -127,7 +137,7 @@ but thats intentional as SMW's status bar is very limited.
 </li>
 </ol>
 <hr>
-<h2>Displaying your own value as a graphical bar</h2>
+<h2><a href="#OwnGraphicalBarBack" id="OwnGraphicalBar">^</a>Displaying your own value as a graphical bar</h2>
 Perhaps if you want to display something other than the provided examples above, here are the templates:
 
 <ul>
@@ -206,7 +216,7 @@ the SNES is <a href="https://en.wikipedia.org/wiki/Endianness">little-endian</a>
 
 </ul>
 <hr>
-<h2>ASM Documentation</h2>
+<h2><a href="#AsmDocumentationBack" id="AsmDocumentation">^</a>ASM Documentation</h2>
 Note: All values here are unsigned. Routine information follows:
 <ol>
 <li>Inside <kbd>GraphicalBarELITE.asm</kbd></li>
@@ -284,7 +294,6 @@ the order of their maximums (3, 8, 8, 8, 8...):<br>
 As an analogy, you fill the cup with water until it's full, then fill the next cup until it's full, until you got all the cups full or run out of water.<br>
 
 Here are the formulas on how each are calculated:<br><br>
-</ul>
 
 <ul>
 <li>Left end:</li>
@@ -309,7 +318,6 @@ on the first middle tile if there are no full middle tiles, if the entire middle
 <li><kbd>floor(x)</kbd> returns the highest integer that is &le; x. Essentially this round down an integer (7/8 = 0.875 &rarr; 0, 9/8 = 1.125 &rarr; 1).</li>
 </ul>
 </ul><br><br>
-
 
 
 The inputs are similar to the previously mentioned routine (such as requiring the attributes), but you don't write to <span class="NoLineBreak"><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd></span> to
@@ -587,6 +595,7 @@ I also made an alternative routine, <kbd>DrawGraphicalBarSubtractionLoopEdition<
 on a repeated subtraction and not using multiplication and division routines. Almost all the inputs and outputs the same, except that the output <kbd>$00-$01</kbd> acts as the remaining fill when the bar is full
 or higher and 0 otherwise (<kbd>RemainingFill = clamp(InputFillAmount - BarMaximumFull)</kbd>), while <kbd>$02-$09</kbd> aren't destroyed.<br><br>
 </li>
+</ul>
 
 <li><kbd>RoundAwayEmpty</kbd>, <kbd>RoundAwayFull</kbd>, and <kbd>RoundAwayEmptyFull</kbd>: After getting the Y register value from <kbd>CalculateGraphicalBarPercentage</kbd>, this increments or
 decrements the fill amount <kbd>$00-$01</kbd> by 1 so it will display 1 and/or <kbd>MaxFill-1</kbd> instead of showing 0 and/or <kbd>MaxFill</kbd> when the value is rounded towards them. The names
@@ -864,7 +873,7 @@ to calculate where to place the bar when using <kbd>BarExtendLeft</kbd> as well 
 </ol>
 
 <hr>
-<h2>Notes</h2>
+<h2><a href="#NotesBack" id="Notes">^</a>Notes</h2>
 <ul>
 
 <li>Due to how this routine works, when display a fill edge that encompass multiple 8x8 bytes at once, it doesn't work, as it was designed to have a single fraction tile.<br>
@@ -967,7 +976,7 @@ the address write range is <kbd>DesiredLastTilePos-((NumberOfTiles-1)*!StatusBar
 address of the status bar (avoid placing the <kbd>DesiredLastTilePos</kbd> that would cause placing the tiles before the first byte of the status bar tiles).</li></ul>
 </ul>
 <hr>
-<h2>Credits</h2>
+<h2><a href="#CreditsBack" id="Credits">^</a>Credits</h2>
 <ul>
 <li><a href="https://www.smwcentral.net/?p=profile&id=8691">Akaginite</a>, for making the math routines</li>
 <li><a href="https://www.w3schools.com/">W3Schools</a> and <a href="https://stackoverflow.com">stackoverflow</a><sup><a href="https://stackoverflow.com/questions/11409895/whats-the-most-elegant-way-to-cap-a-number-to-a-segment">[1]</a></sup>, for making a tutorial on how to make HTML and javascript codes.</li>
