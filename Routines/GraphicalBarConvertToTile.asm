@@ -232,7 +232,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
 ;Be extra careful with the bank borders, 2 bar fill data tables are stored with
 ;!Scratchram_GraphicalBar_FillByteTbl being SecondFill and
-;!Scratchram_GraphicalBar_FillByteTbl+!GraphicalBar_TotalTileUsed being FirstFill. Bank border is basically
+;!Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset being FirstFill. Bank border is basically
 ;the line between $**FFFF and $XXFFFF, since the index addressing only handle 16-bit processing.
 
 ;If you are editing the number of pieces in any bar parts here, the number of pieces must equal
@@ -274,25 +274,25 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 	LDA !Scratchram_GraphicalBar_LeftEndPiece				;\Check if left end exist
 	BEQ .MiddleTranslate							;/
 	if !sa1 == 0
-		INC								;>Pieces + 1
-		STA $4202							;>(Pieces + 1) times...
-		LDA !Scratchram_GraphicalBar_FillByteTbl+!GraphicalBar_TotalTileUsed	;\...FirstFill (remember Commutative property means same result regardless of order)
-		STA $4203							;/
-		JSR WaitCalculation						;>Wait 12 cycles in total (8 is minimum needed)
-		LDA $4216							;>Load product (low byte only)
+		INC												;>Pieces + 1
+		STA $4202											;>(Pieces + 1) times...
+		LDA !Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset	;\...FirstFill (remember Commutative property means same result regardless of order)
+		STA $4203											;/
+		JSR WaitCalculation										;>Wait 12 cycles in total (8 is minimum needed)
+		LDA $4216											;>Load product (low byte only)
 	else
-		LDA #$00							;\Multiply mode
-		STA $2250							;/
-		LDA !Scratchram_GraphicalBar_LeftEndPiece			;\Pieces + 1
-		INC								;/
-		STA $2251							;\(Pieces + 1) times...
-		STZ $2252							;/
-		LDA !Scratchram_GraphicalBar_FillByteTbl+!GraphicalBar_TotalTileUsed	;\...FirstFill (remember Commutative property means same result regardless of order)
-		STA $2253							;|
-		STZ $2254							;/
-		NOP								;\Wait 5 cycles until calculation is done
-		BRA $00								;/
-		LDA $2306							;>Load product (low byte only)
+		LDA #$00											;\Multiply mode
+		STA $2250											;/
+		LDA !Scratchram_GraphicalBar_LeftEndPiece							;\Pieces + 1
+		INC												;/
+		STA $2251											;\(Pieces + 1) times...
+		STZ $2252											;/
+		LDA !Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset	;\...FirstFill (remember Commutative property means same result regardless of order)
+		STA $2253											;|
+		STZ $2254											;/
+		NOP												;\Wait 5 cycles until calculation is done
+		BRA $00												;/
+		LDA $2306											;>Load product (low byte only)
 	endif
 	CLC									;\Add by SecondFill
 	ADC !Scratchram_GraphicalBar_FillByteTbl				;/
@@ -318,29 +318,29 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 	
 	..Loop
 	if !sa1 == 0
-		LDA !Scratchram_GraphicalBar_MiddlePiece				;\Pieces + 1
-		INC									;/
-		STA $4202								;>(Pieces + 1) times...
-		LDA !Scratchram_GraphicalBar_FillByteTbl+!GraphicalBar_TotalTileUsed,x	;\...FirstFill (remember Commutative property means same result reguardless of order)
-		STA $4203								;/(+1 because it starts on the first middle tile, after the left end)
-		JSR WaitCalculation							;>Wait 12 cycles in total (8 is minimum needed)
-		LDA $4216								;>Load product (low byte only)
+		LDA !Scratchram_GraphicalBar_MiddlePiece							;\Pieces + 1
+		INC												;/
+		STA $4202											;>(Pieces + 1) times...
+		LDA !Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset,x	;\...FirstFill (remember Commutative property means same result reguardless of order)
+		STA $4203											;/(+1 because it starts on the first middle tile, after the left end)
+		JSR WaitCalculation										;>Wait 12 cycles in total (8 is minimum needed)
+		LDA $4216											;>Load product (low byte only)
 	else
-		LDA #$00								;\Multiply mode
-		STA $2250								;/
-		LDA !Scratchram_GraphicalBar_MiddlePiece				;\Pieces + 1
-		INC									;/
-		STA $2251								;\(Pieces + 1) times...
-		STZ $2252								;/
-		LDA !Scratchram_GraphicalBar_FillByteTbl+!GraphicalBar_TotalTileUsed,x	;\...FirstFill (remember Commutative property means same result reguardless of order)
-		STA $2253								;|
-		STZ $2254								;/
-		NOP									;\Wait 5 cycles until calculation is done
-		BRA $00									;/
-		LDA $2306								;>Load product (low byte only)
+		LDA #$00											;\Multiply mode
+		STA $2250											;/
+		LDA !Scratchram_GraphicalBar_MiddlePiece							;\Pieces + 1
+		INC												;/
+		STA $2251											;\(Pieces + 1) times...
+		STZ $2252											;/
+		LDA !Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset,x	;\...FirstFill (remember Commutative property means same result reguardless of order)
+		STA $2253											;|
+		STZ $2254											;/
+		NOP												;\Wait 5 cycles until calculation is done
+		BRA $00												;/
+		LDA $2306											;>Load product (low byte only)
 	endif
-	CLC										;\Add by SecondFill
-	ADC !Scratchram_GraphicalBar_FillByteTbl,x					;/
+	CLC													;\Add by SecondFill
+	ADC !Scratchram_GraphicalBar_FillByteTbl,x								;/
 	if !Setting_GraphicalBar_IndexSize != 0
 		REP #$20								;\Rid the high byte
 		AND #$00FF								;|
@@ -361,25 +361,25 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 	BEQ .Done
 	if !sa1 == 0
 		LDA !Scratchram_GraphicalBar_RightEndPiece
-		INC								;>Pieces + 1
-		STA $4202							;>(Pieces + 1) times...
-		LDA !Scratchram_GraphicalBar_FillByteTbl+!GraphicalBar_TotalTileUsed,x	;\...FirstFill (remember Commutative property means same result reguardless of order)
-		STA $4203							;/
-		JSR WaitCalculation						;>Wait 12 cycles in total (8 is minimum needed)
-		LDA $4216							;>Load product (low byte only)
+		INC												;>Pieces + 1
+		STA $4202											;>(Pieces + 1) times...
+		LDA !Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset,x	;\...FirstFill (remember Commutative property means same result reguardless of order)
+		STA $4203											;/
+		JSR WaitCalculation										;>Wait 12 cycles in total (8 is minimum needed)
+		LDA $4216											;>Load product (low byte only)
 	else
-		LDA #$00							;\Multiply mode
-		STA $2250							;/
-		LDA !Scratchram_GraphicalBar_RightEndPiece			;\Pieces + 1
-		INC								;/
-		STA $2251							;\(Pieces + 1) times...
-		STZ $2252							;/
-		LDA !Scratchram_GraphicalBar_FillByteTbl+!GraphicalBar_TotalTileUsed,x	;\...FirstFill (remember Commutative property means same result reguardless of order)
-		STA $2253							;|
-		STZ $2254							;/
-		NOP								;\Wait 5 cycles until calculation is done
-		BRA $00								;/
-		LDA $2306							;>Load product (low byte only)
+		LDA #$00											;\Multiply mode
+		STA $2250											;/
+		LDA !Scratchram_GraphicalBar_RightEndPiece							;\Pieces + 1
+		INC												;/
+		STA $2251											;\(Pieces + 1) times...
+		STZ $2252											;/
+		LDA !Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset,x	;\...FirstFill (remember Commutative property means same result reguardless of order)
+		STA $2253											;|
+		STZ $2254											;/
+		NOP												;\Wait 5 cycles until calculation is done
+		BRA $00												;/
+		LDA $2306											;>Load product (low byte only)
 	endif
 	CLC									;\Add by SecondFill
 	ADC !Scratchram_GraphicalBar_FillByteTbl,x				;/

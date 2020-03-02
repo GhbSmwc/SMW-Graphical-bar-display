@@ -37,7 +37,7 @@
 ;  they synchronize on the number of pieces and sections.
 ;
 ; -If you plan on making different lengths of the bar, I recommend changing the
-;  code (or actually the defines being added by !GraphicalBar_TotalTileUsed) to have FirstBar's output
+;  code (or actually the defines being added by !Setting_GraphicalBar_SecondFillByteTableOffset) to have FirstBar's output
 ;  location be moved by a fixed value that is the longest bar you could possibly have in
 ;  your game to avoid overwriting the other bar. For example: A longest bar with 10 tile
 ;  bytes total (2 end tiles and 8 for middle length), you would have ("$" sign means hex):
@@ -219,9 +219,9 @@ main:
 		...TransferFirstFillBar ;>FirstFill will be located just after SecondFill in memory address: <SecondFill_Table><FirstFill_Table>
 		PHB
 		REP #$30
-		LDA.w #!GraphicalBar_TotalTileUsed-1								;>Number of bytes to transfer, -1 (because byte 0 is included)
+		LDA.w #!Setting_GraphicalBar_SecondFillByteTableOffset-1					;>Number of bytes to transfer, -1 (because byte 0 is included)
 		LDX.w #!Scratchram_GraphicalBar_FillByteTbl							;>Source address
-		LDY.w #!Scratchram_GraphicalBar_FillByteTbl+!GraphicalBar_TotalTileUsed				;>Destination address
+		LDY.w #!Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset	;>Destination address
 		MVN (!Scratchram_GraphicalBar_FillByteTbl>>16), (!Scratchram_GraphicalBar_FillByteTbl>>16)	;>Move them
 		SEP #$30
 		PLB
