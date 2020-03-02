@@ -595,11 +595,12 @@ I also made an alternative routine, <kbd>DrawGraphicalBarSubtractionLoopEdition<
 on a repeated subtraction and not using multiplication and division routines. Almost all the inputs and outputs the same, except that the output <kbd>$00-$01</kbd> acts as the remaining fill when the bar is full
 or higher and 0 otherwise (<kbd>RemainingFill = clamp(InputFillAmount - BarMaximumFull)</kbd>), while <kbd>$02-$09</kbd> aren't destroyed.<br><br>
 </li>
-</ul>
+
 
 <li><kbd>RoundAwayEmpty</kbd>, <kbd>RoundAwayFull</kbd>, and <kbd>RoundAwayEmptyFull</kbd>: After getting the Y register value from <kbd>CalculateGraphicalBarPercentage</kbd>, this increments or
 decrements the fill amount <kbd>$00-$01</kbd> by 1 so it will display 1 and/or <kbd>MaxFill-1</kbd> instead of showing 0 and/or <kbd>MaxFill</kbd> when the value is rounded towards them. The names
 of the routine should be obvious (e.g. <kbd>RoundAwayEmpty</kbd> means round away from empty).</li><br>
+</ul>
 </ul>
 <li><span id="ConvertFillToTile">Inside <kbd>GraphicalBarConvertToTile.asm</kbd></span></li>
 <ul>
