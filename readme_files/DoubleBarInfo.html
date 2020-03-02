@@ -158,9 +158,9 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	..TransferFirstFillBar ;>FirstFill will be located just after SecondFill in memory address: <SecondFill_Table><FirstFill_Table>
 	PHB
 	REP #$30
-	LDA.w #!GraphicalBar_TotalTileUsed-1								;>Number of bytes to transfer, -1 (because byte 0 is included)
+	LDA.w #!Setting_GraphicalBar_SecondFillByteTableOffset-1								;>Number of bytes to transfer, -1 (because byte 0 is included)
 	LDX.w #!Scratchram_GraphicalBar_FillByteTbl							;>Source address
-	LDY.w #!Scratchram_GraphicalBar_FillByteTbl+!GraphicalBar_TotalTileUsed				;>Destination address
+	LDY.w #!Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset				;>Destination address
 	MVN (!Scratchram_GraphicalBar_FillByteTbl>>16), (!Scratchram_GraphicalBar_FillByteTbl>>16)	;>Move them
 	SEP #$30
 	PLB
@@ -220,7 +220,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	STA !Scratchram_GraphicalBar_FillByteTbl+3		;/as that if your value is 8-bit.
 	RTS</pre></td></tr></table><br>
 	
-	<a name="SecondTable">Thus, assuming you left <nobr><kbd>!GraphicalBar_TotalTileUsed</kbd></nobr> equal to <kbd>32</kbd>, both ends set to 3
+	<a name="SecondTable">Thus, assuming you left <nobr><kbd>!Setting_GraphicalBar_SecondFillByteTableOffset</kbd></nobr> equal to <kbd>32</kbd>, both ends set to 3
 	pieces, middle set to 8 pieces, and middle span 7 tile bytes long, the table of values
 	are laid out like this:
 <table><tr><td><pre>!Scratchram_GraphicalBar_FillByteTbl+0:  (SecondFill left end)
@@ -256,8 +256,8 @@ Now that both bar tiles are stored, the routine <nobr><kbd>ConvertBarFillAmountT
 <nobr><kbd>GraphicalBarConvertToTile.asm</kbd></nobr> checks the two equivalent tiles (the two left ends, then the two first middle tile, second middles, and so on...) to determine
 what index to use in order to convert the pairs of fill values into tile numbers (this will write to <nobr><kbd>!Scratchram_GraphicalBar_FillByteTbl+0</kbd></nobr>, not the other table address).<br><br>
 
-You can set <nobr><kbd>!GraphicalBar_TotalTileUsed</kbd></nobr> to any number (beware of bank borders though), just be careful not to have your longest bar in your game to exceed this number
-(so if you have a bar that can go higher than 9 tile bytes long, and you set <nobr><kbd>!GraphicalBar_TotalTileUsed</kbd></nobr> to 9 or lower), else SecondFill will overwrite FirstFill
+You can set <nobr><kbd>!Setting_GraphicalBar_SecondFillByteTableOffset</kbd></nobr> to any number (beware of bank borders though), just be careful not to have your longest bar in your game to exceed this number
+(so if you have a bar that can go higher than 9 tile bytes long, and you set <nobr><kbd>!Setting_GraphicalBar_SecondFillByteTableOffset</kbd></nobr> to 9 or lower), else SecondFill will overwrite FirstFill
 and end up with glitched tiles.<br><br>
 
 The table for the tiles to write to the status bar are formated <a href="DoubleBarFills.png"  target="_blank">like this</a> (this is a two-dimensional array). FirstFill is the fill that
