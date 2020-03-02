@@ -1,4 +1,5 @@
-Note: should have 9 items in main directory or folder in case if any files missing.
+Note: should have 8 items (Excluding the Readme.md) in main directory or folder in
+case if any files missing.
 
 Note: Date sorted from oldest to newest (M/D/Y). Version number period symbol means
 a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 1.9,
@@ -405,3 +406,16 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
  -Seeing them as potential for being a subroutine, I moved them there.
  -The "write to status bar" is more flexible now, as the number of tiles are now RAM based
   instead of fixed numbers.
+3/13/2019 3.18 - Massive updates
+ -Readme now features a link to a HTML javascript that computes the memory range and layout for
+  [!Scratchram_GraphicalBar_FillByteTbl] and the status bar write range, as well as other statics
+  instead of having the user manually calculate to find out if too many bytes taken.
+ -Now features a code if you want a bar that is "Right-aligned" that can extend leftwards.
+ -Several parts of the main Readme was rewritten for better explanations like
+  [!Scratchram_GraphicalBar_FillByteTbl+X] means an address plus X which takes the relative location.
+ -Added explanations about the status bar and overworld border +'s tile data format.
+ -More example codes added such as OWB+ support.
+4/2/2019 - missing info about a required patch
+ -Added note that to write a meter on the overworld border, the overworld border plus patch is required
+  due to the difficulties surrounding editing tiles via vram without using RAM transferring like how the
+  Super Status Bar patch does it.
