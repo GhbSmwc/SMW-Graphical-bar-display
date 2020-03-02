@@ -122,3 +122,53 @@ endif
 		!Setting_Beta32bitMultiplication = 0
 			;^In case if you are editing this code to handle 32 bit for quantity, set this to 1.
 			; This is a beta code.
+
+		!Setting_GraphicalBar_SecondFillByteTableOffset          = 32
+			;^Only used when using a double-bar via "differently colored fill".
+			; This creates another "!Scratchram_GraphicalBar_FillByteTbl" plus n (the value in
+			; this define) bytes from the original fill byte table. This is also the maximum number of 8x8
+			; tile bytes you are going to use (as in, if you have multiple bars with
+			; their own lengths, the one the longest plus any of the two existing end
+			; tiles is this number) for your entire game. Be careful not to make it
+			; possible for any bars to have more tiles than this number, else the first n tiles
+			; will be overwritten and glitched out.
+			;
+			; Here is what it looks like using ASCII art (each character within brackets is a tile byte) using 9 tiles out of max of 32:
+			;  SecondFill                     FirstFill
+			;     |                               |
+			;     V                               V
+			; [<=======>.......................<=======>]
+			;When you keep lengthening the bar:
+			; [<========>......................<========>] (10 tiles out of 32 used)
+			; [<=========>.....................<=========>] (11 tiles out of 32 used)
+			; [<==========>....................<==========>] (12 tiles out of 32 used)
+			;After a while:
+			; [<============================>..<============================>] (30 tiles out of 32 used)
+			; [<=============================>.<=============================>] (31 tiles out of 32 used)
+			; [<==============================><==============================>] (32 tiles out of 32 used)
+			; [<===============================>===============================>] (33 tiles out of 32 used, left end of FirstFill is overwritten by SecondFill's right end)
+			;And longer will start overwriting additional tiles of FirstFill.
+			;
+			; < is left end.
+			; = is middle tile.
+			; > is right end.
+			; . is unused RAM that can be garbage or used when bar is extended.
+
+
+
+;Print descriptions (if you have trouble tracking your RAM address)
+	!Setting_GraphicalBar_Debug_DisplayRAMUsage = 0
+		;^0 = no, 1 = display RAM usage on console window.
+	
+	;print onto console window
+		if !Setting_GraphicalBar_Debug_DisplayRAMUsage != 0
+			print ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;"
+			print ";Graphical bar routine RAM usage"
+			print ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;"
+			print "-Left end piece: $", hex(!Scratchram_GraphicalBar_LeftEndPiece)
+			print "-Middle piece: $", hex(!Scratchram_GraphicalBar_MiddlePiece)
+			print "-Right end piece: $", hex(!Scratchram_GraphicalBar_RightEndPiece)
+			print "-Middle length: $", hex(!Scratchram_GraphicalBar_TempLength)
+			print "-Fill byte table: $", hex(!Scratchram_GraphicalBar_FillByteTbl), " to $", hex(!Scratchram_GraphicalBar_FillByteTbl+31), " (at max length)"
+			print "-Fill byte table (double bar, 2 fills): $", hex(!Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset), " to $", hex(!Scratchram_GraphicalBar_FillByteTbl+31+!Setting_GraphicalBar_SecondFillByteTableOffset), " (at max length)"
+		endif
