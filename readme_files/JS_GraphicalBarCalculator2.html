@@ -178,14 +178,87 @@
 			var TotalPieces = LeftEndPiece + (MiddlePiece * MiddleLength) + RightEndPiece
 		//Display output
 			if (BarOfZeroTiles == false) {
-				OutputString += "<table>"
-				OutputString += "<tr>"
-				OutputString += "<td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> memory usage:</td>"
-				OutputString += "<td><kbd>$" + pad(FillByteTable.toString(16).toUpperCase(), 6) + "</kbd> to <kbd><abbr title='Index=$" + pad((TotalNumberOfTileBytes - 1n).toString(16).toUpperCase(), 2) + "'>$" + pad((FillByteTable + (TotalNumberOfTileBytes - 1n)).toString(16).toUpperCase(), 6) + "</kbd> (Number of tile bytes used: <kbd>" + TotalNumberOfTileBytes.toString(10) + "</kbd> (<kbd>$" + pad(TotalNumberOfTileBytes.toString(16).toUpperCase(), 2) + "</kbd>))</td>"
-				OutputString += "<tr>"
-				OutputString += "<td>Total pieces (full bar):</td>"
-				OutputString += "<td><kbd>" + TotalPieces.toString(10) + "</kbd> (<kbd>$" + pad(TotalPieces.toString(16).toUpperCase(), 4) + "</kbd>)</td>"
-				OutputString += "</tr>"
+				//RAM summary
+					OutputString += "<table>"
+					OutputString += "<tr>"
+					OutputString += "<td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> memory usage:</td>"
+					OutputString += "<td><kbd>$" + pad(FillByteTable.toString(16).toUpperCase(), 6) + "</kbd> to <kbd><abbr title='Index=$" + pad((TotalNumberOfTileBytes - 1n).toString(16).toUpperCase(), 2) + "'>$" + pad((FillByteTable + (TotalNumberOfTileBytes - 1n)).toString(16).toUpperCase(), 6) + "</kbd> (Number of tile bytes used: <kbd>" + TotalNumberOfTileBytes.toString(10) + "</kbd> (<kbd>$" + pad(TotalNumberOfTileBytes.toString(16).toUpperCase(), 2) + "</kbd>))</td>"
+					OutputString += "<tr>"
+					OutputString += "<td>Total pieces (full bar):</td>"
+					OutputString += "<td><kbd>" + TotalPieces.toString(10) + "</kbd> (<kbd>$" + pad(TotalPieces.toString(16).toUpperCase(), 4) + "</kbd>)</td>"
+					OutputString += "</tr>"
+					OutputString += "</table>"
+				//Handle byte array
+					var FillByteTableValues = [
+					//      0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
+						0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, //0-15
+						0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, //16-31
+						0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, //32-47
+						0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, //48-63
+						0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, //64-79
+						0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, //80-95
+						0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, //96-111
+						0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, //112-127
+						0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, //128-143
+						0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, //144-159
+						0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, //160-175
+						0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, //176-191
+						0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, //192-207
+						0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, //208-223
+						0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, //224-239
+						0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, //240-255
+						0n, 0n                                            //256-257
+						]
+					var RunningFillAmount = FillAmount
+					var MiddleTilesLeft = NumberOfMiddleTiles
+					var FillAmountIndex = 0n
+					//Left end
+						if (LeftTileExist != 0n) {
+							if (RunningFillAmount < LeftEndPiece) {
+								FillByteTableValues[0n] = RunningFillAmount //If less then take all remaining fills
+								RunningFillAmount = 0n
+							} else {
+								FillByteTableValues[0n] = LeftEndPiece //If greater than, then take all pieces and subtract fill amount by that number of pieces.
+								RunningFillAmount = RunningFillAmount - LeftEndPiece
+							}
+							FillAmountIndex++
+						}
+					//Middle
+						if (NumberOfMiddleTiles != 0n) {
+							while (MiddleTilesLeft != 0n) {
+								if (RunningFillAmount < MiddlePiece) {
+									FillByteTableValues[FillAmountIndex] = RunningFillAmount
+									RunningFillAmount = 0n
+								} else {
+									FillByteTableValues[FillAmountIndex] = MiddlePiece
+									RunningFillAmount = RunningFillAmount - MiddlePiece
+								}
+								MiddleTilesLeft--
+								FillAmountIndex++
+							}
+						}
+					//Right end
+						if (RightTileExist != 0n) {
+							if (RunningFillAmount < RightEndPiece) {
+								FillByteTableValues[FillAmountIndex] = RunningFillAmount //If less then take all remaining fills
+								RunningFillAmount = 0n
+							} else {
+								FillByteTableValues[FillAmountIndex] = RightEndPiece //If greater than, then take all pieces and subtract fill amount by that number of pieces.
+								RunningFillAmount = RunningFillAmount - RightEndPiece
+							}
+							FillAmountIndex++
+						}
+				//Display the table array of bar tile bytes
+					var TileBytesCount = 0n
+					OutputString += "<table>"
+					OutputString += "<tr><th><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> addresses</th><th>Fill amount</th></tr>"
+					for (TileBytesCount = 0n; TileBytesCount < TotalNumberOfTileBytes; TileBytesCount++) {
+						OutputString += "<tr>"
+						OutputString += "<td><kbd>$" + pad((FillByteTable + TileBytesCount).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + TileBytesCount.toString(10) + "</kbd>)</td>"
+						OutputString += "<td><kbd>$" + pad((FillByteTableValues[TileBytesCount]).toString(16).toUpperCase(), 2) + "</kbd></td>"
+						OutputString += "</tr>"
+					}
+					OutputString += "</table>"
 			} else {
 				OutputString += "Error! A setting have resulted a total of 0 tiles!"
 			}
