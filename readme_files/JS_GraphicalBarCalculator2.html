@@ -27,11 +27,11 @@
 <a href="../GraphicalBar_ReadmeDocumentation.html#TopJSLink">Back to top</a><br>
 <a href="../GraphicalBar_ReadmeDocumentation.html#ComputeGraphicalBarData">Back to info table</a><br><br>
 <table>
-<tr><td>Fill amount:</td><td><input type="number" min="0" max="65535" id="FillAmountDec" onchange="UserInputDecToHex('FillAmountDec', 'FillAmountHex', 4, 0n, 65535n); Calculate()" value="0">/<kbd>$</kbd><input type="text" id="FillAmountHex" onchange="CorrectUserInputHexStringBigInt('FillAmountHex', 4); UserInputHexToDec('FillAmountHex', 'FillAmountDec', 0n, 65535n); Calculate()" value="0000"></td></tr>
-<tr><td>Left End piece:</td><td><input type="number" min="0" max="255" id="LeftEndPieceDec" onchange="UserInputDecToHex('LeftEndPieceDec', 'LeftEndPieceHex', 2, 0n, 255n); Calculate()" value="3">/<kbd>$</kbd><input type="text" id="LeftEndPieceHex" onchange="CorrectUserInputHexStringBigInt('LeftEndPieceHex', 2); UserInputHexToDec('LeftEndPieceHex', 'LeftEndPieceDec', 0n, 255n); Calculate()" value="03"></td></tr>
-<tr><td>Middle piece:</td><td><input type="number" min="0" max="255" id="MiddlePieceDec" onchange="UserInputDecToHex('MiddlePieceDec', 'MiddlePieceHex', 2, 0n, 255n); Calculate()" value="8">/<kbd>$</kbd><input type="text" id="MiddlePieceHex" onchange="CorrectUserInputHexStringBigInt('MiddlePieceHex', 2); UserInputHexToDec('MiddlePieceHex', 'MiddlePieceDec', 0n, 255n); Calculate()" value="08"></td></tr>
-<tr><td>Right End piece:</td><td><input type="number" min="0" max="255" id="RightEndPieceDec" onchange="UserInputDecToHex('RightEndPieceDec', 'RightEndPieceHex', 2, 0n, 255n); Calculate()" value="3">/<kbd>$</kbd><input type="text" id="RightEndPieceHex" onchange="CorrectUserInputHexStringBigInt('RightEndPieceHex', 2); UserInputHexToDec('RightEndPieceHex', 'RightEndPieceDec', 0n, 255n); Calculate()" value="03"></td></tr>
-<tr><td>Length (middle):</td><td><input type="number" min="0" max="255" id="MiddleLengthDec" onchange="UserInputDecToHex('MiddleLengthDec', 'MiddleLengthHex', 2, 0n, 255n); Calculate()" value="7">/<kbd>$</kbd><input type="text" id="MiddleLengthHex" onchange="CorrectUserInputHexStringBigInt('MiddleLengthHex', 2); UserInputHexToDec('MiddleLengthHex', 'MiddleLengthDec', 0n, 255n); Calculate()" value="07"></td></tr>
+<tr><td>Fill amount:</td><td><input type="number" min="0" max="65535" id="FillAmountDec" onchange="UserInputDecToHex('FillAmountDec', 'FillAmountHex', 4, 0n, 65535n); Calculate()" value="0">/<kbd>$</kbd><input type="text" id="FillAmountHex" onchange="CorrectUserInputHexStringBigInt('FillAmountHex', 4); UserInputHexToDec('FillAmountHex', 'FillAmountDec', 4, 0n, 65535n); Calculate()" value="0000"></td></tr>
+<tr><td>Left End piece:</td><td><input type="number" min="0" max="255" id="LeftEndPieceDec" onchange="UserInputDecToHex('LeftEndPieceDec', 'LeftEndPieceHex', 2, 0n, 255n); Calculate()" value="3">/<kbd>$</kbd><input type="text" id="LeftEndPieceHex" onchange="CorrectUserInputHexStringBigInt('LeftEndPieceHex', 2); UserInputHexToDec('LeftEndPieceHex', 'LeftEndPieceDec', 2, 0n, 255n); Calculate()" value="03"></td></tr>
+<tr><td>Middle piece:</td><td><input type="number" min="0" max="255" id="MiddlePieceDec" onchange="UserInputDecToHex('MiddlePieceDec', 'MiddlePieceHex', 2, 0n, 255n); Calculate()" value="8">/<kbd>$</kbd><input type="text" id="MiddlePieceHex" onchange="CorrectUserInputHexStringBigInt('MiddlePieceHex', 2); UserInputHexToDec('MiddlePieceHex', 'MiddlePieceDec', 2, 0n, 255n); Calculate()" value="08"></td></tr>
+<tr><td>Right End piece:</td><td><input type="number" min="0" max="255" id="RightEndPieceDec" onchange="UserInputDecToHex('RightEndPieceDec', 'RightEndPieceHex', 2, 0n, 255n); Calculate()" value="3">/<kbd>$</kbd><input type="text" id="RightEndPieceHex" onchange="CorrectUserInputHexStringBigInt('RightEndPieceHex', 2); UserInputHexToDec('RightEndPieceHex', 'RightEndPieceDec', 2, 0n, 255n); Calculate()" value="03"></td></tr>
+<tr><td>Length (middle):</td><td><input type="number" min="0" max="255" id="MiddleLengthDec" onchange="UserInputDecToHex('MiddleLengthDec', 'MiddleLengthHex', 2, 0n, 255n); Calculate()" value="7">/<kbd>$</kbd><input type="text" id="MiddleLengthHex" onchange="CorrectUserInputHexStringBigInt('MiddleLengthHex', 2); UserInputHexToDec('MiddleLengthHex', 'MiddleLengthDec', 2, 0n, 255n); Calculate()" value="07"></td></tr>
 <tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> location:</td><td><kbd>$</kbd><input type="text" maxlength="6" id="FillByteTable" onchange="CorrectUserInputHexStringBigInt('FillByteTable', 6); Calculate()" value="7F844A">
 
 <button onclick="BigintIncreaseDecreaseHexInput(1n, 'FillByteTable', 0n, 16777215n); CorrectUserInputHexStringBigInt('FillByteTable', 6); Calculate()">+</button>
@@ -61,9 +61,9 @@
 
 
 <script>
-	function UserInputHexToDec(WhatInput, ToWhatInput, min, max) {
+	function UserInputHexToDec(WhatInput, ToWhatInput, PaddingSize, min, max) {
 		var HexNumber = BigintClamp(CorrectHexBigIntValue(document.getElementById(WhatInput).value), min, max)
-		document.getElementById(WhatInput).value = pad(HexNumber.toString(16).toUpperCase(), 2)
+		document.getElementById(WhatInput).value = pad(HexNumber.toString(16).toUpperCase(), PaddingSize)
 		document.getElementById(ToWhatInput).value = HexNumber.toString(10)
 	}
 	function UserInputDecToHex(WhatInput, ToWhatInput, PaddingSize, min, max) {
@@ -181,7 +181,7 @@
 				OutputString += "<table>"
 				OutputString += "<tr>"
 				OutputString += "<td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> memory usage:</td>"
-				OutputString += "<td><kbd>$" + pad(FillByteTable.toString(16).toUpperCase(), 6) + "</kbd> to <kbd><abbr title='Index=$" + pad((TotalNumberOfTileBytes - 1n).toString(16).toUpperCase(), 2) + "'>$" + pad((FillByteTable + (TotalNumberOfTileBytes - 1n)).toString(16).toUpperCase(), 6) + "</kbd> (Number of bytes used: <kbd>" + TotalNumberOfTileBytes.toString(10) + "</kbd> (<kbd>$" + pad(TotalNumberOfTileBytes.toString(16).toUpperCase(), 2) + "</kbd>))</td>"
+				OutputString += "<td><kbd>$" + pad(FillByteTable.toString(16).toUpperCase(), 6) + "</kbd> to <kbd><abbr title='Index=$" + pad((TotalNumberOfTileBytes - 1n).toString(16).toUpperCase(), 2) + "'>$" + pad((FillByteTable + (TotalNumberOfTileBytes - 1n)).toString(16).toUpperCase(), 6) + "</kbd> (Number of tile bytes used: <kbd>" + TotalNumberOfTileBytes.toString(10) + "</kbd> (<kbd>$" + pad(TotalNumberOfTileBytes.toString(16).toUpperCase(), 2) + "</kbd>))</td>"
 				OutputString += "<tr>"
 				OutputString += "<td>Total pieces (full bar):</td>"
 				OutputString += "<td><kbd>" + TotalPieces.toString(10) + "</kbd> (<kbd>$" + pad(TotalPieces.toString(16).toUpperCase(), 4) + "</kbd>)</td>"
