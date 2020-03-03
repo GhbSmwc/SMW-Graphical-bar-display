@@ -1,0 +1,195 @@
+<html>
+	<head>
+		<style>
+			html {
+			background-color: #000207;
+			color: white;
+			font-family: sans-serif;
+			}
+			
+			table, th, td {
+			border: 1px solid white;
+			border-collapse: collapse;
+			}
+			
+			div.SmallFont {
+				font-size: 11px;
+			}
+			
+			div.StatisticsTable {
+				max-width:900px;
+			}
+			input[type='text'] { font-family: monospace;}
+			input[type='number'] { font-family: monospace;}
+		</style>
+	</head>
+<body onload="Calculate()"></body>
+<a href="../GraphicalBar_ReadmeDocumentation.html#TopJSLink">Back to top</a><br>
+<a href="../GraphicalBar_ReadmeDocumentation.html#ComputeGraphicalBarData">Back to info table</a><br><br>
+<table>
+<tr><td>Fill amount:</td><td><input type="number" min="0" max="65535" id="FillAmountDec" onchange="UserInputDecToHex('FillAmountDec', 'FillAmountHex', 4, 0n, 65535n); Calculate()" value="0">/<kbd>$</kbd><input type="text" id="FillAmountHex" onchange="CorrectUserInputHexStringBigInt('FillAmountHex', 4); UserInputHexToDec('FillAmountHex', 'FillAmountDec', 0n, 65535n); Calculate()" value="0000"></td></tr>
+<tr><td>Left End piece:</td><td><input type="number" min="0" max="255" id="LeftEndPieceDec" onchange="UserInputDecToHex('LeftEndPieceDec', 'LeftEndPieceHex', 2, 0n, 255n); Calculate()" value="3">/<kbd>$</kbd><input type="text" id="LeftEndPieceHex" onchange="CorrectUserInputHexStringBigInt('LeftEndPieceHex', 2); UserInputHexToDec('LeftEndPieceHex', 'LeftEndPieceDec', 0n, 255n); Calculate()" value="03"></td></tr>
+<tr><td>Middle piece:</td><td><input type="number" min="0" max="255" id="MiddlePieceDec" onchange="UserInputDecToHex('MiddlePieceDec', 'MiddlePieceHex', 2, 0n, 255n); Calculate()" value="8">/<kbd>$</kbd><input type="text" id="MiddlePieceHex" onchange="CorrectUserInputHexStringBigInt('MiddlePieceHex', 2); UserInputHexToDec('MiddlePieceHex', 'MiddlePieceDec', 0n, 255n); Calculate()" value="08"></td></tr>
+<tr><td>Right End piece:</td><td><input type="number" min="0" max="255" id="RightEndPieceDec" onchange="UserInputDecToHex('RightEndPieceDec', 'RightEndPieceHex', 2, 0n, 255n); Calculate()" value="3">/<kbd>$</kbd><input type="text" id="RightEndPieceHex" onchange="CorrectUserInputHexStringBigInt('RightEndPieceHex', 2); UserInputHexToDec('RightEndPieceHex', 'RightEndPieceDec', 0n, 255n); Calculate()" value="03"></td></tr>
+<tr><td>Length (middle):</td><td><input type="number" min="0" max="255" id="MiddleLengthDec" onchange="UserInputDecToHex('MiddleLengthDec', 'MiddleLengthHex', 2, 0n, 255n); Calculate()" value="7">/<kbd>$</kbd><input type="text" id="MiddleLengthHex" onchange="CorrectUserInputHexStringBigInt('MiddleLengthHex', 2); UserInputHexToDec('MiddleLengthHex', 'MiddleLengthDec', 0n, 255n); Calculate()" value="07"></td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> location:</td><td><kbd>$</kbd><input type="text" maxlength="6" id="FillByteTable" onchange="CorrectUserInputHexStringBigInt('FillByteTable', 6); Calculate()" value="7F844A">
+
+<button onclick="BigintIncreaseDecreaseHexInput(1n, 'FillByteTable', 0n, 16777215n); CorrectUserInputHexStringBigInt('FillByteTable', 6); Calculate()">+</button>
+<button onclick="BigintIncreaseDecreaseHexInput(-1n, 'FillByteTable', 0n, 16777215n); CorrectUserInputHexStringBigInt('FillByteTable', 6); Calculate()">-</button></td></tr>
+
+<tr><td>To write your tiles at address...:</td><td><kbd>$</kbd><input type="text" maxlength="6" id="TileAddress" onchange="CorrectUserInputHexStringBigInt('TileAddress', 6)" value="7FA000">
+
+<button onclick="BigintIncreaseDecreaseHexInput(1n, 'TileAddress', 0n, 16777215n); CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()">+</button>
+<button onclick="BigintIncreaseDecreaseHexInput(-1n, 'TileAddress', 0n, 16777215n); CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()">-</button>
+<button onclick="BigintIncreaseDecreaseHexInput(2n, 'TileAddress', 0n, 16777215n); CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()">+2</button>
+<button onclick="BigintIncreaseDecreaseHexInput(-2n, 'TileAddress', 0n, 16777215n); CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()">-2</button></td></tr>
+
+<tr><td>Status bar format:</td><td>
+<input type="radio" id="StatusBarFormat1" name="StatusBarFormats"><label for="StatusBarFormat1"><kbd>[TTTTTTTT, TTTTTTTT,...], [YXPCCCTT, YXPCCCTT,...]</kbd></label><br>
+<input type="radio" id="StatusBarFormat2" name="StatusBarFormats" checked><label for="StatusBarFormat2"><kbd>[TTTTTTTT, YXPCCCTT]</kbd></label></td></tr>
+
+<tr><td>Leftwards bar?</td><td><input type="checkbox" id="LeftwardsBar"></td></tr>
+<tr><td>Extends leftwards?</td><td><input type="checkbox" id="ExtendLeftwardsBar"></td></tr>
+
+<tr><td>Using static end tiles?</td><td>
+<input type="checkbox" id="UsingStaticLeftEnd"><label for="UsingStaticLeftEnd">Left end</label><br>
+<input type="checkbox" id="UsingStaticRightEnd"><label for="UsingStaticRightEnd">Right end</label></td></tr>
+</table>
+<button onclick="Reset(); Calculate()">Reset</button>
+<hr>
+<span id="Output"></span>
+
+
+<script>
+	function UserInputHexToDec(WhatInput, ToWhatInput, min, max) {
+		var HexNumber = BigintClamp(CorrectHexBigIntValue(document.getElementById(WhatInput).value), min, max)
+		document.getElementById(WhatInput).value = pad(HexNumber.toString(16).toUpperCase(), 2)
+		document.getElementById(ToWhatInput).value = HexNumber.toString(10)
+	}
+	function UserInputDecToHex(WhatInput, ToWhatInput, PaddingSize, min, max) {
+		var DecNumber = BigintClamp(CorrectDecBigIntValue(document.getElementById(WhatInput).value), min, max)
+		document.getElementById(WhatInput).value = DecNumber.toString(10)
+		document.getElementById(ToWhatInput).value = pad(DecNumber.toString(16).toUpperCase(), PaddingSize)
+	}
+	function CorrectUserInputHexStringBigInt(WhatInput, PaddingSize) {
+		var HexNumber = CorrectHexBigIntValue(document.getElementById(WhatInput).value)
+		document.getElementById(WhatInput).value = pad(HexNumber.toString(16).toUpperCase(), PaddingSize)
+	}
+	function BigintClamp(num, min, max) {
+		//Restrict a number within a specified range, bigInt edition.
+		return num <= min ? min : num >= max ? max : num;
+	}
+	function CorrectHexBigIntValue(String) {
+		//This converts the user's input hex string (negative numbers not allowed)
+		//to BigInt.
+		if ((/^([0-9]|[A-F]|[a-f])+$/).test(String) == false) {
+			String = 0n
+		}
+		return CanConvertHexStringToBigInt = BigInt("0x" + String)
+	}
+	function CorrectDecBigIntValue(String) {
+		//This converts the user's input decimal string (negative numbers not allowed)
+		//to BigInt.
+		if ((/^([0-9])+$/).test(String) == false) {
+			String = 0n
+		}
+		return CanConvertHexStringToBigInt = BigInt(String)
+	}
+	function BigintIncreaseDecreaseHexInput(ChangeBy, WhatInput, Min, Max) {
+		//To be used along with a hex input the user enters.
+		//This function is for the increment/decrement buttons since
+		//only the "number" input (only allows characters 0-9) allows
+		//the increment/decrement action (up/down button when selected,
+		//and pressing up and down).
+		//
+		//This one is the BigInt version of IncreaseDecreaseHexInput.
+		document.getElementById(WhatInput).value = BigintClamp((CorrectHexBigIntValue(document.getElementById(WhatInput).value) + ChangeBy), Min, Max).toString(16).toUpperCase()
+	}
+	function pad(num, size) {
+		//This adds leading zeroes. [size] is the number of digits at minimum to show (less than that will fill this with 0s).
+		var s = num+"";
+		while (s.length < size) s = "0" + s;
+		return s;
+	}
+	//----------------------------Stuff that display the output and reset-related main code.
+	function Reset() {
+		document.getElementById("FillAmountDec").value = "0"
+		document.getElementById("FillAmountHex").value = "0000"
+		
+		document.getElementById("LeftEndPieceDec").value = "3"
+		document.getElementById("LeftEndPieceHex").value = "03"
+		
+		document.getElementById("MiddlePieceDec").value = "8"
+		document.getElementById("MiddlePieceHex").value = "08"
+		
+		document.getElementById("RightEndPieceDec").value = "3"
+		document.getElementById("RightEndPieceHex").value = "03"
+		
+		document.getElementById("MiddleLengthDec").value = "7"
+		document.getElementById("MiddleLengthHex").value = "07"
+		
+		document.getElementById("FillByteTable").value = "7F844A"
+		document.getElementById("TileAddress").value = "7FA000"
+		
+		document.getElementById("StatusBarFormat2").checked = true
+		
+		document.getElementById("LeftwardsBar").checked = false
+		document.getElementById("ExtendLeftwardsBar").checked = false
+		
+		document.getElementById("UsingStaticLeftEnd").checked = false
+		document.getElementById("UsingStaticRightEnd").checked = false
+		
+		document.getElementById("Output").innerHTML = ""
+	}
+	function Calculate() {
+		//Clear out the output in case it re-concatenate.
+			var OutputString = ""
+			document.getElementById("Output").innerHTML = ""
+		//Obtain variables from inputs
+			var FillAmount = CorrectDecBigIntValue(document.getElementById("FillAmountDec").value)
+			var LeftEndPiece = CorrectDecBigIntValue(document.getElementById("LeftEndPieceDec").value)
+			var MiddlePiece = CorrectDecBigIntValue(document.getElementById("MiddlePieceDec").value)
+			var RightEndPiece = CorrectDecBigIntValue(document.getElementById("RightEndPieceDec").value)
+			var MiddleLength = CorrectDecBigIntValue(document.getElementById("MiddleLengthDec").value)
+			
+			var FillByteTable = CorrectHexBigIntValue(document.getElementById("FillByteTable").value)
+			var TileAddress = CorrectHexBigIntValue(document.getElementById("TileAddress").value)
+		//Calculate some variables based on user input
+			var LeftTileExist = 0n
+			if (LeftEndPiece > 0n) {
+				LeftTileExist = 1n
+			}
+			var RightTileExist = 0n
+			if (RightEndPiece > 0) {
+				RightTileExist = 1n
+			}
+			var NumberOfMiddleTiles = 0n
+			if ((MiddlePiece != 0n)&&(MiddleLength != 0n)) {
+				NumberOfMiddleTiles = MiddleLength
+			}
+			
+			var TotalNumberOfTileBytes = LeftTileExist + NumberOfMiddleTiles + RightTileExist
+			
+			var BarOfZeroTiles = false
+			if ((LeftTileExist + NumberOfMiddleTiles + RightTileExist) == 0n) {
+				BarOfZeroTiles = true
+			}
+			
+			var TotalPieces = LeftEndPiece + (MiddlePiece * MiddleLength) + RightEndPiece
+		//Display output
+			if (BarOfZeroTiles == false) {
+				OutputString += "<table>"
+				OutputString += "<tr>"
+				OutputString += "<td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> memory usage:</td>"
+				OutputString += "<td><kbd>$" + pad(FillByteTable.toString(16).toUpperCase(), 6) + "</kbd> to <kbd><abbr title='Index=$" + pad((TotalNumberOfTileBytes - 1n).toString(16).toUpperCase(), 2) + "'>$" + pad((FillByteTable + (TotalNumberOfTileBytes - 1n)).toString(16).toUpperCase(), 6) + "</kbd> (Number of bytes used: <kbd>" + TotalNumberOfTileBytes.toString(10) + "</kbd> (<kbd>$" + pad(TotalNumberOfTileBytes.toString(16).toUpperCase(), 2) + "</kbd>))</td>"
+				OutputString += "<tr>"
+				OutputString += "<td>Total pieces (full bar):</td>"
+				OutputString += "<td><kbd>" + TotalPieces.toString(10) + "</kbd> (<kbd>$" + pad(TotalPieces.toString(16).toUpperCase(), 4) + "</kbd>)</td>"
+				OutputString += "</tr>"
+			} else {
+				OutputString += "Error! A setting have resulted a total of 0 tiles!"
+			}
+		//Done
+			document.getElementById("Output").innerHTML = OutputString
+	}
+</script>
