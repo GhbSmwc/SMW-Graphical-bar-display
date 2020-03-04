@@ -27,17 +27,17 @@
 <a href="../GraphicalBar_ReadmeDocumentation.html#TopJSLink">Back to top</a><br>
 <a href="../GraphicalBar_ReadmeDocumentation.html#ComputeGraphicalBarData">Back to info table</a><br><br>
 <table>
-<tr><td>Fill amount:</td><td><input type="number" min="0" max="65535" id="FillAmountDec" onchange="UserInputDecToHex('FillAmountDec', 'FillAmountHex', 4, 0n, 65535n); Calculate()" value="0">/<kbd>$</kbd><input type="text" id="FillAmountHex" onchange="CorrectUserInputHexStringBigInt('FillAmountHex', 4); UserInputHexToDec('FillAmountHex', 'FillAmountDec', 4, 0n, 65535n); Calculate()" value="0000"></td></tr>
-<tr><td>Left End piece:</td><td><input type="number" min="0" max="255" id="LeftEndPieceDec" onchange="UserInputDecToHex('LeftEndPieceDec', 'LeftEndPieceHex', 2, 0n, 255n); Calculate()" value="3">/<kbd>$</kbd><input type="text" id="LeftEndPieceHex" onchange="CorrectUserInputHexStringBigInt('LeftEndPieceHex', 2); UserInputHexToDec('LeftEndPieceHex', 'LeftEndPieceDec', 2, 0n, 255n); Calculate()" value="03"></td></tr>
-<tr><td>Middle piece:</td><td><input type="number" min="0" max="255" id="MiddlePieceDec" onchange="UserInputDecToHex('MiddlePieceDec', 'MiddlePieceHex', 2, 0n, 255n); Calculate()" value="8">/<kbd>$</kbd><input type="text" id="MiddlePieceHex" onchange="CorrectUserInputHexStringBigInt('MiddlePieceHex', 2); UserInputHexToDec('MiddlePieceHex', 'MiddlePieceDec', 2, 0n, 255n); Calculate()" value="08"></td></tr>
-<tr><td>Right End piece:</td><td><input type="number" min="0" max="255" id="RightEndPieceDec" onchange="UserInputDecToHex('RightEndPieceDec', 'RightEndPieceHex', 2, 0n, 255n); Calculate()" value="3">/<kbd>$</kbd><input type="text" id="RightEndPieceHex" onchange="CorrectUserInputHexStringBigInt('RightEndPieceHex', 2); UserInputHexToDec('RightEndPieceHex', 'RightEndPieceDec', 2, 0n, 255n); Calculate()" value="03"></td></tr>
-<tr><td>Length (middle):</td><td><input type="number" min="0" max="255" id="MiddleLengthDec" onchange="UserInputDecToHex('MiddleLengthDec', 'MiddleLengthHex', 2, 0n, 255n); Calculate()" value="7">/<kbd>$</kbd><input type="text" id="MiddleLengthHex" onchange="CorrectUserInputHexStringBigInt('MiddleLengthHex', 2); UserInputHexToDec('MiddleLengthHex', 'MiddleLengthDec', 2, 0n, 255n); Calculate()" value="07"></td></tr>
+<tr><td>Fill amount:</td><td><input type="number" min="0" max="65535" id="FillAmountDec" onchange="UserInputDecToHex('FillAmountDec', 'FillAmountHex', 4, 0n, 65535n); Calculate()" value="0">(<kbd>$</kbd><input type="text" id="FillAmountHex" onchange="CorrectUserInputHexStringBigInt('FillAmountHex', 4); UserInputHexToDec('FillAmountHex', 'FillAmountDec', 4, 0n, 65535n); Calculate()" value="0000">)</td></tr>
+<tr><td>Left End piece:</td><td><input type="number" min="0" max="255" id="LeftEndPieceDec" onchange="UserInputDecToHex('LeftEndPieceDec', 'LeftEndPieceHex', 2, 0n, 255n); Calculate()" value="3">(<kbd>$</kbd><input type="text" id="LeftEndPieceHex" onchange="CorrectUserInputHexStringBigInt('LeftEndPieceHex', 2); UserInputHexToDec('LeftEndPieceHex', 'LeftEndPieceDec', 2, 0n, 255n); Calculate()" value="03">)</td></tr>
+<tr><td>Middle piece:</td><td><input type="number" min="0" max="255" id="MiddlePieceDec" onchange="UserInputDecToHex('MiddlePieceDec', 'MiddlePieceHex', 2, 0n, 255n); Calculate()" value="8">(<kbd>$</kbd><input type="text" id="MiddlePieceHex" onchange="CorrectUserInputHexStringBigInt('MiddlePieceHex', 2); UserInputHexToDec('MiddlePieceHex', 'MiddlePieceDec', 2, 0n, 255n); Calculate()" value="08">)</td></tr>
+<tr><td>Right End piece:</td><td><input type="number" min="0" max="255" id="RightEndPieceDec" onchange="UserInputDecToHex('RightEndPieceDec', 'RightEndPieceHex', 2, 0n, 255n); Calculate()" value="3">(<kbd>$</kbd><input type="text" id="RightEndPieceHex" onchange="CorrectUserInputHexStringBigInt('RightEndPieceHex', 2); UserInputHexToDec('RightEndPieceHex', 'RightEndPieceDec', 2, 0n, 255n); Calculate()" value="03">)</td></tr>
+<tr><td>Length (middle):</td><td><input type="number" min="0" max="255" id="MiddleLengthDec" onchange="UserInputDecToHex('MiddleLengthDec', 'MiddleLengthHex', 2, 0n, 255n); Calculate()" value="7">(<kbd>$</kbd><input type="text" id="MiddleLengthHex" onchange="CorrectUserInputHexStringBigInt('MiddleLengthHex', 2); UserInputHexToDec('MiddleLengthHex', 'MiddleLengthDec', 2, 0n, 255n); Calculate()" value="07">)</td></tr>
 <tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> location:</td><td><kbd>$</kbd><input type="text" maxlength="6" id="FillByteTable" onchange="CorrectUserInputHexStringBigInt('FillByteTable', 6); Calculate()" value="7F844A">
 
 <button onclick="BigintIncreaseDecreaseHexInput(1n, 'FillByteTable', 0n, 16777215n); CorrectUserInputHexStringBigInt('FillByteTable', 6); Calculate()">+</button>
 <button onclick="BigintIncreaseDecreaseHexInput(-1n, 'FillByteTable', 0n, 16777215n); CorrectUserInputHexStringBigInt('FillByteTable', 6); Calculate()">-</button></td></tr>
 
-<tr><td>To write your tiles at address...:</td><td><kbd>$</kbd><input type="text" maxlength="6" id="TileAddress" onchange="CorrectUserInputHexStringBigInt('TileAddress', 6)" value="7FA000">
+<tr><td>To write your tiles at address...:</td><td><kbd>$</kbd><input type="text" maxlength="6" id="TileAddress" onchange="CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()" value="7FA000">
 
 <button onclick="BigintIncreaseDecreaseHexInput(1n, 'TileAddress', 0n, 16777215n); CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()">+</button>
 <button onclick="BigintIncreaseDecreaseHexInput(-1n, 'TileAddress', 0n, 16777215n); CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()">-</button>
@@ -45,11 +45,11 @@
 <button onclick="BigintIncreaseDecreaseHexInput(-2n, 'TileAddress', 0n, 16777215n); CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()">-2</button></td></tr>
 
 <tr><td>Status bar format:</td><td>
-<input type="radio" id="StatusBarFormat1" name="StatusBarFormats"><label for="StatusBarFormat1"><kbd>[TTTTTTTT, TTTTTTTT,...], [YXPCCCTT, YXPCCCTT,...]</kbd></label><br>
-<input type="radio" id="StatusBarFormat2" name="StatusBarFormats" checked><label for="StatusBarFormat2"><kbd>[TTTTTTTT, YXPCCCTT]</kbd></label></td></tr>
+<input type="radio" id="StatusBarFormat1" name="StatusBarFormats" onchange="Calculate()"><label for="StatusBarFormat1"><kbd>[TTTTTTTT, TTTTTTTT,...], [YXPCCCTT, YXPCCCTT,...]</kbd></label><br>
+<input type="radio" id="StatusBarFormat2" name="StatusBarFormats" onchange="Calculate()" checked><label for="StatusBarFormat2"><kbd>[TTTTTTTT, YXPCCCTT]</kbd></label></td></tr>
 
-<tr><td>Leftwards bar?</td><td><input type="checkbox" id="LeftwardsBar"></td></tr>
-<tr><td>Extends leftwards?</td><td><input type="checkbox" id="ExtendLeftwardsBar"></td></tr>
+<tr><td>Leftwards bar?</td><td><input type="checkbox" id="LeftwardsBar" onchange="Calculate()"></td></tr>
+<tr><td>Extends leftwards?</td><td><input type="checkbox" id="ExtendLeftwardsBar" onchange="Calculate()"></td></tr>
 
 <tr><td>Using static end tiles?</td><td>
 <input type="checkbox" id="UsingStaticLeftEnd"><label for="UsingStaticLeftEnd">Left end</label><br>
@@ -110,6 +110,14 @@
 		var s = num+"";
 		while (s.length < size) s = "0" + s;
 		return s;
+	}
+	function DisplaySignedBigIntHexString(num, PaddingSize) {
+		if (num >= 0n) {
+			num = "$"+ pad(num.toString(16).toUpperCase(), PaddingSize)
+		} else {
+			num = "(-$" + pad((num*-1n).toString(16).toUpperCase(), PaddingSize) + ")"
+		}
+		return num
 	}
 	//----------------------------Stuff that display the output and reset-related main code.
 	function Reset() {
@@ -176,6 +184,15 @@
 			}
 			
 			var TotalPieces = LeftEndPiece + (MiddlePiece * MiddleLength) + RightEndPiece
+			
+			var StatusBarFormat = 1n
+			if (document.getElementById("StatusBarFormat2").checked == true) {
+				StatusBarFormat = 2n
+			}
+			var StartingTileAddress = TileAddress
+			if (document.getElementById("ExtendLeftwardsBar").checked == true) {
+				StartingTileAddress = TileAddress - ((TotalNumberOfTileBytes - 1n) * StatusBarFormat)
+			}
 		//Display output
 			if (BarOfZeroTiles == false) {
 				//RAM summary
@@ -188,7 +205,7 @@
 					OutputString += "<td><kbd>" + TotalPieces.toString(10) + "</kbd> (<kbd>$" + pad(TotalPieces.toString(16).toUpperCase(), 4) + "</kbd>)</td>"
 					OutputString += "</tr>"
 					OutputString += "</table>"
-				//Handle byte array
+				//Handle fill byte array
 					var FillByteTableValues = [
 					//      0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
 						0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, //0-15
@@ -249,15 +266,73 @@
 							FillAmountIndex++
 						}
 				//Display the table array of bar tile bytes
-					var TileBytesCount = 0n
+					MiddleTilesLeft = NumberOfMiddleTiles
+					FillAmountIndex = 0n
+					var FractionTileProcessed = 0n //>This determines should it say the tile is full (= 0), fraction (0 to max-1) (= 1), or empty (= 2).
 					OutputString += "<table>"
-					OutputString += "<tr><th><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> addresses</th><th>Fill amount</th></tr>"
-					for (TileBytesCount = 0n; TileBytesCount < TotalNumberOfTileBytes; TileBytesCount++) {
-						OutputString += "<tr>"
-						OutputString += "<td><kbd>$" + pad((FillByteTable + TileBytesCount).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + TileBytesCount.toString(10) + "</kbd>)</td>"
-						OutputString += "<td><kbd>$" + pad((FillByteTableValues[TileBytesCount]).toString(16).toUpperCase(), 2) + "</kbd></td>"
-						OutputString += "</tr>"
-					}
+					OutputString += "<tr><th><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> addresses</th><th>Fill amount</th><th>Max fill amount</th><th>Tile byte type</th><th>Tile address</th></tr>"
+					//LeftEnd
+						if (LeftTileExist != 0) {
+							OutputString += "<tr>"
+							OutputString += "<td><kbd>$" + pad((FillByteTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + FillAmountIndex.toString(10) + "</kbd>)</td>"
+							//Color to indicate full/fraction/empty.
+								if (FillByteTableValues[FillAmountIndex] < LeftEndPiece) {
+									OutputString += "<td bgcolor='yellow'><font color='black'><kbd>" + (FillByteTableValues[FillAmountIndex]).toString(10) + "</kbd> (<kbd>$" + pad((FillByteTableValues[FillAmountIndex]).toString(16).toUpperCase(), 2) + "</kbd>)</font></td>"
+									FractionTileProcessed = 2n //If this tile is fraction, rest should be empty
+								} else {
+									OutputString += "<td bgcolor='orange'><kbd>" + (FillByteTableValues[FillAmountIndex]).toString(10) + "</kbd> (<kbd>$" + pad((FillByteTableValues[FillAmountIndex]).toString(16).toUpperCase(), 2) + "</kbd>)</td>"
+								}
+							OutputString += "<td><kbd>" + LeftEndPiece.toString(10) + "</kbd> (<kbd>$" + pad(LeftEndPiece.toString(16).toUpperCase(), 2) + "</kbd>)</td>"
+							OutputString += "<td><font color='cyan'>Left end</font></td>"
+							OutputString += "<td><kbd>" + DisplaySignedBigIntHexString(StartingTileAddress, 6) + "</kbd></td>"
+							OutputString += "</tr>"
+							FillAmountIndex++
+						}
+					//Middle
+						while (MiddleTilesLeft != 0) {
+							OutputString += "<tr>"
+							OutputString += "<td><kbd>$" + pad((FillByteTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + FillAmountIndex.toString(10) + "</kbd>)</td>"
+							//Color to indicate full/fraction/empty.
+								if ((FillByteTableValues[FillAmountIndex] < MiddlePiece) && (FractionTileProcessed == 0n)) {
+									FractionTileProcessed = 1n //Mark this as a fraction if previous of the 3 sections (left, middle or right) of the bar is full.
+								}
+								if (FractionTileProcessed == 0n) {
+									OutputString += "<td bgcolor='orange'><kbd>" + (FillByteTableValues[FillAmountIndex]).toString(10) + "</kbd> (<kbd>$" + pad((FillByteTableValues[FillAmountIndex]).toString(16).toUpperCase(), 2) + "</kbd>)</td>"
+								} else if (FractionTileProcessed == 1n) {
+									OutputString += "<td bgcolor='yellow'><font color='black'><kbd>" + (FillByteTableValues[FillAmountIndex]).toString(10) + "</kbd> (<kbd>$" + pad((FillByteTableValues[FillAmountIndex]).toString(16).toUpperCase(), 2) + "</kbd>)</font></td>"
+									FractionTileProcessed = 2n //After a fraction tile, mark rest as empty
+								} else {
+									OutputString += "<td bgcolor='grey'><kbd>" + (FillByteTableValues[FillAmountIndex]).toString(10) + "</kbd> (<kbd>$" + pad((FillByteTableValues[FillAmountIndex]).toString(16).toUpperCase(), 2) + "</kbd>)</td>"
+								}
+							OutputString += "<td><kbd>" + MiddlePiece.toString(10) + "</kbd> (<kbd>$" + pad(MiddlePiece.toString(16).toUpperCase(), 2) + "</kbd>)</td>"
+							OutputString += "<td><font color='#00FF00'>Middle " + ((NumberOfMiddleTiles - MiddleTilesLeft) + 1n).toString(10) + "</font></td>"
+							OutputString += "<td><kbd>" + DisplaySignedBigIntHexString((StartingTileAddress + (FillAmountIndex * StatusBarFormat)), 6) + "</kbd></td>"
+							OutputString += "</tr>"
+							
+							MiddleTilesLeft--
+							FillAmountIndex++
+						}
+					//RightEnd
+						if (RightTileExist != 0) {
+							OutputString += "<tr>"
+							OutputString += "<td><kbd>$" + pad((FillByteTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + FillAmountIndex.toString(10) + "</kbd>)</td>"
+							//Color to indicate full/fraction/empty.
+								if ((FillByteTableValues[FillAmountIndex] < RightEndPiece) && (FractionTileProcessed == 0n)) {
+									FractionTileProcessed = 1n //Mark this as a fraction if previous of the 3 sections (left, middle or right) of the bar is full.
+								}
+								if (FractionTileProcessed == 0n) {
+									OutputString += "<td bgcolor='orange'><kbd>" + (FillByteTableValues[FillAmountIndex]).toString(10) + "</kbd> (<kbd>$" + pad((FillByteTableValues[FillAmountIndex]).toString(16).toUpperCase(), 2) + "</kbd>)</td>"
+								} else if (FractionTileProcessed == 1n) {
+									OutputString += "<td bgcolor='yellow'><font color='black'><kbd>" + (FillByteTableValues[FillAmountIndex]).toString(10) + "</kbd> (<kbd>$" + pad((FillByteTableValues[FillAmountIndex]).toString(16).toUpperCase(), 2) + "</kbd>)</font></td>"
+								} else {
+									OutputString += "<td bgcolor='grey'><kbd>" + (FillByteTableValues[FillAmountIndex]).toString(10) + "</kbd> (<kbd>$" + pad((FillByteTableValues[FillAmountIndex]).toString(16).toUpperCase(), 2) + "</kbd>)</td>"
+								}
+							OutputString += "<td><kbd>" + RightEndPiece.toString(10) + "</kbd> (<kbd>$" + pad(RightEndPiece.toString(16).toUpperCase(), 2) + "</kbd>)</td>"
+							OutputString += "<td><font color='red'>Right end</font></td>"
+							OutputString += "<td><kbd>" + DisplaySignedBigIntHexString((StartingTileAddress + (FillAmountIndex * StatusBarFormat)), 6) + "</kbd></td>"
+							OutputString += "</tr>"
+							FillAmountIndex++
+						}
 					OutputString += "</table>"
 			} else {
 				OutputString += "Error! A setting have resulted a total of 0 tiles!"
