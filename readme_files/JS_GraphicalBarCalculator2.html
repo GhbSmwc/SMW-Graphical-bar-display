@@ -21,6 +21,8 @@
 			}
 			input[type='text'] { font-family: monospace;}
 			input[type='number'] { font-family: monospace;}
+			
+			abbr{cursor: help;}
 		</style>
 	</head>
 <body onload="Calculate()"></body>
@@ -37,7 +39,7 @@
 <button onclick="BigintIncreaseDecreaseHexInput(1n, 'FillByteTable', 0n, 16777215n); CorrectUserInputHexStringBigInt('FillByteTable', 6); Calculate()">+</button>
 <button onclick="BigintIncreaseDecreaseHexInput(-1n, 'FillByteTable', 0n, 16777215n); CorrectUserInputHexStringBigInt('FillByteTable', 6); Calculate()">-</button></td></tr>
 
-<tr><td>To write your tiles at address...:</td><td><kbd>$</kbd><input type="text" maxlength="6" id="TileAddress" onchange="CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()" value="7FA000">
+<tr><td><abbr title="The RAM address that is the tile number and/or properties for the status bar or overworld border+.">To write your tiles at address...</abbr>:</td><td><kbd>$</kbd><input type="text" maxlength="6" id="TileAddress" onchange="CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()" value="7FA000">
 
 <button onclick="BigintIncreaseDecreaseHexInput(1n, 'TileAddress', 0n, 16777215n); CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()">+</button>
 <button onclick="BigintIncreaseDecreaseHexInput(-1n, 'TileAddress', 0n, 16777215n); CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()">-</button>
@@ -284,7 +286,11 @@
 								}
 							OutputString += "<td><kbd>" + LeftEndPiece.toString(10) + "</kbd> (<kbd>$" + pad(LeftEndPiece.toString(16).toUpperCase(), 2) + "</kbd>)</td>"
 							OutputString += "<td><font color='cyan'>Left end</font></td>"
-							OutputString += "<td><kbd>" + DisplaySignedBigIntHexString(StartingTileAddress, 6) + "</kbd></td>"
+							if (document.getElementById("LeftwardsBar").checked == false) {
+								OutputString += "<td><kbd>" + DisplaySignedBigIntHexString(StartingTileAddress, 6) + "</kbd></td>"
+							} else {
+								OutputString += "<td><kbd>" + DisplaySignedBigIntHexString((StartingTileAddress + (((TotalNumberOfTileBytes-1n) - FillAmountIndex) * StatusBarFormat)), 6) + "</kbd></td>"
+							}
 							OutputString += "</tr>"
 							FillAmountIndex++
 						}
@@ -306,7 +312,11 @@
 								}
 							OutputString += "<td><kbd>" + MiddlePiece.toString(10) + "</kbd> (<kbd>$" + pad(MiddlePiece.toString(16).toUpperCase(), 2) + "</kbd>)</td>"
 							OutputString += "<td><font color='#00FF00'>Middle " + ((NumberOfMiddleTiles - MiddleTilesLeft) + 1n).toString(10) + "</font></td>"
-							OutputString += "<td><kbd>" + DisplaySignedBigIntHexString((StartingTileAddress + (FillAmountIndex * StatusBarFormat)), 6) + "</kbd></td>"
+							if (document.getElementById("LeftwardsBar").checked == false) {
+								OutputString += "<td><kbd>" + DisplaySignedBigIntHexString((StartingTileAddress + (FillAmountIndex * StatusBarFormat)), 6) + "</kbd></td>"
+							} else {
+								OutputString += "<td><kbd>" + DisplaySignedBigIntHexString((StartingTileAddress + (((TotalNumberOfTileBytes-1n) - FillAmountIndex) * StatusBarFormat)), 6) + "</kbd></td>"
+							}
 							OutputString += "</tr>"
 							
 							MiddleTilesLeft--
@@ -329,7 +339,11 @@
 								}
 							OutputString += "<td><kbd>" + RightEndPiece.toString(10) + "</kbd> (<kbd>$" + pad(RightEndPiece.toString(16).toUpperCase(), 2) + "</kbd>)</td>"
 							OutputString += "<td><font color='red'>Right end</font></td>"
-							OutputString += "<td><kbd>" + DisplaySignedBigIntHexString((StartingTileAddress + (FillAmountIndex * StatusBarFormat)), 6) + "</kbd></td>"
+							if (document.getElementById("LeftwardsBar").checked == false) {
+								OutputString += "<td><kbd>" + DisplaySignedBigIntHexString((StartingTileAddress + (FillAmountIndex * StatusBarFormat)), 6) + "</kbd></td>"
+							} else {
+								OutputString += "<td><kbd>" + DisplaySignedBigIntHexString((StartingTileAddress + (((TotalNumberOfTileBytes-1n) - FillAmountIndex) * StatusBarFormat)), 6) + "</kbd></td>"
+							}
 							OutputString += "</tr>"
 							FillAmountIndex++
 						}
