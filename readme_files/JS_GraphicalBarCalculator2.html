@@ -34,12 +34,27 @@
 <tr><td>Middle piece:</td><td><input type="number" min="0" max="255" id="MiddlePieceDec" onchange="UserInputDecToHex('MiddlePieceDec', 'MiddlePieceHex', 2, 0n, 255n); Calculate()" value="8">(<kbd>$</kbd><input type="text" id="MiddlePieceHex" onchange="CorrectUserInputHexStringBigInt('MiddlePieceHex', 2); UserInputHexToDec('MiddlePieceHex', 'MiddlePieceDec', 2, 0n, 255n); Calculate()" value="08">)</td></tr>
 <tr><td>Right End piece:</td><td><input type="number" min="0" max="255" id="RightEndPieceDec" onchange="UserInputDecToHex('RightEndPieceDec', 'RightEndPieceHex', 2, 0n, 255n); Calculate()" value="3">(<kbd>$</kbd><input type="text" id="RightEndPieceHex" onchange="CorrectUserInputHexStringBigInt('RightEndPieceHex', 2); UserInputHexToDec('RightEndPieceHex', 'RightEndPieceDec', 2, 0n, 255n); Calculate()" value="03">)</td></tr>
 <tr><td>Length (middle):</td><td><input type="number" min="0" max="255" id="MiddleLengthDec" onchange="UserInputDecToHex('MiddleLengthDec', 'MiddleLengthHex', 2, 0n, 255n); Calculate()" value="7">(<kbd>$</kbd><input type="text" id="MiddleLengthHex" onchange="CorrectUserInputHexStringBigInt('MiddleLengthHex', 2); UserInputHexToDec('MiddleLengthHex', 'MiddleLengthDec', 2, 0n, 255n); Calculate()" value="07">)</td></tr>
-<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> location:</td><td><kbd>$</kbd><input type="text" maxlength="6" id="FillByteTable" onchange="CorrectUserInputHexStringBigInt('FillByteTable', 6); Calculate()" value="7F844A">
+<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> location:</td><td><kbd>$</kbd><input type="text" maxlength="6" id="FillByteTable" onchange="CorrectUserInputHexStringBigInt('FillByteTable', 6); Calculate()" value="7F844A" list="BarTileTableRAMList">
+
+<datalist id="BarTileTableRAMList">
+<option value="7F844A">Default RAM address table</option>
+<option value="400198">SA-1 version</option>
+</datalist>
 
 <button onclick="BigintIncreaseDecreaseHexInput(1n, 'FillByteTable', 0n, 16777215n); CorrectUserInputHexStringBigInt('FillByteTable', 6); Calculate()">+</button>
 <button onclick="BigintIncreaseDecreaseHexInput(-1n, 'FillByteTable', 0n, 16777215n); CorrectUserInputHexStringBigInt('FillByteTable', 6); Calculate()">-</button></td></tr>
 
-<tr><td><abbr title="The RAM address that is the tile number and/or properties for the status bar or overworld border+.">To write your tiles at address...</abbr>:</td><td><kbd>$</kbd><input type="text" maxlength="6" id="TileAddress" onchange="CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()" value="7FA000">
+<tr><td><abbr title="The RAM address that is the tile number and/or properties for the status bar or overworld border+.">To write your tiles at address...</abbr>:</td><td><kbd>$</kbd><input type="text" maxlength="6" id="TileAddress" onchange="CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()" value="7FA000" list="StatusBarRAMTileList">
+<datalist id="StatusBarRAMTileList">
+<option value="7E0F09">SMW's status bar (Writes over &ldquo;TIME&rdquo;)</option>
+<option value="7FA000">Super status bar </option>
+<option value="404000">Super status bar (SA-1)</option>
+<option value="7FA03E">Super status bar (Top right corner)</option>
+<option value="40403E">Super status bar (SA-1, top right corner)</option>
+
+<option value="7FEC00">Overworld border plus</option>
+<option value="41EC00">Overworld border plus (SA-1)</option>
+</datalist>
 
 <button onclick="BigintIncreaseDecreaseHexInput(1n, 'TileAddress', 0n, 16777215n); CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()">+</button>
 <button onclick="BigintIncreaseDecreaseHexInput(-1n, 'TileAddress', 0n, 16777215n); CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()">-</button>
@@ -54,8 +69,8 @@
 <tr><td>Extends leftwards?</td><td><input type="checkbox" id="ExtendLeftwardsBar" onchange="Calculate()"></td></tr>
 
 <tr><td>Using static end tiles?</td><td>
-<input type="checkbox" id="UsingStaticLeftEnd"><label for="UsingStaticLeftEnd">Left end</label><br>
-<input type="checkbox" id="UsingStaticRightEnd"><label for="UsingStaticRightEnd">Right end</label></td></tr>
+<input type="checkbox" id="UsingStaticLeftEnd" onchange="Calculate()"><label for="UsingStaticLeftEnd">Left end</label><br>
+<input type="checkbox" id="UsingStaticRightEnd" onchange="Calculate()"><label for="UsingStaticRightEnd">Right end</label></td></tr>
 </table>
 <button onclick="Reset(); Calculate()">Reset</button>
 <hr>
@@ -206,7 +221,29 @@
 					OutputString += "<td>Total pieces (full bar):</td>"
 					OutputString += "<td><kbd>" + TotalPieces.toString(10) + "</kbd> (<kbd>$" + pad(TotalPieces.toString(16).toUpperCase(), 4) + "</kbd>)</td>"
 					OutputString += "</tr>"
-					OutputString += "</table>"
+					OutputString += "<tr><th colspan='2'>Tile addresses</th></tr>"
+					if (document.getElementById("UsingStaticLeftEnd").checked == true){
+						OutputString += "<tr>"
+						OutputString += "<td>Static left end:</td>"
+						OutputString += "<td><kbd>" + DisplaySignedBigIntHexString((StartingTileAddress) - StatusBarFormat, 6) + "</kbd></td>"
+						OutputString += "</tr>"
+					}
+					OutputString += "<tr>"
+					OutputString += "<td>Changable tiles:</td>"
+					OutputString += "<td>"
+					OutputString += "<kbd>" + DisplaySignedBigIntHexString(StartingTileAddress, 6) + "</kbd> to <kbd>" + DisplaySignedBigIntHexString(StartingTileAddress + ((TotalNumberOfTileBytes-1n) * StatusBarFormat), 6) + "</kbd>"
+					if (StatusBarFormat == 2n) {
+						OutputString += " (<abbr title='Example: " + DisplaySignedBigIntHexString(StartingTileAddress, 6) + ", " + DisplaySignedBigIntHexString(StartingTileAddress +2n, 6) + ", " + DisplaySignedBigIntHexString(StartingTileAddress +4n, 6) + "...'>Every other byte)</abbr>"
+					}
+					OutputString += "</td>"
+					OutputString += "</tr>"
+					if (document.getElementById("UsingStaticRightEnd").checked == true){
+						OutputString += "<tr>"
+						OutputString += "<td>Static right end:</td>"
+						OutputString += "<td><kbd>" + DisplaySignedBigIntHexString((StartingTileAddress) + (TotalNumberOfTileBytes * StatusBarFormat), 6) + "</kbd></td>"
+						OutputString += "</tr>"
+					}
+					OutputString += "</table><br>"
 				//Handle fill byte array
 					var FillByteTableValues = [
 					//      0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
