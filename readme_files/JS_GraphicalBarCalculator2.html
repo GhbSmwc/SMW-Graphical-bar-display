@@ -309,7 +309,7 @@
 					FillAmountIndex = 0n
 					var FractionTileProcessed = 0n //>This determines should it say the tile is full (= 0), fraction (0 to max-1) (= 1), or empty (= 2).
 					OutputString += "<table>"
-					OutputString += "<tr><th><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> addresses</th><th>Fill amount</th><th>Max fill amount</th><th>Tile byte type</th><th>Tile address</th></tr>"
+					OutputString += "<tr><th><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> addresses</th><th><abbr title='The values stored in $" + pad(FillByteTable.toString(16).toUpperCase(), 6) + " table.'>Fill amount</th><th>Max fill amount</th><th>Tile byte type</th><th>Tile address</th></tr>"
 					//LeftEnd
 						if (LeftTileExist != 0) {
 							OutputString += "<tr>"
