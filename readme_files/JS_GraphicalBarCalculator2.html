@@ -144,6 +144,17 @@
 		}
 		return ReturnValue
 	}
+	function CheckTwoRangesOverlapping(RangeAMin, RangeAMax, RangeBMin, RangeBMax) {
+		//Returns true of 2 ranges overlap, examples:
+		//A: 1-5, B: 6-10: false
+		//A: 1-5, B: 5-9: true
+		//A: 1-5, B: 1-5: true
+		var ReturnValue = false
+		if ((RangeAMax >= RangeBMin) && (RangeAMin <= RangeBMax)) {
+			ReturnValue = true
+		}
+		return ReturnValue
+	}
 	//----------------------------Stuff that display the output and reset-related main code.
 	function Reset() {
 		document.getElementById("FillAmountDec").value = "0"
@@ -232,8 +243,13 @@
 					OutputString += "<td><kbd>$" + pad(FillByteTable.toString(16).toUpperCase(), 6) + "</kbd> to <kbd><abbr title='Index=$" + pad((TotalNumberOfTileBytes - 1n).toString(16).toUpperCase(), 2) + "'>$" + pad((FillByteTable + (TotalNumberOfTileBytes - 1n)).toString(16).toUpperCase(), 6) + "</kbd> (Number of tile bytes used: <kbd>" + TotalNumberOfTileBytes.toString(10) + "</kbd> (<kbd>$" + pad(TotalNumberOfTileBytes.toString(16).toUpperCase(), 2) + "</kbd>))</td>"
 					OutputString += "</tr>"
 					OutputString += "<tr>"
-					OutputString += "<td>Second fill table (when using non-flicker graphical bar):</td>"
-					OutputString += "<td><kbd>$" + pad(SecondFillTable.toString(16).toUpperCase(), 6) + "</kbd> to <kbd>$" + pad((SecondFillTable + (TotalNumberOfTileBytes - 1n)).toString(16).toUpperCase(), 6) + "</kbd> (Same as above on the number of bytes and indexes as above)</td>"
+					OutputString += "<td>Second fill table (when using &ldquo;seperate graphics&rdquo;):</td>"
+					OutputString += "<td>"
+					OutputString += "<kbd>$" + pad(SecondFillTable.toString(16).toUpperCase(), 6) + "</kbd> to <kbd>$" + pad((SecondFillTable + (TotalNumberOfTileBytes - 1n)).toString(16).toUpperCase(), 6) + "</kbd> (Number of tile bytes used: <kbd>" + TotalNumberOfTileBytes.toString(10) + "</kbd> (<kbd>$" + pad(TotalNumberOfTileBytes.toString(16).toUpperCase(), 2) + "</kbd>))"
+					if (CheckTwoRangesOverlapping(FillByteTable, (FillByteTable + (TotalNumberOfTileBytes - 1n)), SecondFillTable, (SecondFillTable + (TotalNumberOfTileBytes - 1n)))) {
+						OutputString += "<br><font color='red'>Overlap detected!</font>"
+					}
+					OutputString += "</td>"
 					OutputString += "</tr>"
 					OutputString += "<tr>"
 					OutputString += "<td>Total pieces (full bar):</td>"
@@ -333,9 +349,9 @@
 							OutputString += "<tr>"
 							OutputString += "<td><kbd>$" + pad((FillByteTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + FillAmountIndex.toString(10) + "</kbd>)</td>"
 							OutputString += "<td>"
-							OutputString += "<kbd>$" + pad((SecondFillTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + SecondFillOffset.toString(10) + "+" + FillAmountIndex.toString(10) + "</kbd>) "
+							OutputString += "<kbd>$" + pad((SecondFillTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + SecondFillOffset.toString(10) + "+" + FillAmountIndex.toString(10) + "</kbd>)"
 							if (CheckIfNumInRange(SecondFillTable, FillByteTable, (FillByteTable + (TotalNumberOfTileBytes - 1n)))) {
-								OutputString += "<font color='red'>Overlap Detected!</font>"
+								OutputString += "<font color='red'> Overlap Detected!</font>"
 							}
 							OutputString += "</td>"
 							//Color to indicate full/fraction/empty.
@@ -360,9 +376,9 @@
 							OutputString += "<tr>"
 							OutputString += "<td><kbd>$" + pad((FillByteTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + FillAmountIndex.toString(10) + "</kbd>)</td>"
 							OutputString += "<td>"
-							OutputString += "<kbd>$" + pad((SecondFillTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + SecondFillOffset.toString(10) + "+" + FillAmountIndex.toString(10) + "</kbd>) "
+							OutputString += "<kbd>$" + pad((SecondFillTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + SecondFillOffset.toString(10) + "+" + FillAmountIndex.toString(10) + "</kbd>)"
 							if (CheckIfNumInRange((SecondFillTable + FillAmountIndex), FillByteTable, (FillByteTable + (TotalNumberOfTileBytes - 1n)))) {
-								OutputString += "<font color='red'>Overlap Detected!</font>"
+								OutputString += "<font color='red'> Overlap Detected!</font>"
 							}
 							OutputString += "</td>"
 							//Color to indicate full/fraction/empty.
@@ -394,9 +410,9 @@
 							OutputString += "<tr>"
 							OutputString += "<td><kbd>$" + pad((FillByteTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + FillAmountIndex.toString(10) + "</kbd>)</td>"
 							OutputString += "<td>"
-							OutputString += "<kbd>$" + pad((SecondFillTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + SecondFillOffset.toString(10) + "+" + FillAmountIndex.toString(10) + "</kbd>) "
+							OutputString += "<kbd>$" + pad((SecondFillTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + SecondFillOffset.toString(10) + "+" + FillAmountIndex.toString(10) + "</kbd>)"
 							if (CheckIfNumInRange((SecondFillTable + FillAmountIndex), FillByteTable, (FillByteTable + (TotalNumberOfTileBytes - 1n)))) {
-								OutputString += "<font color='red'>Overlap Detected!</font>"
+								OutputString += "<font color='red'> Overlap Detected!</font>"
 							}
 							OutputString += "</td>"
 							//Color to indicate full/fraction/empty.
