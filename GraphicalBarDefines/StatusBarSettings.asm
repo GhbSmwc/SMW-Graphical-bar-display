@@ -191,21 +191,6 @@
 		!SecondFillHexValDisplayPos          = $40403C
 	endif
 		;^Same as above, but secondfill.
-	;Display type
-		!DoubleBar_DisplayType = 1
-			;0 = Use alternating frames (rapid flicker). Must use
-			;    the non-double bar graphic.
-			;1 = Use overlapping graphic (differently colored fill).
-			;    This must have LG1 and LG2 use the double bar graphic.
-
-		!DoubleBar_RoundAway = 1
-			;0 = allow rounding towards empty and full
-			;1 = force to round towards either 1 pieces or maximum-1.
-
-		!DoubleBar_MaxQuantity = $FF
-			;^The maximum value (max quantity) controlled by D-pad.
-
-
 	;Same as above, but this is the "percent" fill:
 		if !sa1 == 0
 			!FirstFillPercentHexValDisplayPos   = $7FA076
@@ -217,6 +202,36 @@
 		else
 			!SecondFillPercentHexValDisplayPos  = $40407C
 		endif
+			;^NOTE: these only display how much of the 2 fills is in the
+			; bar. Meaning with !DoubleBar_DisplayIncrease set to 1,
+			; when FirstQuantity is greater than SecondQuantity (when the
+			; value increases), this happens:
+			;
+			;  SecondFill ("transparent fill") = "Current value"
+			;  FirstFill ("Opaque fill") = "Previous value"
+			;
+			; Therefore, this is the inverse when the fill amount decreases:
+			;
+			;  SecondFill ("transparent fill") = "Previous value"
+			;  FirstFill ("Opaque fill") = "Current value"
+			;
+	;Display type
+		!DoubleBar_DisplayType = 1
+			;^0 = Use alternating frames (rapid flicker). Must use
+			;     the non-double bar graphic.
+			; 1 = Use overlapping graphic (Using separate graphics).
+			;     This must have LG1 and LG2 use the double bar graphic.
+
+		!DoubleBar_RoundAway = 1
+			;^0 = allow rounding towards empty and full (applies to both fills)
+			; 1 = force to round towards either 1 pieces or maximum-1.
+			
+		!DoubleBar_DisplayIncrease = 1
+			;^0 = only display the SecondFill when the bar decreases
+			; 1 = display an increase as well (ideal for when HP is recovered)
+	;Max amount
+		!DoubleBar_MaxQuantity = $FF
+			;^The maximum value (max quantity) controlled by D-pad.
 	
 	;RAM testing for how much fill in bar for a double bar.
 		!Freeram_FirstQuantity = $58
