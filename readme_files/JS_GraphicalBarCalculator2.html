@@ -155,6 +155,20 @@
 		}
 		return ReturnValue
 	}
+	function BigIntMin(A, B) {
+		var ReturnValue = A
+		if (B < A) {
+			ReturnValue = B
+		}
+		return ReturnValue
+	}
+	function BigIntMax(A, B) {
+		var ReturnValue = A
+		if (B > A) {
+			ReturnValue = B
+		}
+		return ReturnValue
+	}
 	//----------------------------Stuff that display the output and reset-related main code.
 	function Reset() {
 		document.getElementById("FillAmountDec").value = "0"
@@ -247,7 +261,7 @@
 					OutputString += "<td>"
 					OutputString += "<kbd>$" + pad(SecondFillTable.toString(16).toUpperCase(), 6) + "</kbd> to <kbd>$" + pad((SecondFillTable + (TotalNumberOfTileBytes - 1n)).toString(16).toUpperCase(), 6) + "</kbd> (Number of tile bytes used: <kbd>" + TotalNumberOfTileBytes.toString(10) + "</kbd> (<kbd>$" + pad(TotalNumberOfTileBytes.toString(16).toUpperCase(), 2) + "</kbd>))"
 					if (CheckTwoRangesOverlapping(FillByteTable, (FillByteTable + (TotalNumberOfTileBytes - 1n)), SecondFillTable, (SecondFillTable + (TotalNumberOfTileBytes - 1n)))) {
-						OutputString += "<br><font color='red'>Overlap detected!</font>"
+						OutputString += "<br><font color='red'>Overlap detected at address <kbd>$" + pad((BigIntMax(FillByteTable, SecondFillTable)).toString(16).toUpperCase(), 6) + "</kbd> to <kbd>$" + pad(BigIntMin((FillByteTable + (TotalNumberOfTileBytes - 1n)), (SecondFillTable + (TotalNumberOfTileBytes - 1n))).toString(16).toUpperCase(), 6) + "</kbd>.</font>"
 					}
 					OutputString += "</td>"
 					OutputString += "</tr>"
