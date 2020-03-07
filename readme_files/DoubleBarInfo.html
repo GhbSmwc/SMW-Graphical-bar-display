@@ -25,7 +25,7 @@ There are two ways to do this using this graphical bar code:
 <table>
 <tr>
 <th>Rapid-flicker</th>
-<th>Using differently colored fill</th>
+<th>Using separate graphics</th>
 </tr>
 <td>
 <center><img src="DoubleBarFills_Flicker.gif"></center><br>
@@ -40,7 +40,7 @@ background tiles on the same layer cannot overlap. Not recommended for use due t
 
 <h2>How this works</h2>
 These bars have two values stored in memory so that they are both represented as separate fills. It's essentially two bars merged into one. The code to do this is
-considerably different if you want the &ldquo;rapid-flicker&rdquo; or &ldquo;differently colored fill&rdquo;.
+considerably different if you want the &ldquo;rapid-flicker&rdquo; or &ldquo;separate graphics&rdquo;.
 <ul>
 <li><b>Rapid-flicker</b>: Template:
 
@@ -129,7 +129,7 @@ The red font is the things you can replace. Note that this does not work with ti
 Border Plus updates tile every other frame), in this case you left shift the <nobr><kbd>#%00000001</kbd></nobr> to <nobr><kbd>#%00000010</kbd></nobr> to obtain
 a slower flicker animation to accommodate this (however the flicker distinct frames become much more noticeable).
 </li><br>
-<li><b>Differently colored fill</b>: You actually have to call the graphical bar routines (<kbd>DrawGraphicalBar</kbd> and maybe
+<li><b>separate graphics</b>: You actually have to call the graphical bar routines (<kbd>DrawGraphicalBar</kbd> and maybe
 <kbd>CalculateGraphicalBarPercentage</kbd>) twice, with the first one's (<kbd>FirstQuantity</kbd>) table being moved to another location in memory.
 Oh, and because there are repeated codes, they are moved to subroutines to save space:
 <table><tr><td><pre>incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
@@ -158,9 +158,9 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	..TransferFirstFillBar ;>FirstFill will be located just after SecondFill in memory address: <SecondFill_Table><FirstFill_Table>
 	PHB
 	REP #$30
-	LDA.w #!Setting_GraphicalBar_SecondFillByteTableOffset-1								;>Number of bytes to transfer, -1 (because byte 0 is included)
+	LDA.w #!Setting_GraphicalBar_SecondFillByteTableOffset-1					;>Number of bytes to transfer, -1 (because byte 0 is included)
 	LDX.w #!Scratchram_GraphicalBar_FillByteTbl							;>Source address
-	LDY.w #!Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset				;>Destination address
+	LDY.w #!Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset	;>Destination address
 	MVN (!Scratchram_GraphicalBar_FillByteTbl>>16), (!Scratchram_GraphicalBar_FillByteTbl>>16)	;>Move them
 	SEP #$30
 	PLB

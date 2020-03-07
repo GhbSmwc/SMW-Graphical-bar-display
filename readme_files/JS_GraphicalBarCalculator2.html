@@ -26,6 +26,9 @@
 		</style>
 	</head>
 <body onload="Calculate()"></body>
+
+<p>Make sure your browser supports <kbd>BigInt</kbd> as javascript's new number format.</p>
+
 <a href="../GraphicalBar_ReadmeDocumentation.html#TopJSLink">Back to top</a><br>
 <a href="../GraphicalBar_ReadmeDocumentation.html#ComputeGraphicalBarData">Back to info table</a><br><br>
 <table>
@@ -35,6 +38,9 @@
 <tr><td>Middle piece:</td><td><input type="number" min="0" max="255" id="MiddlePieceDec" onchange="UserInputDecToHex('MiddlePieceDec', 'MiddlePieceHex', 2, 0n, 255n); Calculate()" value="8">(<kbd>$</kbd><input type="text" id="MiddlePieceHex" onchange="CorrectUserInputHexStringBigInt('MiddlePieceHex', 2); UserInputHexToDec('MiddlePieceHex', 'MiddlePieceDec', 2, 0n, 255n); Calculate()" value="08"><button onclick="BigintIncreaseDecreaseHexInput(1n, 'MiddlePieceHex', 0n, 255n); UserInputHexToDec('MiddlePieceHex', 'MiddlePieceDec', 2, 0n, 255n); Calculate()">+</button><button onclick="BigintIncreaseDecreaseHexInput(-1n, 'MiddlePieceHex', 0n, 255n); UserInputHexToDec('MiddlePieceHex', 'MiddlePieceDec', 2, 0n, 255n); Calculate()">-</button>)</td></tr>
 <tr><td>Right End piece:</td><td><input type="number" min="0" max="255" id="RightEndPieceDec" onchange="UserInputDecToHex('RightEndPieceDec', 'RightEndPieceHex', 2, 0n, 255n); Calculate()" value="3">(<kbd>$</kbd><input type="text" id="RightEndPieceHex" onchange="CorrectUserInputHexStringBigInt('RightEndPieceHex', 2); UserInputHexToDec('RightEndPieceHex', 'RightEndPieceDec', 2, 0n, 255n); Calculate()" value="03"><button onclick="BigintIncreaseDecreaseHexInput(1n, 'RightEndPieceHex', 0n, 255n); UserInputHexToDec('RightEndPieceHex', 'RightEndPieceDec', 2, 0n, 255n); Calculate()">+</button><button onclick="BigintIncreaseDecreaseHexInput(-1n, 'RightEndPieceHex', 0n, 255n); UserInputHexToDec('RightEndPieceHex', 'RightEndPieceDec', 2, 0n, 255n); Calculate()">-</button>)</td></tr>
 <tr><td>Length (middle):</td><td><input type="number" min="0" max="255" id="MiddleLengthDec" onchange="UserInputDecToHex('MiddleLengthDec', 'MiddleLengthHex', 2, 0n, 255n); Calculate()" value="7">(<kbd>$</kbd><input type="text" id="MiddleLengthHex" onchange="CorrectUserInputHexStringBigInt('MiddleLengthHex', 2); UserInputHexToDec('MiddleLengthHex', 'MiddleLengthDec', 2, 0n, 255n); Calculate()" value="07"><button onclick="BigintIncreaseDecreaseHexInput(1n, 'MiddleLengthHex', 0n, 255n); UserInputHexToDec('MiddleLengthHex', 'MiddleLengthDec', 2, 0n, 255n); Calculate()">+</button><button onclick="BigintIncreaseDecreaseHexInput(-1n, 'MiddleLengthHex', 0n, 255n); UserInputHexToDec('MiddleLengthHex', 'MiddleLengthDec', 2, 0n, 255n); Calculate()">-</button>)</td></tr>
+<tr><td><kbd>!Setting_GraphicalBar_SecondFillByteTableOffset</kbd>:</td><td>
+<input type="number" min="0" max="257" id="SecondFillByteTableOffsetDec" onchange="UserInputDecToHex('SecondFillByteTableOffsetDec', 'SecondFillByteTableOffsetHex', 2, 0n, 257n); Calculate()" value="32">(<kbd>$<input type="text" id="SecondFillByteTableOffsetHex" onchange="CorrectUserInputHexStringBigInt('SecondFillByteTableOffsetHex', 2); UserInputHexToDec('SecondFillByteTableOffsetHex', 'SecondFillByteTableOffsetDec', 2, 0n, 257n); Calculate()" value="20"></kbd><button onclick="BigintIncreaseDecreaseHexInput(1n, 'SecondFillByteTableOffsetHex', 0n, 257n); UserInputHexToDec('SecondFillByteTableOffsetHex', 'SecondFillByteTableOffsetDec', 2, 0n, 257n); Calculate()">+</button><button onclick="BigintIncreaseDecreaseHexInput(-1n, 'SecondFillByteTableOffsetHex', 0n, 255n); UserInputHexToDec('SecondFillByteTableOffsetHex', 'SecondFillByteTableOffsetDec', 2, 0n, 257n); Calculate()">-</button>)
+</td></tr>
 <tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> location:</td><td><kbd>$</kbd><input type="text" maxlength="6" id="FillByteTable" onchange="CorrectUserInputHexStringBigInt('FillByteTable', 6); Calculate()" value="7F844A" list="BarTileTableRAMList"><button onclick="BigintIncreaseDecreaseHexInput(1n, 'FillByteTable', 0n, 16777215n); CorrectUserInputHexStringBigInt('FillByteTable', 6); Calculate()">+</button><button onclick="BigintIncreaseDecreaseHexInput(-1n, 'FillByteTable', 0n, 16777215n); CorrectUserInputHexStringBigInt('FillByteTable', 6); Calculate()">-</button>
 
 <datalist id="BarTileTableRAMList">
@@ -130,6 +136,14 @@
 		}
 		return num
 	}
+	function CheckIfNumInRange(Num, RangeMin, RangeMax) {
+		//Returns true if Num is in between (inclusive) RangeMin and RangeMax
+		var ReturnValue = false
+		if ((Num >= RangeMin) && (Num <=  RangeMax)) {
+			ReturnValue = true
+		}
+		return ReturnValue
+	}
 	//----------------------------Stuff that display the output and reset-related main code.
 	function Reset() {
 		document.getElementById("FillAmountDec").value = "0"
@@ -146,6 +160,9 @@
 		
 		document.getElementById("MiddleLengthDec").value = "7"
 		document.getElementById("MiddleLengthHex").value = "07"
+		
+		document.getElementById("SecondFillByteTableOffsetDec").value = "32"
+		document.getElementById("SecondFillByteTableOffsetHex").value = "20"
 		
 		document.getElementById("FillByteTable").value = "7F844A"
 		document.getElementById("TileAddress").value = "7FA000"
@@ -172,6 +189,8 @@
 			var MiddleLength = CorrectDecBigIntValue(document.getElementById("MiddleLengthDec").value)
 			
 			var FillByteTable = CorrectHexBigIntValue(document.getElementById("FillByteTable").value)
+			var SecondFillOffset = CorrectDecBigIntValue(document.getElementById("SecondFillByteTableOffsetDec").value)
+			var SecondFillTable = (CorrectHexBigIntValue(document.getElementById("FillByteTable").value)) + SecondFillOffset
 			var TileAddress = CorrectHexBigIntValue(document.getElementById("TileAddress").value)
 		//Calculate some variables based on user input
 			var LeftTileExist = 0n
@@ -211,6 +230,11 @@
 					OutputString += "<tr>"
 					OutputString += "<td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> memory usage:</td>"
 					OutputString += "<td><kbd>$" + pad(FillByteTable.toString(16).toUpperCase(), 6) + "</kbd> to <kbd><abbr title='Index=$" + pad((TotalNumberOfTileBytes - 1n).toString(16).toUpperCase(), 2) + "'>$" + pad((FillByteTable + (TotalNumberOfTileBytes - 1n)).toString(16).toUpperCase(), 6) + "</kbd> (Number of tile bytes used: <kbd>" + TotalNumberOfTileBytes.toString(10) + "</kbd> (<kbd>$" + pad(TotalNumberOfTileBytes.toString(16).toUpperCase(), 2) + "</kbd>))</td>"
+					OutputString += "</tr>"
+					OutputString += "<tr>"
+					OutputString += "<td>Second fill table (when using non-flicker graphical bar):</td>"
+					OutputString += "<td><kbd>$" + pad(SecondFillTable.toString(16).toUpperCase(), 6) + "</kbd> to <kbd>$" + pad((SecondFillTable + (TotalNumberOfTileBytes - 1n)).toString(16).toUpperCase(), 6) + "</kbd> (Same as above on the number of bytes and indexes as above)</td>"
+					OutputString += "</tr>"
 					OutputString += "<tr>"
 					OutputString += "<td>Total pieces (full bar):</td>"
 					OutputString += "<td><kbd>" + TotalPieces.toString(10) + "</kbd> (<kbd>$" + pad(TotalPieces.toString(16).toUpperCase(), 4) + "</kbd>)</td>"
@@ -303,11 +327,17 @@
 					FillAmountIndex = 0n
 					var FractionTileProcessed = 0n //>This determines should it say the tile is full (= 0), fraction (0 to max-1) (= 1), or empty (= 2).
 					OutputString += "<table>"
-					OutputString += "<tr><th><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> addresses</th><th><abbr title='The values stored in $" + pad(FillByteTable.toString(16).toUpperCase(), 6) + " table.'>Fill amount</th><th>Max fill amount</th><th>Tile byte type</th><th>Tile address</th></tr>"
+					OutputString += "<tr><th><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> addresses</th><th><abbr title='When using &ldquo;seperate graphics&rdquo; of displaying 2 fills at the same time, where FirstFill will be stored in.'>Second table</abbr></th><th><abbr title='The values stored in $" + pad(FillByteTable.toString(16).toUpperCase(), 6) + " table.'>Fill amount</th><th>Max fill amount</th><th>Tile byte type</th><th>Tile address</th></tr>"
 					//LeftEnd
 						if (LeftTileExist != 0) {
 							OutputString += "<tr>"
 							OutputString += "<td><kbd>$" + pad((FillByteTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + FillAmountIndex.toString(10) + "</kbd>)</td>"
+							OutputString += "<td>"
+							OutputString += "<kbd>$" + pad((SecondFillTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + SecondFillOffset.toString(10) + "+" + FillAmountIndex.toString(10) + "</kbd>) "
+							if (CheckIfNumInRange(SecondFillTable, FillByteTable, (FillByteTable + (TotalNumberOfTileBytes - 1n)))) {
+								OutputString += "<font color='red'>Overlap Detected!</font>"
+							}
+							OutputString += "</td>"
 							//Color to indicate full/fraction/empty.
 								if (FillByteTableValues[FillAmountIndex] < LeftEndPiece) {
 									OutputString += "<td bgcolor='yellow'><font color='black'><kbd>" + (FillByteTableValues[FillAmountIndex]).toString(10) + "</kbd> (<kbd>$" + pad((FillByteTableValues[FillAmountIndex]).toString(16).toUpperCase(), 2) + "</kbd>)</font></td>"
@@ -329,6 +359,12 @@
 						while (MiddleTilesLeft != 0) {
 							OutputString += "<tr>"
 							OutputString += "<td><kbd>$" + pad((FillByteTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + FillAmountIndex.toString(10) + "</kbd>)</td>"
+							OutputString += "<td>"
+							OutputString += "<kbd>$" + pad((SecondFillTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + SecondFillOffset.toString(10) + "+" + FillAmountIndex.toString(10) + "</kbd>) "
+							if (CheckIfNumInRange((SecondFillTable + FillAmountIndex), FillByteTable, (FillByteTable + (TotalNumberOfTileBytes - 1n)))) {
+								OutputString += "<font color='red'>Overlap Detected!</font>"
+							}
+							OutputString += "</td>"
 							//Color to indicate full/fraction/empty.
 								if ((FillByteTableValues[FillAmountIndex] < MiddlePiece) && (FractionTileProcessed == 0n)) {
 									FractionTileProcessed = 1n //Mark this as a fraction if previous of the 3 sections (left, middle or right) of the bar is full.
@@ -357,6 +393,12 @@
 						if (RightTileExist != 0) {
 							OutputString += "<tr>"
 							OutputString += "<td><kbd>$" + pad((FillByteTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + FillAmountIndex.toString(10) + "</kbd>)</td>"
+							OutputString += "<td>"
+							OutputString += "<kbd>$" + pad((SecondFillTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + SecondFillOffset.toString(10) + "+" + FillAmountIndex.toString(10) + "</kbd>) "
+							if (CheckIfNumInRange((SecondFillTable + FillAmountIndex), FillByteTable, (FillByteTable + (TotalNumberOfTileBytes - 1n)))) {
+								OutputString += "<font color='red'>Overlap Detected!</font>"
+							}
+							OutputString += "</td>"
 							//Color to indicate full/fraction/empty.
 								if ((FillByteTableValues[FillAmountIndex] < RightEndPiece) && (FractionTileProcessed == 0n)) {
 									FractionTileProcessed = 1n //Mark this as a fraction if previous of the 3 sections (left, middle or right) of the bar is full.
