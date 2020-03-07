@@ -111,12 +111,6 @@ main:
 		INC A
 		STA !Freeram_SecondQuantity
 	else
-		LDA !Freeram_SecondQuantityDelay
-		BEQ ...ChangeTowardsFirstQuantity
-		DEC
-		STA !Freeram_SecondQuantityDelay
-		BRA ...StayFrozen
-		
 		...ChangeTowardsFirstQuantity
 		LDA !Freeram_SecondQuantity
 		CMP !Freeram_FirstQuantity
@@ -124,12 +118,18 @@ main:
 		BCC ...Increment
 		
 		...Decrement
+		LDA !Freeram_SecondQuantityDelay
+		BEQ +
+		DEC
+		STA !Freeram_SecondQuantityDelay
+		BRA ...StayFrozen
+		+
+		LDA !Freeram_SecondQuantity
 		DEC A
 		BRA ...Write
 		
 		...Increment
-		INC A
-		BRA ...Write
+		LDA !Freeram_FirstQuantity
 		
 		...Write
 		STA !Freeram_SecondQuantity
