@@ -361,7 +361,12 @@
 					//LeftEnd
 						if (LeftTileExist != 0) {
 							OutputString += "<tr>"
-							OutputString += "<td><kbd>$" + pad((FillByteTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + FillAmountIndex.toString(10) + "</kbd>)</td>"
+							OutputString += "<td>"
+							OutputString += "<kbd>$" + pad((FillByteTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + FillAmountIndex.toString(10) + "</kbd>)"
+							if (CheckIfNumInRange(FillByteTable + FillAmountIndex, SecondFillTable, (SecondFillTable + (TotalNumberOfTileBytes - 1n)))) {
+								OutputString += "<font color='red'> Overlap Detected!</font>"
+							}
+							OutputString += "</td>"
 							OutputString += "<td>"
 							OutputString += "<kbd>$" + pad((SecondFillTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + SecondFillOffset.toString(10) + "+" + FillAmountIndex.toString(10) + "</kbd>)"
 							if (CheckIfNumInRange(SecondFillTable, FillByteTable, (FillByteTable + (TotalNumberOfTileBytes - 1n)))) {
@@ -388,7 +393,12 @@
 					//Middle
 						while (MiddleTilesLeft != 0) {
 							OutputString += "<tr>"
-							OutputString += "<td><kbd>$" + pad((FillByteTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + FillAmountIndex.toString(10) + "</kbd>)</td>"
+							OutputString += "<td>"
+							OutputString += "<kbd>$" + pad((FillByteTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + FillAmountIndex.toString(10) + "</kbd>)"
+							if (CheckIfNumInRange(FillByteTable + FillAmountIndex, SecondFillTable, (SecondFillTable + (TotalNumberOfTileBytes - 1n)))) {
+								OutputString += "<font color='red'> Overlap Detected!</font>"
+							}
+							OutputString += "</td>"
 							OutputString += "<td>"
 							OutputString += "<kbd>$" + pad((SecondFillTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + SecondFillOffset.toString(10) + "+" + FillAmountIndex.toString(10) + "</kbd>)"
 							if (CheckIfNumInRange((SecondFillTable + FillAmountIndex), FillByteTable, (FillByteTable + (TotalNumberOfTileBytes - 1n)))) {
@@ -422,7 +432,12 @@
 					//RightEnd
 						if (RightTileExist != 0) {
 							OutputString += "<tr>"
-							OutputString += "<td><kbd>$" + pad((FillByteTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + FillAmountIndex.toString(10) + "</kbd>)</td>"
+							OutputString += "<td>"
+							OutputString += "<kbd>$" + pad((FillByteTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + FillAmountIndex.toString(10) + "</kbd>)"
+							if (CheckIfNumInRange(FillByteTable + FillAmountIndex, SecondFillTable, (SecondFillTable + (TotalNumberOfTileBytes - 1n)))) {
+								OutputString += "<font color='red'> Overlap Detected!</font>"
+							}
+							OutputString += "</td>"
 							OutputString += "<td>"
 							OutputString += "<kbd>$" + pad((SecondFillTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + SecondFillOffset.toString(10) + "+" + FillAmountIndex.toString(10) + "</kbd>)"
 							if (CheckIfNumInRange((SecondFillTable + FillAmountIndex), FillByteTable, (FillByteTable + (TotalNumberOfTileBytes - 1n)))) {
