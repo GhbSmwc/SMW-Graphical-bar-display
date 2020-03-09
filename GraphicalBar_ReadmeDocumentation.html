@@ -15,6 +15,8 @@
 			span.NoLineBreak {
 				white-space: nowrap;
 			}
+			
+			abbr{cursor: help;}
 		</style>
 	</head>
 <body>
@@ -347,24 +349,18 @@ Result:
 </tr>
 <tr>
 <td>
-<kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl</b></span></kbd> to <kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl + EndOfAddress</b></span></kbd>
+<kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl</b></span></kbd> to <kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl + ((<abbr title="0 if no left end, 1 if set to any nonzero number of pieces">LeftEnd</abbr> +
+<abbr title="Equals to !Scratchram_GraphicalBar_TempLength if middle pieces is nonzero, 0 otherwise">MiddleLength</abbr> + <abbr title="0 if no right end, 1 if set to any nonzero number of pieces">RightEnd</abbr>) - 1)</b></span></kbd>
 </td>
 <td>
 The table containing a series of bytes ordered from full, then one containing a fraction byte (it ranges from <kbd>0</kbd> to <kbd>max-1</kbd>), then a series of empty bytes.
-Should the bar be more than full (say, 63 out of 62 pieces), the values stored in this table will act as if the bar is full and does not write higher values nor write
-additional bytes.<br><br>
+If the bar's fill amount be greater than maximum (say, 63 out of 62 pieces), the values stored in this table will act as if the bar is full and does not write additional bytes.<br><br>
 
+Number of bytes taken is <kbd>LeftEnd + Middle + RightEnd</kbd> where LeftEnd and RightEnd equals to 1 when set to nonzero number of pieces or 0 otherwise, and middle is equal to <kbd>!Scratchram_GraphicalBar_TempLength</kbd>
+if MiddlePieces (number of pieces in each middle tile) is nonzero, otherwise it is 0. The JavaScript file linked previously will show how many bytes and memory address range it will occupy.<br><br>
 
-The ending address is
-<table><tr><td><pre>EndOfAddress = (LeftEnd + MiddleLength + RightEnd) - 1</pre></td></tr></table>
-And the number of bytes this table uses is the same formula above but without the &ldquo;<kbd>- 1</kbd>&rdquo;.<br><br>
-where:
-<ul>
-<li><kbd>LeftEnd</kbd> is 0 if the left end have 0 pieces and 1 if any non-zero number.</li>
-<li><kbd>RightEnd</kbd> is the same as above but for right end.</li>
-<li><kbd>MiddleLength</kbd> is equal to <kbd>!Scratchram_GraphicalBar_TempLength</kbd> (number of middle tiles) if
-<kbd>!Scratchram_GraphicalBar_MiddlePiece</kbd> is a nonzero number, and 0 otherwise.
-</ul>
+Because the SNES screen is 32 8x8 tiles wide, there is no need to have a bar more than 32 tiles wide (the bar will extend past the border of the screen).
+
 If you are using &ldquo;DoubleBar&rdquo;, it is the duplicate table of above, just located
 nth bytes after depending on what you set <span class="NoLineBreak"><kbd>!Setting_GraphicalBar_SecondFillByteTableOffset</kbd></span>.
 See <a href="readme_files/DoubleBarInfo.html#SecondTable" target="_blank">this information</a> for what I mean.
@@ -877,10 +873,10 @@ to calculate where to place the bar when using <kbd>BarExtendLeft</kbd> as well 
 <h2><a href="#NotesBack" id="Notes">^</a>Notes</h2>
 <ul>
 
-<li>Due to how this routine works, when display a fill edge that encompass multiple 8x8 bytes at once, it doesn't work, as it was designed to have a single fraction tile.<br>
+<li>Due to how this routine works (a rule that none or only a single fraction tile exists), to display a fill edge that encompass multiple 8x8 bytes at once would require checking the adjacent tile bytes
+to determine how the edge tile is rendered:<br>
 <center><img src="readme_files/MultiPartiallyFilled.png"></center><br>
-You have to check the tile byte adjacent to the fraction byte to determine to show the &ldquo;second half&rdquo; of the fill edge. The logic on this is very complex and therefore
-a tutorial for that is not included.</li>
+I've only included the &ldquo;Outlined edge&rdquo; routine (<a href="readme_files/OutlineEdgeBack.html" id="OutlineEdgeBack">see its documentation here</a>), the slanted/rounded edge would have more than 2 full/empty tiles and the logic to make this happen is very complex and probably cost too much tiles.</li>
 <li>You don't have to call the routine <kbd>CalculateGraphicalBarPercentage</kbd> to use <kbd>DrawGraphicalBar</kbd>, this means you can make an icon-based HP system that each
 tile byte holds a set amount of HP, for example, in the <i>Legend of Zelda</i> series starting in <i>Ocarina of Time</i>, you can have each heart containing 4 pieces representing each 1 HP.</li>
 <li>It is best to avoid having any end tiles holding the same number of pieces as the middle, although it still works, it is less optimized as the routine <kbd>DrawGraphicalBar</kbd>
