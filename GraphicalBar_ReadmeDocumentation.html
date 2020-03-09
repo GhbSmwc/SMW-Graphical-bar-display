@@ -876,7 +876,7 @@ to calculate where to place the bar when using <kbd>BarExtendLeft</kbd> as well 
 <li>Due to how this routine works (a rule that none or only a single fraction tile exists), to display a fill edge that encompass multiple 8x8 bytes at once would require checking the adjacent tile bytes
 to determine how the edge tile is rendered:<br>
 <center><img src="readme_files/MultiPartiallyFilled.png"></center><br>
-I've only included the &ldquo;Outlined edge&rdquo; routine (<a href="readme_files/OutlineEdge.html" id="OutlineEdge">see its documentation here</a>), the slanted/rounded edge would have more than 2 full/empty tiles and the logic to make this happen is very complex and probably cost too much tiles.</li>
+I've only included the &ldquo;Outlined edge&rdquo; routine (<a href="readme_files/OutlineEdgeFill.html" id="OutlineEdge">see its documentation here</a>), the slanted/rounded edge would have more than 2 full/empty tiles and the logic to make this happen is very complex and probably cost too much tiles.</li>
 <li>You don't have to call the routine <kbd>CalculateGraphicalBarPercentage</kbd> to use <kbd>DrawGraphicalBar</kbd>, this means you can make an icon-based HP system that each
 tile byte holds a set amount of HP, for example, in the <i>Legend of Zelda</i> series starting in <i>Ocarina of Time</i>, you can have each heart containing 4 pieces representing each 1 HP.</li>
 <li>It is best to avoid having any end tiles holding the same number of pieces as the middle, although it still works, it is less optimized as the routine <kbd>DrawGraphicalBar</kbd>

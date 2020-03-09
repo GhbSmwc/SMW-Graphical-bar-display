@@ -401,3 +401,202 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 		WaitCalculation:	;>The register to perform multiplication and division takes 8/16 cycles to complete.
 		RTS
 	endif
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;Convert fill amount in bar to tile numbers, outlined fill edge
+;edition.
+;
+;This is for having a 1px thick outline that borders between
+;full and empty. There are two versions:
+;-Outline part of the fill: Determines what 2 tiles for full tile.
+;-Outline part of the empty: Determines what 2 tiles for empty tile.
+;
+;Note: There isn't a double bar seperate graphics for this one
+;because IT TAKES A HUGE AMOUNT OF SPACE on the graphics.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	;This is for level:
+		GraphicalBar_LeftEnd8x8sOutlinedEdge:
+		;    0   1   2   3
+		db $36,$37,$38,$39 ;>Left end fills 0-3 (there are 3 pieces by default)
+		GraphicalBar_Middle8x8sOutlinedEdge:
+		;    0   1   2   3   4   5   6   7   8
+		db $55,$56,$57,$58,$59,$65,$66,$67,$68 ;>Middle fills 0-8 (there are 8 pieces on each middle tile by default)
+		GraphicalBar_RightEnd8x8sOutlinedEdge:
+		;    0   1   2   3
+		db $50,$51,$52,$53 ;>Right end fills 0-3 (there are 3 pieces by default)
+	;These here are the same as above but intended for overworld border.
+		GraphicalBar_LeftEnd8x8sOutlinedEdge_Ow:
+		db $80,$81,$82,$83
+		GraphicalBar_Middle8x8sOutlinedEdge_Ow:
+		db $84,$85,$86,$87,$88,$89,$8A,$8B,$8C
+		GraphicalBar_RightEnd8x8sOutlinedEdge_Ow:
+		db $8D,$8E,$8F,$90
+	;Convert tile code following:
+		ConvertBarFillAmountToTilesOutlinedFillEdge:
+		PHB						;>Preserve bank (so that table indexing work properly)
+		PHK						;>push current bank
+		PLB						;>pull out as regular bank
+	;Level or overworld?
+		.WhatTableToUse
+			STZ $00						;>Default to "Level"
+			LDA $0100|!addr					;\If gamemode value is #$0F or higher, that is level
+			CMP #$0F					;|
+			BCS ..Level					;/
+		
+			..Overworld
+				INC $00						;>Otherwise assume its overworld.
+		
+			..Level
+				if !Setting_GraphicalBar_IndexSize == 0
+					LDX #$00
+				else
+					REP #$10								;>16-bit XY
+					LDX #$0000								;>The index for what byte tile position to write.
+				endif
+	;Left end
+		.LeftEndTranslate
+			LDA !Scratchram_GraphicalBar_LeftEndPiece	;\can only be either 0 or the correct number of pieces listed in the table.
+			BEQ .MiddleTranslate				;/
+			if !Setting_GraphicalBar_IndexSize == 0
+				LDA !Scratchram_GraphicalBar_FillByteTbl	;\Y = amount filled byte
+				TAY						;/
+			else
+				REP #$20
+				LDA !Scratchram_GraphicalBar_FillByteTbl
+				AND #$00FF
+				TAY
+				SEP #$20
+			endif
+			LDA $00
+			BEQ ..Level
+			
+			..Overworld
+				...CheckNextTileForOutline
+					INX						;\Check next tile to determine should the full tile have an outline
+					LDA !Scratchram_GraphicalBar_FillByteTbl,x	;|
+					BEQ ....ShowOutline				;/
+			
+					....DontShowOutline
+						DEX						;>Back to current tile
+						LDA #!GraphiBar_FillEdgeLeftEndFullTile
+						BRA ..WriteTable
+					....ShowOutline
+						DEX						;>Back to current tile
+						LDA GraphicalBar_LeftEnd8x8sOutlinedEdge_Ow,y
+						BRA ..WriteTable
+		
+			..Level
+				...CheckNextTileForOutline
+					INX						;\Check next tile to determine should the full tile have an outline
+					LDA !Scratchram_GraphicalBar_FillByteTbl,x	;|
+					BEQ ....ShowOutline				;/
+		
+					....DontShowOutline
+						DEX						;>Back to current tile
+						LDA #!GraphiBar_FillEdgeLeftEndOWFullTile
+						BRA ..WriteTable
+					....ShowOutline
+						DEX						;>Back to current tile
+						LDA GraphicalBar_LeftEnd8x8sOutlinedEdge,y				;\Convert byte to tile number byte
+			..WriteTable
+			STA !Scratchram_GraphicalBar_FillByteTbl		;/
+			INX							;>next tile byte
+	;Middle
+		.MiddleTranslate
+			LDA !Scratchram_GraphicalBar_MiddlePiece	;\check if middle exist.
+			BEQ .RightEndTranslate				;|
+			LDA !Scratchram_GraphicalBar_TempLength		;|
+			BEQ .RightEndTranslate				;/
+
+			if !Setting_GraphicalBar_IndexSize == 0
+				LDA !Scratchram_GraphicalBar_TempLength		;\Number of middle tiles to convert
+				STA $01						;/
+			else
+				REP #$20
+				LDA !Scratchram_GraphicalBar_TempLength
+				AND #$00FF
+				STA $01
+			endif
+			..Loop
+				if !Setting_GraphicalBar_IndexSize == 0
+					LDA !Scratchram_GraphicalBar_FillByteTbl,x	;>Y = the fill amount
+					TAY
+				else
+					LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\amount of filled, indexed
+					AND #$00FF					;|
+					TAY						;/
+					SEP #$20
+				endif
+				LDA $00
+				BEQ ...Level
+			
+				...Overworld
+					;Note to self: plan on adding a check if X ends up beyond the last bar tile, ALWAYS choose to use ShowOutline
+					....CheckNextTileForOutline
+						INX						;\Check next tile to determine should the full tile have an outline
+						LDA !Scratchram_GraphicalBar_FillByteTbl,x	;|
+						BEQ ....ShowOutline				;/
+				
+						.....DontShowOutline
+							DEX						;>Back to current tile
+							LDA #!GraphiBar_FillEdgeLeftEndFullTile
+							BRA ...WriteTable
+						.....ShowOutline
+							DEX						;>Back to current tile
+							LDA GraphicalBar_Middle8x8sOutlinedEdge_Ow,y
+							BRA ...WriteTable
+				
+				...Level
+					....CheckNextTileForOutline
+						INX						;\Check next tile to determine should the full tile have an outline
+						LDA !Scratchram_GraphicalBar_FillByteTbl,x	;|
+						BEQ ....ShowOutline				;/
+				
+						.....DontShowOutline
+							DEX						;>Back to current tile
+							LDA #!GraphiBar_FillEdgeLeftEndFullTile
+							BRA ...WriteTable
+						.....ShowOutline
+							DEX						;>Back to current tile
+							LDA GraphicalBar_Middle8x8sOutlinedEdge,y			;\amount filled as tile graphics
+				...WriteTable
+					STA !Scratchram_GraphicalBar_FillByteTbl,x	;/
+				
+				...Next
+					INX
+					if !Setting_GraphicalBar_IndexSize != 0
+						REP #$20
+					endif
+					DEC $01
+					BNE ..Loop
+				SEP #$20
+	;Right end (there is no next tile after this)
+		.RightEndTranslate
+			LDA !Scratchram_GraphicalBar_RightEndPiece
+			BEQ .Done
+			if !Setting_GraphicalBar_IndexSize == 0
+				LDA !Scratchram_GraphicalBar_FillByteTbl,x
+				TAY
+			else
+				REP #$20
+				LDA !Scratchram_GraphicalBar_FillByteTbl,x
+				AND #$00FF
+				TAY
+				SEP #$20
+			endif
+			LDA $00
+			BEQ ..Level
+		
+			..Overworld
+				LDA GraphicalBar_RightEnd8x8sOutlinedEdge_Ow,y
+				BRA ..WriteTable
+		
+			..Level
+				LDA GraphicalBar_RightEnd8x8sOutlinedEdge,y
+			
+			..WriteTable
+				STA !Scratchram_GraphicalBar_FillByteTbl,x
+	;Done
+		.Done
+			SEP #$30					;>Just in case
+			PLB						;>Pull bank
+			RTL
