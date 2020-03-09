@@ -1,0 +1,40 @@
+<html>
+	<head>
+		<style>
+			html {
+			background-color: #000207;
+			color: white;
+			font-family: sans-serif;
+			}
+			
+			table, th, td {
+			border: 1px solid white;
+			border-collapse: collapse;
+			}
+			
+			span.NoLineBreak {
+				white-space: nowrap;
+			}
+			
+			abbr{cursor: help;}
+		</style>
+	</head>
+<body>
+<a href="../GraphicalBar_ReadmeDocumentation.html#OutlineEdge">Back</a>
+<h1><center>Outlined edge tutorial</center></h1>
+<hr>
+<h2>If you are planning to have the fill edge being the part of the fill</h2>
+<p>Perhaps you wanted a bar that have an outline around the filled region of the bar to avoid &ldquo;cutoff&rdquo;. You could have the bar be like this if you don't want to check adjacent tile bytes:<br>
+<img src="OutLineEach8x8Tile.png"></p>
+<p>However, you would have outlines in places you don't need to. So how do we have outline <b>only</b> where the fill ends at? Well, if we consider looking at this image, you'll have a hint on how to do so:<br>
+<img src="OutLineOnlyFillEdge.png"></p>
+<p>We can determine which 2 full tiles to use based on the next neighboring tile, because:<br>
+<img src="OutlineEdgeCrossing8x8.png"></p>
+Therefore, to determine should <kbd>Current_Tile</kbd> have an outline, if the <kbd>Next_Tile</kbd> fill amount is at least a value of 1, then <kbd>Current_Tile</kbd> shouldn't have an outline. To do that, you execute
+<kbd>GraphicalBarConvertToTile_ConvertBarFillAmountToTilesOutlinedFillEdge</kbd> instead of using <kbd>ConvertBarFillAmountToTiles</kbd>. This handles similarly to <kbd>ConvertBarFillAmountToTiles</kbd> but only checks
+if the next tile is > 0.
+<hr>
+<h2>If you are planning to have the fill edge being the part of the empty</h2>
+<p>This is very similar to above, but this time, the empty have multiple tiles instead of the full tile, and that you check the <b>previous</b> tile to determine which of the 2 empty tiles to use:<br>
+<img src="OutlineEdgePartOfEmpty.png"></p>
+<p>Call <kbd>GraphicalBarConvertToTile_ConvertBarFillAmountToTilesOutlinedFillEdgePartOfEmpty</kbd> instead of <kbd>ConvertBarFillAmountToTiles</kbd>.</p>
