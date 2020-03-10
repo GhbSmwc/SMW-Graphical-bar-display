@@ -492,7 +492,7 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 		
 					....DontShowOutline
 						DEX						;>Back to current tile
-						LDA #!GraphiBar_FillEdgeLeftEndOWFullTile
+						LDA #!GraphiBar_FillEdgeLeftEndFullTile
 						BRA ..WriteTable
 					....ShowOutline
 						DEX						;>Back to current tile
@@ -534,11 +534,11 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 					....CheckNextTileForOutline
 						INX						;\Check next tile to determine should the full tile have an outline
 						LDA !Scratchram_GraphicalBar_FillByteTbl,x	;|
-						BEQ ....ShowOutline				;/
+						BEQ .....ShowOutline				;/
 				
 						.....DontShowOutline
 							DEX						;>Back to current tile
-							LDA #!GraphiBar_FillEdgeLeftEndFullTile
+							LDA #!GraphiBar_FillEdgeMiddleFullTile
 							BRA ...WriteTable
 						.....ShowOutline
 							DEX						;>Back to current tile
@@ -549,11 +549,11 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 					....CheckNextTileForOutline
 						INX						;\Check next tile to determine should the full tile have an outline
 						LDA !Scratchram_GraphicalBar_FillByteTbl,x	;|
-						BEQ ....ShowOutline				;/
+						BEQ .....ShowOutline				;/
 				
 						.....DontShowOutline
 							DEX						;>Back to current tile
-							LDA #!GraphiBar_FillEdgeLeftEndFullTile
+							LDA #!GraphiBar_FillEdgeMiddleFullTile
 							BRA ...WriteTable
 						.....ShowOutline
 							DEX						;>Back to current tile
