@@ -35,6 +35,7 @@ Therefore, to determine should <kbd>Current_Tile</kbd> have an outline, if the <
 if the next tile is > 0.
 <hr>
 <h2>If you are planning to have the fill edge being the part of the empty</h2>
-<p>This is very similar to above, but this time, the empty have multiple tiles instead of the full tile, and that you check the <b>previous</b> tile to determine which of the 2 empty tiles to use:<br>
+<p>This is very similar to above, but &ldquo;inverted&rdquo;, the empty have multiple tiles instead of the full tile, you check the <b>previous</b> tile to determine which of the 2 empty tiles to use, and what empty tile to use
+will use the outline edge if the previous tile is full:<br>
 <img src="OutlineEdgePartOfEmpty.png"></p>
 <p>Call <kbd>GraphicalBarConvertToTile_ConvertBarFillAmountToTilesOutlinedFillEdgePartOfEmpty</kbd> instead of <kbd>ConvertBarFillAmountToTiles</kbd>.</p>
