@@ -1,6 +1,12 @@
 incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
+;Main routines to call are:
+;-ConvertBarFillAmountToTiles
+;-ConvertBarFillAmountToTilesDoubleBar
+;-ConvertBarFillAmountToTilesOutlinedFillEdge
+;-ConvertBarFillAmountToTilesOutlinedFillEdgePartOfEmpty
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Convert fill amount in bar to tile numbers. NOTE: does not work with double-bar.
 ;Scroll down for the double-bar version. This routine checks the gamemode address
