@@ -164,6 +164,14 @@
 		;Same as above but overworld:
 			!GraphiBar_FillEdgeLeftEndOWFullTile = $35
 			!GraphiBar_FillEdgeMiddleOWFullTile = $5A
+	;When you have the outline be part of the empty, these are empty tiles, without lines when the previous tile isn't full.
+		!GraphiBar_FillEdgeMiddleFullTilePartOfEmpty = $55
+		!GraphiBar_FillEdgeRightEndFullTilePartOfEmpty = $50
+		
+		;Same as above but overworld
+			!GraphiBar_FillEdgeMiddleOWFullTilePartOfEmpty = $55
+			!GraphiBar_FillEdgeRightEndOWFullTilePartOfEmpty = $50
+
 ;Tile settings (length does not apply to [ExtendLeftwards.asm] as that is variable in-game):
 	!Default_MiddleLength                = 7             ;>30 = screen-wide (30 + 2 end tiles = 32, all 8x8 tile row in the screen's width)
 	!Default_LeftPieces                  = 3             ;\These will by default, set the RAM for the pieces for each section

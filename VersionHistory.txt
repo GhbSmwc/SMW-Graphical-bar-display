@@ -419,3 +419,5 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
  -Added note that to write a meter on the overworld border, the overworld border plus patch is required
   due to the difficulties surrounding editing tiles via vram without using RAM transferring like how the
   Super Status Bar patch does it.
+3/11/2019
+ -GraphicalBarConvertToTile have some of its codes use indent for convenience to see each code block.
