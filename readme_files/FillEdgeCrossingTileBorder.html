@@ -20,10 +20,23 @@
 		</style>
 	</head>
 <body>
-<a href="../GraphicalBar_ReadmeDocumentation.html#OutlineEdge">Back</a>
-<h1><center>Outlined edge tutorial</center></h1>
+<a href="../GraphicalBar_ReadmeDocumentation.html#FillEdgeCrossingTileBorder">Back</a>
 <hr>
-<h2>If you are planning to have the fill edge being the part of the fill</h2>
+<h2>Table of contents</h2>
+<ul>
+	<li><a href="#SlantedEdge" id="TOC_SlantedEdge">Slanted edge</a></li>
+	<li><a href="#OutlineEdge" id="TOC_OutlineEdge">Outlined edge</a></li>
+</ul>
+<hr>
+<h1><a href="#TOC_SlantedEdge" id="SlantedEdge">^</a>Slanted edge</h1>
+<p>Perhaps viewing this image will give you a hint on how to have a slanted-edge graphical bar:<br>
+<img src="DiagonalFillEdge.png"><br>
+Here, the numbers to the left of each tile indicates an index of the tile array, while the numbers on the right are the fill amount. Combine this image with the one below:<br>
+<img src="DiagonalFillEdge2.png"><br>and you get the idea on how it works. Technically, the amount of fill to be converted into tile index is <i>exceeding</i> the number of
+pieces to accommodate the next tile's fill amount, the tiles shown in the red boxes shows that you have multiple full tiles. Also notice that since there is no next tile
+after the right end, the number of pieces can safely be set to the number of distinct fill amounts.</p>
+<hr>
+<h1><a href="#TOC_OutlineEdge" id="OutlineEdge">^</a>Outlined edge</h1>
 <p>Perhaps you wanted a bar that have an outline around the filled region of the bar to avoid &ldquo;cutoff&rdquo;. You could have the bar be like this if you don't want to check adjacent tile bytes:<br>
 <img src="OutLineEach8x8Tile.png"></p>
 <p>However, you would have outlines in places you don't need to. So how do we have outline <b>only</b> where the fill ends at? Well, if we consider looking at this image, you'll have a hint on how to do so:<br>
