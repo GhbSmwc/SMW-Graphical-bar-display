@@ -32,14 +32,18 @@
 <p>Perhaps viewing this image will give you a hint on how to have a slanted-edge graphical bar:<br>
 <img src="DiagonalFillEdge.png"><br>
 Here, the numbers to the left of each tile indicates an index of the tile array, while the numbers on the right are the fill amount. Combine this image with the one below:<br>
-<img src="DiagonalFillEdge2.png"><br>and you get the idea on how it works. Technically, the amount of fill to be converted into tile index is <i>exceeding</i> the number of
-pieces to accommodate the next tile's fill amount, the tiles shown in the red boxes shows that you have multiple full tiles. Also notice that since there is no next tile
-after the right end, the number of pieces can safely be set to the number of distinct fill amounts.</p>
+<img src="DiagonalFillEdge2.png"><br>
+and you get the idea on how it works. Technically, the amount of fill to be converted into tile index is <i>exceeding</i> the number of
+pieces to accommodate the next tile's fill amount. Also notice that since there is no next tile after the right end, the number of pieces can safely be set to the number of distinct fill amounts.</p>
+
+<p>Duplicate tile numbers on the last n tiles are needed since this covers all possible values of the next tile. If there are 2+ possible different tiles (such as after the left end is 8 pieces for each middle tile
+or if the bar has no middle tiles and a 6-piece right end tile), you would take the number of whichever has the highest value (in this case, you would take 3 pieces for left end + 8 for middle which means the highest
+index would be $0B (11) instead of 3 + 6 = $09 (9) so that both the left end and middle would not use glitched tiles)</p>
 <hr>
 <h1><a href="#TOC_OutlineEdge" id="OutlineEdge">^</a>Outlined edge</h1>
 <p>Perhaps you wanted a bar that have an outline around the filled region of the bar to avoid &ldquo;cutoff&rdquo;. You could have the bar be like this if you don't want to check adjacent tile bytes:<br>
 <img src="OutLineEach8x8Tile.png"></p>
-<p>However, you would have outlines in places you don't need to. So how do we have outline <b>only</b> where the fill ends at? Well, if we consider looking at this image, you'll have a hint on how to do so:<br>
+<p>However, you would have outlines in places you don't need to. So how do we have outline <b>only</b> where the fill ends at? Well, this is gonna be similar to how the slanted fill edge works:<br>
 <img src="OutLineOnlyFillEdge.png"></p>
 <p>We can determine which 2 full tiles to use based on the next neighboring tile, because:<br>
 <img src="OutlineEdgeCrossing8x8.png"></p>
