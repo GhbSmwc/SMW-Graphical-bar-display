@@ -708,13 +708,18 @@ For example, by making left end have 4 pieces instead of 3, you must have 5 valu
 
 	;3 pieces, therefore include 4 values 0-3:
 		GraphicalBar_LeftEnd8x8s:
-		;    0   1   2   3
-		db $36,$37,$38,$39
+		db $36		;>Fill amount/index: $00
+		db $37		;>Fill amount/index: $01
+		db $38		;>Fill amount/index: $02
+		db $39		;>Fill amount/index: $03
 
 	;4 pieces, now values are 0-4:
 		GraphicalBar_LeftEnd8x8s:
-		;    0   1   2   3   4
-		db $36,$37,$38,$39,<u>$xx</u>
+		db $36		;>Fill amount/index: $00
+		db $37		;>Fill amount/index: $01
+		db $38		;>Fill amount/index: $02
+		db $39		;>Fill amount/index: $03
+		db <font color="red">$xx</font>		;>Fill amount/index: $04
 </pre></td></tr></table>
 
 <br><br>

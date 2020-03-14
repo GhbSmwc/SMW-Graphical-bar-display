@@ -49,21 +49,49 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	;bytes beyond the table.
 	;This is for level:
 		GraphicalBar_LeftEnd8x8s:
-		;    0   1   2   3
-		db $36,$37,$38,$39 ;>Left end fills 0-3 (there are 3 pieces by default)
+		;Left end fill amount tile numbers:
+		db $36		;>Fill amount/index: $00
+		db $37		;>Fill amount/index: $01
+		db $38		;>Fill amount/index: $02
+		db $39		;>Fill amount/index: $03
 		GraphicalBar_Middle8x8s:
-		;    0   1   2   3   4   5   6   7   8
-		db $55,$56,$57,$58,$59,$65,$66,$67,$68 ;>Middle fills 0-8 (there are 8 pieces on each middle tile by default)
+		;Middle fill amount tile numbers
+		db $55		;>Fill amount/index: $00
+		db $56		;>Fill amount/index: $01
+		db $57		;>Fill amount/index: $02
+		db $58		;>Fill amount/index: $03
+		db $59		;>Fill amount/index: $04
+		db $65		;>Fill amount/index: $05
+		db $66		;>Fill amount/index: $06
+		db $67		;>Fill amount/index: $07
+		db $68		;>Fill amount/index: $08
 		GraphicalBar_RightEnd8x8s:
-		;    0   1   2   3
-		db $50,$51,$52,$53 ;>Right end fills 0-3 (there are 3 pieces by default)
+		;Right end fill amount tile numbers:
+		db $50		;>Fill amount/index: $00
+		db $51		;>Fill amount/index: $01
+		db $52		;>Fill amount/index: $02
+		db $53		;>Fill amount/index: $03
 	;These here are the same as above but intended for overworld border.
 		GraphicalBar_LeftEnd8x8s_Ow:
-		db $80,$81,$82,$83
+		db $80		;>Fill amount/index: $00
+		db $81		;>Fill amount/index: $01
+		db $82		;>Fill amount/index: $02
+		db $83		;>Fill amount/index: $03
 		GraphicalBar_Middle8x8s_Ow:
-		db $84,$85,$86,$87,$88,$89,$8A,$8B,$8C
+		db $84		;>Fill amount/index: $00
+		db $85		;>Fill amount/index: $01
+		db $86		;>Fill amount/index: $02
+		db $87		;>Fill amount/index: $03
+		db $88		;>Fill amount/index: $04
+		db $89		;>Fill amount/index: $05
+		db $8A		;>Fill amount/index: $06
+		db $8B		;>Fill amount/index: $07
+		db $8C		;>Fill amount/index: $08
 		GraphicalBar_RightEnd8x8s_Ow:
-		db $8D,$8E,$8F,$90
+		db $8D		;>Fill amount/index: $00
+		db $8E		;>Fill amount/index: $01
+		db $8F		;>Fill amount/index: $02
+		db $90		;>Fill amount/index: $03
 	;Convert tile code following:
 		ConvertBarFillAmountToTiles:
 		PHB						;>Preserve bank (so that table indexing work properly)
@@ -408,14 +436,11 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 		RTS
 	endif
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;Convert fill amount in bar to tile numbers, outlined fill edge
-;edition.
+;Handle fill amount when they cross borders.
 ;
-;This is for having a 1px thick outline that borders between
-;full and empty. There are two versions:
-;-Outline part of the fill: Determines what 2 tiles for full tile.
-;-Outline part of the empty: Determines what 2 tiles for empty tile.
-;
+;This code is designed to handle display multiple tiles having "partial-filled"
+;amounts by taking one tile, and determine what tile to use based on the next tile.
+;ideal for outlined edges or slated edge fills.
 ;
 ;Input:
 ; -!Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
@@ -443,21 +468,46 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;This is for level:
 		GraphicalBar_LeftEnd8x8sOutlinedEdge:
-		;    0   1   2   3
-		db $36,$37,$38,$39 ;>Left end fills 0-3 (there are 3 pieces by default)
+		db $36		;>Index: $00
+		db $37		;>Index: $01
+		db $38		;>Index: $02
+		db $39		;>Index: $03
 		GraphicalBar_Middle8x8sOutlinedEdge:
-		;    0   1   2   3   4   5   6   7   8
-		db $55,$56,$57,$58,$59,$65,$66,$67,$68 ;>Middle fills 0-8 (there are 8 pieces on each middle tile by default)
+		db $55		;>Index: $00
+		db $56		;>Index: $01
+		db $57		;>Index: $02
+		db $58		;>Index: $03
+		db $59		;>Index: $04
+		db $65		;>Index: $05
+		db $66		;>Index: $06
+		db $67		;>Index: $07
+		db $68		;>Index: $08
 		GraphicalBar_RightEnd8x8sOutlinedEdge:
-		;    0   1   2   3
-		db $50,$51,$52,$53 ;>Right end fills 0-3 (there are 3 pieces by default)
+		db $50		;>Index: $00
+		db $51		;>Index: $01
+		db $52		;>Index: $02
+		db $53		;>Index: $03
 	;These here are the same as above but intended for overworld border.
 		GraphicalBar_LeftEnd8x8sOutlinedEdge_Ow:
-		db $80,$81,$82,$83
+		db $80		;>Index: $00
+		db $81		;>Index: $01
+		db $82		;>Index: $02
+		db $83		;>Index: $03
 		GraphicalBar_Middle8x8sOutlinedEdge_Ow:
-		db $84,$85,$86,$87,$88,$89,$8A,$8B,$8C
+		db $84		;>Index: $00
+		db $85		;>Index: $01
+		db $86		;>Index: $02
+		db $87		;>Index: $03
+		db $88		;>Index: $04
+		db $89		;>Index: $05
+		db $8A		;>Index: $06
+		db $8B		;>Index: $07
+		db $8C		;>Index: $08
 		GraphicalBar_RightEnd8x8sOutlinedEdge_Ow:
-		db $8D,$8E,$8F,$90
+		db $8D		;>Index: $00
+		db $8E		;>Index: $01
+		db $8F		;>Index: $02
+		db $90		;>Index: $03
 	;Convert tile code following:
 		ConvertBarFillAmountToTilesOutlinedFillEdge:
 		PHB						;>Preserve bank (so that table indexing work properly)
