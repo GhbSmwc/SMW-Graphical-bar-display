@@ -442,6 +442,12 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 ;amounts by taking one tile, and determine what tile to use based on the next tile.
 ;ideal for outlined edges or slated edge fills.
 ;
+;Works like this: Consider the fill amount: [$03, $01]
+;Now the "head" of the fill is on the second byte, to accomodate this, the first byte
+;will take that amount ($03) and add by the next tile ($01, which results $03 + $01 = $04).
+;
+;This by default, uses the slanted fill edge and not the outlined edge.
+;
 ;Input:
 ; -!Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
 ;  the maximum amount of fill for this byte itself. If 0, it's not included in table.
@@ -468,25 +474,44 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;This is for level:
 		GraphicalBar_LeftEnd8x8sOutlinedEdge:
-		db $36		;>Index: $00
-		db $37		;>Index: $01
-		db $38		;>Index: $02
-		db $39		;>Index: $03
+		db $36		;>Index: $00 (Filled amount: $00 out of $03)
+		db $37		;>Index: $01 (Filled amount: $01 out of $03)
+		db $38		;>Index: $02 (Filled amount: $02 out of $03)
+		db $39		;>Index: $03 (Filled amount: $03 out of $03)
+		db $45		;>Index: $04 ($03 + $01 = Index: $04)
+		db $46		;>Index: $05 ($03 + $02 = Index: $05)
+		db $47		;>Index: $06 ($03 + $03 = Index: $06)
+		db $47		;>Index: $07 ($03 + $04 = Index: $07)
+		db $47		;>Index: $08 ($03 + $05 = Index: $08)
+		db $47		;>Index: $09 ($03 + $06 = Index: $09)
+		db $47		;>Index: $0A ($03 + $07 = Index: $0A)
+		db $47		;>Index: $0B ($03 + $08 = Index: $0B)
 		GraphicalBar_Middle8x8sOutlinedEdge:
-		db $55		;>Index: $00
-		db $56		;>Index: $01
-		db $57		;>Index: $02
-		db $58		;>Index: $03
-		db $59		;>Index: $04
-		db $65		;>Index: $05
-		db $66		;>Index: $06
-		db $67		;>Index: $07
-		db $68		;>Index: $08
+		db $4B		;>Index: $00 (Filled amount: $00 out of $08)
+		db $4C		;>Index: $01 (Filled amount: $01 out of $08)
+		db $4D		;>Index: $02 (Filled amount: $02 out of $08)
+		db $4E		;>Index: $03 (Filled amount: $03 out of $08)
+		db $4F		;>Index: $04 (Filled amount: $04 out of $08)
+		db $50		;>Index: $05 (Filled amount: $05 out of $08)
+		db $51		;>Index: $06 (Filled amount: $06 out of $08)
+		db $52		;>Index: $07 (Filled amount: $07 out of $08)
+		db $53		;>Index: $08 (Filled amount: $08 out of $08)
+		db $54		;>Index: $09 ($08 + $01 = Index: $09)
+		db $55		;>Index: $0A ($08 + $02 = Index: $0A)
+		db $56		;>Index: $0B ($08 + $03 = Index: $0B)
+		db $56		;>Index: $0C ($08 + $04 = Index: $0C)
+		db $56		;>Index: $0D ($08 + $05 = Index: $0D)
+		db $56		;>Index: $0E ($08 + $06 = Index: $0E)
+		db $56		;>Index: $0F ($08 + $07 = Index: $0F)
+		db $56		;>Index: $10 ($08 + $08 = Index: $10) Maximum value of next tile ($08 of next middle tile vs $03 of right end)
 		GraphicalBar_RightEnd8x8sOutlinedEdge:
-		db $50		;>Index: $00
-		db $51		;>Index: $01
-		db $52		;>Index: $02
-		db $53		;>Index: $03
+		db $57		;>Index: $00 (Filled amount: $00 out of $06)
+		db $58		;>Index: $01 (Filled amount: $01 out of $06)
+		db $59		;>Index: $02 (Filled amount: $02 out of $06)
+		db $5A		;>Index: $03 (Filled amount: $03 out of $06)
+		db $5B		;>Index: $04 (Filled amount: $04 out of $06)
+		db $5C		;>Index: $05 (Filled amount: $05 out of $06)
+		db $5D		;>Index: $06 (Filled amount: $06 out of $06)
 	;These here are the same as above but intended for overworld border.
 		GraphicalBar_LeftEnd8x8sOutlinedEdge_Ow:
 		db $80		;>Index: $00
