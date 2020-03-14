@@ -45,8 +45,3 @@ index would be $0B (11) instead of 3 + 6 = $09 (9) so that both the left end and
 <img src="OutLineEach8x8Tile.png"></p>
 <p>However, you would have outlines in places you don't need to. So how do we have outline <b>only</b> where the fill ends at? Well, this is gonna be similar to how the slanted fill edge works:<br>
 <img src="OutLineOnlyFillEdge.png"></p>
-<p>We can determine which 2 full tiles to use based on the next neighboring tile, because:<br>
-<img src="OutlineEdgeCrossing8x8.png"></p>
-Therefore, to determine should <kbd>Current_Tile</kbd> have an outline, if the <kbd>Next_Tile</kbd> fill amount is at least a value of 1, then <kbd>Current_Tile</kbd> shouldn't have an outline. To do that, you execute
-<kbd>GraphicalBarConvertToTile_ConvertBarFillAmountToTilesOutlinedFillEdge</kbd> instead of using <kbd>ConvertBarFillAmountToTiles</kbd>. This handles similarly to <kbd>ConvertBarFillAmountToTiles</kbd> but only checks
-if the next tile is > 0.
