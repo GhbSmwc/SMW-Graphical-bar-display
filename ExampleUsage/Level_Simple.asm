@@ -20,11 +20,14 @@ main:
 	LDA $94							;\Player's X position "progress"
 	SEC							;|
 	SBC #$0008						;>because the minimum player's X pos is #$0008
+	BPL +							;|\Prevent underflow.
+	LDA #$0000						;||
+	+							;|/
 	STA !Scratchram_GraphicalBar_FillByteTbl		;/
 	SEP #$20
 	LDA.b #!Default_MiddleLength				;\Input length (middle)
 	STA !Scratchram_GraphicalBar_TempLength			;/
-	LDA #$E0						;\The maximum X positon the player can be (right edge of the level)
+	LDA #$E0						;\The maximum X position the player can be (right edge of the level)
 	STA !Scratchram_GraphicalBar_FillByteTbl+2		;|
 	LDA $5E							;|
 	DEC							;|
