@@ -31,56 +31,58 @@ endif
 	;Ram stuff (note that ram banks $7E/$7F cannot be accessed when
 	;sa-1 mode is running, so use banks $40/$41).
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		;Bar attributes. These are RAM addresses that sets the number of pieces
+		;and length of the middle. Not to be confused with default values
+		;in StatusBarSettings where it mentions (excluding the outer brackets):
+		;-[Tile settings (length does not apply to [ExtendLeftwards.asm] as that is variable in-game)]
+		;Since that is the actual number of pieces, while this is the RAM address locations that stores
+		;them in case if you have 2+ bars with different attributes.
+			if !sa1 == 0
+				!Scratchram_GraphicalBar_LeftEndPiece   = $60		;>normal ROM
+			else
+				!Scratchram_GraphicalBar_LeftEndPiece   = $400195	;>SA-1 ROM
+			endif
+				;^[1 byte] number of pieces on the left end byte/8x8 tile.
 
-		if !sa1 == 0
-			!Scratchram_GraphicalBar_LeftEndPiece   = $60		;>normal ROM
-		else
-			!Scratchram_GraphicalBar_LeftEndPiece   = $400195	;>SA-1 ROM
-		endif
-			;^[1 byte] number of pieces on the left end byte/8x8 tile.
+			if !sa1 == 0
+				!Scratchram_GraphicalBar_MiddlePiece    = $61
+			else
+				!Scratchram_GraphicalBar_MiddlePiece    = $400196
+			endif
+				;^[1 byte] number of pieces on each middle byte/8x8 tile.
 
+			if !sa1 == 0
+				!Scratchram_GraphicalBar_RightEndPiece  = $62
+			else
+				!Scratchram_GraphicalBar_RightEndPiece  = $400197
+			endif
+				;^[1 byte] number of pieces on the right end byte/8x8 tile.
 
-		if !sa1 == 0
-			!Scratchram_GraphicalBar_MiddlePiece    = $61
-		else
-			!Scratchram_GraphicalBar_MiddlePiece    = $400196
-		endif
-			;^[1 byte] number of pieces on each middle byte/8x8 tile.
-
-
-		if !sa1 == 0
-			!Scratchram_GraphicalBar_RightEndPiece  = $62
-		else
-			!Scratchram_GraphicalBar_RightEndPiece  = $400197
-		endif
-			;^[1 byte] number of pieces on the right end byte/8x8 tile.
-
-		if !sa1 == 0
-			!Scratchram_GraphicalBar_FillByteTbl = $7F844A
-		else
-			!Scratchram_GraphicalBar_FillByteTbl = $400198
-		endif
-			;^[>= 4 bytes] Used to hold the fill amount for each
-			; byte to be converted into tile numbers to be used for display.
-			; The amount of bytes used is:
-			;
-			; BytesUsed = LeftExist + (MiddleExist*Length) + RightExist
-			;
-			; where any variable with "exist" in name is either 0
-			; (pieces is 0) or 1 (pieces is nonzero).
-			;
-			; Also used for calculating the percentage:
-			;  +$00 to +$01 = quantity
-			;  +$02 to +$03 = max quantity
-
-
-		if !sa1 == 0
-			!Scratchram_GraphicalBar_TempLength  = $7F8449
-		else
-			!Scratchram_GraphicalBar_TempLength  = $4001B8
-		endif
-			;^[1 byte] how many middle bytes/8x8 to be written on the bar. This is
-			;basically the length of the bar.
+			if !sa1 == 0
+				!Scratchram_GraphicalBar_TempLength  = $7F8449
+			else
+				!Scratchram_GraphicalBar_TempLength  = $4001B8
+			endif
+				;^[1 byte] how many middle bytes/8x8 to be written on the bar. This is
+				;basically the length of the bar.
+		;Fill byte table:
+			if !sa1 == 0
+				!Scratchram_GraphicalBar_FillByteTbl = $7F844A
+			else
+				!Scratchram_GraphicalBar_FillByteTbl = $400198
+			endif
+				;^[>= 4 bytes] Used to hold the fill amount for each
+				; byte to be converted into tile numbers to be used for display.
+				; The amount of bytes used is:
+				;
+				; BytesUsed = LeftExist + (MiddleExist*Length) + RightExist
+				;
+				; where any variable with "exist" in name is either 0
+				; (pieces is 0) or 1 (pieces is nonzero).
+				;
+				; Also used for calculating the percentage:
+				;  +$00 to +$01 = quantity
+				;  +$02 to +$03 = max quantity
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;Graphical bar Settings
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

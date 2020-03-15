@@ -177,6 +177,9 @@
 	!Default_LeftPieces                  = 3             ;\These will by default, set the RAM for the pieces for each section
 	!Default_MiddlePieces                = 8             ;|
 	!Default_RightPieces                 = 3             ;/
+		;^Don't get confused with GraphicalBarDefines.asm's Bar attributes. These are the ACTUAL number of pieces
+		; that the RAM address are set to contain these values. Therefore, these are what the RAM address are set
+		; by default.
 
 	!Default_LeftwardsBar                           = 0
 		;^0 = Fill from left to right
