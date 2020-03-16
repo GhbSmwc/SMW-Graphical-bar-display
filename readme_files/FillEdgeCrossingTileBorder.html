@@ -60,8 +60,8 @@ And now the tile number index to use is <kbd>$04</kbd> (because <kbd>$03</kbd> f
 If there are 2+ possible different tiles byte types after the current tile (such as middle or right end after the left end), you would take the number of whichever has the highest maximum (in this case, Middle have 8 pieces, and right end have 6 pieces,
 therefore you take the 8 and not the 6).<br><br>
 
-Looking at the previous example image above, left end have 3 pieces, middle have 8 pieces, and right end have 6. Left end's table should have 12 ($0B, 3 + 8 + 1 = 12) items in the table (not 10 from 3 + <abbr title="Right end&#39;s number of pieces is less than middle&#39;s 8 pieces">6</abbr> + 1), middle
-should have 17 ($10, 8 + 8 + 1 = 17) items in table (not 15 by 8 + <abbr title="Right end&#39;s number of pieces is less than Middle&#39;s 8 pieces">6</abbr> + 1.)</p>
+Looking at the previous example image above, left end have 3 pieces, middle have 8 pieces, and right end have 6. Left end's table should have 12 (Index numbered from $00 to $0B, 3 + 8 + 1 = 12) items in the table (not 10 from 3 + <abbr title="Right end&#39;s number of pieces is less than middle&#39;s 8 pieces">6</abbr> + 1), middle
+should have 17 (Index numbered from $00 to $10, 8 + 8 + 1 = 17) items in table (not 15 by 8 + <abbr title="Right end&#39;s number of pieces is less than Middle&#39;s 8 pieces">6</abbr> + 1.)</p>
 <hr>
 <h1><a href="#TOC_OutlineEdge" id="OutlineEdge">^</a>Outlined edge</h1>
 <p>Perhaps you wanted a bar that have an outline around the filled region of the bar to avoid &ldquo;cutoff&rdquo;. You could have the bar be like this if you don't want to check adjacent tile bytes:<br>
