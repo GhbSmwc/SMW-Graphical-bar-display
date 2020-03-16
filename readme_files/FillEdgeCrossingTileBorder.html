@@ -39,12 +39,29 @@ Don't forget to insert the graphics accordingly.</p>
 <img src="DiagonalFillEdge.png"><br>
 Here, the numbers to the left of each tile indicates an index of the tile array, while the numbers on the right are the fill amount. Combine this image with the one below:<br>
 <img src="DiagonalFillEdge2.png"><br>
-and you get the idea on how it works. Technically, the amount of fill to be converted into tile index is <i>exceeding</i> the number of
-pieces to accommodate the next tile's fill amount. Also notice that since there is no next tile after the right end, the number of pieces can safely be set to the number of distinct fill amounts.</p>
+and you get the idea on how it works. To check adjacent tiles to determine what tile to use, you would take the current tile byte's fill amount, <b><abbr title="If there is no next tile after the last tile, provided you disabled the right end, it would assume to add by 0 as to avoid adding by a garbage value.">and then add by the amount of the next tile byte</abbr></b>. The total
+is then the index of the tile to use, for example:
+<table>
+<tr><th>Fill byte table (relative address/example)</th><th>Tile byte type</th><th>Fill amount</th><th>Fill amount maximum</th><th>Index to use</th></tr>
+<tr><td>+0/<kbd>$7F844A</kbd></td><td><font color="cyan">Left end</font></td><td bgcolor="orange"><kbd>$03</kbd></td><td><kbd>$03</kbd></td><td><kbd>$04</kbd> (This fill amount, plus 1 from next tile amount)</td></tr>
+<tr><td>+1/<kbd>$7F844B</kbd></td><td><font color="green">Middle 1</font></td><td bgcolor="yellow"><font color="black"><kbd>$01</kbd></font></td><td><kbd>$08</kbd></td><td><kbd>$01</kbd> (This fill amount, plus 0 of the next tile amount)</td></tr>
+<tr><td>+2/<kbd>$7F844C</kbd></td><td><font color="green">Middle 2</font></td><td bgcolor="grey"><kbd>$00</kbd></td><td><kbd>$08</kbd></td><td><kbd>$00</kbd> (This fill amount, plus 0 of the next tile amount)</td></tr>
+<tr><td>+3/<kbd>$7F844D</kbd></td><td><font color="green">Middle 3</font></td><td bgcolor="grey"><kbd>$00</kbd></td><td><kbd>$08</kbd></td><td><kbd>$00</kbd> (This fill amount, plus 0 of the next tile amount)</td></tr>
+<tr><td>+4/<kbd>$7F844E</kbd></td><td><font color="green">Middle 4</font></td><td bgcolor="grey"><kbd>$00</kbd></td><td><kbd>$08</kbd></td><td><kbd>$00</kbd> (This fill amount, plus 0 of the next tile amount)</td></tr>
+<tr><td>+5/<kbd>$7F844F</kbd></td><td><font color="green">Middle 5</font></td><td bgcolor="grey"><kbd>$00</kbd></td><td><kbd>$08</kbd></td><td><kbd>$00</kbd> (This fill amount, plus 0 of the next tile amount)</td></tr>
+<tr><td>+6/<kbd>$7F8450</kbd></td><td><font color="green">Middle 6</font></td><td bgcolor="grey"><kbd>$00</kbd></td><td><kbd>$08</kbd></td><td><kbd>$00</kbd> (This fill amount, plus 0 of the next tile amount)</td></tr>
+<tr><td>+7/<kbd>$7F8451</kbd></td><td><font color="green">Middle 7</font></td><td bgcolor="grey"><kbd>$00</kbd></td><td><kbd>$08</kbd></td><td><kbd>$00</kbd> (This fill amount, plus 0 of the next tile amount)</td></tr>
+<tr><td>+8/<kbd>$7F8452</kbd></td><td><font color="red">Right end</font></td><td bgcolor="grey"><kbd>$00</kbd></td><td><kbd>$06</kbd></td><td><kbd>$00</kbd> (use only this tile's fill amount for indexing, don't add by a value after here)</td></tr>
+</table>
+And now the tile number index to use is <kbd>$04</kbd> (because <kbd>$03</kbd> from the left end, plus <kbd>$01</kbd> of the middle 1, equals <kbd>$04</kbd>, which then that becomes the index of what tile to use).
+</p>
 
-<p>Duplicate tile numbers on the last n tiles are needed since this covers all possible values of the next tile. If there are 2+ possible different tiles (such as after the left end is 8 pieces for each middle tile
-or if the bar has no middle tiles and a 6-piece right end tile), you would take the number of whichever has the highest value (in this case, you would take 3 pieces for left end + 8 for middle which means the highest
-index would be $0B (11) instead of 3 + 6 = $09 (9) so that both the left end and middle would not use glitched tiles)</p>
+<p>Duplicate tile numbers on the last n values in the table are needed since this covers all possible values of the next tile (the number of items in the table must have <kbd>NumberOfPiecesInCurrentTile + NumberOfPiecesInNextTile</kbd>).
+If there are 2+ possible different tiles byte types after the current tile (such as middle or right end after the left end), you would take the number of whichever has the highest maximum (in this case, Middle have 8 pieces, and right end have 6 pieces,
+therefore you take the 8 and not the 6).<br><br>
+
+Looking at the previous example image above, left end have 3 pieces, middle have 8 pieces, and right end have 6. Left end's table should have 11 ($0B, 3 + 8 = 11) items in the table (not 9 from 3 + <abbr title="Right end&#39;s number of pieces is less than middle&#39;s 8 pieces">6</abbr>), middle
+should have 16 ($10, 8 + 8 = 16) items in table (not 14 by 8 + <abbr title="Right end&#39;s number of pieces is less than Middle&#39;s 8 pieces">6</abbr>.)</p>
 <hr>
 <h1><a href="#TOC_OutlineEdge" id="OutlineEdge">^</a>Outlined edge</h1>
 <p>Perhaps you wanted a bar that have an outline around the filled region of the bar to avoid &ldquo;cutoff&rdquo;. You could have the bar be like this if you don't want to check adjacent tile bytes:<br>
