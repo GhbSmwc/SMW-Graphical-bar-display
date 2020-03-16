@@ -21,26 +21,18 @@
 	</head>
 <body>
 <a href="../GraphicalBar_ReadmeDocumentation.html#FillEdgeCrossingTileBorder">Back</a>
-<hr>
-<h2>Table of contents</h2>
-<ul>
-	<li><a href="#SlantedEdge" id="TOC_SlantedEdge">Slanted edge</a></li>
-	<li><a href="#OutlineEdge" id="TOC_OutlineEdge">Outlined edge</a></li>
-</ul>
+
+<center><h1>Fill edge documentation</h1></center>
+
 <p>Note: This does not support double-bar's &ldquo;Using separate graphics&rdquo;, as having <i>even more</i> tiles would eat up a lot of tile space.<p>
 
 <p>To have this gimmick is very similar to the basic graphical bar code, but you use <kbd>ConvertBarFillAmountToTilesEdgeOverMultipleTiles</kbd> instead of <kbd>ConvertBarFillAmountToTiles</kbd>.
 Don't forget to insert the graphics accordingly.</p>
 
 <p>I've provide tables in the exgraphics subfolders (the HTML files) so you don't have to manually enter the tile number for each fill amount.</p>
-<hr>
-<h1><a href="#TOC_SlantedEdge" id="SlantedEdge">^</a>Slanted edge</h1>
-<p>Perhaps viewing this image will give you a hint on how to have a slanted-edge graphical bar:<br>
-<img src="DiagonalFillEdge.png"><br>
-Here, the numbers to the left of each tile indicates an index of the tile array, while the numbers on the right are the fill amount. Combine this image with the one below:<br>
-<img src="DiagonalFillEdge2.png"><br>
-and you get the idea on how it works. To check adjacent tiles to determine what tile to use, you would take the current tile byte's fill amount, <b><abbr title="If there is no next tile after the last tile, provided you disabled the right end, it would assume to add by 0 as to avoid adding by a garbage value.">and then add by the amount of the next tile byte</abbr></b>. The total
-is then the index of the tile to use, for example:
+
+<p>All of these uses the same subroutine (but different tile numbers and the number of values in the table) using <kbd>ConvertBarFillAmountToTilesEdgeOverMultipleTiles</kbd> (instead of using <kbd>ConvertBarFillAmountToTiles</kbd>). The way this whole thing
+works is by taking the fill amount of a given tile byte, then add by the amount of the next tile byte (if that given tile byte is the last tile, then don't add by anything), the sum is now what tile to use for that given tile byte:
 <table>
 <tr><th>Fill byte table (relative address/example)</th><th>Tile byte type</th><th>Fill amount</th><th>Fill amount maximum</th><th>Index to use</th></tr>
 <tr><td>+0/<kbd>$7F844A</kbd></td><td><font color="cyan">Left end</font></td><td bgcolor="orange"><kbd>$03</kbd></td><td><kbd>$03</kbd></td><td><kbd>$04</kbd> (This fill amount, plus 1 from next tile amount)</td></tr>
@@ -53,18 +45,22 @@ is then the index of the tile to use, for example:
 <tr><td>+7/<kbd>$7F8451</kbd></td><td><font color="green">Middle 7</font></td><td bgcolor="grey"><kbd>$00</kbd></td><td><kbd>$08</kbd></td><td><kbd>$00</kbd> (This fill amount, plus 0 of the next tile amount)</td></tr>
 <tr><td>+8/<kbd>$7F8452</kbd></td><td><font color="red">Right end</font></td><td bgcolor="grey"><kbd>$00</kbd></td><td><kbd>$06</kbd></td><td><kbd>$00</kbd> (use only this tile's fill amount for indexing, don't add by a value after here)</td></tr>
 </table>
-And now the tile number index to use is <kbd>$04</kbd> (because <kbd>$03</kbd> from the left end, plus <kbd>$01</kbd> of the middle 1, equals <kbd>$04</kbd>, which then that becomes the index of what tile to use).
-</p>
 
-<p>Duplicate tile numbers on the last n values in the table are needed since the table covers all possible values of the total (the number of items in the table must have <kbd>NumberOfPiecesInCurrentTile + <abbr title="Which tile byte type after the current has the highest number of pieces.">MaxNumberOfPiecesInNextTile</abbr> + 1</kbd>).
-If there are 2+ possible different tiles byte types after the current tile (such as middle or right end after the left end), you would take the number of whichever has the highest maximum (in this case, Middle have 8 pieces, and right end have 6 pieces,
-therefore you take the 8 and not the 6).<br><br>
+This also means that duplicate tiles may be needed on the last n items in the tile table, because this covers all possible indexes from <kbd>$00</kbd> to <kbd>NumberOfPiecesOfGivenTile + <abbr title="Any number of pieces of whichever tile after this have the highest number of pieces, for example, if the next tile is a middle with 8 pieces or the right end have 6 pieces, you would take the 8 and not the 6.">HighestNumberOFPiecesOfNextTile</kbd>.
+If you happen to have fewer number of values in the table than needed, garbage tiles will appear as soon as the next tile's fill amount is at or higher than a certain amount.</p>
 
-Looking at the previous example image above, left end have 3 pieces, middle have 8 pieces, and right end have 6. Left end's table should have 12 (Index numbered from $00 to $0B, 3 + 8 + 1 = 12) items in the table (not 10 from 3 + <abbr title="Right end&#39;s number of pieces is less than middle&#39;s 8 pieces">6</abbr> + 1), middle
-should have 17 (Index numbered from $00 to $10, 8 + 8 + 1 = 17) items in table (not 15 by 8 + <abbr title="Right end&#39;s number of pieces is less than Middle&#39;s 8 pieces">6</abbr> + 1.)</p>
+<h2>Quick jumps</h2>
+<ul>
+	<li><a href="#SlantedEdge" id="TOC_SlantedEdge">Slanted edge</a></li>
+	<li><a href="#OutlineEdge" id="TOC_OutlineEdge">Outlined edge</a></li>
+	<li><a href="#RoundedEdge" id="TOC_RoundedEdge">RoundedEdge</a></li>
+</ul>
+<hr>
+<h1><a href="#TOC_SlantedEdge" id="SlantedEdge">^</a>Slanted edge</h1>
+<img src="DiagonalFillEdge.png"><br>
 <hr>
 <h1><a href="#TOC_OutlineEdge" id="OutlineEdge">^</a>Outlined edge</h1>
-<p>Perhaps you wanted a bar that have an outline around the filled region of the bar to avoid &ldquo;cutoff&rdquo;. You could have the bar be like this if you don't want to check adjacent tile bytes:<br>
-<img src="OutLineEach8x8Tile.png"></p>
-<p>However, you would have outlines in places you don't need to. So how do we have outline <b>only</b> where the fill ends at? Well, this is gonna be similar to how the slanted fill edge works:<br>
 <img src="OutLineOnlyFillEdge.png"></p>
+<hr>
+<h1><a href="#TOC_RoundedEdge" id="RoundedEdge">^</a>Rounded edge</h1>
+<img src="RoundedFillEdge.png">
