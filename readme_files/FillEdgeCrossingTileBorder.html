@@ -27,7 +27,7 @@
 <p>Note: This does not support double-bar's &ldquo;Using separate graphics&rdquo;, as having <i>even more</i> tiles would eat up a lot of tile space.<p>
 
 <p>To have this gimmick is very similar to the basic graphical bar code, but you use <kbd>ConvertBarFillAmountToTilesEdgeOverMultipleTiles</kbd> instead of <kbd>ConvertBarFillAmountToTiles</kbd>.
-Don't forget to insert the graphics accordingly.</p>
+Don't forget to insert the graphics accordingly, and to edit the table in <kbd>ConvertBarFillAmountToTilesEdgeOverMultipleTiles</kbd> (it is set to use the diagonal fill edge by default).</p>
 
 <p>I've provide tables in the exgraphics subfolders (the HTML files) so you don't have to manually enter the tile number for each fill amount.</p>
 
@@ -46,8 +46,8 @@ works is by taking the fill amount of a given tile byte, then add by the amount 
 <tr><td>+8/<kbd>$7F8452</kbd></td><td><font color="red">Right end</font></td><td bgcolor="grey"><kbd>$00</kbd></td><td><kbd>$06</kbd></td><td><kbd>$00</kbd> (use only this tile's fill amount for indexing, don't add by a value after here)</td></tr>
 </table>
 
-This also means that duplicate tiles may be needed on the last n items in the tile table, because this covers all possible indexes from <kbd>$00</kbd> to <kbd>NumberOfPiecesOfGivenTile + <abbr title="Any number of pieces of whichever tile after this have the highest number of pieces, for example, if the next tile is a middle with 8 pieces or the next tile is a right end (no middle tiles) that have have 6 pieces, you would take the 8 and not the 6.">HighestNumberOFPiecesOfNextTile</kbd>.
-If you happen to have fewer number of values in the table than needed, garbage tiles will appear as soon as the next tile's fill amount is at or higher than a certain amount.</p>
+This also means that duplicate tiles may be needed on the last n items in the tile table, because this covers all possible indexes from <kbd>$00</kbd> to <kbd>NumberOfPiecesOfGivenTile + <abbr title="Any number of pieces of whichever tile after this have the highest number of pieces, for example, working on the left end tile, if the next tile is a middle with 8 pieces or the next tile is a right end (no middle tiles) that have 6 pieces, you would take the 8 and not the 6 for indexing for the left end, it then becomes 3 + 8 = 11 ($0B) which is the highest index.">HighestNumberOFPiecesOfNextTile</kbd>.
+If you happen to have fewer number of values in the table than needed, garbage tiles will appear as soon as the next tile's fill amount is higher than a certain amount.</p>
 
 <h2>Quick jumps</h2>
 <ul>
