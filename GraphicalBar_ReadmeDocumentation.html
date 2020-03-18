@@ -320,14 +320,15 @@ on the first middle tile if there are no full middle tiles, if the entire middle
 <li><kbd>floor(x)</kbd> returns the highest integer that is &le; x. Essentially this round down an integer (7/8 = 0.875 &rarr; 0, 9/8 = 1.125 &rarr; 1).</li>
 </ul>
 </ul><br>
-Another way is by taking the given fill amount, subtract by the maximum starting at the first byte towards the last byte, if the subtraction was successful (subtracted without going in the negatives), would write
+<p>Another way is by taking the given fill amount, subtract by the maximum starting at the first byte towards the last byte, if the subtraction was successful (subtracted without going in the negatives), would write
 the maximum amount to the byte in the table and writes the difference back to the remaining fill amount, otherwise would write the remaining fill amount into byte in the table and
-set the remaining fill amount to 0. After this, this then repeats until all tile bytes are finished.
+set the remaining fill amount to 0. After this, this then repeats until all tile bytes are finished.<br><br>
 
-<ul><li>For example: using the same attributes as examples above, 14 - 3 = 11. Subtraction successful, write 3 (maximum)
-for the left end, and then write 11 back to the remaining fill amount. Then 11 - 8 = 3, subtraction successful, so the first middle tile byte is 8 (maximum). Finally, 3 - 8 = (-5). Subtraction failed, write the remaining amount
-(3) on the second middle tile byte. Set the remaining fill amount to 0, and repeat until all tile bytes processed.</li></ul>
+<ul><li>For example: using the same attributes as examples above, [14 - 3 = 11]. Subtraction successful, write 3 (maximum)
+for the left end, and then write 11 back to the remaining fill amount. Then [11 - 8 = 3], subtraction successful, so the first middle tile byte is 8 (maximum). Finally, [3 - 8 = (-5)]. Subtraction failed, write the remaining amount
+(3) on the second middle tile byte. Set the remaining fill amount to 0, and repeat until all tile bytes processed (which results in [0 - MaxAmount], and repeatedly sets the following bytes to 0).</li></ul>
 <br><br>
+This is known as repeated subtraction, it keeps subtracting until no more is left. This is performed in <kbd>DrawGraphicalBarSubtractionLoopEdition</kbd> which is explained later.</p>
 
 
 The inputs are similar to the previously mentioned routine (such as requiring the attributes), but you don't write to <span class="NoLineBreak"><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd></span> to
@@ -597,7 +598,7 @@ without the need of manually calculating the values.<br><br>
 
 I also made an alternative routine, <kbd>DrawGraphicalBarSubtractionLoopEdition</kbd>, behaves almost exactly identical to <kbd>DrawGraphicalBar</kbd> but a lot less lines of code and is based
 on a repeated subtraction and not using multiplication and division routines. Almost all the inputs and outputs the same, except that the output <kbd>$00-$01</kbd> acts as the remaining fill when the bar is full
-or higher and 0 otherwise (<kbd>RemainingFill = clamp(InputFillAmount - BarMaximumFull)</kbd>), while <kbd>$02-$09</kbd> aren't destroyed.<br><br>
+or higher and 0 otherwise (<kbd>RemainingFill = <abbr title="Picks what number in the parameter is the highest value. If the fill amount is less than 0, it results things like max(-5, 0) which returns 0 and not -5">max</abbr>((InputFillAmount - BarMaximumFull), 0)</kbd>), while <kbd>$02-$09</kbd> aren't destroyed.<br><br>
 </li>
 
 
