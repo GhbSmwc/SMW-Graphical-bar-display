@@ -319,7 +319,15 @@ on the first middle tile if there are no full middle tiles, if the entire middle
 <li><kbd>clamp(x, min, max)</kbd> returns x in between <kbd>min</kbd> and <kbd>max</kbd>, but returns <kbd>min</kbd> if at or below that number and <kbd>max</kbd> if at or above that number</li>
 <li><kbd>floor(x)</kbd> returns the highest integer that is &le; x. Essentially this round down an integer (7/8 = 0.875 &rarr; 0, 9/8 = 1.125 &rarr; 1).</li>
 </ul>
-</ul><br><br>
+</ul><br>
+Another way is by taking the given fill amount, subtract by the maximum starting at the first byte towards the last byte, if the subtraction was successful (subtracted without going in the negatives), would write
+the maximum amount to the byte in the table and writes the difference back to the remaining fill amount, otherwise would write the remaining fill amount into byte in the table and
+set the remaining fill amount to 0. After this, this then repeats until all tile bytes are finished.
+
+<ul><li>For example: using the same attributes as examples above, 14 - 3 = 11. Subtraction successful, write 3 (maximum)
+for the left end, and then write 11 back to the remaining fill amount. Then 11 - 8 = 3, subtraction successful, so the first middle tile byte is 8 (maximum). Finally, 3 - 8 = (-5). Subtraction failed, write the remaining amount
+(3) on the second middle tile byte. Set the remaining fill amount to 0, and repeat until all tile bytes processed.</li></ul>
+<br><br>
 
 
 The inputs are similar to the previously mentioned routine (such as requiring the attributes), but you don't write to <span class="NoLineBreak"><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd></span> to
