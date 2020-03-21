@@ -899,7 +899,8 @@ tile byte holds a set amount of HP, for example, in the <i>Legend of Zelda</i> s
 <li><p>It is possible to have a <i>double-ended</i> bar (<img src="readme_files/DoubleEndedBar.gif"> that starts in the middle and fill towards both ends), if you just copy the already-written tiles, and then
 <abbr title="Clear or set bit 6 of the YXPCCCTT">X-flip</abbr> it and write it to the left of the <abbr title="Not using a leftwards bar on this one.">left-to-right</abbr> bar
 or to the right of the leftwards bar if you wrote that first. Keep in mind that the bar fill stored in the fill table's tile byte is <b>always</b> left end, middles, and then right end, so therefore the &ldquo;left end&rdquo; or &ldquo;first middle&rdquo;
-is the &ldquo;center&rdquo; where the fill starts at. Keep in mind that the fill is centered 2 pieces (for pixel columns-styled graphics, 2 columns of pixels) when the fill amount is set to 1 due to a mirrored copy. It is very rare that games display a value as a bar like this though.<p></li>
+is the &ldquo;center&rdquo; where the fill starts at. Keep in mind that the fill is centered 2 pieces (for pixel columns-styled graphics, 2 columns of pixels) when the fill amount is set to 1 due to a mirrored copy, and also  you cannot have
+a double-ended with the total number of tiles being an odd number--having the fill centered on one tile instead of two. It is very rare that games display a value as a bar like this though.<p></li>
 
 <li><p>It is best to avoid having any end tiles holding the same number of pieces as the middle, although it still works, it is less optimized as the routine <kbd>DrawGraphicalBar</kbd>
 only takes a value and represent them as each bytes capped at their maximum. Therefore if you're planning to have 8 pieces for both left and right ends, and have 7 middle bytes also
