@@ -887,14 +887,21 @@ to calculate where to place the bar when using <kbd>BarExtendLeft</kbd> as well 
 <h2><a href="#NotesBack" id="Notes">^</a>Notes</h2>
 <ul>
 
-<li>Due to how this routine works (a rule that none or only a single fraction tile exists), to display a fill edge that encompass multiple 8x8 bytes at once would require checking the adjacent tile bytes
+<li><p>Due to how this routine works (a rule that none or only a single fraction tile exists), to display a fill edge that encompass multiple 8x8 bytes at once would require checking the adjacent tile bytes
 to determine how the edge tile is rendered:<br>
 <center><img src="readme_files/MultiPartiallyFilled.png"></center><br>
 I've included a <a href="readme_files/FillEdgeCrossingTileBorder.html" id="FillEdgeCrossingTileBorder">tutorial for that</a>, this involves having a code that checks the next tile byte over to determine
-what tile to use when the current tile is full.</li><br>
-<li>You don't have to call the routine <kbd>CalculateGraphicalBarPercentage</kbd> to use <kbd>DrawGraphicalBar</kbd>, this means you can make an icon-based HP system that each
-tile byte holds a set amount of HP, for example, in the <i>Legend of Zelda</i> series starting in <i>Ocarina of Time</i>, you can have each heart containing 4 pieces representing each 1 HP.</li>
-<li>It is best to avoid having any end tiles holding the same number of pieces as the middle, although it still works, it is less optimized as the routine <kbd>DrawGraphicalBar</kbd>
+what tile to use when the current tile is full.</p></li>
+
+<li><p>You don't have to call the routine <kbd>CalculateGraphicalBarPercentage</kbd> to use <kbd>DrawGraphicalBar</kbd>, this means you can make an icon-based HP system that each
+tile byte holds a set amount of HP, for example, in the <i>Legend of Zelda</i> series starting in <i>Ocarina of Time</i>, you can have each heart containing 4 pieces representing each 1 HP.</p></li>
+
+<li><p>It is possible to have a <i>double-ended</i> bar (<img src="readme_files/DoubleEndedBar.gif"> that starts in the middle and fill towards both ends), if you just copy the already-written tiles, and then
+<abbr title="Clear or set bit 6 of the YXPCCCTT">X-flip</abbr> it and write it to the left of the <abbr title="Not using a leftwards bar on this one.">left-to-right</abbr> bar
+or to the right of the leftwards bar if you wrote that first. Keep in mind that the bar fill stored in the fill table's tile byte is <b>always</b> left end, middles, and then right end, so therefore the &ldquo;left end&rdquo; or &ldquo;first middle&rdquo;
+is the &ldquo;center&rdquo; where the fill starts at. Keep in mind that the fill is centered 2 pieces (for pixel columns-styled graphics, 2 columns of pixels) when the fill amount is set to 1 due to a mirrored copy. It is very rare that games display a value as a bar like this though.<p></li>
+
+<li><p>It is best to avoid having any end tiles holding the same number of pieces as the middle, although it still works, it is less optimized as the routine <kbd>DrawGraphicalBar</kbd>
 only takes a value and represent them as each bytes capped at their maximum. Therefore if you're planning to have 8 pieces for both left and right ends, and have 7 middle bytes also
 having 8 pieces at the max, it is better to have both end tiles set to 0 pieces and have 9 middle tiles holding 8 pieces, here is what it looks like on a full bar:<br><br>
 
@@ -977,15 +984,17 @@ the same table graphic as middle and cause cutoff-ended bar.
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles (end tiles recognized).
 	;[...]</pre></td></tr></table><br><br>
 
-</li>
-<li>You might've noticed the define <span class="NoLineBreak"><kbd>!Settings_GraphicalBar_IndexSize</kbd></span> found in <kbd>GraphicalBarDefines.asm</kbd>, I left that there in for some rare cases anyone
-would need a bar that is more than 255 tile bytes long (So a 16-bit addressing was needed).</li>
-<li>Be careful when you call the routine <kbd>WriteBarToHUD</kbd> (and <kbd>WriteBarToHUDLeftwards</kbd>), as because this is multi-bytes based, it will write from
+</p></li>
+<li><p>You might've noticed the define <span class="NoLineBreak"><kbd>!Settings_GraphicalBar_IndexSize</kbd></span> found in <kbd>GraphicalBarDefines.asm</kbd>, I left that there in for some rare cases anyone
+would need a bar that is more than 255 tile bytes long (So a 16-bit addressing was needed).</p></li>
+
+<li><p>Be careful when you call the routine <kbd>WriteBarToHUD</kbd> (and <kbd>WriteBarToHUDLeftwards</kbd>), as because this is multi-bytes based, it will write from
 <span class="NoLineBreak"><kbd>!Default_GraphicalBarPosition</kbd></span> to <span class="NoLineBreak"><kbd>!Default_GraphicalBarPosition+((NumberOfTiles-1)*!StatusBarFormat)</kbd></span> address. Thus if you place the bar at RAM address
-<kbd>$0F2F</kbd>, the address bytes beyond that (which is non-status-bar-related data, from timer data, scores, then an unused RAM area ($0F3A) and so on) gets overwritten.</li>
-<ul><li>However, if you are using the &ldquo;extend leftwards&rdquo; (not to be confused with a leftwards <b>filling bar</b>; the bar that extends leftwards as you increase the length),
+<kbd>$0F2F</kbd>, the address bytes beyond that (which is non-status-bar-related data, from timer data, scores, then an unused RAM area ($0F3A) and so on) gets overwritten.</p></li>
+
+<ul><li><p>However, if you are using the &ldquo;extend leftwards&rdquo; (not to be confused with a leftwards <b>filling bar</b>; the bar that extends leftwards as you increase the length),
 the address write range is <kbd>DesiredLastTilePos-((NumberOfTiles-1)*!StatusBarFormat)</kbd> to <kbd>DesiredLastTilePos</kbd>, so be careful not to have the bar data be written past the starting RAM
-address of the status bar (avoid placing the <kbd>DesiredLastTilePos</kbd> that would cause placing the tiles before the first byte of the status bar tiles).</li></ul>
+address of the status bar (avoid placing the <kbd>DesiredLastTilePos</kbd> that would cause placing the tiles before the first byte of the status bar tiles).</p></li></ul>
 </ul>
 <hr>
 <h2><a href="#CreditsBack" id="Credits">^</a>Credits</h2>
