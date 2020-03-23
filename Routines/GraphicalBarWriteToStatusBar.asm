@@ -357,3 +357,120 @@ WriteBarStaticTileToHUDRightsideFormat2:
 		LDA.b $06 : STA [$03],y				;>Tile properties 
 	endif
 	RTL
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;Write double-ended bar.
+;This routine will copy a left-to-right bar and pastes it
+;in a location to the left of the original bar.
+;
+;To be used after calling WriteBarToHUD.
+;
+;Don't use this with leftwards bar, as this takes the leftmost
+;tile on the status bar to handle making a mirrored copy.
+;Input:
+; -!Scratchram_GraphicalBar_LeftEndPiece, !Scratchram_GraphicalBar_MiddlePiece,
+;   !Scratchram_GraphicalBar_RightEndPiece, and !Scratchram_GraphicalBar_TempLength:
+;   Used to determine how many tile bytes.
+; -$00-$02: The location of the left-to-right bar (address taken from the first tile)
+;   to copy from for the tile numbers.
+; -$03-$05: Same as above but tile properties.
+;Output:
+; -[Address_In_00 - (NumberOfTiles * !StatusBarFormat)] to [Address_In_00 - (1 * !StatusBarFormat)]
+;   the area the mirrored copy will be written at, applies to both tile numbers and properties.
+;Overwritten:
+; -$06-$08: Used for the address of the mirrored copy for tile numbers.
+; -$09-$0B: Used for the address of the mirrored copy for tile properties.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+WriteDoubleEndedBar:
+	;Get starting address of the flipped bar (write the flipped bar at an address stored in $06 and $09):
+		JSL CountNumberOfTiles
+		TXY				;>Y = the countdown index
+		TXA				;\Find where is the leftmost position of the mirrored bar.
+		INC				;|(LeftmostPos = LeftToRightBarLeftTilePos - NumberOfTiles)
+		REP #$21			;|To do 16-bit minus 8-bit, do this instead:
+		AND #$00FF			;|(LeftmostPos = (-NumberOfTiles) + LeftToRightBarLeftTilePos)
+		EOR #$FFFF			;|
+		INC A				;|
+		ADC $00				;|
+		STA $06				;|
+		SEP #$20			;/
+		if !StatusBar_UsingCustomProperties != 0
+			TXA				;\Find where is the leftmost position of the mirrored bar.
+			INC				;|(LeftmostPos = LeftToRightBarLeftTilePos - NumberOfTiles)
+			REP #$21			;|To do 16-bit minus 8-bit, do this instead:
+			AND #$00FF			;|(LeftmostPos = (-NumberOfTiles) + LeftToRightBarLeftTilePos)
+			EOR #$FFFF			;|
+			INC A				;|
+			ADC $02				;|
+			STA $09				;|
+			SEP #$20			;/
+		endif
+	;Copy tiles from left-to-right bar
+		LDX #$00			;>X = the countup index
+		.Loop
+			..WriteFlippedBarTileNumb
+				LDA [$00],y		;>Load a tile starting at the last...
+				PHY
+				TXY			;>STA [$xx],x don't exist, only STA [$xx,x] which does different.
+				STA [$06],y		;>...And then write tile starting on the first.
+				PLY
+			if !StatusBar_UsingCustomProperties != 0
+				..WriteFlippedBarTileProps
+					LDA [$03],y		;>Load a tile starting at the last...
+					PHY
+					TXY			;>STA [$xx],x don't exist, only STA [$xx,x] which does different.
+					ORA.b #%01000000	;>Set bit 6 (the X-flip bit)
+					STA [$09],y		;>...And then write tile starting on the first.
+					PLY
+			endif
+			..Next
+				INX				;>Next tile (addr+1) on the flipped bar.
+				DEY				;>Next tile (addr-1) on the left-to-right bar.
+				BPL .Loop
+	RTL
+WriteDoubleEndedBarFormat2:
+	;Get starting address of the flipped bar (write the flipped bar at an address stored in $06 and $09):
+		JSL CountNumberOfTiles
+		TXA
+		ASL
+		TAY				;>Y = the countdown index
+		INC #2				;\Find where is the leftmost position of the mirrored bar.
+		REP #$21			;|(LeftmostPos = LeftToRightBarLeftTilePos - NumberOfTiles)
+		AND #$00FF			;|To do 16-bit minus 8-bit, do this instead:
+		EOR #$FFFF			;|(LeftmostPos = (-NumberOfTiles) + LeftToRightBarLeftTilePos)
+		INC A				;|
+		ADC $00				;|
+		STA $06				;|
+		SEP #$20			;/
+		if !StatusBar_UsingCustomProperties != 0
+			INC #2				;\Find where is the leftmost position of the mirrored bar.
+			REP #$21			;|(LeftmostPos = LeftToRightBarLeftTilePos - NumberOfTiles)
+			AND #$00FF			;|To do 16-bit minus 8-bit, do this instead:
+			EOR #$FFFF			;|(LeftmostPos = (-NumberOfTiles) + LeftToRightBarLeftTilePos)
+			INC A				;|
+			ADC $02				;|
+			STA $09				;|
+			SEP #$20			;/
+		endif
+	;Copy tiles from left-to-right bar
+		LDX #$00			;>X = the countup index
+		.Loop
+			..WriteFlippedBarTileNumb
+				LDA [$00],y		;>Load a tile starting at the last...
+				PHY
+				TXY			;>STA [$xx],x don't exist, only STA [$xx,x] which does different.
+				STA [$06],y		;>...And then write tile starting on the first.
+				PLY
+			if !StatusBar_UsingCustomProperties != 0
+				..WriteFlippedBarTileProps
+					LDA [$03],y		;>Load a tile starting at the last...
+					PHY
+					TXY			;>STA [$xx],x don't exist, only STA [$xx,x] which does different.
+					ORA.b #%01000000	;>Set bit 6 (the X-flip bit)
+					STA [$09],y		;>...And then write tile starting on the first.
+					PLY
+			endif
+			..Next
+				INX #2				;>Next tile (addr+1) on the flipped bar.
+				DEY #2				;>Next tile (addr-1) on the left-to-right bar.
+				BPL .Loop
+	RTL
