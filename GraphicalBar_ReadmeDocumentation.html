@@ -46,6 +46,12 @@ named <span class="NoLineBreak"><kbd>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</kb
 <li><a href="#Installation" id="InstallationBack">Installation (test run)</a></li>
 <li><a href="#OwnGraphicalBar" id="OwnGraphicalBarBack">Displaying your own value as a graphical bar</a></li>
 <li><a href="#AsmDocumentation" id="AsmDocumentationBack">ASM Documentation</a></li>
+<ul>
+	<li><a href="#GraphicalBarELITE" id="GraphicalBarELITEBack"><kbd>GraphicalBarELITE.asm</kbd></a></li>
+	<li><a href="#GraphicalBarConvertToTile" id="GraphicalBarConvertToTileBack"><kbd>GraphicalBarConvertToTile.asm</kbd></a></li>
+	<li><a href="#GraphicalBarWriteToStatusBar" id="GraphicalBarWriteToStatusBarBack"><kbd>GraphicalBarWriteToStatusBar.asm</kbd></li>
+	<li><a href="#GraphicalBarOtherRoutines" id="GraphicalBarOtherRoutinesBack"><kbd>GraphicalBarOtherRoutines.asm</kbd></a></li>
+</ul>
 <li><a href="#Notes" id="NotesBack">Notes</a></li>
 <li><a href="#Credits" id="CreditsBack">Credits</a></li>
 
@@ -221,7 +227,7 @@ the SNES is <a href="https://en.wikipedia.org/wiki/Endianness">little-endian</a>
 <h2><a href="#AsmDocumentationBack" id="AsmDocumentation">^</a>ASM Documentation</h2>
 Note: All values here are unsigned. Routine information follows:
 <ol>
-<li>Inside <kbd>GraphicalBarELITE.asm</kbd></li>
+<li><a href="#GraphicalBarELITEBack" id="GraphicalBarELITE">^</a>Inside <kbd>GraphicalBarELITE.asm</kbd></li>
 <ul>
 <li><kbd>CalculateGraphicalBarPercentage</kbd>: Calculates the ratio of Quantity over MaxQuantity to X over the number of pieces (the whole bar).
 For example: 50/100 on a 62-pieced bar outputs value of 31.</li>
@@ -607,7 +613,7 @@ decrements the fill amount <kbd>$00-$01</kbd> by 1 so it will display 1 and/or <
 of the routine should be obvious (e.g. <kbd>RoundAwayEmpty</kbd> means round away from empty).</li><br>
 </ul>
 </ul>
-<li><span id="ConvertFillToTile">Inside <kbd>GraphicalBarConvertToTile.asm</kbd></span></li>
+<li><span id="ConvertFillToTile"><a href="#GraphicalBarConvertToTileBack" id="GraphicalBarConvertToTile">^</a>Inside <kbd>GraphicalBarConvertToTile.asm</kbd></span></li>
 <ul>
 <li><kbd>ConvertBarFillAmountToTiles</kbd>: converts the bar fill table into tile numbers via indexing (inputs the same as above and don't
 need to be rewritten). Note that this DOES modifies the values in <kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd>:
@@ -740,16 +746,20 @@ The table of tile numbers in the routine are ordered from empty to full in the t
 </li>
 <li><kbd>ConvertBarFillAmountToTilesDoubleBar</kbd>: Same as above, but handles a double-filled bar. Tiles are formated <a href="readme_files/DoubleBarFills.png" target="_blank">like this</a>.
 Also like above, make sure you have the number of pieces equal to <kbd>(NumberOfPieces+1)^2</kbd> number of values in table (for example, left end have 4 pieces, therefore you must have 25 values;
-<kbd>(4+1)^2 = 25</kbd>). I recommend to have the table to form a perfect square so that the fill values are visually organized.</li><br>
+<kbd>(4+1)^2 = 25</kbd>). I recommend to have the table to form a perfect square so that the fill values are visually organized.<br>
 
 Of course, the default graphics included here are pixel-column-based, meaning each column of pixels is 1 piece of a bar.<br><br>
 
-Note that this does not support overworld graphics unlike above, as there are even more tiles used than the status bar.<br><br>
+Note that this does not support overworld graphics unlike above, as there are even more tiles used than the status bar.</li><br><br>
+
+<li><kbd>ConvertBarFillAmountToTilesEdgeOverMultipleTiles</kbd>: This handles graphics involving the fill edge covering multiple 8x8 tiles. This is often used for slanted, rounded, or outlined fill edge graphic:<br>
+<img src="readme_files/MultiPartiallyFilled.png"><br>
+See explanation <a href="readme_files/FillEdgeCrossingTileBorder.html" id="FillEdgeCrossingTileBorder">here</a>.
+</li>
 
 </ul><br>
 
-
-<li><span id="StatusBarWrite">Inside <kbd>GraphicalBarWriteToStatusBar.asm</kbd>. Note that there are two similar subroutines main labels with one that have &ldquo;<kbd>Format2</kbd>&rdquo; (such as <kbd>WriteBarToHUD</kbd> and
+<li><span id="StatusBarWrite"><a href="#GraphicalBarWriteToStatusBarBack" id="GraphicalBarWriteToStatusBar">^</a>Inside <kbd>GraphicalBarWriteToStatusBar.asm</kbd>. Note that there are two similar subroutines main labels with one that have &ldquo;<kbd>Format2</kbd>&rdquo; (such as <kbd>WriteBarToHUD</kbd> and
 <kbd>WriteBarToHUDFormat2</kbd>) appended are the same as the other but handles a different status bar/OWB format. See <a href="readme_files/Layer3TileFormat/Layer3TileFormat.html" target="_blank">this information</a>
 regarding the tile formats.</li>
 <ul>
@@ -878,29 +888,61 @@ to calculate where to place the bar when using <kbd>BarExtendLeft</kbd> as well 
 </tr>
 </table>
 
+</li><br>
+<li><kbd>WriteDoubleEndedBar</kbd>: Writes a mirrored version of the left-to-right bar and places it to the left of that bar. This is intended to display double-ended bars that as the fill increases, it starts in the center
+and fill towards both ends (<img src="readme_files/DoubleEndedBar.gif">). You call this routine after calling <kbd>DrawGraphicalBar</kbd> (don't use the leftwards version).
+
+<table>
+<tr><th>Input</th><th>Description</th></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_LeftEndPiece</kbd>, <kbd>!Scratchram_GraphicalBar_MiddlePiece</kbd>, <kbd>!Scratchram_GraphicalBar_RightEndPiece</kbd>, and
+<kbd>!Scratchram_GraphicalBar_TempLength</kbd></td><td>Needed to count how many tiles to figure out where the starting address for the mirrored bar.</td></tr>
+
+<tr><td><kbd>$00</kbd> to <kbd>$02</kbd> (24-bit)</td><td>The location of the <b>starting</b> tile of the original left-tor-right bar for tile numbers</td></tr>
+<tr><td><kbd>$03</kbd> to <kbd>$05</kbd> (24-bit)</td><td>Same as above but tile properties.</td></tr>
+</table><br>
+
+<table>
+<tr><th>Output</th><th>Description</th></tr>
+<tr><td><kbd>Address_In_00-(NumberOfTiles*!StatusBarFormat)</kbd> to <kbd>Address_In_00-(1*!StatusBarFormat)</kbd></td><td>The area where the flipped bar will be written at (tile numbers).</td></tr>
+<tr><td><kbd>Address_In_03-(NumberOfTiles*!StatusBarFormat)</kbd> to <kbd>Address_In_03-(1*!StatusBarFormat)</kbd></td><td>Same as above but tile properties</td></tr>
+<tr><td><kbd>$06</kbd> to <kbd>$08</kbd></td><td rowspan="2">(overwritten, not useful after this routine) Needed since the address of the original bar and mirrored are both needed during the loop.</td></tr>
+<tr><td><kbd>$09</kbd> to <kbd>$0B</kbd></td></tr>
+</table>
+
 </li>
 </ul>
 </li>
+
+<li><a href="#GraphicalBarOtherRoutinesBack" id="GraphicalBarOtherRoutines">^</a>Inside <kbd>GraphicalBarOtherRoutines.asm</kbd></li>
+<ul>
+<li><kbd>MapRangeToStartAt0</kbd>: Maps any given range (of 2 given numbers) to a zero-based range (for use so that any number that is the minimum maps to 0% and maximum to 100%).
+For example: A range from 75 to 100 would be converted to 0 to 25. The given amount in between minimum and maximum is also converted via subtracting by the minimum number (in this case, subtracted by 75). This is useful for stacked
+bars like EXP progress bar or multiple HP bars for bosses. You call this routine before you call <kbd>CalculateGraphicalBarPercentage</kbd>.
+<table>
+<tr><th>Input</th><th>Description</th></tr>
+<tr><td><kbd>$00</kbd> to <kbd>$01</kbd> (16-bit)</td><td>The quantity (expected to be in between two numbers).</td></tr>
+<tr><td><kbd>$02</kbd> to <kbd>$03</kbd> (16-bit)</td><td>The minimum quantity.</td></tr>
+<tr><td><kbd>$04</kbd> to <kbd>$05</kbd> (16-bit)</td><td>The maximum quantity.</td></tr>
+</table><br>
+
+<table>
+<tr><th>Output</th><th>Description</th><th>Where to write for <kbd>CalculateGraphicalBarPercentage</kbd></th></tr>
+<tr><td><kbd>$00</kbd> to <kbd>$01</kbd> (16-bit)</td><td>The quantity, subtracted by minimum quantity .</td><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl+1</kbd></td></tr>
+<tr><td><kbd>$02</kbd> to <kbd>$03</kbd> (16-bit)</td><td>The minimum quantity (stayed the same).</td><td>Not used</td></tr>
+<tr><td><kbd>$04</kbd> to <kbd>$05</kbd> (16-bit)</td><td>The maximum quantity (subtracted by minimal quantity), this is also the size of the range.</td><td><kbd>!Scratchram_GraphicalBar_FillByteTbl+2</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl+3</kbd></td></tr>
+</table><br>
+
+I've made a test file <kbd>Level_RangeBased.asm</kbd> (located in <kbd>ExampleUsage</kbd> folder) that demonstrates this.
+</li>
+</ul>
 </ol>
 
 <hr>
 <h2><a href="#NotesBack" id="Notes">^</a>Notes</h2>
 <ul>
 
-<li><p>Due to how this routine works (a rule that none or only a single fraction tile exists), to display a fill edge that encompass multiple 8x8 bytes at once would require checking the adjacent tile bytes
-to determine how the edge tile is rendered:<br>
-<center><img src="readme_files/MultiPartiallyFilled.png"></center><br>
-I've included a <a href="readme_files/FillEdgeCrossingTileBorder.html" id="FillEdgeCrossingTileBorder">tutorial for that</a>, this involves having a code that checks the next tile byte over to determine
-what tile to use when the current tile is full.</p></li>
-
 <li><p>You don't have to call the routine <kbd>CalculateGraphicalBarPercentage</kbd> to use <kbd>DrawGraphicalBar</kbd>, this means you can make an icon-based HP system that each
 tile byte holds a set amount of HP, for example, in the <i>Legend of Zelda</i> series starting in <i>Ocarina of Time</i>, you can have each heart containing 4 pieces representing each 1 HP.</p></li>
-
-<li><p>It is possible to have a <i>double-ended</i> bar (<img src="readme_files/DoubleEndedBar.gif"> that starts in the middle and fill towards both ends), if you just copy the already-written tiles, and then
-<abbr title="Clear or set bit 6 of the YXPCCCTT">X-flip</abbr> it and write it to the left of the <abbr title="Not using a leftwards bar on this one.">left-to-right</abbr> bar
-or to the right of the leftwards bar if you wrote that first. Keep in mind that the bar fill stored in the fill table's tile byte is <b>always</b> left end, middles, and then right end, so therefore the &ldquo;left end&rdquo; or &ldquo;first middle&rdquo;
-is the &ldquo;center&rdquo; where the fill starts at. Keep in mind that the fill is centered 2 pieces (for pixel columns-styled graphics, 2 columns of pixels) when the fill amount is set to 1 due to a mirrored copy, and also  you cannot have
-a double-ended with the total number of tiles being an odd number--having the fill centered on one tile instead of two. It is very rare that games display a value as a bar like this though.<p></li>
 
 <li><p>It is best to avoid having any end tiles holding the same number of pieces as the middle, although it still works, it is less optimized as the routine <kbd>DrawGraphicalBar</kbd>
 only takes a value and represent them as each bytes capped at their maximum. Therefore if you're planning to have 8 pieces for both left and right ends, and have 7 middle bytes also
