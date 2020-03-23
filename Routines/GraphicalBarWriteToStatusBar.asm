@@ -384,24 +384,32 @@ WriteDoubleEndedBar:
 	;Get starting address of the flipped bar (write the flipped bar at an address stored in $06 and $09):
 		JSL CountNumberOfTiles
 		TXY				;>Y = the countdown index
-		TXA				;\Find where is the leftmost position of the mirrored bar.
-		INC				;|(LeftmostPos = LeftToRightBarLeftTilePos - NumberOfTiles)
-		REP #$21			;|To do 16-bit minus 8-bit, do this instead:
-		AND #$00FF			;|(LeftmostPos = (-NumberOfTiles) + LeftToRightBarLeftTilePos)
-		EOR #$FFFF			;|
+		TXA				;\
+		if !StatusBar_UsingCustomProperties != 0
+			PHA
+		endif
+		INC				;|Find where is the leftmost position of the mirrored bar.
+		REP #$21			;|(LeftmostPos = LeftToRightBarLeftTilePos - NumberOfTiles)
+		AND #$00FF			;|To do 16-bit minus 8-bit, do this instead:
+		EOR #$FFFF			;|(LeftmostPos = (-NumberOfTiles) + LeftToRightBarLeftTilePos)
 		INC A				;|
 		ADC $00				;|
 		STA $06				;|
+		LDA $02				;|\Bank byte
+		STA $08				;|/
 		SEP #$20			;/
 		if !StatusBar_UsingCustomProperties != 0
+			PLA
 			TXA				;\Find where is the leftmost position of the mirrored bar.
 			INC				;|(LeftmostPos = LeftToRightBarLeftTilePos - NumberOfTiles)
 			REP #$21			;|To do 16-bit minus 8-bit, do this instead:
 			AND #$00FF			;|(LeftmostPos = (-NumberOfTiles) + LeftToRightBarLeftTilePos)
 			EOR #$FFFF			;|
 			INC A				;|
-			ADC $02				;|
+			ADC $03				;|
 			STA $09				;|
+			LDA $05				;|\Bank byte
+			STA $0B				;|/
 			SEP #$20			;/
 		endif
 	;Copy tiles from left-to-right bar
@@ -432,6 +440,9 @@ WriteDoubleEndedBarFormat2:
 		JSL CountNumberOfTiles
 		TXA
 		ASL
+		if !StatusBar_UsingCustomProperties != 0
+			PHA
+		endif
 		TAY				;>Y = the countdown index
 		INC #2				;\Find where is the leftmost position of the mirrored bar.
 		REP #$21			;|(LeftmostPos = LeftToRightBarLeftTilePos - NumberOfTiles)
@@ -440,15 +451,20 @@ WriteDoubleEndedBarFormat2:
 		INC A				;|
 		ADC $00				;|
 		STA $06				;|
+		LDA $02				;|\Bank byte
+		STA $08				;|/
 		SEP #$20			;/
 		if !StatusBar_UsingCustomProperties != 0
+			PLA
 			INC #2				;\Find where is the leftmost position of the mirrored bar.
 			REP #$21			;|(LeftmostPos = LeftToRightBarLeftTilePos - NumberOfTiles)
 			AND #$00FF			;|To do 16-bit minus 8-bit, do this instead:
 			EOR #$FFFF			;|(LeftmostPos = (-NumberOfTiles) + LeftToRightBarLeftTilePos)
 			INC A				;|
-			ADC $02				;|
+			ADC $03				;|
 			STA $09				;|
+			LDA $05				;|\Bank byte
+			STA $0B				;|/
 			SEP #$20			;/
 		endif
 	;Copy tiles from left-to-right bar
