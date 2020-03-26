@@ -752,7 +752,8 @@ Of course, the default graphics included here are pixel-column-based, meaning ea
 
 Note that this does not support overworld graphics unlike above, as there are even more tiles used than the status bar.</li><br><br>
 
-<li><kbd>ConvertBarFillAmountToTilesEdgeOverMultipleTiles</kbd>: This handles graphics involving the fill edge covering multiple 8x8 tiles. This is often used for slanted, rounded, or outlined fill edge graphic:<br>
+<li><kbd>ConvertBarFillAmountToTilesEdgeOverMultipleTiles</kbd>: Due to the way <kbd>DrawGraphicalBar</kbd>'s format of having only a single fraction tile byte exist, this subroutine makes having
+the fill edge covering multiple 8x8 tiles possible. This is often used for slanted, rounded, or outlined fill edge graphic:<br>
 <img src="readme_files/MultiPartiallyFilled.png"><br>
 See explanation <a href="readme_files/FillEdgeCrossingTileBorder.html" id="FillEdgeCrossingTileBorder">here</a>.
 </li>
