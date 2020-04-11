@@ -1,0 +1,3 @@
+-The "fill edge that takes multiple tiles" tables by default does not support OW graphics, due to the fact that with huge number of combinations,
+ so if you want slanted/rounded/outlined fill edge on the OW border, you have to draw them and create the tables yourself. You can use the level-status-bar
+ as a template.
