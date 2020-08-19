@@ -6,7 +6,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Only include this if there is no SA-1 detection, such as including this
 ;in a (seperate) patch.
-if defined("!sa1") == 0
+if defined("sa1") == 0
 	!dp = $0000
 	!addr = $0000
 	!sa1 = 0
