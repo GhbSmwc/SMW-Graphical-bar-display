@@ -660,7 +660,7 @@ or higher and 0 otherwise (<kbd>RemainingFill = <abbr title="Picks what number i
 <abbr title="Equals to !Scratchram_GraphicalBar_TempLength if middle pieces is nonzero, 0 otherwise">MiddleLength</abbr> + <abbr title="0 if no right end, 1 if set to any nonzero number of pieces">RightEnd</abbr>) - 1)</b></span></kbd>
 </td>
 <td align="center" valign="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td>
-<td>table array containing each tile byte fill amount, same as <kbd>CalculateGraphicalBarPercentage</kbd></td>
+<td>The table array containing each tile byte fill amount, same as <kbd>CalculateGraphicalBarPercentage</kbd>.</td>
 <tr><td><kbd>$00</kbd> to <kbd>$01</kbd></td><td align="center" valign="center">2</td><td>The leftover remaining amount of fill, if the fill amount is greater than the maximum/total, 0 otherwise (calculated via <kbd>RemainingFill = max((InputFillAmount - BarMaximumFull), 0)</kbd>)</td></tr>
 </tr>
 
