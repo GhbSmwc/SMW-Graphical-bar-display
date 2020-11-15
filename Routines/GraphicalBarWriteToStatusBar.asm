@@ -360,7 +360,8 @@ WriteBarStaticTileToHUDRightsideFormat2:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Write double-ended bar.
 ;This routine will copy a left-to-right bar and pastes it
-;in a location to the left of the original bar.
+;in a location to the left of the original bar. This results
+;displaying a bar that fills from the center to the ends.
 ;
 ;To be used after calling WriteBarToHUD.
 ;
