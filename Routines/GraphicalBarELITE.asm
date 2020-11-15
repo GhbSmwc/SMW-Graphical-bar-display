@@ -68,6 +68,14 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;  is full).
 ;*TotalMaxPieces = the number of pieces of the whole bar when full.
 ;
+;The SNES does not support floating point numbers in any way, thus
+;handling them as integer fractions by multiplying first before dividing
+;is the only way to compute correctly. Dividing first before multiplying
+;(Quantity / MaxQuantity * TotalMaxPieces) results only displaying 0%
+;(if less than 100%) or 100% (if 100%) due to rounding from the division
+;operation before multiplied (bad idea to round numbers on any operations
+;BEFORE the last operation because errors accumulate).
+;
 ;Note that during a division, it checks if the remainder is greater than
 ;or equal to half of MaxQuantity (rounded 1/2 up) to check should it would
 ;round up or not (also rounds 1/2 up).
