@@ -653,25 +653,25 @@ DrawGraphicalBarSubtractionLoopEdition:
 		BCC ..NotFull                                   ;>If Fillamount < MaxAmount, use all remaining $00.
 		
 		..Full
-		LDA !Scratchram_GraphicalBar_LeftEndPiece       ;\Full left end.
-		STA !Scratchram_GraphicalBar_FillByteTbl        ;/
-		LDA $00                                         ;\Fill amount deducted.
-		SEC                                             ;|
-		SBC !Scratchram_GraphicalBar_LeftEndPiece       ;|
-		STA $00                                         ;|
-		LDA $01                                         ;|
-		SBC #$00                                        ;|
-		STA $01                                         ;/
-		BRA ..NextByte
+			LDA !Scratchram_GraphicalBar_LeftEndPiece       ;\Full left end.
+			STA !Scratchram_GraphicalBar_FillByteTbl        ;/
+			LDA $00                                         ;\Fill amount deducted.
+			SEC                                             ;|
+			SBC !Scratchram_GraphicalBar_LeftEndPiece       ;|
+			STA $00                                         ;|
+			LDA $01                                         ;|
+			SBC #$00                                        ;|
+			STA $01                                         ;/
+			BRA ..NextByte
 		
 		..NotFull
-		LDA $00                                         ;\Take all the rest of $00.
-		STA !Scratchram_GraphicalBar_FillByteTbl        ;|
-		STZ $00                                         ;|
-		STZ $01                                         ;/
+			LDA $00                                         ;\Take all the rest of $00.
+			STA !Scratchram_GraphicalBar_FillByteTbl        ;|
+			STZ $00                                         ;|
+			STZ $01                                         ;/
 		
 		..NextByte
-		INX                                             ;>Next tile byte
+			INX                                             ;>Next tile byte
 	.Middle
 		LDA !Scratchram_GraphicalBar_MiddlePiece        ;\If middle does not exist, skip
 		BEQ .RightEnd                                   ;|
@@ -682,35 +682,35 @@ DrawGraphicalBarSubtractionLoopEdition:
 		TAY                                             ;/
 		
 		..LoopMiddleTiles
-		LDA $00                                         ;\Fillamount = Fillamount - MaxAmount (without writing to $00)
-		SEC                                             ;|(SBC clears carry if an unsigned underflow occurs (x < 0))
-		SBC !Scratchram_GraphicalBar_MiddlePiece        ;|
-		LDA $01                                         ;|
-		SBC #$00                                        ;/
-		BCC ..NotFull                                   ;>If Fillamount < MaxAmount, use all remaining $00.
+			LDA $00                                         ;\Fillamount = Fillamount - MaxAmount (without writing to $00)
+			SEC                                             ;|(SBC clears carry if an unsigned underflow occurs (x < 0))
+			SBC !Scratchram_GraphicalBar_MiddlePiece        ;|
+			LDA $01                                         ;|
+			SBC #$00                                        ;/
+			BCC ..NotFull                                   ;>If Fillamount < MaxAmount, use all remaining $00.
 		
 		..Full
-		LDA !Scratchram_GraphicalBar_MiddlePiece        ;\Full middle tile.
-		STA !Scratchram_GraphicalBar_FillByteTbl,x      ;/
-		LDA $00                                         ;\Fill amount deducted.
-		SEC                                             ;|
-		SBC !Scratchram_GraphicalBar_MiddlePiece        ;|
-		STA $00                                         ;|
-		LDA $01                                         ;|
-		SBC #$00                                        ;|
-		STA $01                                         ;/
-		BRA ..NextByte
+			LDA !Scratchram_GraphicalBar_MiddlePiece        ;\Full middle tile.
+			STA !Scratchram_GraphicalBar_FillByteTbl,x      ;/
+			LDA $00                                         ;\Fill amount deducted.
+			SEC                                             ;|
+			SBC !Scratchram_GraphicalBar_MiddlePiece        ;|
+			STA $00                                         ;|
+			LDA $01                                         ;|
+			SBC #$00                                        ;|
+			STA $01                                         ;/
+			BRA ..NextByte
 		
 		..NotFull
-		LDA $00                                         ;\Take all the rest of $00.
-		STA !Scratchram_GraphicalBar_FillByteTbl,x      ;|
-		STZ $00                                         ;|
-		STZ $01                                         ;/
+			LDA $00                                         ;\Take all the rest of $00.
+			STA !Scratchram_GraphicalBar_FillByteTbl,x      ;|
+			STZ $00                                         ;|
+			STZ $01                                         ;/
 		
 		..NextByte
-		INX                                             ;>Next middle tile or to the right end.
-		DEY                                             ;\Loop till all middle tiles done.
-		BNE ..LoopMiddleTiles                           ;/
+			INX                                             ;>Next middle tile or to the right end.
+			DEY                                             ;\Loop till all middle tiles done.
+			BNE ..LoopMiddleTiles                           ;/
 	.RightEnd
 		LDA !Scratchram_GraphicalBar_RightEndPiece      ;\If right end does not exist, skip
 		BEQ .Done                                       ;/
@@ -723,22 +723,22 @@ DrawGraphicalBarSubtractionLoopEdition:
 		BCC ..NotFull                                   ;>If Fillamount < MaxAmount, use all remaining $00.
 		
 		..Full
-		LDA !Scratchram_GraphicalBar_RightEndPiece      ;\Full right end.
-		STA !Scratchram_GraphicalBar_FillByteTbl,x      ;/
-		LDA $00                                         ;\Fill amount deducted.
-		SEC                                             ;|
-		SBC !Scratchram_GraphicalBar_RightEndPiece      ;|
-		STA $00                                         ;|
-		LDA $01                                         ;|
-		SBC #$00                                        ;|
-		STA $01                                         ;/
-		BRA .Done
+			LDA !Scratchram_GraphicalBar_RightEndPiece      ;\Full right end.
+			STA !Scratchram_GraphicalBar_FillByteTbl,x      ;/
+			LDA $00                                         ;\Fill amount deducted.
+			SEC                                             ;|
+			SBC !Scratchram_GraphicalBar_RightEndPiece      ;|
+			STA $00                                         ;|
+			LDA $01                                         ;|
+			SBC #$00                                        ;|
+			STA $01                                         ;/
+			BRA .Done
 		
 		..NotFull
-		LDA $00                                         ;\Take all the rest of $00.
-		STA !Scratchram_GraphicalBar_FillByteTbl,x      ;|
-		STZ $00                                         ;|
-		STZ $01                                         ;/
+			LDA $00                                         ;\Take all the rest of $00.
+			STA !Scratchram_GraphicalBar_FillByteTbl,x      ;|
+			STZ $00                                         ;|
+			STZ $01                                         ;/
 	.Done
 		RTL
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
