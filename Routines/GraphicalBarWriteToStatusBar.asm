@@ -32,99 +32,99 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	if !OWPlusAndSSBSameFormat == 0
 		WriteBarToHUD:
-		JSL CountNumberOfTiles
-		CPX #$FF				;\If 0-1 = (-1), there is no tile to write.
-		BEQ .Done				;/(non-existent bar)
-		TXY					;>STA [$xx],x does not exist! Only STA [$xx,x] does but functions differently!
+			JSL CountNumberOfTiles
+			CPX #$FF				;\If 0-1 = (-1), there is no tile to write.
+			BEQ .Done				;/(non-existent bar)
+			TXY					;>STA [$xx],x does not exist! Only STA [$xx,x] does but functions differently!
 
-		.Loop
-		LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\Write each tile.
-		STA [$00],y					;/
-		if !StatusBar_UsingCustomProperties != 0
-			LDA $06
-			STA [$03],y
-		endif
-		
-		..Next
-		DEX
-		DEY
-		BPL .Loop
-		
-		.Done
-		RTL
+			.Loop
+				LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\Write each tile.
+				STA [$00],y					;/
+				if !StatusBar_UsingCustomProperties != 0
+					LDA $06
+					STA [$03],y
+				endif
+				
+				..Next
+					DEX
+					DEY
+					BPL .Loop
+			
+			.Done
+				RTL
 	endif
 	
 	WriteBarToHUDFormat2:
-	JSL CountNumberOfTiles
-	CPX #$FF				;\If 0-1 = (-1), there is no tile to write.
-	BEQ .Done				;/(non-existent bar)
-	TXA					;\Have Y = X*2 due to SSB/OWB+ patch formated for 2 contiguous bytes per tile.
-	ASL					;|
-	TAY					;/
-	
-	.Loop
-	LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\Write each tile.
-	STA [$00],y					;/
-	if !StatusBar_UsingCustomProperties != 0
-		LDA $06
-		STA [$03],y
-	endif
-	
-	..Next
-	DEX
-	DEY #2
-	BPL .Loop
-	
-	.Done
-	RTL
+		JSL CountNumberOfTiles
+		CPX #$FF				;\If 0-1 = (-1), there is no tile to write.
+		BEQ .Done				;/(non-existent bar)
+		TXA					;\Have Y = X*2 due to SSB/OWB+ patch formated for 2 contiguous bytes per tile.
+		ASL					;|
+		TAY					;/
+		
+		.Loop
+			LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\Write each tile.
+			STA [$00],y					;/
+			if !StatusBar_UsingCustomProperties != 0
+				LDA $06
+				STA [$03],y
+			endif
+			
+			..Next
+				DEX
+				DEY #2
+				BPL .Loop
+		
+		.Done
+			RTL
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Same as above, but fills leftwards as opposed to rightwards.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	if !OWPlusAndSSBSameFormat == 0
 		WriteBarToHUDLeftwards:
+			JSL CountNumberOfTiles
+			CPX #$FF
+			BEQ .Done
+			LDY #$00
+			
+			.Loop
+				LDA !Scratchram_GraphicalBar_FillByteTbl,x
+				STA [$00],y
+				if !StatusBar_UsingCustomProperties != 0
+					LDA $06
+					STA [$03],y
+				endif
+			
+				..Next
+					INY
+					DEX
+					BPL .Loop
+		
+			.Done
+				RTL
+	endif
+	
+	WriteBarToHUDLeftwardsFormat2:
 		JSL CountNumberOfTiles
 		CPX #$FF
 		BEQ .Done
 		LDY #$00
 		
 		.Loop
-		LDA !Scratchram_GraphicalBar_FillByteTbl,x
-		STA [$00],y
-		if !StatusBar_UsingCustomProperties != 0
-			LDA $06
-			STA [$03],y
-		endif
-		
-		..Next
-		INY
-		DEX
-		BPL .Loop
+			LDA !Scratchram_GraphicalBar_FillByteTbl,x
+			STA [$00],y
+			if !StatusBar_UsingCustomProperties != 0
+				LDA $06
+				STA [$03],y
+			endif
+			
+			..Next
+				INY #2
+				DEX
+				BPL .Loop
 		
 		.Done
-		RTL
-	endif
-	
-	WriteBarToHUDLeftwardsFormat2:
-	JSL CountNumberOfTiles
-	CPX #$FF
-	BEQ .Done
-	LDY #$00
-	
-	.Loop
-	LDA !Scratchram_GraphicalBar_FillByteTbl,x
-	STA [$00],y
-	if !StatusBar_UsingCustomProperties != 0
-		LDA $06
-		STA [$03],y
-	endif
-	
-	..Next
-	INY #2
-	DEX
-	BPL .Loop
-	
-	.Done
-	RTL
+			RTL
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Bar extend leftwards (as the length increases, the final/last/
 ;rightmost tile stays on the same "rightmost" position and the left
@@ -294,10 +294,32 @@ CountNumberOfTiles:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	if !OWPlusAndSSBSameFormat == 0
 		WriteBarStaticTileToHUDLeftside:
+			REP #$20
+			DEC $00			;\Go to a location 1 tile to the left from the leftside tile.
+			if !StatusBar_UsingCustomProperties != 0
+				DEC $03			;/
+			endif
+			SEP #$20
+			LDA $07 : STA [$00]		;>Tile number for leftside
+			if !StatusBar_UsingCustomProperties != 0
+				LDA $06 : STA [$03]		;>Tile properties
+			endif
+			REP #$20
+			INC $00			;\Restore
+			if !StatusBar_UsingCustomProperties != 0
+				INC $03			;/
+			endif
+			SEP #$20
+			RTL
+	endif
+	
+	WriteBarStaticTileToHUDLeftsideFormat2:
 		REP #$20
 		DEC $00			;\Go to a location 1 tile to the left from the leftside tile.
+		DEC $00			;>DEC twice due to that you have to move 2 bytes over to move over by 1 tile.
 		if !StatusBar_UsingCustomProperties != 0
 			DEC $03			;/
+			DEC $03
 		endif
 		SEP #$20
 		LDA $07 : STA [$00]		;>Tile number for leftside
@@ -306,45 +328,23 @@ CountNumberOfTiles:
 		endif
 		REP #$20
 		INC $00			;\Restore
+		INC $00
 		if !StatusBar_UsingCustomProperties != 0
 			INC $03			;/
+			INC $03
 		endif
-		SEP #$20
+			SEP #$20
 		RTL
-	endif
-	
-	WriteBarStaticTileToHUDLeftsideFormat2:
-	REP #$20
-	DEC $00			;\Go to a location 1 tile to the left from the leftside tile.
-	DEC $00			;>DEC twice due to that you have to move 2 bytes over to move over by 1 tile.
-	if !StatusBar_UsingCustomProperties != 0
-		DEC $03			;/
-		DEC $03
-	endif
-	SEP #$20
-	LDA $07 : STA [$00]		;>Tile number for leftside
-	if !StatusBar_UsingCustomProperties != 0
-		LDA $06 : STA [$03]		;>Tile properties
-	endif
-	REP #$20
-	INC $00			;\Restore
-	INC $00
-	if !StatusBar_UsingCustomProperties != 0
-		INC $03			;/
-		INC $03
-	endif
-		SEP #$20
-	RTL
 	if !OWPlusAndSSBSameFormat == 0
 		WriteBarStaticTileToHUDRightside:
-		JSL CountNumberOfTiles
-		INX							;After last middle tile.
-		TXY
-		LDA $07 : STA [$00],y					;>Tile number for rightside
-		if !StatusBar_UsingCustomProperties != 0
-			LDA.b $06 : STA [$03],y				;>Tile properties 
-		endif
-		RTL
+			JSL CountNumberOfTiles
+			INX							;After last middle tile.
+			TXY
+			LDA $07 : STA [$00],y					;>Tile number for rightside
+			if !StatusBar_UsingCustomProperties != 0
+				LDA.b $06 : STA [$03],y				;>Tile properties 
+			endif
+			RTL
 	endif
 WriteBarStaticTileToHUDRightsideFormat2:
 	JSL CountNumberOfTiles
@@ -425,15 +425,15 @@ WriteDoubleEndedBar:
 				TXY			;>STA [$xx],x don't exist, only STA [$xx,x] which does different.
 				STA [$06],y		;>...And then write tile starting on the first.
 				PLY
-			if !StatusBar_UsingCustomProperties != 0
-				..WriteFlippedBarTileProps
-					LDA [$03],y		;>Load a tile starting at the last...
-					PHY
-					TXY			;>STA [$xx],x don't exist, only STA [$xx,x] which does different.
-					ORA.b #%01000000	;>Set bit 6 (the X-flip bit)
-					STA [$09],y		;>...And then write tile starting on the first.
-					PLY
-			endif
+				if !StatusBar_UsingCustomProperties != 0
+					..WriteFlippedBarTileProps
+						LDA [$03],y		;>Load a tile starting at the last...
+						PHY
+						TXY			;>STA [$xx],x don't exist, only STA [$xx,x] which does different.
+						ORA.b #%01000000	;>Set bit 6 (the X-flip bit)
+						STA [$09],y		;>...And then write tile starting on the first.
+						PLY
+				endif
 			..Next
 				INX				;>Next tile (addr+1) on the flipped bar.
 				DEY				;>Next tile (addr-1) on the left-to-right bar.
@@ -480,15 +480,15 @@ WriteDoubleEndedBarFormat2:
 				TXY			;>STA [$xx],x don't exist, only STA [$xx,x] which does different.
 				STA [$06],y		;>...And then write tile starting on the first.
 				PLY
-			if !StatusBar_UsingCustomProperties != 0
-				..WriteFlippedBarTileProps
-					LDA [$03],y		;>Load a tile starting at the last...
-					PHY
-					TXY			;>STA [$xx],x don't exist, only STA [$xx,x] which does different.
-					ORA.b #%01000000	;>Set bit 6 (the X-flip bit)
-					STA [$09],y		;>...And then write tile starting on the first.
-					PLY
-			endif
+				if !StatusBar_UsingCustomProperties != 0
+					..WriteFlippedBarTileProps
+						LDA [$03],y		;>Load a tile starting at the last...
+						PHY
+						TXY			;>STA [$xx],x don't exist, only STA [$xx,x] which does different.
+						ORA.b #%01000000	;>Set bit 6 (the X-flip bit)
+						STA [$09],y		;>...And then write tile starting on the first.
+						PLY
+				endif
 			..Next
 				INX #2				;>Next tile (addr+1) on the flipped bar.
 				DEY #2				;>Next tile (addr-1) on the left-to-right bar.
