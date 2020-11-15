@@ -366,7 +366,10 @@ WriteBarStaticTileToHUDRightsideFormat2:
 ;To be used after calling WriteBarToHUD.
 ;
 ;Don't use this with leftwards bar, as this takes the leftmost
-;tile on the status bar to handle making a mirrored copy.
+;tile on the status bar to handle making a mirrored copy. This
+;always SETS the X bit in YXPCCCTT, thus the tiles graphic must be
+;filling left-to-right by default.
+;
 ;Input:
 ; -!Scratchram_GraphicalBar_LeftEndPiece, !Scratchram_GraphicalBar_MiddlePiece,
 ;   !Scratchram_GraphicalBar_RightEndPiece, and !Scratchram_GraphicalBar_TempLength:

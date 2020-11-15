@@ -356,13 +356,13 @@ set the remaining fill amount to 0. After this, this then repeats until all tile
 for the left end, and then write 11 back to the remaining fill amount. Then [11 - 8 = 3], subtraction successful, so the first middle tile byte is 8 (maximum). Finally, [3 - 8 = (-5)]. Subtraction failed, write the remaining amount
 (3) on the second middle tile byte. Set the remaining fill amount to 0, and repeat until all tile bytes processed (which results in [0 - MaxAmount], and repeatedly sets the following bytes to 0):
 <table>
-<tr><th><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> addresses</th><th>Tile byte type</th><th>Fill amount</th><th>Calculation</th><th>Remaining fill amount changes</th></tr>
-<tr><td><kbd>$7F844A</kbd> (<kbd>Address+0</kbd>)</td><td><font color="cyan">Left end</font></td><td bgcolor="orange"><kbd>3</kbd> (<kbd>$03</kbd>)</td><td><kbd>14 - 3 = 11</kbd> subtraction successful!</td><td>14 &rightarrow; 11</td></tr>
-<tr><td><kbd>$7F844B</kbd> (<kbd>Address+1</kbd>)</td><td><font color="#00FF00">Middle 1</font></td><td bgcolor="orange"><kbd>8</kbd> (<kbd>$08</kbd>)</td><td><kbd>11 - 8 = 3</kbd> subtraction successful!</td><td>11 &rightarrow; 3</td></tr>
-<tr><td><kbd>$7F844C</kbd> (<kbd>Address+2</kbd>)</td><td><font color="#00FF00">Middle 2</font></td><td bgcolor="yellow"><font color="black"><kbd>3</kbd> (<kbd>$03</kbd>)</font></td><td><kbd>3 - 8 = (-5)</kbd> subtraction failed!</td><td>3 &rightarrow; 0</td></tr>
-<tr><td><kbd>$7F844D</kbd> (<kbd>Address+3</kbd>)</td><td><font color="#00FF00">Middle 3</font></td><td bgcolor="grey"><kbd>0</kbd> (<kbd>$00</kbd>)</td><td><kbd>0 - 8 = (-8)</kbd> subtraction failed!</td><td>0 &rightarrow; 0</td></tr>
-<tr><td><kbd>$7F844E</kbd> (<kbd>Address+4</kbd>)</td><td><font color="#00FF00">Middle 4</font></td><td bgcolor="grey"><kbd>0</kbd> (<kbd>$00</kbd>)</td><td><kbd>0 - 8 = (-8)</kbd> subtraction failed!</td><td>0 &rightarrow; 0</td></tr>
-<tr><td colspan="5">...&downarrow; continues failing subtractions and setting the fill amount of each bytes to 0.</td></tr>
+<tr><th><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> addresses</th><th>Tile byte type</th><th>Fill amount</th><th>Fill maximum</th><th>Calculation</th><th>Remaining fill amount changes</th></tr>
+<tr><td><kbd>$7F844A</kbd> (<kbd>Address+0</kbd>)</td><td><font color="cyan">Left end</font></td><td bgcolor="orange"><kbd>3</kbd> (<kbd>$03</kbd>)</td><td align="center"><kbd>3</kbd></td><td><kbd>14 - 3 = 11</kbd> subtraction successful!</td><td>14 &rightarrow; 11</td></tr>
+<tr><td><kbd>$7F844B</kbd> (<kbd>Address+1</kbd>)</td><td><font color="#00FF00">Middle 1</font></td><td bgcolor="orange"><kbd>8</kbd> (<kbd>$08</kbd>)</td><td align="center"><kbd>8</kbd></td><td><kbd>11 - 8 = 3</kbd> subtraction successful!</td><td>11 &rightarrow; 3</td></tr>
+<tr><td><kbd>$7F844C</kbd> (<kbd>Address+2</kbd>)</td><td><font color="#00FF00">Middle 2</font></td><td bgcolor="yellow"><font color="black"><kbd>3</kbd> (<kbd>$03</kbd>)</font></td><td align="center"><kbd>8</kbd></td><td><kbd>3 - 8 = (-5)</kbd> subtraction failed!</td><td>3 &rightarrow; 0</td></tr>
+<tr><td><kbd>$7F844D</kbd> (<kbd>Address+3</kbd>)</td><td><font color="#00FF00">Middle 3</font></td><td bgcolor="grey"><kbd>0</kbd> (<kbd>$00</kbd>)</td><td align="center"><kbd>8</kbd></td><td><kbd>0 - 8 = (-8)</kbd> subtraction failed!</td><td>0 &rightarrow; 0</td></tr>
+<tr><td><kbd>$7F844E</kbd> (<kbd>Address+4</kbd>)</td><td><font color="#00FF00">Middle 4</font></td><td bgcolor="grey"><kbd>0</kbd> (<kbd>$00</kbd>)</td><td align="center"><kbd>8</kbd></td><td><kbd>0 - 8 = (-8)</kbd> subtraction failed!</td><td>0 &rightarrow; 0</td></tr>
+<tr><td colspan="6">...&downarrow; continues failing subtractions and setting the fill amount of each bytes to 0.</td></tr>
 </table></li></ul>
 <br><br>
 This is known as repeated subtraction, it keeps subtracting until no more is left. This is performed in <kbd>DrawGraphicalBarSubtractionLoopEdition</kbd> which is explained later.</p>
@@ -642,6 +642,29 @@ without the need of manually calculating the values.</li><br>
 <li><kbd>DrawGraphicalBarSubtractionLoopEdition</kbd> An alternative routine to <kbd>DrawGraphicalBar</kbd>, behaves almost exactly identical but a lot less lines of code and is based on a repeated
 subtraction and not using multiplication and division routines. Almost all the inputs and outputs the same, except that the output <kbd>$00-$01</kbd> acts as the remaining fill when the bar is full
 or higher and 0 otherwise (<kbd>RemainingFill = <abbr title="Picks what number in the parameter is the highest value. If the fill amount is less than 0, it results things like max(-5, 0) which returns 0 and not -5">max</abbr>((InputFillAmount - BarMaximumFull), 0)</kbd>), while <kbd>$02-$09</kbd> aren't destroyed.<br><br>
+
+<table>
+<tr><th>Input</th><td>Number of bytes</td><th>Description</th></tr>
+<tr><td><kbd>$00</kbd> to <kbd>$01</kbd></td><td align="center" valign="center">2</td><td>The amount of fill</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_LeftEndPiece</kbd></td><td align="center" valign="center">1</td><td rowspan="4">Graphical bar attributes, same as <kbd>CalculateGraphicalBarPercentage</kbd></td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_MiddlePiece</kbd></td><td align="center" valign="center">1</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_RightEndPiece</kbd></td><td align="center" valign="center">1</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_TempLength</kbd></td><td align="center" valign="center">1</td></tr>
+</table><br>
+
+<table>
+<tr><th>Output</th><th>Number of Bytes</th><th>Description</th></tr>
+<tr>
+<td>
+<kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl</b></span></kbd> to <kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl + ((<abbr title="0 if no left end, 1 if set to any nonzero number of pieces">LeftEnd</abbr> +
+<abbr title="Equals to !Scratchram_GraphicalBar_TempLength if middle pieces is nonzero, 0 otherwise">MiddleLength</abbr> + <abbr title="0 if no right end, 1 if set to any nonzero number of pieces">RightEnd</abbr>) - 1)</b></span></kbd>
+</td>
+<td align="center" valign="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td>
+<td>table array containing each tile byte fill amount, same as <kbd>CalculateGraphicalBarPercentage</kbd></td>
+<tr><td><kbd>$00</kbd> to <kbd>$01</kbd></td><td align="center" valign="center">2</td><td>The leftover remaining amount of fill, if the fill amount is greater than the maximum/total, 0 otherwise (calculated via <kbd>RemainingFill = max((InputFillAmount - BarMaximumFull), 0)</kbd>)</td></tr>
+</tr>
+
+</table>
 </li>
 
 

@@ -409,7 +409,7 @@ DrawGraphicalBar:
 		;NumberOfMiddleEmpties = clamp(InputMiddleLength - (NumberOfFullMiddles + 1), 0, InputMiddleLength)
 		; ^Note: This writes $00 to all the remaining middles when there are 2+ less full tiles than InputMiddleLength
 		;  (A fraction tile can also be $00, thus the first number that is not maxed in the table is always a fraction,
-		;  i.e: [$03,$08,$08,$00,$00] <- the first $00 after the $08 is reguarded as a fraction.
+		;  i.e: [$03,$08,$08,$00,$00] <- the first $00 after the $08 is reguarded as a fraction.)
 		LDA !Scratchram_GraphicalBar_MiddlePiece	;\Both of these have to be nonzero to include middle.
 		BNE +						;|
 		JMP .RightEnd					;|
@@ -640,7 +640,7 @@ DrawGraphicalBar:
 ; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+EndAddress:
 ;  A table array containing the amount of fill for each byte, explained previously.
 ; -$00 to $01: The leftover fill amount. If bar isn't full, it will be #$0000, otherwise its
-;  [RemainingFill = OriginalFill - EntireBarCapicity].
+;  [RemainingFill = OriginalFill - EntireBarCapicity]. (calculated via RemainingFill = max((InputFillAmount - BarMaximumFull), 0))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 DrawGraphicalBarSubtractionLoopEdition:
 		LDX #$00
