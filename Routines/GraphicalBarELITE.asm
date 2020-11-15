@@ -355,12 +355,13 @@ CalculateGraphicalBarPercentage:
 ;
 ;  The end of the address going to be used is this:
 ;
-;  EndAddress = (LeftEnd + MiddleLength + RightEnd) - 1
+;  EndAddress = (L + MLength + R) - 1
 ;
-;  LeftEnd and/or RightEnd are 0 if there are no pieces for each of them,
-;  MiddleLength is basically !Scratchram_GraphicalBar_TempLength. If that or
-;  if MiddlePiece = zero (either 16 or 8-bit, this will be zero and will not be
-;  included). This can be read as each byte means each 8x8 tile.
+;  -L (left end) and/or R (right end) are 0 if there are no pieces for each of them, otherwise 1.
+;  -MLength (Middle length) is basically !Scratchram_GraphicalBar_TempLength. If that or
+;   if MiddlePiece = zero (either 16 or 8-bit, this will be zero and will not be
+;   included).
+;  This can be read as each byte means each 8x8 tile.
 ;Overwritten/Destroyed:
 ; -$00 to $07: garbage:
 ; --$00 to $01: will be when this routine is finished:
@@ -624,7 +625,7 @@ DrawGraphicalBar:
 ;Convert amount of fill to each fill per byte, repeated subtraction edition.
 ;
 ;Same as the other version, however does not use multiplication and division
-;routines. 
+;routines. In fact, this alone does not use any other subroutines AT ALL.
 ;
 ;Input:
 ; -$00 to $01: The amount of fill for the WHOLE bar.
@@ -636,7 +637,13 @@ DrawGraphicalBar:
 ;   middle bytes)
 ;Output:
 ; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+EndAddress:
-;  A table array containing the amount of fill for each byte, explained previously.
+;  A table array containing the amount of fill for each byte, the address it ends at is:
+;
+;  EndAddress = (L + MLength + R) - 1
+;
+;  -L and R are 0 if set to 0 number of pieces, 1 otherwise on any nonzero values.
+;  -MLength is how many middle tiles.
+;
 ; -$00 to $01: The leftover fill amount. If bar isn't full, it will be #$0000, otherwise its
 ;  [RemainingFill = OriginalFill - EntireBarCapicity]. (calculated via RemainingFill = max((InputFillAmount - BarMaximumFull), 0))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
