@@ -1005,7 +1005,8 @@ to calculate where to place the bar when using <kbd>BarExtendLeft</kbd> as well 
 
 </li><br>
 <li><kbd>WriteDoubleEndedBar</kbd>: Writes a mirrored version of the left-to-right bar and places it to the left of that bar. This is intended to display double-ended bars that as the fill increases, it starts in the center
-and fill towards both ends (<img src="readme_files/DoubleEndedBar.gif">). You call this routine after calling <kbd>DrawGraphicalBar</kbd> (don't use the leftwards version).
+and fill towards both ends (<img src="readme_files/DoubleEndedBar.gif">). You call this routine after calling <kbd>DrawGraphicalBar</kbd> (don't use the leftwards version). NOTE: The mirrored copy ALWAYS have the X-bit in YXPCCCTT
+being SET (the bar graphic tiles must be filling left-to-right by default).
 
 <table>
 <tr><th>Input</th><th>Number of bytes</th><th>Description</th></tr>
