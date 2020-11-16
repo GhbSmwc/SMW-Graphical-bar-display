@@ -368,7 +368,7 @@ WriteBarStaticTileToHUDRightsideFormat2:
 ;Don't use this with leftwards bar, as this takes the leftmost
 ;tile on the status bar to handle making a mirrored copy. This
 ;always SETS the X bit in YXPCCCTT, thus the bar graphic tiles
-;must be filling left-to-right by default.
+;must be filling left-to-right by default (in the .bin files).
 ;
 ;Input:
 ; -!Scratchram_GraphicalBar_LeftEndPiece, !Scratchram_GraphicalBar_MiddlePiece,

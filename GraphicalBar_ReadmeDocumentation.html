@@ -321,7 +321,8 @@ See more information <a id="RoundAwayFromComplete" href="readme_files/RoundAwayF
 in this order: [n] bytes being at their set maximums (full bytes, if any), [none or 1] fraction byte (no fraction if bar is full), and then [n] empty bytes (if any), while keeping
 the order of their maximums (3, 8, 8, 8, 8...):<br>
 <img src="readme_files/FillAmountDividedUnevenlyToTileBytes.png"><br>
-As an analogy, you fill the cup with water until it's full, then fill the next cup until it's full, until you got all the cups full or run out of water.<br>
+As an analogy, you fill the cup with water until it's full, then fill the next cup until it's full, until you got all the cups full or run out of water. The reason for this being
+treated as segmented is because the SNES' graphics are all tile-based, so we have to deal with them tile-by-tile.<br><br>
 
 Here are the formulas on how each are calculated:<br><br>
 
@@ -935,7 +936,7 @@ stays in place). This is useful for displaying enemy HP bars that are &ldquo;rig
 Write range:
 <table>
 <tr><th>Output</th><th>Number of bytes</th><th>Description</th></tr>
-<tr><td><kbd><b>$00</b></kbd> to <kbd><b>$02</b></kbd></td><td align="center" valign="center">3</td><td>The tile location where to write the starting starting (leftmost) tile, calculated via subtracting what you have inputed by
+<tr><td><kbd><b>$00</b></kbd> to <kbd><b>$02</b></kbd></td><td align="center" valign="center">3</td><td>The tile number location where to write the starting starting (leftmost) tile, calculated via subtracting what you have inputed by
 the number of tiles, minus 1 (<kbd>LeftmostTilePosition = RAMAddressIn00 - ((NumberOfTiles-1) * TileFormat)</kbd>, where <kbd>RAMAddressIn00</kbd> is the RAM address prior calling this routine),
 then writes back to <kbd>$00</kbd>.</td></tr>
 <tr><td><kbd><b>$03</b></kbd> to <kbd><b>$05</b></kbd></td><td align="center" valign="center">3</td><td>Same as above, but for tile properties (if you have enabled tile properties write).</td></tr>
@@ -946,11 +947,12 @@ After executing this subroutine, then calling <kbd>WriteBarToHUD</kbd> or <kbd>W
 <tr>
 <td><kbd><span class="NoLineBreak"><b>RAMAddressIn00 - ((NumberOfTiles-1) * TileFormat)</b></span></kbd> to <span class="NoLineBreak"><kbd><b>RAMAddressIn00</b></kbd></span></td>
 <td><kbd>NumberOfTiles*!StatusBarFormat</kbd> (every other byte written if TileFormat = 2)</td>
-<td rowspan="2">Same as <kbd>WriteBarToHUD</kbd>.</td>
+<td>The tile numbers of the bar.</td>
 </tr>
 <tr>
 <td><kbd><span class="NoLineBreak"><b>RAMAddressIn03 - ((NumberOfTiles-1) * TileFormat)</b></span></kbd> to <span class="NoLineBreak"><kbd><b>RAMAddressIn03</b></kbd></span></td>
 <td><kbd>NumberOfTiles*!StatusBarFormat</kbd> (every other byte written if TileFormat = 2)</td>
+<td>The tile properties of the bar.</td>
 </tr>
 </table><br>
 <img src="readme_files/BarExtendLeftTiles.png"><br>

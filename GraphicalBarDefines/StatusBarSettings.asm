@@ -182,14 +182,17 @@
 		; by default.
 
 	!Default_LeftwardsBar                           = 0
-		;^0 = Fill from left to right
-		; 1 = Fill from right to left
+		;^0 = Fill from left to right (default)
+		; 1 = Fill from right to left (will always SET bit X in YXPCCCTT).
 		; Note that end tiles are also mirrored. This only works properly
 		; on any status bar patches that allow editing the tile properties.
 		; Having this set to 1 while using SMW's vanilla status bar causes
 		; each tiles to fill backwards (rightwards as fill increases) while
 		; advancing tiles to the left. If that is the case, flip the tiles
 		; in the file bin then or edit SMW's status bar table at address $008C81.
+		;
+		; Note: Make sure the bar graphic tiles are fill left-to-right
+		; BY DEFAULT (in the .bin files).
 
 ;Double bar. Only works with the super status bar patch.
 	!Setting_DoubleBar_FillMode = 0
