@@ -916,12 +916,12 @@ it will work on that as well (if <kbd>!StatusBarFormat</kbd> set to $02 and you 
 table to use OW layer 3 tiles).</li><br>
 
 <li><kbd>WriteBarToHUDLeftwards</kbd>: Same as above, but writes an X-flipped version (<img width="96" src="readme_files/TransperentBackgroundXFlipped.png">). Note that it only
-works properly if you managed to set bit 6 of YXPCCCTT properties byte. Tiles arranged are flipped so the leftmost tile (including the end tiles) is now the right most, the
-second leftmost is second rightmost, and so on. If you didn't X-flip the tiles via editing the tile properties (YXPCCCTT), each tile won't be X-flipped but are still arranged backwards (when filling up, the rightmost
-tile fills towards the right and advances to the tile towards the left). In vanilla SMW, it is still possible to edit the tile properties (but cannot be changed in-game as the
-data is stored in ROM) at around address <kbd>$008C81</kbd>.<br><br>
+works properly if you set bit 6 of YXPCCCTT properties byte (this routine itself does not automatically set bit 6, even with <kbd>!StatusBar_UsingCustomProperties</kbd> set to <kbd>1</kbd>), assuming
+the default graphic for the fill tiles are left-to-right. The tiles are arranged in reverse order so the leftmost tile (including the end tiles) is now the right most, the second leftmost is second
+rightmost, and so on. If you didn't X-flip the tiles via editing the tile properties (YXPCCCTT), each tile will starts filling left-to-right starting at the rightmost tile going towards the left.
+In vanilla SMW, it is still possible to edit the tile properties (but cannot be changed in-game as the data is stored in ROM) at around address <kbd>$008C81</kbd>.<br><br>
 
-To avoid confusion, I refer the end tiles in which the fill <b>starts</b> as the left end and right end to where the fill goes to. Left/right side refers the literal left/right side from the user's perspective.
+To avoid confusion, I refer the end tiles in which the fill <b>starts</b> as the left end and right end to where the fill goes to. Left/right <i>side</i> refers the literal left/right side from the user's perspective.
 Also keep in mind that as you increase the length of the bar, it will always extend towards the right unless you use the <kbd>BarExtendLeft</kbd> routine.</li><br>
 
 <li><kbd>BarExtendLeft</kbd>: Normally, without this routine, as the bar's length (not to be confused with the above routine) increases (say, increase the middle length), the

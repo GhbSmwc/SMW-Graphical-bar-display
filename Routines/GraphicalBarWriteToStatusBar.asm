@@ -22,7 +22,8 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ; -If you are using custom status bar patches that enables editing tile properties in-game,
 ;  and have set "!StatusBar_UsingCustomProperties" to 1, you have another input:
 ; --$03 to $05: Same as $00 to $02 but for tile properties instead of tile numbers.
-; --$06: The tile properties (YXPCCCTT) you want it to be.
+; --$06: The tile properties (YXPCCCTT) you want it to be. Note: This does not automatically
+;   set the X-bit flip flag for the leftwards bar.
 ;Output:
 ; -[RAMAddressIn00] to [RAMAddressIn00 + ((NumberOfTiles-1)*TileFormat]: the status bar/OWB+
 ;  RAM write range.
