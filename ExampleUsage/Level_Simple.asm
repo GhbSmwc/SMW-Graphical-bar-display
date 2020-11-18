@@ -13,6 +13,11 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;This is a simple test ASM using the graphical bar.
 ;best tested using uberasm tool.
 
+!PaletteChanging = 1
+ ;^0 = stays the same palette regardless the amount of fill in bar
+ ; 1 = change color based on how much fill. See code below marked
+ ; [PaletteChangingCode]
+
 main:
 ;Get x position percentage in horizontal level.
 ;This is basically the progress meter.
@@ -39,6 +44,12 @@ main:
 	LDA.b #!Default_RightPieces				;|
 	STA !Scratchram_GraphicalBar_RightEndPiece		;/
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
+	if notequal(and(notequal(!PaletteChanging, 0), notequal(!StatusBar_UsingCustomProperties, 0)), 0)
+		REP #$20
+		LDA $00						;>We are going to need this to determine its palette
+		PHA
+		SEP #$20
+	endif
 	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
 	LDA.b #!Default_GraphicalBar_Pos_Tile
@@ -54,10 +65,29 @@ main:
 		STA $04
 		LDA.b #!Default_GraphicalBar_Pos_Properties>>16
 		STA $05
-		if !Default_LeftwardsBar == 0
-			LDA.b #!Default_StatusBar_TilePropertiesSetting			;\Properties
+		if !PaletteChanging == 0
+			if !Default_LeftwardsBar == 0
+				LDA.b #!Default_StatusBar_TilePropertiesSetting			;\Properties
+			else
+				LDA.b #(!Default_StatusBar_TilePropertiesSetting|(!Default_LeftwardsBar<<6))
+			endif
 		else
-			LDA.b #(!Default_StatusBar_TilePropertiesSetting|(!Default_LeftwardsBar<<6))
+			.PaletteThresholds
+				LDX #$00
+				REP #$20
+				PLA
+				CMP.w #19		;>Threshold 1
+				BCC ..GetValueFromTable
+				INX
+				CMP.w #37		;>Threshold 2
+				BCC ..GetValueFromTable
+				
+				;At or above threshold 2
+					INX
+				
+				..GetValueFromTable
+					SEP #$20
+					LDA PaletteTable,x
 		endif
 		STA $06								;/
 	endif
@@ -75,3 +105,10 @@ main:
 		endif
 	endif
 	RTL
+	
+	PaletteTable:
+		;These contain the colors to use based on how much fill,
+		;must be ordered in increasing thresholds, in YXPCCCTT form.
+			db %00101100	;>If below Threshold 1
+			db %00111100	;>If below Threshold 2
+			db %00111000	;>If at or above Threshold 2
