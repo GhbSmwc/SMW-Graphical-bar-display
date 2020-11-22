@@ -16,7 +16,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 !PaletteChanging = 1
  ;^0 = stays the same palette regardless the amount of fill in bar
  ; 1 = change color based on how much fill. See code below marked
- ; [PaletteChangingCode]
+ ; [PaletteChangingCode].
 
 main:
 ;Get x position percentage in horizontal level.
@@ -108,7 +108,15 @@ main:
 	
 	PaletteTable:
 		;These contain the colors to use based on how much fill,
-		;must be ordered in increasing thresholds, in YXPCCCTT form.
-			db %00101100	;>If below Threshold 1
-			db %00111100	;>If below Threshold 2
-			db %00111000	;>If at or above Threshold 2
+		;ordered in increasing thresholds, in YXPCCCTT form.
+		;Formula for making YXPCCCTT data format workable with defines: [(!YFlip<<7)+(!Default_LeftwardsBar<<6)+(!palette<<2)+(!PageNumber)]
+		; -!YFlip: Not mentioned in the defines, but for formula only (valid range 0-1).
+		; -!Default_LeftwardsBar: Mentioned in the defines, X flip (valid range 0-1).
+		; -!palette: Not mentioned in the defines, but for formula only (valid range 0-7).
+		; -!PageNumber: Not mentioned in the defines, but for formula only (valid range 0-3).
+		;
+		;Because this code never assumes of you having a horizontal bar of 2 8x8 tiles tall, the Y flip is never needed
+		;((0<<7) results 0, which means no addition occurs).
+			db (!Default_LeftwardsBar<<6)+(3<<2)+(0)	;>If below Threshold 1
+			db (!Default_LeftwardsBar<<6)+(7<<2)+(0)	;>If below Threshold 2
+			db (!Default_LeftwardsBar<<6)+(6<<2)+(0)	;>If at or above Threshold 2
