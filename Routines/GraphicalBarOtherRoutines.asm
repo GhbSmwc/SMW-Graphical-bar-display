@@ -88,3 +88,37 @@ MapRangeToStartAt0:
 	.Done
 	SEP #$20
 	RTL
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;Invert quantity.
+;
+;This routine inverts a given quantity (ex. 12/100 becomes 88/100), by
+;taking the maximum amount, subtracted by the current amount
+;(100 - 12 = 88). If quantity is exceeding the maximum amount prior to
+;this (Max - QuantityGreaterThanMax = negative), will output 0.
+;
+;Note: Best use this subroutine to handle the literal quantity amount,
+;not the fill/percentage amount after using
+;CalculateGraphicalBarPercentage, to avoid potential accumulating
+;rounding errors cause by converting into fill amounts.
+;
+;Input:
+; -$00-$01 (16-bit): The quantity
+; -$02-$03 (16-bit): The max quantity
+;Output:
+; -$00-$01 (16-bit): The inverted quantity (minimum value is $0000)
+; -$02-$03 (16-bit): The max quantity (unchanged)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+InvertQuantity:
+	REP #$20
+	LDA $02				;\MaxQuantity - Quantity
+	SEC				;|
+	SBC $00				;/>(SBC clears carry if underflow occurs, otherwise carry is set)
+	BCS .SubtractedNormally		;>If subtracted without underflow (results nonnegative value), then it is OK
+	
+	.SubtractedByLarger		;
+		LDA #$0000		;>Otherwise bottom out at $0000
+	.SubtractedNormally
+		STA $00
+	.Done
+		SEP #$20
+		RTL

@@ -42,6 +42,9 @@
 		;^Tile properties (if you enable editing properties in-game). Note: Bit 6 (X-flip) is
 		; forced to be set when !Default_LeftwardsBar is set to 1. If you want this to be x flipped,
 		; set that aforementioned setting. (YXPCCCTT)
+		;
+		;This does not apply to color-changing bars, see [Level_Simple.asm] at the table at the bottom,
+		;as this define only apply to graphical bars with static tile properties.
 
 	!Default_Overworld_TilePropertiesSetting      = %00111001
 		;^Same as above, but overworld map.

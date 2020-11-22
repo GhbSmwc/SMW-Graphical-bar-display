@@ -175,6 +175,7 @@ Perhaps if you want to display something other than the provided examples above,
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;^These are needed so the defines relating to the graphical bars work.
 
+main:		;&gt;You DO need this if using uberasm tool.
 .InputRatio
 	LDA <font color="red">$0DBF|!addr</font>						;\Quantity low byte (example: current HP). Use RAM here.
 	STA !Scratchram_GraphicalBar_FillByteTbl		;/
