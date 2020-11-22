@@ -865,7 +865,8 @@ Note that scratch RAM <kbd>$00</kbd> and <kbd>$01</kbd> is overwritten to determ
 The table of tile numbers in the routine are ordered from empty to full in the tile array, I left the comments on there to show what fill amount for every byte for easier editing.<br><br>
 
 </li>
-<li><a href="#ConvertBarFillAmountToTilesDoubleBar_Back" id="ConvertBarFillAmountToTilesDoubleBar">^</a><kbd>ConvertBarFillAmountToTilesDoubleBar</kbd>: Same as above, but handles a double-filled bar. Tiles are formated <a href="readme_files/DoubleBarFills.png" target="_blank">like this</a>.
+<li><a href="#ConvertBarFillAmountToTilesDoubleBar_Back" id="ConvertBarFillAmountToTilesDoubleBar">^</a><kbd>ConvertBarFillAmountToTilesDoubleBar</kbd>: Same as above, but handles a
+<a href="readme_files/DoubleBarInfo.html">double-filled bar (aka double-bar)</a>. Tiles are formated <a href="readme_files/DoubleBarFills.png" target="_blank">like this</a>.
 Also like above, make sure you have the number of pieces equal to <kbd>(NumberOfPieces+1)^2</kbd> number of values in table (for example, left end have 4 pieces, therefore you must have 25 values;
 <kbd>(4+1)^2 = 25</kbd>). I recommend to have the table to form a perfect square so that the fill values are visually organized.<br>
 
