@@ -105,7 +105,7 @@ MapRangeToStartAt0:
 ; -$00-$01 (16-bit): The quantity
 ; -$02-$03 (16-bit): The max quantity
 ;Output:
-; -$00-$01 (16-bit): The inverted quantity (minimum value is $0000)
+; -$00-$01 (16-bit): The inverted quantity (InvertedQuantity = max(MaxQuantity - Quantity, 0))
 ; -$02-$03 (16-bit): The max quantity (unchanged)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 InvertQuantity:
