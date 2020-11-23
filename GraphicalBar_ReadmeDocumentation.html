@@ -274,8 +274,7 @@ For example: 50/100 on a 62-pieced bar outputs value of 31.</li>
 <kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl+3</b></span></kbd>
 </td>
 <td align="center" valign="center">2</td>
-<td>The maximum amount (16-bit) something. If this value is <kbd>$0000</kbd>, will assume
-the bar is full due to dividing by zero (known as &ldquo;max quantity&rdquo;).</td>
+<td>The maximum amount (16-bit) something (known as &ldquo;max quantity&rdquo;).</td>
 </tr>
 <tr>
 <td>
@@ -319,16 +318,17 @@ Result:
 <tr>
 <td><kbd><span class="NoLineBreak"><b>$00</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$01</b></span></kbd></td>
 <td align="center" valign="center">2</td>
-<td>The amount of fill as a &ldquo;percentage&rdquo;. Calculated by <kbd>FillAmount = RoundHalfUp(Quantity * TotalNumberOfPiecesInBar / MaxQuantity)</kbd></td>
+<td>The amount of fill as a &ldquo;percentage&rdquo;. Calculated by <kbd>FillAmount = <abbr title="During division, if the remainder is less than half the divisor, would round down to nearest integer, otherwise if greater than or equal to, rounds up to nearest integer.">RoundHalfUp</abbr>(Quantity * TotalNumberOfPiecesInBar / MaxQuantity)</kbd>
+If max quantity is 0, a division by zero occurs, and outputs <kbd>$FFFF</kbd>.</td>
 </tr>
 <tr>
 <td><kbd><span class="NoLineBreak"><b>Y register</b></span></kbd></td>
 <td align="center" valign="center">1 (not stored)</td>
 <td>Rounding towards empty and full indicator:
 <ul>
-<li>Y = $00 if not rounded to empty or full (if exact empty, rounded to any number besides 0 or maximum, or full (or higher))</li>
-<li>Y = $01 if rounded to empty.</li>
-<li>Y = $02 if rounded to full.</li>
+<li><kbd>Y = $00</kbd> if not rounded to empty or full (if exact empty, rounded to any number besides 0 or maximum, or full (or higher))</li>
+<li><kbd>Y = $01</kbd> if rounded to empty.</li>
+<li><kbd>Y = $02</kbd> if rounded to full.</li>
 See more information <a id="RoundAwayFromComplete" href="readme_files/RoundAwayFromComplete.html">here</a>.
 </ul></td>
 </tr>
