@@ -59,71 +59,71 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	BEQ .Frame0
 	
 	.Frame1
-	;Odd frame
-	;REP #$20
-	LDA <font color="red">!Freeram_SecondQuantity</font>
-	BRA .SetupQuantity
+		;Odd frame
+		;REP #$20
+		LDA <font color="red">!Freeram_SecondQuantity</font>
+		BRA .SetupQuantity
 	
 	.Frame0
-	;Even frame
-	;REP #$20
-	LDA <font color="red">!Freeram_FirstQuantity</font>
+		;Even frame
+		;REP #$20
+		LDA <font color="red">!Freeram_FirstQuantity</font>
 	
 	.SetupQuantity
-	STA !Scratchram_GraphicalBar_FillByteTbl 		;>Quantity low
-	LDA <font color="red">#$00</font>						;\Quantity high (remove this two-line for 16-bit)
-	STA !Scratchram_GraphicalBar_FillByteTbl+1		;/
-	LDA <font color="red">#!DoubleBar_MaxQuantity</font>				;\Max Quantity low
-	STA !Scratchram_GraphicalBar_FillByteTbl+2		;/
-	LDA <font color="red">#$00</font>						;\Max quantity high (remove this two-line for 16-bit)
-	STA !Scratchram_GraphicalBar_FillByteTbl+3		;/
-	;SEP #$20
-	
-	LDA <font color="green">#!Default_LeftPieces</font>				;\Left end pieces
-	STA !Scratchram_GraphicalBar_LeftEndPiece		;/
-	LDA <font color="green">#!Default_MiddlePieces</font>				;\Middle pieces
-	STA !Scratchram_GraphicalBar_MiddlePiece		;/
-	LDA.b <font color="green">#!Default_MiddleLength</font>				;\Middle length
-	STA !Scratchram_GraphicalBar_TempLength			;/
-	LDA <font color="green">#!Default_RightPieces</font>				;\Right end pieces
-	STA !Scratchram_GraphicalBar_RightEndPiece		;/
-	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
-	<font color="orange">JSL GraphicalBarELITE_RoundAwayEmptyFull</font>
-	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
-	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
-	LDA.b <font color="yellow">#!Default_GraphicalBar_Pos_Tile</font>				;\Setup address to where to draw the bar.
-	STA $00								;|
-	LDA.b <font color="yellow">#!Default_GraphicalBar_Pos_Tile>>8</font>			;|
-	STA $01								;|
-	LDA.b <font color="yellow">#!Default_GraphicalBar_Pos_Tile>>16</font>			;|
-	STA $02								;/
-	if !StatusBar_UsingCustomProperties != 0
-		LDA.b <font color="yellow">#!Default_GraphicalBar_Pos_Properties</font>				;\Same as above but properties
-		STA $03								;|
-		LDA.b <font color="yellow">#!Default_GraphicalBar_Pos_Properties>>8</font>			;|
-		STA $04								;|
-		LDA.b <font color="yellow">#!Default_GraphicalBar_Pos_Properties>>16</font>			;|
-		STA $05								;/
+		STA !Scratchram_GraphicalBar_FillByteTbl 		;>Quantity low
+		LDA <font color="red">#$00</font>						;\Quantity high (remove this two-line for 16-bit)
+		STA !Scratchram_GraphicalBar_FillByteTbl+1		;/
+		LDA <font color="red">#!DoubleBar_MaxQuantity</font>				;\Max Quantity low
+		STA !Scratchram_GraphicalBar_FillByteTbl+2		;/
+		LDA <font color="red">#$00</font>						;\Max quantity high (remove this two-line for 16-bit)
+		STA !Scratchram_GraphicalBar_FillByteTbl+3		;/
+		;SEP #$20
+	;GetBarData
+		LDA <font color="green">#!Default_LeftPieces</font>				;\Left end pieces
+		STA !Scratchram_GraphicalBar_LeftEndPiece		;/
+		LDA <font color="green">#!Default_MiddlePieces</font>				;\Middle pieces
+		STA !Scratchram_GraphicalBar_MiddlePiece		;/
+		LDA.b <font color="green">#!Default_MiddleLength</font>				;\Middle length
+		STA !Scratchram_GraphicalBar_TempLength			;/
+		LDA <font color="green">#!Default_RightPieces</font>				;\Right end pieces
+		STA !Scratchram_GraphicalBar_RightEndPiece		;/
+		JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
+		<font color="orange">JSL GraphicalBarELITE_RoundAwayEmptyFull</font>
+		JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
+		JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
+		LDA.b <font color="yellow">#!Default_GraphicalBar_Pos_Tile</font>				;\Setup address to where to draw the bar.
+		STA $00								;|
+		LDA.b <font color="yellow">#!Default_GraphicalBar_Pos_Tile>>8</font>			;|
+		STA $01								;|
+		LDA.b <font color="yellow">#!Default_GraphicalBar_Pos_Tile>>16</font>			;|
+		STA $02								;/
+		if !StatusBar_UsingCustomProperties != 0
+			LDA.b <font color="yellow">#!Default_GraphicalBar_Pos_Properties</font>				;\Same as above but properties
+			STA $03								;|
+			LDA.b <font color="yellow">#!Default_GraphicalBar_Pos_Properties>>8</font>			;|
+			STA $04								;|
+			LDA.b <font color="yellow">#!Default_GraphicalBar_Pos_Properties>>16</font>			;|
+			STA $05								;/
+			if !Default_LeftwardsBar == 0
+				LDA.b <font color="green">#!Default_StatusBar_TilePropertiesSetting</font>			;\Properties
+			else
+				LDA.b <font color="green">#(!Default_StatusBar_TilePropertiesSetting|(!Default_LeftwardsBar<<6))</font></<6))<>
+			endif
+			STA $06								;/
+		endif
 		if !Default_LeftwardsBar == 0
-			LDA.b <font color="green">#!Default_StatusBar_TilePropertiesSetting</font>			;\Properties
+			if !StatusBarFormat = $01
+				JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;>Write to status bar
+			else
+				JSL GraphicalBarWriteToStatusBar_WriteBarToHUDFormat2		;>Write to status bar
+			endif
 		else
-			LDA.b <font color="green">#(!Default_StatusBar_TilePropertiesSetting|(!Default_LeftwardsBar<<6))</font></<6))<>
+			if !StatusBarFormat = $01
+				JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards
+			else
+				JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwardsFormat2
+			endif
 		endif
-		STA $06								;/
-	endif
-	if !Default_LeftwardsBar == 0
-		if !StatusBarFormat = $01
-			JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;>Write to status bar
-		else
-			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDFormat2		;>Write to status bar
-		endif
-	else
-		if !StatusBarFormat = $01
-			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards
-		else
-			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwardsFormat2
-		endif
-	endif
 	RTL</pre></td></tr></table>
 Remove the semicolons in front of <nobr><kbd>REP #$20</kbd></nobr> and <nobr><kbd>SEP #$20</kbd></nobr> should your quantity amount is a 16-bit number (going over 255)
 The red font is the things you can replace. Note that this does not work with tiles that update other than each and every frame (for example, the Overworld
@@ -157,14 +157,14 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	JSL GraphicalBarELITE_DrawGraphicalBar
 	
 	..TransferFirstFillBar ;>FirstFill will be located just after SecondFill in memory address: <SecondFill_Table><FirstFill_Table>
-	PHB
-	REP #$30
-	LDA.w #!Setting_GraphicalBar_SecondFillByteTableOffset-1					;>Number of bytes to transfer, -1 (because byte 0 is included)
-	LDX.w #!Scratchram_GraphicalBar_FillByteTbl							;>Source address
-	LDY.w #!Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset	;>Destination address
-	MVN (!Scratchram_GraphicalBar_FillByteTbl>>16), (!Scratchram_GraphicalBar_FillByteTbl>>16)	;>Move them
-	SEP #$30
-	PLB
+		PHB
+		REP #$30
+		LDA.w #!Setting_GraphicalBar_SecondFillByteTableOffset-1					;>Number of bytes to transfer, -1 (because byte 0 is included)
+		LDX.w #!Scratchram_GraphicalBar_FillByteTbl							;>Source address
+		LDY.w #!Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset	;>Destination address
+		MVN (!Scratchram_GraphicalBar_FillByteTbl>>16), (!Scratchram_GraphicalBar_FillByteTbl>>16)	;>Move them
+		SEP #$30
+		PLB
 .SecondQuantity
 	;Thankfully the graphical bar routines does not mess up the scratch RAM inputs (other than !Scratchram_GraphicalBar_FillByteTbl), therefore
 	;you only need to set them once.
@@ -214,7 +214,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	endif
 	RTL
 	
-	GetMaxQuantityPercentage:
+GetMaxQuantityPercentage:
 	LDA <font color="red">#!DoubleBar_MaxQuantity</font>				;\Max quantity (example: max HP). Can be a fixed value (#$) or adjustable RAM in-game.
 	STA !Scratchram_GraphicalBar_FillByteTbl+2		;/
 	LDA <font color="red">#$00</font>						;\High byte above, same format as you would do for quantity, so do the same

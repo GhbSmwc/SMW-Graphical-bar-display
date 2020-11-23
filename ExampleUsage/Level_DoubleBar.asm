@@ -37,10 +37,11 @@
 ;  they synchronize on the number of pieces and sections.
 ;
 ; -If you plan on making different lengths of the bar, I recommend changing the
-;  code (or actually the defines being added by !Setting_GraphicalBar_SecondFillByteTableOffset) to have FirstBar's output
-;  location be moved by a fixed value that is the longest bar you could possibly have in
-;  your game to avoid overwriting the other bar. For example: A longest bar with 10 tile
-;  bytes total (2 end tiles and 8 for middle length), you would have ("$" sign means hex):
+;  code (or actually the defines being added by !Setting_GraphicalBar_SecondFillByteTableOffset)
+;  to have FirstBar's output location be moved by a fixed value that is the longest bar
+;  you could possibly have in your game to avoid overwriting the other bar. For example:
+;  A longest bar with 10 tile bytes total (2 end tiles and 8 for middle length), you would
+;  have ("$" sign means hex):
 ;
 ;   FirstFillLocation = SecondFillLocation + $0A
 ;
@@ -65,56 +66,57 @@ main:
 		BNE ...Up			;|
 		BIT.b #%00000100		;|
 		BNE ...Down			;/
-		BRA ..HandleSecondFill		
+		BRA ...Done		
 		
 		...Up
-		LDA !Freeram_FirstQuantity
-		CMP #!DoubleBar_MaxQuantity
-		BEQ ..HandleSecondFill
-		INC A
-		STA !Freeram_FirstQuantity
-		if !Setting_DoubleBar_FillMode != 0
-			LDA.b #!Setting_DoubleBar_FillMode
-			STA !Freeram_SecondQuantityDelay
-		endif
-		BRA ..HandleSecondFill
+			LDA !Freeram_FirstQuantity		;\Avoid incrementing past max
+			CMP #!DoubleBar_MaxQuantity		;|
+			BEQ ...Done				;/
+			INC A
+			STA !Freeram_FirstQuantity
+			if !Setting_DoubleBar_FillMode != 0
+				LDA.b #!Setting_DoubleBar_FillMode
+				STA !Freeram_SecondQuantityDelay
+			endif
+			BRA ...Done
 		
 		...Down
-		LDA !Freeram_FirstQuantity
-		BEQ ..HandleSecondFill
-		DEC A
-		STA !Freeram_FirstQuantity
-		if !Setting_DoubleBar_FillMode != 0
-			LDA.b #!Setting_DoubleBar_FillMode
-			STA !Freeram_SecondQuantityDelay
-		endif
-	
+			LDA !Freeram_FirstQuantity		;\Avoid decrementing past 0.
+			BEQ ...Done				;/
+			DEC A
+			STA !Freeram_FirstQuantity
+			if !Setting_DoubleBar_FillMode != 0
+				LDA.b #!Setting_DoubleBar_FillMode
+				STA !Freeram_SecondQuantityDelay
+			endif
+		...Done
 ..HandleSecondFill
-	;SecondFill-related controller stuff
-		if !Setting_DoubleBar_FillMode == 0
-			;Increment/Decrement SecondFill on controller
-				LDA $15				;\SecondFill control
-				BIT.b #%00000010		;|
-				BNE ...Left			;|
-				BIT.b #%00000001		;|
-				BNE ...Right			;/
-				BRA .DisplayFillAmount
-				
-				...Left
+	if !Setting_DoubleBar_FillMode == 0
+		;SecondFill-related controller stuff
+		;Increment/Decrement SecondFill on controller
+			LDA $15				;\SecondFill control
+			BIT.b #%00000010		;|
+			BNE ...Left			;|
+			BIT.b #%00000001		;|
+			BNE ...Right			;/
+			BRA .DisplayFillAmount
+			
+			...Left
 				LDA !Freeram_SecondQuantity
 				BEQ .DisplayFillAmount
 				DEC A
 				STA !Freeram_SecondQuantity
 				BRA .DisplayFillAmount
-				
-				...Right
+			
+			...Right
 				LDA !Freeram_SecondQuantity
 				CMP #!DoubleBar_MaxQuantity
 				BEQ .DisplayFillAmount
 				INC A
 				STA !Freeram_SecondQuantity
-		else
-			...ChangeTowardsFirstQuantity
+	else
+		...ChangeTowardsFirstQuantity
+			;Secondfill automatically follows first fill, after a delay.
 			;Increment (or instantly set to FirstFill when below FirstFill)/Decrement SecondFill towards FirstFill.
 				if !DoubleBar_DisplayIncrease != 0
 					LDA !Freeram_SecondQuantityDelay	;\When the delay timer is active, SecondFill won't change.
@@ -129,8 +131,8 @@ main:
 			CMP !Freeram_FirstQuantity	;|
 			BEQ ...Same			;|
 			BCC ...Increment		;/>If SecondFill less than FirstFill, increment towards FirstFill
-			
-			...Decrement
+		
+		...Decrement
 			if !DoubleBar_DisplayIncrease == 0
 				LDA !Freeram_SecondQuantityDelay	;\Only freeze by timer when decrementing, while increment does not need a timer.
 				BEQ +					;|
@@ -143,19 +145,19 @@ main:
 			endif
 			DEC A
 			BRA ...Write
-			
-			...Increment
+		
+		...Increment
 			if !DoubleBar_DisplayIncrease == 0
 				LDA !Freeram_FirstQuantity
 			else
 				INC
 			endif
-			...Write
+		...Write
 			STA !Freeram_SecondQuantity
 			
-			...StayFrozen
-			...Same
-		endif
+		...StayFrozen
+		...Same
+	endif
 	
 .DisplayFillAmount
 	;This displays the hex numbers representing the two fills in the bar.
@@ -192,37 +194,37 @@ main:
 		BEQ .Frame0
 		
 		.Frame1
-		;Odd frame
-		;REP #$20
-		LDA !Freeram_SecondQuantity
-		BRA .Write
+			;Odd frame
+			;REP #$20
+			LDA !Freeram_SecondQuantity
+			BRA .Write
 		
 		.Frame0
-		;Even frame
-		;REP #$20
-		LDA !Freeram_FirstQuantity
+			;Even frame
+			;REP #$20
+			LDA !Freeram_FirstQuantity
 		
 		.Write
-		STA !Scratchram_GraphicalBar_FillByteTbl
+			STA !Scratchram_GraphicalBar_FillByteTbl
 	else
 		..GraphicalDoubleBarFirstFill
-		LDA !Freeram_SecondQuantity
-		CMP !Freeram_FirstQuantity
-		BCC ...DisplaySecondQuantityAsFirstFill
+			LDA !Freeram_SecondQuantity
+			CMP !Freeram_FirstQuantity
+			BCC ...DisplaySecondQuantityAsFirstFill
 		
-		...DisplayFirstQuantityAsFirstFill
-		LDA !Freeram_FirstQuantity				;\Amount of fill for first fill
-		STA !Scratchram_GraphicalBar_FillByteTbl		;/
-		BRA +
+			...DisplayFirstQuantityAsFirstFill
+				LDA !Freeram_FirstQuantity				;\Amount of fill for first fill
+				STA !Scratchram_GraphicalBar_FillByteTbl		;/
+				BRA +
 		
-		...DisplaySecondQuantityAsFirstFill
-		LDA !Freeram_SecondQuantity
-		STA !Scratchram_GraphicalBar_FillByteTbl
+			...DisplaySecondQuantityAsFirstFill
+				LDA !Freeram_SecondQuantity
+				STA !Scratchram_GraphicalBar_FillByteTbl
 		
 		+
 	endif
 	
-	;Get graphical bar values.
+	;Setup graphical bar attributes.
 		JSR GetPercentageQuantity
 		LDA #!Default_LeftPieces				;\Left end pieces
 		STA !Scratchram_GraphicalBar_LeftEndPiece		;/
@@ -232,6 +234,7 @@ main:
 		STA !Scratchram_GraphicalBar_TempLength			;/
 		LDA #!Default_RightPieces				;\Right end pieces
 		STA !Scratchram_GraphicalBar_RightEndPiece		;/
+	;Percentage
 		JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
 		if !DoubleBar_RoundAway != 0
 			JSL GraphicalBarELITE_RoundAwayEmptyFull
@@ -246,7 +249,7 @@ main:
 			STA !FirstFillPercentHexValDisplayPos+(1*!StatusBarFormat)	;/
 		endif
 	;Call subroutine
-	JSL GraphicalBarELITE_DrawGraphicalBar
+		JSL GraphicalBarELITE_DrawGraphicalBar
 ;;;;;;;;;;;;
 ;SecondFill
 ;;;;;;;;;;;;
@@ -254,41 +257,41 @@ main:
 		JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles
 	else
 		...TransferFirstFillBar ;>FirstFill will be located just after SecondFill in memory address: <SecondFill_Table><FirstFill_Table>
-		PHB
-		REP #$30
-		LDA.w #!Setting_GraphicalBar_SecondFillByteTableOffset-1					;>Number of bytes to transfer, -1 (because byte 0 is included)
-		LDX.w #!Scratchram_GraphicalBar_FillByteTbl							;>Source address
-		LDY.w #!Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset	;>Destination address
-		MVN (!Scratchram_GraphicalBar_FillByteTbl>>16), (!Scratchram_GraphicalBar_FillByteTbl>>16)	;>Move them
-		SEP #$30
-		PLB
+			PHB
+			REP #$30
+			LDA.w #!Setting_GraphicalBar_SecondFillByteTableOffset-1					;>Number of bytes to transfer, -1 (because byte 0 is included)
+			LDX.w #!Scratchram_GraphicalBar_FillByteTbl							;>Source address
+			LDY.w #!Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset	;>Destination address
+			MVN (!Scratchram_GraphicalBar_FillByteTbl>>16), (!Scratchram_GraphicalBar_FillByteTbl>>16)	;>Move them
+			SEP #$30
+			PLB
 
 		..GraphicalDoubleBarSecondFill
-		;Thankfully the graphical bar routines does not mess up the scratch RAM inputs (other than !Scratchram_GraphicalBar_FillByteTbl), therefore
-		;you only need to set them once.
-		if !DoubleBar_DisplayIncrease == 0
-			LDA !Freeram_SecondQuantity					;\Amount of fill for second fill
-			STA !Scratchram_GraphicalBar_FillByteTbl		;/
-		else
-			LDA !Freeram_SecondQuantity
-			CMP !Freeram_FirstQuantity
-			BCC ...DisplayFirstQuantityAsSecondFill			;>When the bar increases (results SecondFill < Firstfill), SecondFill is the FirstQuantity (ex. Current HP after recovery)
-			
-			...DisplaySecondQuantityAsSecondFill			;>When the bar decreases (results SecondFill > FirstFill), SecondFill is the SecondQuantity (ex. The HP amount before the damage)
-			LDA !Freeram_SecondQuantity				;\Amount of fill for second fill
-			STA !Scratchram_GraphicalBar_FillByteTbl		;/
-			BRA +
-			
-			...DisplayFirstQuantityAsSecondFill
-			LDA !Freeram_FirstQuantity				;\Amount of fill for second fill
-			STA !Scratchram_GraphicalBar_FillByteTbl		;/
-			+
-		endif
-		JSR GetPercentageQuantity				;>Rewrite the values used for the percentage.
-		JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
-		if !DoubleBar_RoundAway != 0
-			JSL GraphicalBarELITE_RoundAwayEmptyFull
-		endif
+			;Thankfully the graphical bar routines does not mess up the scratch RAM inputs (other than !Scratchram_GraphicalBar_FillByteTbl), therefore
+			;you only need to set them once.
+			if !DoubleBar_DisplayIncrease == 0
+				LDA !Freeram_SecondQuantity					;\Amount of fill for second fill
+				STA !Scratchram_GraphicalBar_FillByteTbl		;/
+			else
+				LDA !Freeram_SecondQuantity
+				CMP !Freeram_FirstQuantity
+				BCC ...DisplayFirstQuantityAsSecondFill			;>When the bar increases (results SecondFill < Firstfill), SecondFill is the FirstQuantity (ex. Current HP after recovery)
+				
+				...DisplaySecondQuantityAsSecondFill			;>When the bar decreases (results SecondFill > FirstFill), SecondFill is the SecondQuantity (ex. The HP amount before the damage)
+					LDA !Freeram_SecondQuantity				;\Amount of fill for second fill
+					STA !Scratchram_GraphicalBar_FillByteTbl		;/
+					BRA +
+				
+				...DisplayFirstQuantityAsSecondFill
+					LDA !Freeram_FirstQuantity				;\Amount of fill for second fill
+					STA !Scratchram_GraphicalBar_FillByteTbl		;/
+					+
+			endif
+			JSR GetPercentageQuantity				;>Rewrite the values used for the percentage.
+			JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
+			if !DoubleBar_RoundAway != 0
+				JSL GraphicalBarELITE_RoundAwayEmptyFull
+			endif
 		;Hex display of values.
 			if !StatusBarFormat == $02
 				LDA $00								;\every 16th number increments the 1st digit.
@@ -341,41 +344,41 @@ main:
 	;due to every other frame, doesn't have the info for both at the same frame.
 	if !DoubleBar_DisplayType == 0
 		.FirstFillPercentageRapidFlicker
-		LDA !Freeram_FirstQuantity				;\Amount of fill for first fill
-		STA !Scratchram_GraphicalBar_FillByteTbl		;/
-		JSR GetPercentageQuantity
-		JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
-		if !DoubleBar_RoundAway != 0
-			JSL GraphicalBarELITE_RoundAwayEmptyFull
-		endif
-		if !StatusBarFormat == $02
-			LDA $00								;\every 16th number increments the 1st digit.
-			LSR #$04							;|
-			STA !FirstFillPercentHexValDisplayPos				;/
-			LDA $00								;\limit it to #$00-#$0F on 2nd digit digit.
-			AND #$0F							;|
-			STA !FirstFillPercentHexValDisplayPos+(1*!StatusBarFormat)	;/
-		endif
+			LDA !Freeram_FirstQuantity				;\Amount of fill for first fill
+			STA !Scratchram_GraphicalBar_FillByteTbl		;/
+			JSR GetPercentageQuantity
+			JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
+			if !DoubleBar_RoundAway != 0
+				JSL GraphicalBarELITE_RoundAwayEmptyFull
+			endif
+			if !StatusBarFormat == $02
+				LDA $00								;\every 16th number increments the 1st digit.
+				LSR #$04							;|
+				STA !FirstFillPercentHexValDisplayPos				;/
+				LDA $00								;\limit it to #$00-#$0F on 2nd digit digit.
+				AND #$0F							;|
+				STA !FirstFillPercentHexValDisplayPos+(1*!StatusBarFormat)	;/
+			endif
 		.SecondFillPercentageRapidFlicker
-		LDA !Freeram_SecondQuantity					;\Amount of fill for second fill
-		STA !Scratchram_GraphicalBar_FillByteTbl		;/
-		JSR GetPercentageQuantity
-		JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
-		if !DoubleBar_RoundAway != 0
-			JSL GraphicalBarELITE_RoundAwayEmptyFull
-		endif
-		if !StatusBarFormat == $02
-			LDA $00								;\every 16th number increments the 1st digit.
-			LSR #$04							;|
-			STA !SecondFillPercentHexValDisplayPos				;/
-			LDA $00								;\limit it to #$00-#$0F on 2nd digit digit.
-			AND #$0F							;|
-			STA !SecondFillPercentHexValDisplayPos+(1*!StatusBarFormat)	;/
-		endif
+			LDA !Freeram_SecondQuantity					;\Amount of fill for second fill
+			STA !Scratchram_GraphicalBar_FillByteTbl		;/
+			JSR GetPercentageQuantity
+			JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
+			if !DoubleBar_RoundAway != 0
+				JSL GraphicalBarELITE_RoundAwayEmptyFull
+			endif
+			if !StatusBarFormat == $02
+				LDA $00								;\every 16th number increments the 1st digit.
+				LSR #$04							;|
+				STA !SecondFillPercentHexValDisplayPos				;/
+				LDA $00								;\limit it to #$00-#$0F on 2nd digit digit.
+				AND #$0F							;|
+				STA !SecondFillPercentHexValDisplayPos+(1*!StatusBarFormat)	;/
+			endif
 	endif
 	RTL
-	;-------------------------------------------------------------------------------------------------
-	GetPercentageQuantity:
+;-------------------------------------------------------------------------------------------------
+GetPercentageQuantity:
 	LDA #$00						;\High byte of above. Should your value here is 8-bit or only 1 byte long,
 	STA !Scratchram_GraphicalBar_FillByteTbl+1		;/use [LDA #$00 : STA !Scratchram_GraphicalBar_FillByteTbl+1].
 	LDA #!DoubleBar_MaxQuantity				;\Max quantity (example: max HP). Can be a fixed value (#$) or adjustable RAM in-game.
