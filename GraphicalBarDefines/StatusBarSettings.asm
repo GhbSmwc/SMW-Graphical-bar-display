@@ -201,23 +201,8 @@
 	!Setting_DoubleBar_FillMode = 0
 		;^0 = manually control how much fill for both bars.
 		; 1-255 = Control only firstfill with secondfill gradually follows
-		;  the firstfill, this also acts as how much delay (in frames).
-		;NOTE: If !Setting_SecondFillType is set to 1, this is overridden
-		;to make secondfill follow firstfill.
-	
-	!Setting_SecondFillType = 0
-		;^0 = Second fill's amount is quantity (the value before being
-		;     converted into percentage via CalculateGraphicalBarPercentage).
-		;     This option is useful if you have changable maximum quantities
-		;     to avoid misleading of displaying that the fill decreases
-		;     when the maximum increases and the fill increases when the
-		;     maximum decreases, which looks like the quantity have changed.
-		; 1 = Second fill is the percentage amount (the value in percentage,
-		;     meaning the amount of units of the bar). This option is useful
-		;     if you wanted the second fill to increment and decrement at a
-		;     constant rate regardless of the maximum quantity.
-		;     NOTE: This overrides Setting_DoubleBar_FillMode to always make
-		;     secondfill follow firstfill.
+		;  the firstfill, this also acts as how much delay (in frames) before
+		;  secondfill increments/decrements towards firstfill.
 
 	if !sa1 == 0
 		!FirstFillHexValDisplayPos           = $7FA036
@@ -279,7 +264,9 @@
 			;^[1 byte] The amount of fill for the first fill
 	
 		!Freeram_SecondQuantity = $5C
-			;^[1 byte] The amount of fill for the second fill
+			;^[1 byte] The amount of fill for the second fill. When
+			; Level_DoubleBar2.asm is used, this acts as the percentage
+			; instead (or amount filled) rather than an actual second quantity.
 	
 		!Freeram_SecondQuantityDelay = $79
 			;^[1 byte or not used at all] The amount of delay

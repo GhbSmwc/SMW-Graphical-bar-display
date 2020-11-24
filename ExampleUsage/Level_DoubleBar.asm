@@ -58,107 +58,107 @@ incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
 main:
-.IncrementDecrementTest
-..HandleFirstFill
-	;Controller to test
-		LDA $15				;\Pressing up and down to adjust firstfill value
-		BIT.b #%00001000		;|
-		BNE ...Up			;|
-		BIT.b #%00000100		;|
-		BNE ...Down			;/
-		BRA ...Done		
-		
-		...Up
-			LDA !Freeram_FirstQuantity		;\Avoid incrementing past max
-			CMP #!DoubleBar_MaxQuantity		;|
-			BEQ ...Done				;/
-			INC A
-			STA !Freeram_FirstQuantity
-			if !Setting_DoubleBar_FillMode != 0
-				LDA.b #!Setting_DoubleBar_FillMode
-				STA !Freeram_SecondQuantityDelay
-			endif
-			BRA ...Done
-		
-		...Down
-			LDA !Freeram_FirstQuantity		;\Avoid decrementing past 0.
-			BEQ ...Done				;/
-			DEC A
-			STA !Freeram_FirstQuantity
-			if !Setting_DoubleBar_FillMode != 0
-				LDA.b #!Setting_DoubleBar_FillMode
-				STA !Freeram_SecondQuantityDelay
-			endif
-		...Done
-..HandleSecondFill
-	if !Setting_DoubleBar_FillMode == 0
-		;SecondFill-related controller stuff
-		;Increment/Decrement SecondFill on controller
-			LDA $15				;\SecondFill control
-			BIT.b #%00000010		;|
-			BNE ...Left			;|
-			BIT.b #%00000001		;|
-			BNE ...Right			;/
-			BRA .DisplayFillAmount
-			
-			...Left
-				LDA !Freeram_SecondQuantity
-				BEQ .DisplayFillAmount
-				DEC A
-				STA !Freeram_SecondQuantity
-				BRA .DisplayFillAmount
-			
-			...Right
-				LDA !Freeram_SecondQuantity
-				CMP #!DoubleBar_MaxQuantity
-				BEQ .DisplayFillAmount
-				INC A
-				STA !Freeram_SecondQuantity
-	else
-		...ChangeTowardsFirstQuantity
-			;Secondfill automatically follows first fill, after a delay.
-			;Increment (or instantly set to FirstFill when below FirstFill)/Decrement SecondFill towards FirstFill.
-				if !DoubleBar_DisplayIncrease != 0
-					LDA !Freeram_SecondQuantityDelay	;\When the delay timer is active, SecondFill won't change.
-					BEQ +					;|
-					DEC					;|
-					STA !Freeram_SecondQuantityDelay	;|
-					BRA ...StayFrozen			;|
-					+					;/
-				endif
-			
-			LDA !Freeram_SecondQuantity	;\Determine rather or not SecondFill to increase, decrease or don't change at all.
-			CMP !Freeram_FirstQuantity	;|
-			BEQ ...Same			;|
-			BCC ...Increment		;/>If SecondFill less than FirstFill, increment towards FirstFill
-		
-		...Decrement
-			if !DoubleBar_DisplayIncrease == 0
-				LDA !Freeram_SecondQuantityDelay	;\Only freeze by timer when decrementing, while increment does not need a timer.
-				BEQ +					;|
-				DEC					;|
-				STA !Freeram_SecondQuantityDelay	;|
-				BRA ...StayFrozen			;|
-				+					;/
+	.IncrementDecrementTest
+		..HandleFirstFill
+			;Controller to test
+				LDA $15				;\Pressing up and down to adjust firstfill value
+				BIT.b #%00001000		;|
+				BNE ...Up			;|
+				BIT.b #%00000100		;|
+				BNE ...Down			;/
+				BRA ...Done		
 				
-				LDA !Freeram_SecondQuantity
-			endif
-			DEC A
-			BRA ...Write
-		
-		...Increment
-			if !DoubleBar_DisplayIncrease == 0
-				LDA !Freeram_FirstQuantity
+				...Up
+					LDA !Freeram_FirstQuantity		;\Avoid incrementing past max
+					CMP #!DoubleBar_MaxQuantity		;|
+					BEQ ...Done				;/
+					INC A
+					STA !Freeram_FirstQuantity
+					if !Setting_DoubleBar_FillMode != 0
+						LDA.b #!Setting_DoubleBar_FillMode
+						STA !Freeram_SecondQuantityDelay
+					endif
+					BRA ...Done
+				
+				...Down
+					LDA !Freeram_FirstQuantity		;\Avoid decrementing past 0.
+					BEQ ...Done				;/
+					DEC A
+					STA !Freeram_FirstQuantity
+					if !Setting_DoubleBar_FillMode != 0
+						LDA.b #!Setting_DoubleBar_FillMode
+						STA !Freeram_SecondQuantityDelay
+					endif
+				...Done
+		..HandleSecondFill
+			if !Setting_DoubleBar_FillMode == 0
+				;SecondFill-related controller stuff
+				;Increment/Decrement SecondFill on controller
+					LDA $15				;\SecondFill control
+					BIT.b #%00000010		;|
+					BNE ...Left			;|
+					BIT.b #%00000001		;|
+					BNE ...Right			;/
+					BRA .DisplayFillAmount
+					
+					...Left
+						LDA !Freeram_SecondQuantity
+						BEQ .DisplayFillAmount
+						DEC A
+						STA !Freeram_SecondQuantity
+						BRA .DisplayFillAmount
+					
+					...Right
+						LDA !Freeram_SecondQuantity
+						CMP #!DoubleBar_MaxQuantity
+						BEQ .DisplayFillAmount
+						INC A
+						STA !Freeram_SecondQuantity
 			else
-				INC
+				...ChangeTowardsFirstQuantity
+					;SecondFill automatically follows first fill, after a delay.
+					;Increment (or instantly set to FirstFill when below FirstFill)/Decrement SecondFill towards FirstFill.
+						if !DoubleBar_DisplayIncrease != 0
+							LDA !Freeram_SecondQuantityDelay	;\When the delay timer is active, SecondFill won't change.
+							BEQ +					;|
+							DEC					;|
+							STA !Freeram_SecondQuantityDelay	;|
+							BRA ...StayFrozen			;|
+							+					;/
+						endif
+					
+					LDA !Freeram_SecondQuantity	;\Determine rather or not SecondFill to increase, decrease or don't change at all.
+					CMP !Freeram_FirstQuantity	;|
+					BEQ ...Same			;|
+					BCC ...Increment		;/>If SecondFill less than FirstFill, increment towards FirstFill
+				
+				...Decrement
+					if !DoubleBar_DisplayIncrease == 0
+						LDA !Freeram_SecondQuantityDelay	;\Only freeze by timer when decrementing, while increment does not need a timer.
+						BEQ +					;|
+						DEC					;|
+						STA !Freeram_SecondQuantityDelay	;|
+						BRA ...StayFrozen			;|
+						+					;/
+						
+						LDA !Freeram_SecondQuantity
+					endif
+					DEC A
+					BRA ...Write
+				
+				...Increment
+					if !DoubleBar_DisplayIncrease == 0
+						LDA !Freeram_FirstQuantity
+					else
+						INC
+					endif
+				...Write
+					STA !Freeram_SecondQuantity
+					
+				...StayFrozen
+				...Same
 			endif
-		...Write
-			STA !Freeram_SecondQuantity
-			
-		...StayFrozen
-		...Same
-	endif
-	
+		
 .DisplayFillAmount
 	;This displays the hex numbers representing the two fills in the bar.
 	;Only works with Super Status Bar patch.
@@ -180,7 +180,7 @@ main:
 
 .GraphicalDoubleBarTest
 ;;;;;;;;;;;;
-;Firstfill
+;FirstFill
 ;;;;;;;;;;;;
 	if !DoubleBar_DisplayType == 0
 		if !DoubleBar_DisplayIncrease == 0
@@ -275,7 +275,7 @@ main:
 			else
 				LDA !Freeram_SecondQuantity
 				CMP !Freeram_FirstQuantity
-				BCC ...DisplayFirstQuantityAsSecondFill			;>When the bar increases (results SecondFill < Firstfill), SecondFill is the FirstQuantity (ex. Current HP after recovery)
+				BCC ...DisplayFirstQuantityAsSecondFill			;>When the bar increases (results SecondFill < FirstFill), SecondFill is the FirstQuantity (ex. Current HP after recovery)
 				
 				...DisplaySecondQuantityAsSecondFill			;>When the bar decreases (results SecondFill > FirstFill), SecondFill is the SecondQuantity (ex. The HP amount before the damage)
 					LDA !Freeram_SecondQuantity				;\Amount of fill for second fill
