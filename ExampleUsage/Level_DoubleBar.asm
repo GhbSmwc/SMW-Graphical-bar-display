@@ -53,6 +53,9 @@
 ;  So should your bar be shorter, it would look like this ("." symbol means leftover byte):
 ;
 ;  [====]....[====]....
+;
+; -BOTH !Freeram_FirstQuantity and !Freeram_SecondQuantity are both quantities, unlike
+;  Level_DoubleBar2.asm
 
 incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"

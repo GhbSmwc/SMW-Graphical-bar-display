@@ -1,6 +1,6 @@
-;This is similar to [Level_DoubleBar.asm] but SecondFill is stored as a percentage than as a secondary quantity. Meaning
-;it holds the number of units in the bar (or pixels) filled. This is useful if you wanted the second fill to follow
-;first fill at a constant rate regardless of maximum amount.
+;This is similar to [Level_DoubleBar.asm] but SecondFill (!Freeram_SecondQuantity) is stored as a percentage than as
+;a secondary quantity. Meaning it holds the number of units in the bar (or pixels) filled. This is useful if you
+;wanted the second fill to follow first fill at a constant rate regardless of maximum amount.
 
 
 incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"

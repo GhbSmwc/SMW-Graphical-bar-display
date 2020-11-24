@@ -264,9 +264,12 @@
 			;^[1 byte] The amount of fill for the first fill
 	
 		!Freeram_SecondQuantity = $5C
-			;^[1 byte] The amount of fill for the second fill. When
-			; Level_DoubleBar2.asm is used, this acts as the percentage
+			;^[1 byte] The amount of fill for the second fill.
+			; Note:
+			; -When Level_DoubleBar.asm is used, this acts as a literal quantity.
+			; -When Level_DoubleBar2.asm is used, this acts as the percentage
 			; instead (or amount filled) rather than an actual second quantity.
+			
 	
 		!Freeram_SecondQuantityDelay = $79
 			;^[1 byte or not used at all] The amount of delay
