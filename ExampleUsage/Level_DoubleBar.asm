@@ -54,8 +54,11 @@
 ;
 ;  [====]....[====]....
 ;
-; -BOTH !Freeram_FirstQuantity and !Freeram_SecondQuantity are both quantities, unlike
-;  Level_DoubleBar2.asm
+; -BOTH !Freeram_FirstQuantity and !Freeram_SecondQuantity are quantities, unlike
+;  Level_DoubleBar2.asm, which that have !Freeram_SecondQuantity acting as a percentage.
+;  Unsuitable should the absolute difference of FirstQuantity and SecondQuantity be a very
+;  large number, results in the SecondFill taking forever (a lot of frames of
+;  incrementing/decrementing) to finally equals to FirstQuantity.
 
 incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
@@ -213,7 +216,7 @@ main:
 		..GraphicalDoubleBarFirstFill
 			LDA !Freeram_SecondQuantity
 			CMP !Freeram_FirstQuantity
-			BCC ...DisplaySecondQuantityAsFirstFill
+			BCC ...DisplaySecondQuantityAsFirstFill				;>If SecondQuantity < FirstQuantity, write SecondQuantity as FirstFill (such as HP recovery)
 		
 			...DisplayFirstQuantityAsFirstFill
 				LDA !Freeram_FirstQuantity				;\Amount of fill for first fill
@@ -221,8 +224,8 @@ main:
 				BRA +
 		
 			...DisplaySecondQuantityAsFirstFill
-				LDA !Freeram_SecondQuantity
-				STA !Scratchram_GraphicalBar_FillByteTbl
+				LDA !Freeram_SecondQuantity				;\Swapped if SecondQuantity < FirstQuantity (such as HP recovered)
+				STA !Scratchram_GraphicalBar_FillByteTbl		;/
 		
 		+
 	endif
@@ -278,7 +281,7 @@ main:
 			else
 				LDA !Freeram_SecondQuantity
 				CMP !Freeram_FirstQuantity
-				BCC ...DisplayFirstQuantityAsSecondFill			;>When the bar increases (results SecondFill < FirstFill), SecondFill is the FirstQuantity (ex. Current HP after recovery)
+				BCC ...DisplayFirstQuantityAsSecondFill			;>When the bar increases (results SecondFill < FirstFill), SecondFill is the FirstQuantity (such as HP recovery)
 				
 				...DisplaySecondQuantityAsSecondFill			;>When the bar decreases (results SecondFill > FirstFill), SecondFill is the SecondQuantity (ex. The HP amount before the damage)
 					LDA !Freeram_SecondQuantity				;\Amount of fill for second fill
@@ -286,7 +289,7 @@ main:
 					BRA +
 				
 				...DisplayFirstQuantityAsSecondFill
-					LDA !Freeram_FirstQuantity				;\Amount of fill for second fill
+					LDA !Freeram_FirstQuantity				;\Amounts being swapped, if SecondQuantity < FirstQuantity
 					STA !Scratchram_GraphicalBar_FillByteTbl		;/
 					+
 			endif

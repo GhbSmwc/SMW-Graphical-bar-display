@@ -52,6 +52,7 @@ named <span class="NoLineBreak"><kbd>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</kb
 		<li><a href="#CalculateGraphicalBarPercentage" id="CalculateGraphicalBarPercentage_Back"><kbd>CalculateGraphicalBarPercentage</kbd></a></li>
 		<li><a href="#DrawGraphicalBar" id="DrawGraphicalBar_Back"><kbd>DrawGraphicalBar</kbd></a></li>
 		<li><a href="#DrawGraphicalBarSubtractionLoopEdition" id="DrawGraphicalBarSubtractionLoopEdition_Back"><kbd>DrawGraphicalBarSubtractionLoopEdition</kbd></a></li>
+		<li><a href="#TOCRoundAwayFromComplete" id="TOCRoundAwayFromComplete_Back"><kbd>Round away from empty/full/both</kbd></a></li>
 	</ul>
 	<li><a href="#GraphicalBarConvertToTile" id="GraphicalBarConvertToTileBack"><kbd>GraphicalBarConvertToTile.asm</kbd></a></li>
 	<ul>
@@ -692,9 +693,19 @@ or higher and 0 otherwise (<kbd>RemainingFill = <abbr title="Picks what number i
 </li>
 
 
-<li><kbd>RoundAwayEmpty</kbd>, <kbd>RoundAwayFull</kbd>, and <kbd>RoundAwayEmptyFull</kbd>: After getting the Y register value from <kbd>CalculateGraphicalBarPercentage</kbd>, this increments or
+<li><a href="#TOCRoundAwayFromComplete_Back" id="TOCRoundAwayFromComplete">^</a><kbd>RoundAwayEmpty</kbd>, <kbd>RoundAwayFull</kbd>, and <kbd>RoundAwayEmptyFull</kbd>: After getting the Y register value from <kbd>CalculateGraphicalBarPercentage</kbd>, this increments or
 decrements the fill amount <kbd>$00-$01</kbd> by 1 so it will display 1 and/or <kbd>MaxFill-1</kbd> instead of showing 0 and/or <kbd>MaxFill</kbd> when the value is rounded towards them. The names
-of the routine should be obvious (e.g. <kbd>RoundAwayEmpty</kbd> means round away from empty).</li><br>
+of the routine should be obvious (e.g. <kbd>RoundAwayEmpty</kbd> means round away from empty). See explanation <a href="readme_files/RoundAwayFromComplete.html">here</a>.</li><br>
+<table>
+<tr><th>Input</th><th>Number of bytes</th><th>Description</th></tr>
+<tr><td>Y register</td><td align="center" valign="center">1 (not stored)</td><td>Rounding modes, as explained when using <kbd>CalculateGraphicalBarPercentage</kbd>.</td></tr>
+</table><br><br>
+
+<table>
+<tr><th>Output</th><th>Number of bytes</th><th>Description</th></tr>
+<tr><td><kbd>$00</kbd> to <kbd>$01</kbd></td><td align="center" valign="center">2</td><td>Rounded percentage value.</td></tr>
+</table><br><br>
+
 </ul>
 </ul>
 <li><span id="ConvertFillToTile"><a href="#GraphicalBarConvertToTileBack" id="GraphicalBarConvertToTile">^</a>Inside <kbd>GraphicalBarConvertToTile.asm</kbd></span></li>
