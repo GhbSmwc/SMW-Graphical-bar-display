@@ -1,6 +1,7 @@
 ;This is similar to [Level_DoubleBar.asm] but SecondFill (!Freeram_SecondQuantity) is stored as a percentage than as
 ;a secondary quantity. Meaning it holds the number of units in the bar (or pixels) filled. This is useful if you
-;wanted the second fill to follow first fill at a constant rate regardless of maximum amount.
+;wanted the second fill to follow first fill at a constant rate regardless of maximum amount, but SecondFill
+;will also display as if FirstFill changes should the maximum changes.
 
 ;While having !DoubleBar_DisplayIncrease set to 1, If you look at the codes at [...HandleSwappableFills], it has
 ;only one check of which of the two FillPercentages is greater and duplicate code to write to $00 before writing to

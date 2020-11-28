@@ -56,10 +56,17 @@
 ;
 ; -BOTH !Freeram_FirstQuantity and !Freeram_SecondQuantity are quantities, unlike
 ;  Level_DoubleBar2.asm, which that have !Freeram_SecondQuantity acting as a percentage.
-;  Unsuitable should the absolute difference of FirstQuantity and SecondQuantity be a very
-;  large number, results in the SecondFill taking forever (a lot of frames of
-;  incrementing/decrementing) to finally equals to FirstQuantity.
-
+;
+; --The benefit of this ASM file is that it avoids misleading displays when Max is changed
+;   (the fill look like it increased when max decreases, and the fill look like it decreases
+;   when max increases), causing SecondFill to treat as if Quantity has been changed. Both
+;   fills are “scaled” when Max changes.
+; --However, the problem is that this will result an inconsistent rate of SecondFill
+;   incrementing/decrementing towards FirstFill. Unless you code it so that it increase/
+;   decrease at a faster rate if the difference between FirstQuantity and SecondQuantity
+;   is a very large number, SecondFill will persist a very long time slowly INC/DEC towards
+;   FirstFill.
+;
 incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
