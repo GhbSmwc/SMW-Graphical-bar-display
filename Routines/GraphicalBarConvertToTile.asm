@@ -468,8 +468,9 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 ; -$01 Needed to convert the middle tiles
 ; -$02 Needed to avoid checking a tile that is after the last tile.
 ;
-;Note: There isn't a double bar seperate graphics for this one
+;Note: There isn't a double bar separate graphics for this one
 ;because IT TAKES A HUGE AMOUNT OF SPACE on the graphics.
+;Use a rapid-flicker or don't use double-bar at all.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;This is for level:
 		GraphicalBar_LeftEnd8x8sFillEdgeCross:
@@ -756,7 +757,10 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 				RTL
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;Count tiles. Stupid that you cannot call a separate subroutine
-	;file from a subroutine file.
+	;file from a subroutine file. This is used by other subroutines
+	;to compute the left side of the bar position so that the right
+	;side is at a fixed position.
+	;
 	;Input:
 	;-!Scratchram_GraphicalBar_LeftEndPiece,
 	; !Scratchram_GraphicalBar_MiddlePiece,

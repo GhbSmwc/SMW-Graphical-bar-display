@@ -642,8 +642,8 @@ DrawGraphicalBar:
 ; (2) Index for tale array increases, and repeat back to step (1)
 ;
 ;^Essentially, you are transferring a given amount and “distributing” a given value
-; to each consecutive byte in the table. This is divison in the form of repeated
-; subtraction.
+; to each consecutive byte in the table. This is division in the form of repeated
+; subtraction. Much lighter than the other version, and is a standalone subroutine.
 ;
 ;Input:
 ; -$00 to $01: The amount of fill for the WHOLE bar.

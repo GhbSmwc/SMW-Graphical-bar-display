@@ -1,5 +1,8 @@
 ;This contains misc routines that least likely going to be used
 ;in most cases.
+;Routines list:
+;-MapRangeToStartAt0
+;-InvertQuantity
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;SA-1 handling
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -96,7 +99,7 @@ MapRangeToStartAt0:
 ;(100 - 12 = 88). If quantity is exceeding the maximum amount prior to
 ;this (Max - QuantityGreaterThanMax = negative), will output 0.
 ;
-;Note: Best use this subroutine to handle the literal quantity amount,
+;Note: Best use this subroutine to handle the literal quantity amounts,
 ;not the fill/percentage amount after using
 ;CalculateGraphicalBarPercentage, to avoid potential accumulating
 ;rounding errors cause by converting into fill amounts.
