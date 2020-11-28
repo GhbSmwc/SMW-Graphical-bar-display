@@ -626,6 +626,24 @@ DrawGraphicalBar:
 ;
 ;Same as the other version, however does not use multiplication and division
 ;routines. In fact, this alone does not use any other subroutines AT ALL.
+;It works by:
+;
+;(1) Taking the given/remaining fill amount, compares or subtracts by the
+;    maximum amount given for each byte in table: [RemainingFill - Maximum = Difference]
+;(1.1) If “Difference” becomes negative (RemainingFill < Maximum) “RemainingFill”
+;      (prior this subtraction into the negative) is copied and stored into
+;      the byte in the table array and then “RemainingFill” is set to 0.
+;      In simple terms, use all the rest if remaining fill is small.
+;(1.2) If zero or positive number occurs (RemainingFill >= Maximum),
+;      a byte in the table array is set to “Maximum”, “RemainingFill” is set to
+;      “Difference” (as in, RemainingFill := RemainingFill - Maximum).
+;      In simple terms, remaining amount deducted to “completely fill” a byte
+;      in table array.
+; (2) Index for tale array increases, and repeat back to step (1)
+;
+;^Essentially, you are transferring a given amount and “distributing” a given value
+; to each consecutive byte in the table. This is divison in the form of repeated
+; subtraction.
 ;
 ;Input:
 ; -$00 to $01: The amount of fill for the WHOLE bar.
@@ -657,9 +675,9 @@ DrawGraphicalBarSubtractionLoopEdition:
 		SBC !Scratchram_GraphicalBar_LeftEndPiece       ;|
 		LDA $01                                         ;|
 		SBC #$00                                        ;/
-		BCC ..NotFull                                   ;>If Fillamount < MaxAmount, use all remaining $00.
+		BCC ..NotFull                                   ;>If Fillamount < MaxAmount, use all remaining fill amount of $00.
 		
-		..Full
+		..Full ;>Otherwise set the byte to max, and deduct the remaining fill amount by maximum.
 			LDA !Scratchram_GraphicalBar_LeftEndPiece       ;\Full left end.
 			STA !Scratchram_GraphicalBar_FillByteTbl        ;/
 			LDA $00                                         ;\Fill amount deducted.
@@ -694,9 +712,9 @@ DrawGraphicalBarSubtractionLoopEdition:
 			SBC !Scratchram_GraphicalBar_MiddlePiece        ;|
 			LDA $01                                         ;|
 			SBC #$00                                        ;/
-			BCC ..NotFull                                   ;>If Fillamount < MaxAmount, use all remaining $00.
+			BCC ..NotFull                                   ;>If Fillamount < MaxAmount, use all remaining fill amount of $00.
 		
-		..Full
+		..Full ;>Otherwise set the byte to max, and deduct the remaining fill amount by maximum.
 			LDA !Scratchram_GraphicalBar_MiddlePiece        ;\Full middle tile.
 			STA !Scratchram_GraphicalBar_FillByteTbl,x      ;/
 			LDA $00                                         ;\Fill amount deducted.
@@ -727,9 +745,9 @@ DrawGraphicalBarSubtractionLoopEdition:
 		SBC !Scratchram_GraphicalBar_RightEndPiece      ;|
 		LDA $01                                         ;|
 		SBC #$00                                        ;/
-		BCC ..NotFull                                   ;>If Fillamount < MaxAmount, use all remaining $00.
+		BCC ..NotFull                                   ;>If Fillamount < MaxAmount, use all remaining fill amount of $00.
 		
-		..Full
+		..Full ;>Otherwise set the byte to max, and deduct the remaining fill amount by maximum.
 			LDA !Scratchram_GraphicalBar_RightEndPiece      ;\Full right end.
 			STA !Scratchram_GraphicalBar_FillByteTbl,x      ;/
 			LDA $00                                         ;\Fill amount deducted.
