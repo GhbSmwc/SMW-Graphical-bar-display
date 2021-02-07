@@ -32,7 +32,8 @@ Don't forget to insert the graphics accordingly, and to edit the table in <kbd>C
 <p>I've provide tables in the exgraphics subfolders (the HTML files) so you don't have to manually enter the tile number for each fill amount.</p>
 
 <p>All of these uses the same subroutine (but different tile numbers and the number of values in the table) using <kbd>ConvertBarFillAmountToTilesEdgeOverMultipleTiles</kbd> (instead of using <kbd>ConvertBarFillAmountToTiles</kbd>). The way this
-works is by taking the fill amount of the current tile byte processed, add by the amount of the <abbr title="Fill_byte_table_index_you_are_on + 1">next</abbr> tile byte (if that given tile byte is the last tile, then don't add by anything), and then the total is now what tile index to use for that given tile byte:
+works is by taking the fill amount of the current tile byte processed, add by the amount of the <abbr title="Fill_byte_table_index_you_are_on + 1">next</abbr> tile byte (if the current tile byte is the last tile, then don't add by anything), and
+then the total is now what tile index to use for that given tile byte:
 <table>
 <tr><th>Fill byte table (relative address/example)</th><th>Tile byte type</th><th>Fill amount</th><th>Fill amount maximum</th><th>Index to use</th></tr>
 <tr><td>+0/<kbd>$7F844A</kbd></td><td><font color="cyan">Left end</font></td><td bgcolor="orange"><kbd>$03</kbd></td><td><kbd>$03</kbd></td><td><kbd>$04</kbd> (This fill amount, plus 1 from next tile amount)</td></tr>
@@ -55,7 +56,8 @@ If you happen to have fewer number of values in the table than needed, garbage t
 	<li><a href="#OutlineEdge" id="TOC_OutlineEdge">Outlined edge</a></li>
 	<li><a href="#RoundedEdge" id="TOC_RoundedEdge">RoundedEdge</a></li>
 </ul><br>
-The following images below illustrates how they work. The numbers next to the leftmost margin is the index, ranging <kbd>$00</kbd> to <kbd>NumberOfPiecesOfGivenTile + HighestNumberOFPiecesOfNextTile</kbd> and the numbers to the right of each tile is the fill amount.
+The following images below illustrates how they work. The numbers on the leftmost margin is the index, ranging <kbd>$00</kbd> to <kbd>NumberOfPiecesOfGivenTile + HighestNumberOFPiecesOfNextTile</kbd> and the numbers to the right of each tile is the fill amount. Whenever the next tile byte starts filling, the current tile
+before it is always treated full (despite both current and next are graphically displaying partially filled), unless the current tile is the last tile, in which may have a higher maximum to graphically make it look full (example is for Diagonal edge, if the maximum is 3 and the graphics for the outline wasn't edited, it would use index 3, which ends up looking like the last tile is halfway full).
 <hr>
 <h1><a href="#TOC_DiagonalEdge" id="DiagonalEdge">^</a>Diagonal edge</h1>
 <img src="DiagonalFillEdge.png"><br>
