@@ -16,7 +16,7 @@
 ;Addition and subtraction of the quantity can carry over to the next range instead of
 ;stopping at the end of each ranges, for example:
 ;
-;The boss have 200 HP:
+;The boss have 200 HP at the start:
 ;-Phase 1: 101 to 200 HP
 ;-Phase 2: 1 to 100 HP
 ;When the boss have 105 HP and takes 10 damage, HP will now be 95 HP instead of 100,

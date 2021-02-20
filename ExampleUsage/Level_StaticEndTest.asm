@@ -3,9 +3,6 @@
 ;JSLs not to call a routine that doesn't have a destination label here).
 
 ;This code tests the static end tile that moves based on the length of the bar.
-;TODO
-;-Write blank tiles prior this routine so if the bar extends and contract, don't leave behind duplicate tiles.
-;-Write a static end tile on the side of the bar that doesn't move
 
 ;0 to not write static end tiles, otherwise set to 1 (don't set to any other number.).
  !GraphicalBarExampleTest_StaticLeft = 1
@@ -184,4 +181,4 @@ main:
 		endif
 	endif
 	.Done
-	RTL
+		RTL

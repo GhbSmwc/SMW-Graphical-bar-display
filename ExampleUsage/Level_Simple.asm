@@ -15,8 +15,9 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
 !PaletteChanging = 1
  ;^0 = stays the same palette regardless the amount of fill in bar
- ; 1 = change color based on how much fill. See code below marked
- ; [PaletteChangingCode].
+ ; 1 = change color based on how much fill. See code below with the label
+ ; [PaletteThresholds] and the table [PaletteTable]. This is if you wanted
+ ; a pokemon-styled HP bar that changes colors based on the fill amount.
 
 main:
 ;Get x position percentage in horizontal level.
@@ -73,9 +74,9 @@ main:
 			endif
 		else
 			.PaletteThresholds
-				LDX #$00
+				LDX #$00		;>Default the index to 0
 				REP #$20
-				PLA
+				PLA			;>Pull out fill amount
 				CMP.w #19		;>Threshold 1
 				BCC ..GetValueFromTable
 				INX
