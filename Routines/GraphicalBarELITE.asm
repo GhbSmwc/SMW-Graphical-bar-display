@@ -57,23 +57,27 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ; ---------------------------  = FilledPieces
 ;        MaxQuantity
 ;
-; You may be wondering, why multiply first, and then divide, like most modern
+; You may be wondering, why multiply first, and then divide, unlike most modern
 ; programmers to calculate a percentage? Well, it is because we are dealing
-; with integers and division. After division is performed, the number is
-; rounded (division routine alone rounds downwards, but this one rounds half-up).
-; Performing any rounding before the last step tends to increase the error
-; (how far off from the exact value). Even with floating points, division first
-; before multiply, will have a larger error than multiply-first, especially if it
-; results in a fraction, that when reduced with the denominator is not a power of 2
-; (results in repeating binary digits after the radix point).
-; Example: 100 out of 300 HP should mean the bar should be 18.[6] (bracketed means repeating digits) pieces filled.
+; with integers and division (not floating points). After division is performed,
+; the quotient is rounded (division routine alone rounds downwards, but this one
+; here rounds half-up). Performing any rounding before the last step tends to
+; increase (accumulate) the error (how far off from the exact value). It is
+; better to perform rounding ONLY on the final result than anytime before the
+; last operation.
+;
+; Example: 1 out of 3 HP on a 62-pieced bar results 20.[6] pieces filled
+; (bracketed digits means repeating digits).
 ;  Division rounding first:
-;   (100 HP / 300 Max HP) * 56 = 0 filled out of 56 pieces in bar. It is off by a huge 16.[6] units.
+;   (1 HP / 3 Max HP) * 62 = 0 filled out of 62 pieces in bar. It is off by a huge 20.[6] units.
 ;   This is going to result the bar only displaying full or empty, if quantity is less than 50%, will show 0%, otherwise
 ;   it will show 100%.
 ;  Division rounding last:
-;   (100 HP * 56 pieces) / 300 HP = 19 filled out of 56 pieces in bar. It is off by a small 0.[3] units.
-;Where:
+;   (1 HP * 62 pieces) / 3 HP = 21 filled out of 62 pieces in bar. It is off by a tiny 0.[3] units.
+;   Multiplying with 2 integers always results the correct value, unless an overflow occurs, but this
+;   subroutine utilizes "16bit*16bit = 32bit" and "32bit/16bit = R:16bit Q:16bit" subroutines, so 16-bit
+;   overflows during multiplication is impossible.
+;The variables are:
 ;*Quantity = the amount of something, say current HP.
 ;*MaxQuantity = the maximum amount of something, say max HP.
 ;*FilledPieces = the number of pieces filled in the whole bar (rounded 1/2 up).
@@ -83,18 +87,6 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;  use (such as filling 2 separate bars, filling up the 2nd one after the 1st
 ;  is full).
 ;*TotalMaxPieces = the number of pieces of the whole bar when full.
-;
-;The SNES does not support floating point numbers in any way, thus
-;handling them as integer fractions by multiplying first before dividing
-;is the only way to compute correctly. Dividing first before multiplying
-;(Quantity / MaxQuantity * TotalMaxPieces) results only displaying 0%
-;(if less than 100%) or 100% (if 100%) due to rounding from the division
-;operation before multiplied (bad idea to round numbers on any operations
-;BEFORE the last operation because errors accumulate).
-;
-;Note that during a division, it checks if the remainder is greater than
-;or equal to half of MaxQuantity (rounded 1/2 up) to check should it would
-;round up or not (also rounds 1/2 up).
 ;
 ;Input:
 ; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+1:
@@ -107,7 +99,9 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ; -!Scratchram_GraphicalBar_TempLength: number of middle bytes excluding both ends.
 ;
 ;Output:
-; -$00 to $01: the "percentage" amount of fill in the bar (rounded 1/2 up).
+; -$00 to $01: the "percentage" amount of fill in the bar (rounded 1/2 up, done by
+;  checking if the remainder after division, is being >= half of the divisor
+;  (MaxQuantity)).
 ; -Y register: if rounded towards empty (fill amount = 0) or full:
 ; --Y = #$00 if:
 ; ---Exactly full (or more, so it treats as if the bar is full if more than enough)
@@ -659,7 +653,7 @@ DrawGraphicalBar:
 ;
 ;^Essentially, you are transferring a given amount and “distributing” a given value
 ; to each consecutive byte in the table. This is division in the form of repeated
-; subtraction. Much lighter than the other version, and is a standalone subroutine.
+; subtraction. Much lighter than the other version.
 ;
 ;Input:
 ; -$00 to $01: The amount of fill for the WHOLE bar.
