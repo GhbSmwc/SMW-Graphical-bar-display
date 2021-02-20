@@ -57,6 +57,22 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ; ---------------------------  = FilledPieces
 ;        MaxQuantity
 ;
+; You may be wondering, why multiply first, and then divide, like most modern
+; programmers to calculate a percentage? Well, it is because we are dealing
+; with integers and division. After division is performed, the number is
+; rounded (division routine alone rounds downwards, but this one rounds half-up).
+; Performing any rounding before the last step tends to increase the error
+; (how far off from the exact value). Even with floating points, division first
+; before multiply, will have a larger error than multiply-first, especially if it
+; results in a fraction, that when reduced with the denominator is not a power of 2
+; (results in repeating binary digits after the radix point).
+; Example: 100 out of 300 HP should mean the bar should be 18.[6] (bracketed means repeating digits) pieces filled.
+;  Division rounding first:
+;   (100 HP / 300 Max HP) * 56 = 0 filled out of 56 pieces in bar. It is off by a huge 16.[6] units.
+;   This is going to result the bar only displaying full or empty, if quantity is less than 50%, will show 0%, otherwise
+;   it will show 100%.
+;  Division rounding last:
+;   (100 HP * 56 pieces) / 300 HP = 19 filled out of 56 pieces in bar. It is off by a small 0.[3] units.
 ;Where:
 ;*Quantity = the amount of something, say current HP.
 ;*MaxQuantity = the maximum amount of something, say max HP.
