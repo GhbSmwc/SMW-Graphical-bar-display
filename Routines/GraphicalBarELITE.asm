@@ -673,7 +673,7 @@ DrawGraphicalBar:
 ;  -MLength is how many middle tiles.
 ;
 ; -$00 to $01: The leftover fill amount. If bar isn't full, it will be #$0000, otherwise its
-;  [RemainingFill = OriginalFill - EntireBarCapicity]. (calculated via RemainingFill = max((InputFillAmount - BarMaximumFull), 0))
+;  [RemainingFill = OriginalFill - EntireBarCapicity]. (overall calculation: RemainingFill = max((InputFillAmount - BarMaximumFull), 0))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 DrawGraphicalBarSubtractionLoopEdition:
 		LDX #$00
@@ -722,30 +722,30 @@ DrawGraphicalBarSubtractionLoopEdition:
 			SBC !Scratchram_GraphicalBar_MiddlePiece        ;|
 			LDA $01                                         ;|
 			SBC #$00                                        ;/
-			BCC ..NotFull                                   ;>If Fillamount < MaxAmount, use all remaining fill amount of $00.
+			BCC ...NotFull                                   ;>If Fillamount < MaxAmount, use all remaining fill amount of $00.
 		
-		..Full ;>Otherwise set the byte to max, and deduct the remaining fill amount by maximum.
-			LDA !Scratchram_GraphicalBar_MiddlePiece        ;\Full middle tile.
-			STA !Scratchram_GraphicalBar_FillByteTbl,x      ;/
-			LDA $00                                         ;\Fill amount deducted.
-			SEC                                             ;|
-			SBC !Scratchram_GraphicalBar_MiddlePiece        ;|
-			STA $00                                         ;|
-			LDA $01                                         ;|
-			SBC #$00                                        ;|
-			STA $01                                         ;/
-			BRA ..NextByte
-		
-		..NotFull
-			LDA $00                                         ;\Take all the rest of $00.
-			STA !Scratchram_GraphicalBar_FillByteTbl,x      ;|
-			STZ $00                                         ;|
-			STZ $01                                         ;/
-		
-		..NextByte
-			INX                                             ;>Next middle tile or to the right end.
-			DEY                                             ;\Loop till all middle tiles done.
-			BNE ..LoopMiddleTiles                           ;/
+			...Full ;>Otherwise set the byte to max, and deduct the remaining fill amount by maximum.
+				LDA !Scratchram_GraphicalBar_MiddlePiece        ;\Full middle tile.
+				STA !Scratchram_GraphicalBar_FillByteTbl,x      ;/
+				LDA $00                                         ;\Fill amount deducted.
+				SEC                                             ;|
+				SBC !Scratchram_GraphicalBar_MiddlePiece        ;|
+				STA $00                                         ;|
+				LDA $01                                         ;|
+				SBC #$00                                        ;|
+				STA $01                                         ;/
+				BRA ...NextByte
+			
+			...NotFull
+				LDA $00                                         ;\Take all the rest of $00.
+				STA !Scratchram_GraphicalBar_FillByteTbl,x      ;|
+				STZ $00                                         ;|
+				STZ $01                                         ;/
+			
+			...NextByte
+				INX                                             ;>Next middle tile or to the right end.
+				DEY                                             ;\Loop till all middle tiles done.
+				BNE ..LoopMiddleTiles                           ;/
 	.RightEnd
 		LDA !Scratchram_GraphicalBar_RightEndPiece      ;\If right end does not exist, skip
 		BEQ .Done                                       ;/
