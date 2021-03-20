@@ -262,17 +262,21 @@ You can set <nobr><kbd>!Setting_GraphicalBar_SecondFillByteTableOffset</kbd></no
 (so if you have a bar that can go higher than 9 tile bytes long, and you set <nobr><kbd>!Setting_GraphicalBar_SecondFillByteTableOffset</kbd></nobr> to 9 or lower), else SecondFill will overwrite FirstFill
 and end up with glitched tiles. The <a href="JS_GraphicalBarCalculator2.html" id="DoubleBarSG">JavaScript calculator</a> also have a detection feature to alert you when you have such settings.<br><br>
 
-The table for the tiles to write to the status bar are formated <a href="DoubleBarFills.png"  target="_blank">like this</a> (this is a two-dimensional array). The two fill amounts are interpreted as if
-FirstFill is overlapping SecondFill, meaning both fill amounts are measured as &ldquo;lengths&rdquo; <b>from the <abbr title="left side of the bar, unless you use a &ldquo;leftwards&rdquo; bar, then it is the right side.">starting side<abbr> of the bar</b>
-rather than SecondFill measured starting from where FirstFill's edge is at. Here is an example:<br>
-<img src="SecondFillTreatedAsOverlap.png"><br><br>
+The table for the tiles to write to the status bar are formated <a href="DoubleBarFills.png" target="_blank">like this</a> (this is a two-dimensional array).</li></ul><br>
 
+Now note: in both cases, the two fill amounts are interpreted as if FirstFill is overlapping SecondFill, meaning both fill amounts are measured as &ldquo;lengths&rdquo; <b>from the
+<abbr title="left side of the bar, unless you use a &ldquo;leftwards&rdquo; bar, then it is the right side.">starting side<abbr> of the bar</b> rather than SecondFill measured starting
+from where FirstFill's edge is at. Here is an example:<br>
+<img src="SecondFillTreatedAsOverlap.png"><br><br>
+The perceived SecondFill would be: <kbd>SecondFill_Shown = max(SecondFill - FirstFill, 0)</kbd><br><br>
+If you want SecondFill to be mapped from where FirstFill is at, take pre-calculated SecondFill and add by FirstFill (both before calling DrawGraphicalBar), this result (written as the new SecondFill)
+will offset the fill to start at where
+FirstFill value is at:
+<img src="SecondFillStartatFirstFill.png"><br><br>
 
 If you want to display an increase (such as healing), you must swap the values so that SecondFill represents the current amount and FirstFill showing the previous amount, since the
 doublebar routine when using separate graphics have FirstFill overpowers SecondFill:<br>
 <img src="FirstFillSecondFill.png"><br>
 FirstFill is current HP and SecondFill represent previous HP.
-</li>
-</ul><br>
 
 And thats it, be very careful as the quantity inputs data are loss when calling <kbd>GraphicalBarELITE_DrawGraphicalBar</kbd> due to the reused scratch RAM to save memory.
