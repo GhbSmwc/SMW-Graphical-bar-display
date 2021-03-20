@@ -5,6 +5,12 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;-ConvertBarFillAmountToTiles
 ;-ConvertBarFillAmountToTilesDoubleBar
 ;-ConvertBarFillAmountToTilesEdgeOverMultipleTiles
+;
+;
+;Note: Tile tables here are generally ordered from empty (0) to full (max).
+;And these routines only support the TTTTTTTT byte of the tile data, therefore
+;make sure your bar tiles are all on the same graphic page (the TT in YXPCCCTT
+;must be the same).
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Convert fill amount in bar to tile numbers. NOTE: does not work with double-bar.
@@ -514,44 +520,44 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 		db $5D		;>Index: $06 (Filled amount: $06 out of $06)
 	;These here are the same as above but intended for overworld border.
 		GraphicalBar_LeftEnd8x8sFillEdgeCross_Ow:
-		db $36		;>Index: $00 (Filled amount: $00 out of $03)
-		db $37		;>Index: $01 (Filled amount: $01 out of $03)
-		db $38		;>Index: $02 (Filled amount: $02 out of $03)
-		db $39		;>Index: $03 (Filled amount: $03 out of $03)
-		db $45		;>Index: $04 ($03 + $01 = Index: $04)
-		db $46		;>Index: $05 ($03 + $02 = Index: $05)
-		db $47		;>Index: $06 ($03 + $03 = Index: $06)
-		db $47		;>Index: $07 ($03 + $04 = Index: $07)
-		db $47		;>Index: $08 ($03 + $05 = Index: $08)
-		db $47		;>Index: $09 ($03 + $06 = Index: $09)
-		db $47		;>Index: $0A ($03 + $07 = Index: $0A)
-		db $47		;>Index: $0B ($03 + $08 = Index: $0B)
+		db $80		;>Index: $00 (Filled amount: $00 out of $03)
+		db $81		;>Index: $01 (Filled amount: $01 out of $03)
+		db $82		;>Index: $02 (Filled amount: $02 out of $03)
+		db $83		;>Index: $03 (Filled amount: $03 out of $03)
+		db $84		;>Index: $04 ($03 + $01 = Index: $04)
+		db $85		;>Index: $05 ($03 + $02 = Index: $05)
+		db $86		;>Index: $06 ($03 + $03 = Index: $06)
+		db $86		;>Index: $07 ($03 + $04 = Index: $07)
+		db $86		;>Index: $08 ($03 + $05 = Index: $08)
+		db $86		;>Index: $09 ($03 + $06 = Index: $09)
+		db $86		;>Index: $0A ($03 + $07 = Index: $0A)
+		db $86		;>Index: $0B ($03 + $08 = Index: $0B)
 		GraphicalBar_Middle8x8sFillEdgeCross_Ow:
-		db $4B		;>Index: $00 (Filled amount: $00 out of $08)
-		db $4C		;>Index: $01 (Filled amount: $01 out of $08)
-		db $4D		;>Index: $02 (Filled amount: $02 out of $08)
-		db $4E		;>Index: $03 (Filled amount: $03 out of $08)
-		db $4F		;>Index: $04 (Filled amount: $04 out of $08)
-		db $50		;>Index: $05 (Filled amount: $05 out of $08)
-		db $51		;>Index: $06 (Filled amount: $06 out of $08)
-		db $52		;>Index: $07 (Filled amount: $07 out of $08)
-		db $53		;>Index: $08 (Filled amount: $08 out of $08)
-		db $54		;>Index: $09 ($08 + $01 = Index: $09)
-		db $55		;>Index: $0A ($08 + $02 = Index: $0A)
-		db $56		;>Index: $0B ($08 + $03 = Index: $0B)
-		db $56		;>Index: $0C ($08 + $04 = Index: $0C)
-		db $56		;>Index: $0D ($08 + $05 = Index: $0D)
-		db $56		;>Index: $0E ($08 + $06 = Index: $0E)
-		db $56		;>Index: $0F ($08 + $07 = Index: $0F)
-		db $56		;>Index: $10 ($08 + $08 = Index: $10) Maximum value of next tile ($08 of next middle tile vs $03 of right end)
+		db $87		;>Index: $00 (Filled amount: $00 out of $08)
+		db $88		;>Index: $01 (Filled amount: $01 out of $08)
+		db $89		;>Index: $02 (Filled amount: $02 out of $08)
+		db $8A		;>Index: $03 (Filled amount: $03 out of $08)
+		db $8B		;>Index: $04 (Filled amount: $04 out of $08)
+		db $8C		;>Index: $05 (Filled amount: $05 out of $08)
+		db $8D		;>Index: $06 (Filled amount: $06 out of $08)
+		db $8E		;>Index: $07 (Filled amount: $07 out of $08)
+		db $8F		;>Index: $08 (Filled amount: $08 out of $08)
+		db $90		;>Index: $09 ($08 + $01 = Index: $09)
+		db $92		;>Index: $0A ($08 + $02 = Index: $0A)
+		db $93		;>Index: $0B ($08 + $03 = Index: $0B)
+		db $93		;>Index: $0C ($08 + $04 = Index: $0C)
+		db $93		;>Index: $0D ($08 + $05 = Index: $0D)
+		db $93		;>Index: $0E ($08 + $06 = Index: $0E)
+		db $93		;>Index: $0F ($08 + $07 = Index: $0F)
+		db $93		;>Index: $10 ($08 + $08 = Index: $10) Maximum value of next tile ($08 of next middle tile vs $03 of right end)
 		GraphicalBar_RightEnd8x8sFillEdgeCross_Ow:
-		db $57		;>Index: $00 (Filled amount: $00 out of $06)
-		db $58		;>Index: $01 (Filled amount: $01 out of $06)
-		db $59		;>Index: $02 (Filled amount: $02 out of $06)
-		db $5A		;>Index: $03 (Filled amount: $03 out of $06)
-		db $5B		;>Index: $04 (Filled amount: $04 out of $06)
-		db $5C		;>Index: $05 (Filled amount: $05 out of $06)
-		db $5D		;>Index: $06 (Filled amount: $06 out of $06)
+		db $94		;>Index: $00 (Filled amount: $00 out of $06)
+		db $95		;>Index: $01 (Filled amount: $01 out of $06)
+		db $96		;>Index: $02 (Filled amount: $02 out of $06)
+		db $97		;>Index: $03 (Filled amount: $03 out of $06)
+		db $98		;>Index: $04 (Filled amount: $04 out of $06)
+		db $99		;>Index: $05 (Filled amount: $05 out of $06)
+		db $9A		;>Index: $06 (Filled amount: $06 out of $06)
 	;Convert tile code following:
 		ConvertBarFillAmountToTilesEdgeOverMultipleTiles:
 			PHB						;>Preserve bank (so that table indexing work properly)

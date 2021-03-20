@@ -25,13 +25,11 @@ By <a href="https://www.smwcentral.net/?p=profile&id=18802">GreenHammerBro</a><b
 See <a href="https://github.com/GhbSmwc/SMW-Graphical-bar-display">github</a>.</center>
 
 <h2>Introduction</h2>
-This is a guide on how to setup a display of a value of something as a graphical bar that you see in many games. Unlike some hacks like SMWCP2 and
-brutal Mario (both as health bars), which are 1-unit (or piece) per tile being displayed, this package contains code to display multiple units per tile
-(8 units normally), as well as representing a ratio of something with any number (1-65535) as the max. This means that this can have more accurate
-representation of a value (say it approximate to the nearest pixel instead of 8x8 tile) as a percentage.<br><br>
-
-The purpose of the code contained here is to represent something as a graphical bar to be used on various things like health, progress, percentage of
-something, etc. as opposed to merely displaying digits.<br><br>
+This is a guide on how to setup a display of a value of something as a graphical bar (or progress bar) that you see in many games. Unlike some hacks like
+SMWCP2 and brutal Mario (both as health bars), which are 1-unit (or piece) per tile being displayed, this package contains code to display multiple units
+per tile (8 units normally), as well as representing a ratio of something with any number (1-65535) as the max. This means that this can have more accurate
+representation of a value (say it approximate to the nearest pixel instead of 8x8 tile) as a percentage and have any maximum amount without affecting the
+length of the bar.<br><br>
 <h2>Notes</h2>
 <ul>
 <li>This HTML uses <a href="https://en.wikipedia.org/wiki/ASCII_art">ASCII art</a> to represent something, so make sure you have your browser setting for <a href="https://en.wikipedia.org/wiki/Monospaced_font">fixed-width font</a> such as
@@ -640,7 +638,7 @@ relative address (index):</td>
 </tr>
 </table><br>
 
-Because of this, it also means that the <a href="#ConvertFillToTile"><kbd>FillAmount &rightarrow; TileNumber</kbd></a> and <a href="#StatusBarWrite"><kbd>tile write</kbd></a> routine themselves <b>will not write static
+<span id="StaticEndTiles"></span>Because of this, it also means that the <a href="#ConvertFillToTile"><kbd>FillAmount &rightarrow; TileNumber</kbd></a> and <a href="#StatusBarWrite"><kbd>tile write</kbd></a> routine themselves <b>will not write static
 tiles as end tiles</b> (&ldquo;static end tiles&rdquo; are end tiles that don't change regardless of the fill amount; not part of the fill, only just to serve to avoid bar cutoff resembling <i>Cave Story</i>'s health bar),
 only the changeable tiles, here is what I mean as an example:<br>
 <img src="readme_files/StaticEndTiles.png"><br>
@@ -712,7 +710,7 @@ of the routine should be obvious (e.g. <kbd>RoundAwayEmpty</kbd> means round awa
 <li><span id="ConvertFillToTile"><a href="#GraphicalBarConvertToTileBack" id="GraphicalBarConvertToTile">^</a>Inside <kbd>GraphicalBarConvertToTile.asm</kbd></span></li>
 <ul>
 <li><a href="#ConvertBarFillAmountToTiles_Back" id="ConvertBarFillAmountToTiles">^</a><kbd>ConvertBarFillAmountToTiles</kbd>: converts the bar fill table into tile numbers via indexing (inputs the same as above and don't
-need to be rewritten). Note that this DOES modifies the values in <kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd>:
+need to be rewritten). Note that this DOES modifies the values in <kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> (replacing them with tile numbers):
 <table>
 <tr>
 <th>Input</th>
@@ -997,7 +995,8 @@ Example when using the super status bar patch:<br>
 Be careful with bank borders crossing (don't have status bar tile tables that goes from <kbd>$7EFFFF</kbd> to <kbd>$7F0000</kbd>, for a made-up example), as I discovered that
 Akaginite's <kbd>16Bit - 8Bit</kbd> (done by <kbd>((-8Bit) + 16Bit</kbd>)) does not work with bank borders if <kbd>8Bit</kbd> is <kbd>$00</kbd> because that causes the carry flag
 to be clear, unlike the normal SBC. However, this is very unlikely as no status bar tile tables would ever do that.</li><br>
-<li><a href="#WriteBarStaticTileToHUD_Back" id="WriteBarStaticTileToHUD">^</a><span id="StaticEndRoutine">Static end tiles handlers</span> (this calculates where to write the static end tiles based on the length of the bar and also writes to tile number and properties).
+<li><a href="#WriteBarStaticTileToHUD_Back" id="WriteBarStaticTileToHUD">^</a><span id="StaticEndRoutine">Static end tiles handlers</span> (this calculates where to write the static
+end tiles based on the length of the bar and also writes to tile number and properties, <a href="#StaticEndTiles">as mentioned earlier</a>).
 <ul>
 <li><kbd>WriteBarStaticTileToHUDLeftside</kbd>: Writes tile for the left side of the bar (a tile just before the bar's leftmost tile). Writes at <kbd>RAMAddressIn00 - TileFormat</kbd> for
 a bar that extend rightwards and <kbd>RAMAddressIn00 - (NumberOfTiles*!StatusBarFormat)</kbd> for leftwards.</li>
