@@ -22,6 +22,10 @@
 			input[type='text'] { font-family: monospace;}
 			input[type='number'] { font-family: monospace;}
 			
+			span.NoLineBreak {
+				white-space: nowrap;
+			}
+			
 			abbr{cursor: help;}
 		</style>
 	</head>
@@ -224,7 +228,7 @@
 				LeftTileExist = 1n
 			}
 			var RightTileExist = 0n
-			if (RightEndPiece > 0) {
+			if (RightEndPiece > 0n) {
 				RightTileExist = 1n
 			}
 			var NumberOfMiddleTiles = 0n
@@ -251,6 +255,8 @@
 			}
 		//Display output
 			if (BarOfZeroTiles == false) {
+				//Title
+					OutputString += "<h1>Memory layout and statistics</h1>"
 				//RAM summary
 					OutputString += "<table>"
 					OutputString += "<tr>"
@@ -293,7 +299,7 @@
 						OutputString += "</tr>"
 					}
 					OutputString += "</table><br>"
-				//Handle fill byte array
+				//Handle fill byte array (computes the fill byte table array)
 					var FillByteTableValues =  new Array(257).fill(0n) //Create an array filled with bigint of zeroes. With maximum number of tiles, only 257 items (index 0-256) needed (1 for left, + 255 for middle, + 1 for right = 257 tiles)
 					var RunningFillAmount = FillAmount
 					var MiddleTilesLeft = NumberOfMiddleTiles
@@ -341,7 +347,7 @@
 					OutputString += "<table>"
 					OutputString += "<tr><th><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> addresses</th><th><abbr title='When using &ldquo;seperate graphics&rdquo; of displaying 2 fills at the same time, where FirstFill will be stored in.'>Second table</abbr></th><th><abbr title='The values stored in $" + pad(FillByteTable.toString(16).toUpperCase(), 6) + " table.'>Fill amount</th><th>Max fill amount</th><th>Tile byte type</th><th>Tile address</th></tr>"
 					//LeftEnd
-						if (LeftTileExist != 0) {
+						if (LeftTileExist != 0n) {
 							OutputString += "<tr>"
 							OutputString += "<td>"
 							OutputString += "<kbd>$" + pad((FillByteTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + FillAmountIndex.toString(10) + "</kbd>)"
@@ -373,7 +379,7 @@
 							FillAmountIndex++
 						}
 					//Middle
-						while (MiddleTilesLeft != 0) {
+						while (MiddleTilesLeft != 0n) {
 							OutputString += "<tr>"
 							OutputString += "<td>"
 							OutputString += "<kbd>$" + pad((FillByteTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + FillAmountIndex.toString(10) + "</kbd>)"
@@ -412,7 +418,7 @@
 							FillAmountIndex++
 						}
 					//RightEnd
-						if (RightTileExist != 0) {
+						if (RightTileExist != 0n) {
 							OutputString += "<tr>"
 							OutputString += "<td>"
 							OutputString += "<kbd>$" + pad((FillByteTable + FillAmountIndex).toString(16).toUpperCase(), 6) + "</kbd> (<kbd>Address+" + FillAmountIndex.toString(10) + "</kbd>)"
@@ -447,7 +453,31 @@
 							OutputString += "</tr>"
 							FillAmountIndex++
 						}
-					OutputString += "</table>"
+					OutputString += "</table><br>"
+				//Preview (displays the graphical bar, only works if both ends are set to 3 or 0, and the middle pieces set to 8 or zero).
+					OutputString += "<h1>In-game preview</h1>"
+					OutputString += "Note: Only available using default number of pieces or zero for left end, middle, and right end.<br>"
+					if (((LeftEndPiece == 3n)||(LeftEndPiece == 0n))&&((MiddlePiece == 8n)||(MiddlePiece == 0n))&&((RightEndPiece == 3n)||(RightEndPiece == 0n))) {
+						OutputString += "<span class='NoLineBreak'>"
+						MiddleTilesLeft = NumberOfMiddleTiles
+						FillAmountIndex = 0n
+						if (LeftEndPiece == 3n) {
+							OutputString += "<img src='GraphicalBarFills/LeftEnd_" + FillByteTableValues[FillAmountIndex] + "_of_3.png'>"
+							FillAmountIndex++
+						}
+						if (NumberOfMiddleTiles != 0n) {
+							while (MiddleTilesLeft != 0n) {
+								OutputString += "<img src='GraphicalBarFills/Middle_" + FillByteTableValues[FillAmountIndex] + "_of_8.png'>"
+								FillAmountIndex++
+								MiddleTilesLeft--
+							}
+						}
+						if (RightEndPiece == 3n) {
+							OutputString += "<img src='GraphicalBarFills/RightEnd_" + FillByteTableValues[FillAmountIndex] + "_of_3.png'>"
+							FillAmountIndex++
+						}
+						OutputString += "</span>"
+					}
 			} else {
 				OutputString += "Error! A setting have resulted a total of 0 tiles!"
 			}
