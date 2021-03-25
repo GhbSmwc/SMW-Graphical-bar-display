@@ -27,6 +27,16 @@
 			}
 			
 			abbr{cursor: help;}
+			
+			
+			img.img-hor {
+				-moz-transform: scaleX(-1);
+				-o-transform: scaleX(-1);
+				-webkit-transform: scaleX(-1);
+				transform: scaleX(-1);
+				filter: FlipH;
+				-ms-filter: "FlipH";
+			}
 		</style>
 	</head>
 <body onload="Calculate()"></body>
@@ -460,21 +470,40 @@
 					if (((LeftEndPiece == 3n)||(LeftEndPiece == 0n))&&((MiddlePiece == 8n)||(MiddlePiece == 0n))&&((RightEndPiece == 3n)||(RightEndPiece == 0n))) {
 						OutputString += "<span class='NoLineBreak'>"
 						MiddleTilesLeft = NumberOfMiddleTiles
-						FillAmountIndex = 0n
-						if (LeftEndPiece == 3n) {
-							OutputString += "<img src='GraphicalBarFills/LeftEnd_" + FillByteTableValues[FillAmountIndex] + "_of_3.png'>"
-							FillAmountIndex++
-						}
-						if (NumberOfMiddleTiles != 0n) {
-							while (MiddleTilesLeft != 0n) {
-								OutputString += "<img src='GraphicalBarFills/Middle_" + FillByteTableValues[FillAmountIndex] + "_of_8.png'>"
+						if (document.getElementById("LeftwardsBar").checked == false) {
+							FillAmountIndex = 0n
+							if (LeftEndPiece == 3n) {
+								OutputString += "<img src='GraphicalBarFills/LeftEnd_" + FillByteTableValues[FillAmountIndex] + "_of_3.png'>"
 								FillAmountIndex++
-								MiddleTilesLeft--
 							}
-						}
-						if (RightEndPiece == 3n) {
-							OutputString += "<img src='GraphicalBarFills/RightEnd_" + FillByteTableValues[FillAmountIndex] + "_of_3.png'>"
-							FillAmountIndex++
+							if (NumberOfMiddleTiles != 0n) {
+								while (MiddleTilesLeft != 0n) {
+									OutputString += "<img src='GraphicalBarFills/Middle_" + FillByteTableValues[FillAmountIndex] + "_of_8.png'>"
+									FillAmountIndex++
+									MiddleTilesLeft--
+								}
+							}
+							if (RightEndPiece == 3n) {
+								OutputString += "<img src='GraphicalBarFills/RightEnd_" + FillByteTableValues[FillAmountIndex] + "_of_3.png'>"
+								FillAmountIndex++
+							}
+						} else {
+							FillAmountIndex = TotalNumberOfTileBytes - 1n
+							if (RightEndPiece == 3n) {
+								OutputString += "<img src='GraphicalBarFills/RightEnd_" + FillByteTableValues[FillAmountIndex] + "_of_3.png' class='img-hor'>"
+								FillAmountIndex--
+							}
+							if (NumberOfMiddleTiles != 0n) {
+								while (MiddleTilesLeft != 0n) {
+									OutputString += "<img src='GraphicalBarFills/Middle_" + FillByteTableValues[FillAmountIndex] + "_of_8.png' class='img-hor'>"
+									FillAmountIndex--
+									MiddleTilesLeft--
+								}
+							}
+							if (LeftEndPiece == 3n) {
+								OutputString += "<img src='GraphicalBarFills/LeftEnd_" + FillByteTableValues[FillAmountIndex] + "_of_3.png' class='img-hor'>"
+								FillAmountIndex--
+							}
 						}
 						OutputString += "</span>"
 					}
