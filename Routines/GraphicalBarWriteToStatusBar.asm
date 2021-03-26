@@ -80,6 +80,10 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 			RTL
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Same as above, but fills leftwards as opposed to rightwards.
+;
+;NOTE: does not reverse the order of data in
+;!Scratchram_GraphicalBar_FillByteTbl, it simply writes to the HUD
+;in reverse order.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	if !OWPlusAndSSBSameFormat == 0
 		WriteBarToHUDLeftwards:

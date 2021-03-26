@@ -955,6 +955,8 @@ the default graphic for the fill tiles are left-to-right. The tiles are arranged
 rightmost, and so on. If you didn't X-flip the tiles via editing the tile properties (YXPCCCTT), each tile will starts filling left-to-right starting at the rightmost tile going towards the left.
 In vanilla SMW, it is still possible to edit the tile properties (but cannot be changed in-game as the data is stored in ROM) at around address <kbd>$008C81</kbd>.<br><br>
 
+Note that this does NOT reverse the order of bytes stored in <kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> table, it simply takes that table, and write them on the HUD backwards.<br><br>
+
 To avoid confusion, I refer the end tiles in which the fill <b>starts</b> as the left end and right end to where the fill goes to. Left/right <i>side</i> refers the literal left/right side from the user's perspective.
 Also keep in mind that as you increase the length of the bar, it will always extend towards the right unless you use the <kbd>BarExtendLeft</kbd> routine.</li><br>
 
