@@ -69,6 +69,7 @@ main:
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
 	JSL GraphicalBarELITE_RoundAwayEmptyFull
 	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
+	STZ $00								;>Use Level-layer3 tileset
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
 	
 	LDA.b #!Default_GraphicalBar_Pos_TileExtendLeftwards		;\Input rightmost tile position

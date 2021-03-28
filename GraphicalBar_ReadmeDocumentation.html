@@ -201,6 +201,7 @@ main:		;&gt;You DO need this if using uberasm tool.
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
 	<font color="orange">JSL GraphicalBarELITE_RoundAwayEmptyFull</font>
 	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
+	STZ $00								;>Use Level-layer3 tileset
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
 	LDA.b <font color="yellow">#!Default_GraphicalBar_Pos_Tile</font>				;\Setup address to where to draw the bar.
 	STA $00								;|
@@ -721,6 +722,16 @@ need to be rewritten). Note that this DOES modifies the values in <kbd>!Scratchr
 <th>Description</th>
 </tr>
 <tr>
+<td><kbd>$00</kbd></td>
+<td align="center" valign="center">1</td>
+<td>Determines what sets of fill graphic tiles to use based on:<br>
+<ul>
+<li><kbd>#$00</kbd> = Level, layer 3</li>
+<li><kbd>#$01</kbd> = Level, sprite</li>
+<li><kbd>#$02</kbd> = Overworld, layer 3</li>
+</ul></td>
+</tr>
+<tr>
 <td><kbd>!Scratchram_GraphicalBar_LeftEndPiece</kbd></td>
 <td align="center" valign="center">1</td>
 <td rowspan="4">Needed to convert each tile by identifying the left end, middle (and how many middle tiles), and right end.</td>
@@ -857,21 +868,21 @@ For example, by making left end have 4 pieces instead of 3, you must have 5 valu
 ;This is an example, therefore the numbers in this table may
 ;be different to you.
 
-	;3 pieces, therefore include 4 values 0-3:
-		GraphicalBar_LeftEnd8x8s:
-		db $36		;>Fill amount/index: $00
-		db $37		;>Fill amount/index: $01
-		db $38		;>Fill amount/index: $02
-		db $39		;>Fill amount/index: $03
+			GraphicalBar_LeftEnd8x8s_Lvl_L3:
+			;Left end fill amount tile numbers:
+			db $36		;>Fill amount/index: $00
+			db $37		;>Fill amount/index: $01
+			db $38		;>Fill amount/index: $02
+			db $39		;>Fill amount/index: $03
 
 	;4 pieces, now values are 0-4:
-		GraphicalBar_LeftEnd8x8s:
-		db $36		;>Fill amount/index: $00
-		db $37		;>Fill amount/index: $01
-		db $38		;>Fill amount/index: $02
-		db $39		;>Fill amount/index: $03
-		db <font color="red">$xx</font>		;>Fill amount/index: $04
-</pre></td></tr></table>
+			GraphicalBar_LeftEnd8x8s_Lvl_L3:
+			;Left end fill amount tile numbers:
+			db $36		;>Fill amount/index: $00
+			db $37		;>Fill amount/index: $01
+			db $38		;>Fill amount/index: $02
+			db $39		;>Fill amount/index: $03
+			db <font color="red">$xx</font>		;>Fill amount/index: $04</pre></td></tr></table>
 
 <br><br>
 

@@ -88,6 +88,7 @@ main:
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
 	JSL GraphicalBarELITE_RoundAwayEmptyFull
 	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
+	STZ $00								;>Use Level-layer3 tileset
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
 	if !GraphicalBarExampleTest_StaticEnd_ExtendLeft == 0
 		LDA.b #!GraphicalBarExampleTest_NoExtendLeftBarPos		;\Setup address to where to draw the bar.

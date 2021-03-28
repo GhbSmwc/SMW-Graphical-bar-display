@@ -127,6 +127,7 @@ main:
 					...ShowFirstFill			;>$00 already contains the FirstFill
 					;WriteGraphicalBar
 						JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
+						STZ $00								;>Use Level-layer3 tileset
 						JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert to tiles.
 						LDA.b #!Default_GraphicalBar_Pos_Tile
 						STA $00

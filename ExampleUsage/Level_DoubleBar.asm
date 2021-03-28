@@ -267,6 +267,7 @@ main:
 ;SecondFill
 ;;;;;;;;;;;;
 	if !DoubleBar_DisplayType == 0
+		STZ $00								;>Use Level-layer3 tileset
 		JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles
 	else
 		...TransferFirstFillBar ;>FirstFill will be located just after SecondFill in memory address: <SecondFill_Table><FirstFill_Table>

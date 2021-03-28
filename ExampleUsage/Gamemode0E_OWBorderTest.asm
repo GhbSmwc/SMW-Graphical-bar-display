@@ -37,6 +37,8 @@ main:
 	JSL GraphicalBarELITE_RoundAwayEmptyFull			;>Avoid rounding towards 0 or MaxPieces when they are not those numbers.
 	
 	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
+	LDA #$02							;\Use Level-layer3 tileset
+	STA $00								;/
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
 	LDA.b #!Default_GraphicalBar_Pos_Tile_OverworldMap		;\Setup address to where to draw the bar.
 	STA $00								;|

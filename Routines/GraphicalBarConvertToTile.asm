@@ -23,6 +23,13 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ; $13-$14 covers level load and level.
 ;
 ;Input:
+; -$00: What set of graphics to use. Under default setting and code:
+;  -#$00 = Level, layer 3
+;  -#$01 = Level, sprite
+;  -#$02 = Overworld, layer 3
+;  You can add more sets of bar tiles by adding a new table as well as adding code
+;  to use the new table.
+;
 ; -!Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
 ;  the maximum amount of fill for this byte itself. If 0, it's not included in table.
 ; -!Scratchram_GraphicalBar_MiddlePiece: Same as above but each middle byte.
@@ -33,13 +40,6 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+x:
 ;  converted to tile numbers.
 ;Overwritten/Destroyed:
-; -$00 Needed for fast checking if overworld or not (better than
-;  checking $0100 every time using BCC/BCS):
-; --#$00 for level
-; --#$01 for overworld.
-;  I deliberately make it use scratch RAM in the case you have
-;  even more tables (3+ states of graphics) for each graphic.
-;  Feel free to edit the code though.
 ; -$01 Needed to convert the middle tiles
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;These are tile numbers. Each number, starting from the
@@ -53,36 +53,61 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 	;when they use invalid indexing that would points to
 	;bytes beyond the table.
 	;This is for level:
-		GraphicalBar_LeftEnd8x8s:
-		;Left end fill amount tile numbers:
-		db $36		;>Fill amount/index: $00
-		db $37		;>Fill amount/index: $01
-		db $38		;>Fill amount/index: $02
-		db $39		;>Fill amount/index: $03
-		GraphicalBar_Middle8x8s:
-		;Middle fill amount tile numbers
-		db $55		;>Fill amount/index: $00
-		db $56		;>Fill amount/index: $01
-		db $57		;>Fill amount/index: $02
-		db $58		;>Fill amount/index: $03
-		db $59		;>Fill amount/index: $04
-		db $65		;>Fill amount/index: $05
-		db $66		;>Fill amount/index: $06
-		db $67		;>Fill amount/index: $07
-		db $68		;>Fill amount/index: $08
-		GraphicalBar_RightEnd8x8s:
-		;Right end fill amount tile numbers:
-		db $50		;>Fill amount/index: $00
-		db $51		;>Fill amount/index: $01
-		db $52		;>Fill amount/index: $02
-		db $53		;>Fill amount/index: $03
+		;Layer 3
+			GraphicalBar_LeftEnd8x8s_Lvl_L3:
+			;Left end fill amount tile numbers:
+			db $36		;>Fill amount/index: $00
+			db $37		;>Fill amount/index: $01
+			db $38		;>Fill amount/index: $02
+			db $39		;>Fill amount/index: $03
+			GraphicalBar_Middle8x8s_Lvl_L3:
+			;Middle fill amount tile numbers
+			db $55		;>Fill amount/index: $00
+			db $56		;>Fill amount/index: $01
+			db $57		;>Fill amount/index: $02
+			db $58		;>Fill amount/index: $03
+			db $59		;>Fill amount/index: $04
+			db $65		;>Fill amount/index: $05
+			db $66		;>Fill amount/index: $06
+			db $67		;>Fill amount/index: $07
+			db $68		;>Fill amount/index: $08
+			GraphicalBar_RightEnd8x8s_Lvl_L3:
+			;Right end fill amount tile numbers:
+			db $50		;>Fill amount/index: $00
+			db $51		;>Fill amount/index: $01
+			db $52		;>Fill amount/index: $02
+			db $53		;>Fill amount/index: $03
+		;Sprite
+			GraphicalBar_LeftEnd8x8s_Lvl_Spr:
+			;Left end fill amount tile numbers:
+			db $85		;>Fill amount/index: $00
+			db $86		;>Fill amount/index: $01
+			db $87		;>Fill amount/index: $02
+			db $95		;>Fill amount/index: $03
+			GraphicalBar_Middle8x8s_Lvl_Spr:
+			;Middle fill amount tile numbers
+			db $96		;>Fill amount/index: $00
+			db $97		;>Fill amount/index: $01
+			db $8A		;>Fill amount/index: $02
+			db $8B		;>Fill amount/index: $03
+			db $9A		;>Fill amount/index: $04
+			db $9B		;>Fill amount/index: $05
+			db $C0		;>Fill amount/index: $06
+			db $C1		;>Fill amount/index: $07
+			db $D0		;>Fill amount/index: $08
+			GraphicalBar_RightEnd8x8s_Lvl_Spr:
+			;Right end fill amount tile numbers:
+			db $D1		;>Fill amount/index: $00
+			db $E0		;>Fill amount/index: $01
+			db $E1		;>Fill amount/index: $02
+			db $F0		;>Fill amount/index: $03
 	;These here are the same as above but intended for overworld border.
-		GraphicalBar_LeftEnd8x8s_Ow:
+		GraphicalBar_LeftEnd8x8s_Ow_L3:
 		db $80		;>Fill amount/index: $00
 		db $81		;>Fill amount/index: $01
 		db $82		;>Fill amount/index: $02
 		db $83		;>Fill amount/index: $03
-		GraphicalBar_Middle8x8s_Ow:
+		GraphicalBar_Middle8x8s_Ow_L3:
 		db $84		;>Fill amount/index: $00
 		db $85		;>Fill amount/index: $01
 		db $86		;>Fill amount/index: $02
@@ -92,7 +117,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 		db $8A		;>Fill amount/index: $06
 		db $8B		;>Fill amount/index: $07
 		db $8C		;>Fill amount/index: $08
-		GraphicalBar_RightEnd8x8s_Ow:
+		GraphicalBar_RightEnd8x8s_Ow_L3:
 		db $8D		;>Fill amount/index: $00
 		db $8E		;>Fill amount/index: $01
 		db $8F		;>Fill amount/index: $02
@@ -102,23 +127,12 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 			PHB						;>Preserve bank (so that table indexing work properly)
 			PHK						;>push current bank
 			PLB						;>pull out as regular bank
-		;Level or overworld?
-			.WhatTableToUse
-				STZ $00						;>Default to "Level"
-				LDA $0100|!addr					;\If gamemode value is #$0F or higher, that is level
-				CMP #$0F					;|
-				BCS ..Level					;/
-			
-			..Overworld
-				INC $00						;>Otherwise assume its overworld.
-			
-			..Level
-				if !Setting_GraphicalBar_IndexSize == 0
-					LDX #$00
-				else
-					REP #$10								;>16-bit XY
-					LDX #$0000								;>The index for what byte tile position to write.
-				endif
+			if !Setting_GraphicalBar_IndexSize == 0
+				LDX #$00
+			else
+				REP #$10								;>16-bit XY
+				LDX #$0000								;>The index for what byte tile position to write.
+			endif
 		;Left end
 			.LeftEndTranslate
 				LDA !Scratchram_GraphicalBar_LeftEndPiece	;\can only be either 0 or the correct number of pieces listed in the table.
@@ -134,15 +148,18 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 					SEP #$20
 				endif
 				LDA $00
-				BEQ ..Level
+				BEQ ..LevelLayer3
+				CMP #$01
+				BEQ ..LevelSprite
 			
-			..Overworld
-				LDA GraphicalBar_LeftEnd8x8s_Ow,y
+			..OverworldLayer3
+				LDA GraphicalBar_LeftEnd8x8s_Ow_L3,y
 				BRA ..WriteTable
-			
-			..Level
-				LDA GraphicalBar_LeftEnd8x8s,y				;\Convert byte to tile number byte
-			
+			..LevelLayer3
+				LDA GraphicalBar_LeftEnd8x8s_Lvl_L3,y				;\Convert byte to tile number byte
+				BRA ..WriteTable
+			..LevelSprite
+				LDA GraphicalBar_LeftEnd8x8s_Lvl_Spr,y
 			..WriteTable
 				STA !Scratchram_GraphicalBar_FillByteTbl		;/
 				INX							;>next tile byte
@@ -173,15 +190,18 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 						SEP #$20
 					endif
 					LDA $00
-					BEQ ...Level
-			
-					...Overworld
-						LDA GraphicalBar_Middle8x8s_Ow,y
+					BEQ ...LevelLayer3
+					CMP #$01
+					BEQ ...LevelSprite
+					
+					...OverworldLayer3
+						LDA GraphicalBar_Middle8x8s_Ow_L3,y
 						BRA ...WriteTable
-					
-					...Level
-						LDA GraphicalBar_Middle8x8s,y			;\amount filled as tile graphics
-					
+					...LevelLayer3
+						LDA GraphicalBar_Middle8x8s_Lvl_L3,y			;\amount filled as tile graphics
+						BRA ...WriteTable
+					...LevelSprite
+						LDA GraphicalBar_Middle8x8s_Lvl_Spr,y
 					...WriteTable
 						STA !Scratchram_GraphicalBar_FillByteTbl,x	;/
 			
@@ -208,22 +228,25 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 					SEP #$20
 				endif
 				LDA $00
-				BEQ ..Level
+				BEQ ..LevelLayer3
+				CMP #$01
+				BEQ ..LevelSprite
 			
 				..Overworld
-					LDA GraphicalBar_RightEnd8x8s_Ow,y
+					LDA GraphicalBar_RightEnd8x8s_Ow_L3,y
 					BRA ..WriteTable
-				
-				..Level
-					LDA GraphicalBar_RightEnd8x8s,y
-				
+				..LevelLayer3
+					LDA GraphicalBar_RightEnd8x8s_Lvl_L3,y
+					BRA ..WriteTable
+				..LevelSprite
+					LDA GraphicalBar_RightEnd8x8s_Lvl_Spr,y
 				..WriteTable
 					STA !Scratchram_GraphicalBar_FillByteTbl,x
 		;Done
 			.Done
-			SEP #$30					;>Just in case
-			PLB						;>Pull bank
-			RTL
+				SEP #$30					;>Just in case
+				PLB						;>Pull bank
+				RTL
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Convert fill amount in bar to tile numbers, double-bar edition
 ;Inputs and outputs the same as above.
@@ -276,12 +299,12 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
 ;If you are editing the number of pieces in any bar parts here, the number of pieces must equal
 ;to (NumberOfPieces+1)^2 number of values in the table here.
-GraphicalBar_LeftEnd8x8sDoubleBar:
+GraphicalBar_LeftEnd8x8sDoubleBar_Lvl_L3:
 db $29,$2A,$2B,$2C    ;>(0;0), (0;1), (0;2), (0;3). When FirstFill = 0, and SecondFill is any value
 db $2D,$2D,$2F,$35    ;>(1;0), (1;1), (1;2), (1;3). When FirstFill = 1, and SecondFill is any value
 db $36,$36,$36,$37    ;>(2;0), (2;1), (2;2), (2;3). When FirstFill = 2, and SecondFill is any value
 db $38,$38,$38,$38    ;>(3;0), (3;1), (3;2), (3;3). When FirstFill = 3, and SecondFill is any value
-GraphicalBar_Middle8x8sDoubleBar:
+GraphicalBar_Middle8x8sDoubleBar_Lvl_L3:
 db $39,$45,$46,$47,$48,$49,$4B,$4C,$4D ;>(0;0), (0;1), (0;2), (0;3), (0;4), (0;5), (0;6), (0;7), (0;8)
 db $4E,$4E,$4F,$50,$51,$52,$53,$54,$55 ;>(1;0), (1;1), (1;2), (1;3), (1;4), (1;5), (1;6), (1;7), (1;8)
 db $56,$56,$56,$57,$58,$59,$5A,$5B,$5C ;>(2;0), (2;1), (2;2), (2;3), (2;4), (2;5), (2;6), (2;7), (2;8)
@@ -291,7 +314,7 @@ db $69,$69,$69,$69,$69,$69,$6A,$6B,$6C ;>(5;0), (5;1), (5;2), (5;3), (5;4), (5;5
 db $6D,$6D,$6D,$6D,$6D,$6D,$6D,$6E,$6F ;>(6;0), (6;1), (6;2), (6;3), (6;4), (6;5), (6;6), (6;7), (6;8)
 db $71,$71,$71,$71,$71,$71,$71,$71,$72 ;>(7;0), (7;1), (7;2), (7;3), (7;4), (7;5), (7;6), (7;7), (7;8)
 db $73,$73,$73,$73,$73,$73,$73,$73,$73 ;>(8;0), (8;1), (8;2), (8;3), (8;4), (8;5), (8;6), (8;7), (8;8)
-GraphicalBar_RightEnd8x8sDoubleBar:
+GraphicalBar_RightEnd8x8sDoubleBar_Lvl_L3:
 db $74,$75,$79,$7A    ;>(0;0), (0;1), (0;2), (0;3)
 db $7B,$7B,$7C,$7D    ;>(1;0), (1;1), (1;2), (1;3)
 db $7E,$7E,$7E,$7F    ;>(2;0), (2;1), (2;2), (2;3)
@@ -341,7 +364,7 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 		SEP #$20								;/
 	endif
 	TAY									;>Transfer #$00XX fill value to y
-	LDA GraphicalBar_LeftEnd8x8sDoubleBar,y					;\Convert left end
+	LDA GraphicalBar_LeftEnd8x8sDoubleBar_Lvl_L3,y					;\Convert left end
 	STA !Scratchram_GraphicalBar_FillByteTbl				;/
 	INX									;>next tile
 
@@ -386,7 +409,7 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 		SEP #$20								;/
 	endif
 	TAY									;>Transfer #$00XX fill value to y
-	LDA GraphicalBar_Middle8x8sDoubleBar,y					;\Convert middle tile
+	LDA GraphicalBar_Middle8x8sDoubleBar_Lvl_L3,y					;\Convert middle tile
 	STA !Scratchram_GraphicalBar_FillByteTbl,x				;/
 	
 	...Next
@@ -428,7 +451,7 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 		SEP #$20								;/
 	endif
 	TAY									;>Transfer #$00XX fill value to y
-	LDA GraphicalBar_RightEnd8x8sDoubleBar,y						;\Convert middle tile
+	LDA GraphicalBar_RightEnd8x8sDoubleBar_Lvl_L3,y						;\Convert middle tile
 	STA !Scratchram_GraphicalBar_FillByteTbl,x				;/
 	
 	.Done
