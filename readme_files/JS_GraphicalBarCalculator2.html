@@ -47,23 +47,23 @@
 <a href="../GraphicalBar_ReadmeDocumentation.html#ComputeGraphicalBarData">Back to info table</a><br>
 <a href="DoubleBarInfo.html#DoubleBarSG">Back to Double bar information</a><br><br>
 <table>
-<tr><td>Fill amount:</td><td><input type="number" min="0" max="65535" id="FillAmountDec" onchange="UserInputDecToHex('FillAmountDec', 'FillAmountHex', 4, 0n, 65535n); Calculate()" value="0">(<kbd>$</kbd><input type="text" id="FillAmountHex" onchange="CorrectUserInputHexStringBigInt('FillAmountHex', 4); UserInputHexToDec('FillAmountHex', 'FillAmountDec', 4, 0n, 65535n); Calculate()" value="0000"><button onclick="BigintIncreaseDecreaseHexInput(1n, 'FillAmountHex', 0n, 65535n); UserInputHexToDec('FillAmountHex', 'FillAmountDec', 4, 0n, 65535n); Calculate()">+</button><button onclick="BigintIncreaseDecreaseHexInput(-1n, 'FillAmountHex', 0n, 65535n); UserInputHexToDec('FillAmountHex', 'FillAmountDec', 4, 0n, 65535n); Calculate()">-</button>)
+<tr><td>Fill amount:</td><td><input type="number" min="0" max="65535" id="FillAmountDec" onchange="UserInputDecToHex('FillAmountDec', 'FillAmountHex', 4, 0n, 65535n); Calculate()" value="0">(<kbd>$</kbd><input class="HexNumberInput" type="text" id="FillAmountHex" onchange="CorrectUserInputHexStringBigInt('FillAmountHex', 4); UserInputHexToDec('FillAmountHex', 'FillAmountDec', 4, 0n, 65535n); Calculate()" value="0000"><button onclick="BigintIncreaseDecreaseHexInput(1n, 'FillAmountHex', 0n, 65535n); UserInputHexToDec('FillAmountHex', 'FillAmountDec', 4, 0n, 65535n); Calculate()">+</button><button onclick="BigintIncreaseDecreaseHexInput(-1n, 'FillAmountHex', 0n, 65535n); UserInputHexToDec('FillAmountHex', 'FillAmountDec', 4, 0n, 65535n); Calculate()">-</button>)
 </td></tr>
-<tr><td>Left End piece:</td><td><input type="number" min="0" max="255" id="LeftEndPieceDec" onchange="UserInputDecToHex('LeftEndPieceDec', 'LeftEndPieceHex', 2, 0n, 255n); Calculate()" value="3">(<kbd>$</kbd><input type="text" id="LeftEndPieceHex" onchange="CorrectUserInputHexStringBigInt('LeftEndPieceHex', 2); UserInputHexToDec('LeftEndPieceHex', 'LeftEndPieceDec', 2, 0n, 255n); Calculate()" value="03"><button onclick="BigintIncreaseDecreaseHexInput(1n, 'LeftEndPieceHex', 0n, 255n); UserInputHexToDec('LeftEndPieceHex', 'LeftEndPieceDec', 2, 0n, 255n); Calculate()">+</button><button onclick="BigintIncreaseDecreaseHexInput(-1n, 'LeftEndPieceHex', 0n, 255n); UserInputHexToDec('LeftEndPieceHex', 'LeftEndPieceDec', 2, 0n, 255n); Calculate()">-</button>)</td></tr>
-<tr><td>Middle piece:</td><td><input type="number" min="0" max="255" id="MiddlePieceDec" onchange="UserInputDecToHex('MiddlePieceDec', 'MiddlePieceHex', 2, 0n, 255n); Calculate()" value="8">(<kbd>$</kbd><input type="text" id="MiddlePieceHex" onchange="CorrectUserInputHexStringBigInt('MiddlePieceHex', 2); UserInputHexToDec('MiddlePieceHex', 'MiddlePieceDec', 2, 0n, 255n); Calculate()" value="08"><button onclick="BigintIncreaseDecreaseHexInput(1n, 'MiddlePieceHex', 0n, 255n); UserInputHexToDec('MiddlePieceHex', 'MiddlePieceDec', 2, 0n, 255n); Calculate()">+</button><button onclick="BigintIncreaseDecreaseHexInput(-1n, 'MiddlePieceHex', 0n, 255n); UserInputHexToDec('MiddlePieceHex', 'MiddlePieceDec', 2, 0n, 255n); Calculate()">-</button>)</td></tr>
-<tr><td>Right End piece:</td><td><input type="number" min="0" max="255" id="RightEndPieceDec" onchange="UserInputDecToHex('RightEndPieceDec', 'RightEndPieceHex', 2, 0n, 255n); Calculate()" value="3">(<kbd>$</kbd><input type="text" id="RightEndPieceHex" onchange="CorrectUserInputHexStringBigInt('RightEndPieceHex', 2); UserInputHexToDec('RightEndPieceHex', 'RightEndPieceDec', 2, 0n, 255n); Calculate()" value="03"><button onclick="BigintIncreaseDecreaseHexInput(1n, 'RightEndPieceHex', 0n, 255n); UserInputHexToDec('RightEndPieceHex', 'RightEndPieceDec', 2, 0n, 255n); Calculate()">+</button><button onclick="BigintIncreaseDecreaseHexInput(-1n, 'RightEndPieceHex', 0n, 255n); UserInputHexToDec('RightEndPieceHex', 'RightEndPieceDec', 2, 0n, 255n); Calculate()">-</button>)</td></tr>
-<tr><td>Length (middle):</td><td><input type="number" min="0" max="255" id="MiddleLengthDec" onchange="UserInputDecToHex('MiddleLengthDec', 'MiddleLengthHex', 2, 0n, 255n); Calculate()" value="7">(<kbd>$</kbd><input type="text" id="MiddleLengthHex" onchange="CorrectUserInputHexStringBigInt('MiddleLengthHex', 2); UserInputHexToDec('MiddleLengthHex', 'MiddleLengthDec', 2, 0n, 255n); Calculate()" value="07"><button onclick="BigintIncreaseDecreaseHexInput(1n, 'MiddleLengthHex', 0n, 255n); UserInputHexToDec('MiddleLengthHex', 'MiddleLengthDec', 2, 0n, 255n); Calculate()">+</button><button onclick="BigintIncreaseDecreaseHexInput(-1n, 'MiddleLengthHex', 0n, 255n); UserInputHexToDec('MiddleLengthHex', 'MiddleLengthDec', 2, 0n, 255n); Calculate()">-</button>)</td></tr>
+<tr><td>Left End piece:</td><td><input type="number" min="0" max="255" id="LeftEndPieceDec" onchange="UserInputDecToHex('LeftEndPieceDec', 'LeftEndPieceHex', 2, 0n, 255n); Calculate()" value="3">(<kbd>$</kbd><input class="HexNumberInput" type="text" id="LeftEndPieceHex" onchange="CorrectUserInputHexStringBigInt('LeftEndPieceHex', 2); UserInputHexToDec('LeftEndPieceHex', 'LeftEndPieceDec', 2, 0n, 255n); Calculate()" value="03"><button onclick="BigintIncreaseDecreaseHexInput(1n, 'LeftEndPieceHex', 0n, 255n); UserInputHexToDec('LeftEndPieceHex', 'LeftEndPieceDec', 2, 0n, 255n); Calculate()">+</button><button onclick="BigintIncreaseDecreaseHexInput(-1n, 'LeftEndPieceHex', 0n, 255n); UserInputHexToDec('LeftEndPieceHex', 'LeftEndPieceDec', 2, 0n, 255n); Calculate()">-</button>)</td></tr>
+<tr><td>Middle piece:</td><td><input type="number" min="0" max="255" id="MiddlePieceDec" onchange="UserInputDecToHex('MiddlePieceDec', 'MiddlePieceHex', 2, 0n, 255n); Calculate()" value="8">(<kbd>$</kbd><input class="HexNumberInput" type="text" id="MiddlePieceHex" onchange="CorrectUserInputHexStringBigInt('MiddlePieceHex', 2); UserInputHexToDec('MiddlePieceHex', 'MiddlePieceDec', 2, 0n, 255n); Calculate()" value="08"><button onclick="BigintIncreaseDecreaseHexInput(1n, 'MiddlePieceHex', 0n, 255n); UserInputHexToDec('MiddlePieceHex', 'MiddlePieceDec', 2, 0n, 255n); Calculate()">+</button><button onclick="BigintIncreaseDecreaseHexInput(-1n, 'MiddlePieceHex', 0n, 255n); UserInputHexToDec('MiddlePieceHex', 'MiddlePieceDec', 2, 0n, 255n); Calculate()">-</button>)</td></tr>
+<tr><td>Right End piece:</td><td><input type="number" min="0" max="255" id="RightEndPieceDec" onchange="UserInputDecToHex('RightEndPieceDec', 'RightEndPieceHex', 2, 0n, 255n); Calculate()" value="3">(<kbd>$</kbd><input class="HexNumberInput" type="text" id="RightEndPieceHex" onchange="CorrectUserInputHexStringBigInt('RightEndPieceHex', 2); UserInputHexToDec('RightEndPieceHex', 'RightEndPieceDec', 2, 0n, 255n); Calculate()" value="03"><button onclick="BigintIncreaseDecreaseHexInput(1n, 'RightEndPieceHex', 0n, 255n); UserInputHexToDec('RightEndPieceHex', 'RightEndPieceDec', 2, 0n, 255n); Calculate()">+</button><button onclick="BigintIncreaseDecreaseHexInput(-1n, 'RightEndPieceHex', 0n, 255n); UserInputHexToDec('RightEndPieceHex', 'RightEndPieceDec', 2, 0n, 255n); Calculate()">-</button>)</td></tr>
+<tr><td>Length (middle):</td><td><input type="number" min="0" max="255" id="MiddleLengthDec" onchange="UserInputDecToHex('MiddleLengthDec', 'MiddleLengthHex', 2, 0n, 255n); Calculate()" value="7">(<kbd>$</kbd><input class="HexNumberInput" type="text" id="MiddleLengthHex" onchange="CorrectUserInputHexStringBigInt('MiddleLengthHex', 2); UserInputHexToDec('MiddleLengthHex', 'MiddleLengthDec', 2, 0n, 255n); Calculate()" value="07"><button onclick="BigintIncreaseDecreaseHexInput(1n, 'MiddleLengthHex', 0n, 255n); UserInputHexToDec('MiddleLengthHex', 'MiddleLengthDec', 2, 0n, 255n); Calculate()">+</button><button onclick="BigintIncreaseDecreaseHexInput(-1n, 'MiddleLengthHex', 0n, 255n); UserInputHexToDec('MiddleLengthHex', 'MiddleLengthDec', 2, 0n, 255n); Calculate()">-</button>)</td></tr>
 <tr><td><kbd>!Setting_GraphicalBar_SecondFillByteTableOffset</kbd>:</td><td>
-<input type="number" min="0" max="257" id="SecondFillByteTableOffsetDec" onchange="UserInputDecToHex('SecondFillByteTableOffsetDec', 'SecondFillByteTableOffsetHex', 2, 0n, 257n); Calculate()" value="32">(<kbd>$<input type="text" id="SecondFillByteTableOffsetHex" onchange="CorrectUserInputHexStringBigInt('SecondFillByteTableOffsetHex', 2); UserInputHexToDec('SecondFillByteTableOffsetHex', 'SecondFillByteTableOffsetDec', 2, 0n, 257n); Calculate()" value="20"></kbd><button onclick="BigintIncreaseDecreaseHexInput(1n, 'SecondFillByteTableOffsetHex', 0n, 257n); UserInputHexToDec('SecondFillByteTableOffsetHex', 'SecondFillByteTableOffsetDec', 2, 0n, 257n); Calculate()">+</button><button onclick="BigintIncreaseDecreaseHexInput(-1n, 'SecondFillByteTableOffsetHex', 0n, 255n); UserInputHexToDec('SecondFillByteTableOffsetHex', 'SecondFillByteTableOffsetDec', 2, 0n, 257n); Calculate()">-</button>)
+<input type="number" min="0" max="257" id="SecondFillByteTableOffsetDec" onchange="UserInputDecToHex('SecondFillByteTableOffsetDec', 'SecondFillByteTableOffsetHex', 2, 0n, 257n); Calculate()" value="32">(<kbd>$<input class="HexNumberInput" type="text" id="SecondFillByteTableOffsetHex" onchange="CorrectUserInputHexStringBigInt('SecondFillByteTableOffsetHex', 2); UserInputHexToDec('SecondFillByteTableOffsetHex', 'SecondFillByteTableOffsetDec', 2, 0n, 257n); Calculate()" value="20"></kbd><button onclick="BigintIncreaseDecreaseHexInput(1n, 'SecondFillByteTableOffsetHex', 0n, 257n); UserInputHexToDec('SecondFillByteTableOffsetHex', 'SecondFillByteTableOffsetDec', 2, 0n, 257n); Calculate()">+</button><button onclick="BigintIncreaseDecreaseHexInput(-1n, 'SecondFillByteTableOffsetHex', 0n, 255n); UserInputHexToDec('SecondFillByteTableOffsetHex', 'SecondFillByteTableOffsetDec', 2, 0n, 257n); Calculate()">-</button>)
 </td></tr>
-<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> location:</td><td><kbd>$</kbd><input type="text" maxlength="6" id="FillByteTable" onchange="CorrectUserInputHexStringBigInt('FillByteTable', 6); Calculate()" value="7F844A" list="BarTileTableRAMList"><button onclick="BigintIncreaseDecreaseHexInput(1n, 'FillByteTable', 0n, 16777215n); CorrectUserInputHexStringBigInt('FillByteTable', 6); Calculate()">+</button><button onclick="BigintIncreaseDecreaseHexInput(-1n, 'FillByteTable', 0n, 16777215n); CorrectUserInputHexStringBigInt('FillByteTable', 6); Calculate()">-</button>
+<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> location:</td><td><kbd>$</kbd><input class="HexNumberInput" type="text" maxlength="6" id="FillByteTable" onchange="CorrectUserInputHexStringBigInt('FillByteTable', 6); Calculate()" value="7F844A" list="BarTileTableRAMList"><button onclick="BigintIncreaseDecreaseHexInput(1n, 'FillByteTable', 0n, 16777215n); CorrectUserInputHexStringBigInt('FillByteTable', 6); Calculate()">+</button><button onclick="BigintIncreaseDecreaseHexInput(-1n, 'FillByteTable', 0n, 16777215n); CorrectUserInputHexStringBigInt('FillByteTable', 6); Calculate()">-</button>
 
 <datalist id="BarTileTableRAMList">
 <option value="7F844A">Default RAM address table</option>
 <option value="400198">SA-1 version</option>
 </datalist></td></tr>
 
-<tr><td><abbr title="The RAM address that is the tile number and/or properties for the status bar or overworld border+.">To write your tiles at address...</abbr>:</td><td><kbd>$</kbd><input type="text" maxlength="6" id="TileAddress" onchange="CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()" value="7FA000" list="StatusBarRAMTileList"><button onclick="BigintIncreaseDecreaseHexInput(1n, 'TileAddress', 0n, 16777215n); CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()">+</button><button onclick="BigintIncreaseDecreaseHexInput(-1n, 'TileAddress', 0n, 16777215n); CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()">-</button><button onclick="BigintIncreaseDecreaseHexInput(2n, 'TileAddress', 0n, 16777215n); CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()">+2</button><button onclick="BigintIncreaseDecreaseHexInput(-2n, 'TileAddress', 0n, 16777215n); CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()">-2</button>
+<tr><td><abbr title="The RAM address that is the tile number and/or properties for the status bar or overworld border+.">To write your tiles at address...</abbr>:</td><td><kbd>$</kbd><input class="HexNumberInput" type="text" maxlength="6" id="TileAddress" onchange="CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()" value="7FA000" list="StatusBarRAMTileList"><button onclick="BigintIncreaseDecreaseHexInput(1n, 'TileAddress', 0n, 16777215n); CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()">+</button><button onclick="BigintIncreaseDecreaseHexInput(-1n, 'TileAddress', 0n, 16777215n); CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()">-</button><button onclick="BigintIncreaseDecreaseHexInput(2n, 'TileAddress', 0n, 16777215n); CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()">+2</button><button onclick="BigintIncreaseDecreaseHexInput(-2n, 'TileAddress', 0n, 16777215n); CorrectUserInputHexStringBigInt('TileAddress', 6); Calculate()">-2</button>
 
 <datalist id="StatusBarRAMTileList">
 <option value="7E0F09">SMW's status bar (Writes over &ldquo;TIME&rdquo;)</option>
@@ -93,6 +93,69 @@
 
 
 <script>
+	//These makes hex input texts behave like a number input, pressing UP/DOWN on the arrow keys to increment/decrement a hex input.
+		window.onload = function(){
+			var FocusedElement = document.activeElement;
+			if(FocusedElement.addEventListener ) {
+				FocusedElement.addEventListener('keydown',this.keyHandler,false);
+			} else if(FocusedElement.attachEvent ) {
+				FocusedElement.attachEvent('onkeydown',this.keyHandler);
+			}
+			Calculate()
+		}
+	
+		function keyHandler(e) {
+			if (((e.keyCode == 38)||e.keyCode == 40)&&(document.activeElement.className == "HexNumberInput")) {
+				var target;
+				var InputNumber = BigInt(CorrectHexBigIntValue(document.activeElement.value))
+				if (!e) var e = window.event;
+				if (e.target) target = e.target;
+				else if (e.srcElement) target = e.srcElement;
+		
+				if(e.keyCode == 38) {
+					InputNumber++
+					e.preventDefault()	//Prevents the caret (blinking text cursor) from being placed at the beginning of the line.
+				} else if(e.keyCode == 40) {
+					if (InputNumber > 0n) {
+						InputNumber--
+					}
+				}
+				document.activeElement.value = InputNumber.toString(16).toUpperCase()
+				document.activeElement.setSelectionRange(document.activeElement.value.length, document.activeElement.value.length)
+				//Execute the functions that were in the element's onchange.
+					var ActiveElementInputID = document.activeElement.id
+					if (ActiveElementInputID == "FillAmountHex") {
+						BigintClamp(BigInt("0x" + document.getElementById(ActiveElementInputID).value), 0n, 65535n)
+						CorrectUserInputHexStringBigInt('FillAmountHex', 4)
+						UserInputHexToDec('FillAmountHex', 'FillAmountDec', 4, 0n, 65535n)
+					} else if ((ActiveElementInputID == "LeftEndPieceHex")||(ActiveElementInputID == "MiddlePieceHex")||(ActiveElementInputID == "RightEndPieceHex")||(ActiveElementInputID == "MiddleLengthHex")){
+						BigintClamp(BigInt("0x" + document.getElementById(ActiveElementInputID).value), 0n, 255n)
+						if (ActiveElementInputID == "LeftEndPieceHex") {
+							CorrectUserInputHexStringBigInt('LeftEndPieceHex', 2)
+							UserInputHexToDec('LeftEndPieceHex', 'LeftEndPieceDec', 2, 0n, 255n)
+						} else if (ActiveElementInputID == "MiddlePieceHex") {
+							CorrectUserInputHexStringBigInt('MiddlePieceHex', 2)
+							UserInputHexToDec('MiddlePieceHex', 'MiddlePieceDec', 2, 0n, 255n)
+						} else if (ActiveElementInputID == "RightEndPieceHex") {
+							CorrectUserInputHexStringBigInt('RightEndPieceHex', 2)
+							UserInputHexToDec('RightEndPieceHex', 'RightEndPieceDec', 2, 0n, 255n)
+						} else if (ActiveElementInputID == "MiddleLengthHex") {
+							CorrectUserInputHexStringBigInt('MiddleLengthHex', 2)
+							UserInputHexToDec('MiddleLengthHex', 'MiddleLengthDec', 2, 0n, 255n)
+						}
+					} else if (ActiveElementInputID == "SecondFillByteTableOffsetHex") {
+						CorrectUserInputHexStringBigInt('MiddleLengthHex', 2)
+						UserInputHexToDec('SecondFillByteTableOffsetHex', 'SecondFillByteTableOffsetDec', 2, 0n, 257n)
+					} else if (ActiveElementInputID == "FillByteTable") {
+						document.getElementById("FillByteTable").value = (BigintClamp(CorrectHexBigIntValue(document.getElementById("FillByteTable").value), 0n, BigInt("0xFFFFFF")).toString(16))
+						CorrectUserInputHexStringBigInt('FillByteTable', 6)
+					} else if (ActiveElementInputID == "TileAddress") {
+						document.getElementById("TileAddress").value = (BigintClamp(CorrectHexBigIntValue(document.getElementById("TileAddress").value), 0n, BigInt("0xFFFFFF")).toString(16))
+						CorrectUserInputHexStringBigInt('TileAddress', 6)
+					}
+					Calculate()
+			}
+		}
 	function UserInputHexToDec(WhatInput, ToWhatInput, PaddingSize, min, max) {
 		var HexNumber = BigintClamp(CorrectHexBigIntValue(document.getElementById(WhatInput).value), min, max)
 		document.getElementById(WhatInput).value = pad(HexNumber.toString(16).toUpperCase(), PaddingSize)
