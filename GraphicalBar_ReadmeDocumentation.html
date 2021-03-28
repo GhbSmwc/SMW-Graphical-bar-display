@@ -1240,6 +1240,7 @@ would support sprite OAM.</p>
 <ol>
 	<li>Shared subroutines patch</li>
 	<ol>
+		<li>Before you use Shared Subroutines patch, read the readme and several comments in there! A simple mistake can cause issues.</li><br>
 		<li>The routines in <kbd>GraphicalBarELITE.asm</kbd>, <kbd>GraphicalBarConvertToTile.asm</kbd>, and <kbd>GraphicalBarOtherRoutines.asm</kbd>, copy that (and only the subroutines, you CAN include the comments), paste it in a temporary blank
 		document, and check for any potential label conflicts (two identical labels to jump to) between that and the already-included routines in Shared Subroutines patch's <kbd>subroutinecode.asm</kbd>, if the are, then rename them. It is also possible
 		that routines in this package may already exist in the shared subroutines package, especially if you added even more subroutines, so one or the other copy of the subroutine can safely be omitted(but make sure the labels are right).<br><br>
