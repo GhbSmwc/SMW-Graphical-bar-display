@@ -105,17 +105,17 @@
 		}
 	
 		function keyHandler(e) {
-			if (((e.keyCode == 38)||e.keyCode == 40)&&(document.activeElement.className == "HexNumberInput")) {
+			if (((e.code == "ArrowUp")||e.code == "ArrowDown")&&(document.activeElement.className == "HexNumberInput")) {
 				var target;
 				var InputNumber = BigInt(CorrectHexBigIntValue(document.activeElement.value))
 				if (!e) var e = window.event;
 				if (e.target) target = e.target;
 				else if (e.srcElement) target = e.srcElement;
-		
-				if(e.keyCode == 38) {
+				
+				if(e.code == "ArrowUp") {
 					InputNumber++
 					e.preventDefault()	//Prevents the caret (blinking text cursor) from being placed at the beginning of the line.
-				} else if(e.keyCode == 40) {
+				} else if(e.code == "ArrowDown") {
 					if (InputNumber > 0n) {
 						InputNumber--
 					}
