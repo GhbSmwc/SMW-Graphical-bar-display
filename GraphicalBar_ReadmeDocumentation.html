@@ -517,7 +517,7 @@ that is <kbd>$7F844A + 1</kbd> which is address <kbd>$7F844B</kbd>).
 </tr>
 </table><br>
 
-If any maximum was set to $00, they are excluded from the table and are skipped:
+If any maximum was set to $00, they are excluded from the table and are skipped (all bytes with a nonzero maximum should not have a gap of unused bytes in between in any of them):
 <table>
 <tr>
 <td>
@@ -1076,9 +1076,9 @@ being SET (the bar graphic tiles must be filling left-to-right by default).
 
 <li><a href="#GraphicalBarOtherRoutinesBack" id="GraphicalBarOtherRoutines">^</a>Inside <kbd>GraphicalBarOtherRoutines.asm</kbd></li>
 <ul>
-<li><a href="#MapRangeToStartAt0_Back" id="MapRangeToStartAt0">^</a><kbd>MapRangeToStartAt0</kbd>: Maps any given range (of 2 given numbers) to a zero-based range (for use so that any number that is the minimum maps to 0% and maximum to 100%).
-For example: A range from 75 to 100 would be converted to 0 to 25. The given amount in between minimum and maximum is also converted via subtracting by the minimum number (in this case, subtracted by 75). This is useful for stacked
-bars like EXP progress bar or multiple HP bars for bosses. You call this routine before you call <kbd>CalculateGraphicalBarPercentage</kbd>.
+<li><a href="#MapRangeToStartAt0_Back" id="MapRangeToStartAt0">^</a><kbd>MapRangeToStartAt0</kbd>: Maps any given range, and the quantity (of 3 given numbers) to a zero-based range (for use so that any number that is the minimum maps to
+0% and maximum to 100%). For example: A range from 75 to 100 with a quantity of 85 would be converted to 0 to 25 with a quantity of 10. This is useful for stacked bars like EXP progress bar or multiple HP bars for bosses. You call this
+routine before you call <kbd>CalculateGraphicalBarPercentage</kbd>.
 <table>
 <tr><th>Input</th><th>Number of bytes</th><th>Description</th></tr>
 <tr><td><kbd>$00</kbd> to <kbd>$01</kbd></td><td align="center" valign="center">2</td><td>The quantity (expected to be in between two numbers).</td></tr>
@@ -1088,9 +1088,9 @@ bars like EXP progress bar or multiple HP bars for bosses. You call this routine
 
 <table>
 <tr><th>Output</th><th>Number of bytes</th><th>Description</th><th>Where to write for <kbd>CalculateGraphicalBarPercentage</kbd></th></tr>
-<tr><td><kbd>$00</kbd> to <kbd>$01</kbd></td><td align="center" valign="center">2</td><td>The quantity, subtracted by minimum quantity .</td><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl+1</kbd></td></tr>
-<tr><td><kbd>$02</kbd> to <kbd>$03</kbd></td><td align="center" valign="center">2</td><td>The minimum quantity (stayed the same).</td><td>Not used</td></tr>
-<tr><td><kbd>$04</kbd> to <kbd>$05</kbd></td><td align="center" valign="center">2</td><td>The maximum quantity (subtracted by minimal quantity), this is also the size of the range.</td><td><kbd>!Scratchram_GraphicalBar_FillByteTbl+2</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl+3</kbd></td></tr>
+<tr><td><kbd>$00</kbd> to <kbd>$01</kbd></td><td align="center" valign="center">2</td><td>The quantity, subtracted by minimum quantity. <kbd>ZeroBasedQuantity = max(Quantity - Minimum, 0)</kbd></td><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl+1</kbd></td></tr>
+<tr><td><kbd>$02</kbd> to <kbd>$03</kbd></td><td align="center" valign="center">2</td><td>The minimum quantity (stayed the same).</td><td>Not used (because this will always be zero -- subtracts by itself.</td></tr>
+<tr><td><kbd>$04</kbd> to <kbd>$05</kbd></td><td align="center" valign="center">2</td><td>The maximum quantity (subtracted by minimal quantity), this is also the size of the range. <kbd>ZeroBasedMaxQuaitity = MaxQuantity - MinQuantity</kbd></td><td><kbd>!Scratchram_GraphicalBar_FillByteTbl+2</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl+3</kbd></td></tr>
 </table><br>
 
 I've made a test file <kbd>Level_RangeBased.asm</kbd> (located in <kbd>ExampleUsage</kbd> folder) that demonstrates this.
