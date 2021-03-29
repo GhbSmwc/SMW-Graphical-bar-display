@@ -1270,6 +1270,9 @@ incsrc "SharedSub_Defines/SubroutineDefs.asm"</pre></td></tr></table>
 				In <kbd>sharedsub.asm</kbd>, add this to the subroutine list (preferably below all others),<sup>1</sup>:
 <table><tr><td><pre>; Graphical bar
 autoclean JML CalculateGraphicalBarPercentage
+autoclean JML RoundAwayEmpty
+autoclean JML RoundAwayFull
+autoclean JML RoundAwayEmptyFull
 autoclean JML DrawGraphicalBar
 autoclean JML DrawGraphicalBarSubtractionLoopEdition
 autoclean JML ConvertBarFillAmountToTiles
@@ -1280,6 +1283,9 @@ autoclean JML ConvertBarFillAmountToTilesEdgeOverMultipleTiles</pre></td></tr></
 				Do a similar thing, but for defines for <kbd>SharedSub_Defines/SubroutineDefs.asm</kbd><sup>1</sup>:
 <table><tr><td><pre>; Graphical bar
 %SetDefine(CalculateGraphicalBarPercentage)
+%SetDefine(RoundAwayEmpty)
+%SetDefine(RoundAwayFull)
+%SetDefine(RoundAwayEmptyFull)
 %SetDefine(DrawGraphicalBar)
 %SetDefine(DrawGraphicalBarSubtractionLoopEdition)
 %SetDefine(ConvertBarFillAmountToTiles)
@@ -1291,7 +1297,9 @@ autoclean JML ConvertBarFillAmountToTilesEdgeOverMultipleTiles</pre></td></tr></
 		</ol>
 	<li>Custom sprite</li>
 		<ol>
-		<li>Placeholder</li>
+		<li>In the Shared Subroutines folder, you'll want a copy of <kbd>SharedSub_Defines</kbd> folder in pixi's main directory (where the exe is at, not in any
+		subfolders).</li>
+		<li>Same goes with <kbd>GraphicalBarDefines</kbd> folder. Have it just like above.</li>
 		</ol>
 </ol>
 
