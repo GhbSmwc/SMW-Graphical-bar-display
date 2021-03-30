@@ -86,10 +86,10 @@ DrawSpriteGraphicalBar:
 		LDA.b #%00110001
 		STA $0303|!addr,y
 	..Next
-		DEY
-		DEY
-		DEY
-		DEY
+		INY
+		INY
+		INY
+		INY
 		INX
 		CPX #$09
 		BCC ..OAMLoop
