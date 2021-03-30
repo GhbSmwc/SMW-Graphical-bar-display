@@ -15,6 +15,16 @@ SpriteCode:
 	RTS
 	
 	
+GraphicalBarTileOffset:
+	db $00
+	db $08
+	db $10
+	db $18
+	db $20
+	db $28
+	db $30
+	db $38
+	db $40
 DrawSpriteGraphicalBar:
 .InputRatio
 	LDA $14							;\Quantity
@@ -46,8 +56,9 @@ DrawSpriteGraphicalBar:
 	
 	%GetDrawInfo()	;Y = OAM index, $00 = sprite scrn X pos, $01 = sprite scrn Y pos
 	;Note to self:
-	;%GetDrawInfo() uses a destroy-return-address to "double-out" the soubroutine upon returning, by "pulling" before the RTL.
-	;Pushing and not pulling aftwards before calling %GetDrawInfo() can cause the game to crash due to now other data is in the stack
+	;%GetDrawInfo() uses a destroy-return-address to "double-out" the subroutine upon returning, by "pulling" before the RTL.
+	;This results in using the 2nd-last return address (pull, then RTL uses the previous return address, not the current one)
+	;Pushing and not pulling afterwards before calling %GetDrawInfo() can cause the game to crash due to now other data is in the stack
 	;to destroy the return address. Give thanks to JamesD28.
 	;
 	;Y index SHOULD be a multiple of 4
@@ -58,20 +69,32 @@ DrawSpriteGraphicalBar:
 	;$0204 to $03FF = repeat of above every 4 bytes.
 	;
 	;We start at $0300 because I have a feeling that $0200-$02FF is used by something else.
-	LDA $00
-	STA $0300|!addr,y
 	
-	LDA $01
-	STA $0301|!addr,y
-	
-	LDA !Scratchram_GraphicalBar_FillByteTbl
-	STA $0302|!addr,y
-	
-	LDA.b #%00110001
-	STA $0303|!addr,y
-	
+	LDX #$00
+	..OAMLoop
+		LDA $00
+		CLC
+		ADC GraphicalBarTileOffset,x
+		STA $0300|!addr,y
+		
+		LDA $01
+		STA $0301|!addr,y
+		
+		LDA !Scratchram_GraphicalBar_FillByteTbl,x
+		STA $0302|!addr,y
+		
+		LDA.b #%00110001
+		STA $0303|!addr,y
+	..Next
+		DEY
+		DEY
+		DEY
+		DEY
+		INX
+		CPX #$09
+		BCC ..OAMLoop
 	LDY #$00
-	LDA #$00
+	LDA #$08
 	LDX $15E9|!addr
 	JSL $01B7B3|!BankB
 	RTS
