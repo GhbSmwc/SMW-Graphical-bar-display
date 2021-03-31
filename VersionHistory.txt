@@ -428,4 +428,12 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
  -Table of contents are much more navigatable, linking to subsections
  -Sentences reworded.
  -Included a secondary version of doublebar, this time, it stores the second quantity as fill amount rather than
-  have both be literal quantity amount, both as percentages. This enables things like if you want secondfill to increment/decrement at a constant rate.
+  have both be literal quantity amount, both as percentages. This enables things like if you want secondfill to
+  increment/decrement at a constant rate.
+3/26/2021 to [insert date here]
+ -The javascript html's hex input now reacts to up/down arrow keys, therefore behaving closer to how number inputs
+  work (up increases the value, down decreases).
+ -ConvertBarFillAmountToTiles have been revamped to not check $0100 (game mode), rather have $00 as an input to
+  determine what sets of fill graphics to use, allowing multiple sets of graphics in the same game mode (such
+  as a layer 3 graphical bar and a sprite graphical bar).
+ -Added sprite OAM support (as a custom sprite code).
