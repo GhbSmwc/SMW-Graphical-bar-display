@@ -6,8 +6,8 @@ incsrc "../SharedSub_Defines/SubroutineDefs.asm"
 ;EXB1:
 ; $00 = Horizontal graphical bar - fill rightwards.
 ; $01 = Horizontal graphical bar - fill leftwards (YXPPCCCT's X bit set to 1).
-;
-;
+; $02 = Vertical graphical bar - fill upwards.
+; $03 = Vertical graphical bar - fill downwards (YXPPCCCT's Y bit set to 1).
 
 print "MAIN ",pc
 	PHB : PHK : PLB
@@ -69,64 +69,122 @@ DrawSpriteGraphicalBar:
 	JSL !CountNumberOfTiles		;>Have this OUTSIDE the loop and have the information of how many tiles in $02...
 	INX
 	STX $02				;>Store number of tiles in $02.
-	LDA $00
-	STA $03				;>Store the initial tile X pos in $03 (this makes writing each tile in each 8 pixels to the right)
 	LDX #$00
-	wdm
-	..OAMLoop
-		LDA $03						;\X pos
-		STA $0300|!addr,y				;/
-		
-		LDA $01						;\Y pos
-		STA $0301|!addr,y				;/
-		
-		LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\Tile number
-		STA $0302|!addr,y				;/
-		
-		...HandleXFlip
+	PHX
+	LDX $15E9|!addr
+	LDA !extra_byte_1,x
+	PLX
+	CMP #$02
+	BCS ..VerticalBar
+	..HorizontalBar
+		LDA $00
+		STA $03				;>Store the initial tile X pos in $03 (this makes writing each tile in each 8 pixels to the right)
+		...OAMLoop
+			LDA $03						;\X pos
+			STA $0300|!addr,y				;/
+			
+			LDA $01						;\Y pos
+			STA $0301|!addr,y				;/
+			
+			LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\Tile number
+			STA $0302|!addr,y				;/
+			
+			....HandleXFlip
+				PHX
+				LDX $15E9|!addr
+				LDA !extra_byte_1,x
+				PLX
+				CMP #$00				;>Needed so it does not automatically compares X (PLX sets the N and Z flags) compare with A instead.
+				BEQ .....NoFlip
+				.....Flip
+					LDA.b #%01110001
+					BRA .....Write
+				.....NoFlip
+					LDA.b #%00110001
+				.....Write
+					STA $0303|!addr,y		;>YXPPCCCT
+		...Next
 			PHX
 			LDX $15E9|!addr
 			LDA !extra_byte_1,x
 			PLX
-			CMP #$00				;>Needed so it does not automatically compares X (PLX sets the N and Z flags) compare with A instead.
+			CMP #$00				;>Needed so it does not automatically compares X (PLX sets the N and Z flags), compare with A instead.
 			BEQ ....NoFlip
 			....Flip
-				LDA.b #%01110001
+				LDA $03			;\Move tile X position by 8 pixels
+				SEC			;|
+				SBC #$08		;/
 				BRA ....Write
 			....NoFlip
-				LDA.b #%00110001
+				LDA $03			;\Move tile X position by 8 pixels
+				CLC			;|
+				ADC #$08		;/
 			....Write
-				STA $0303|!addr,y		;>YXPPCCCT
-	..Next
-		PHX
-		LDX $15E9|!addr
-		LDA !extra_byte_1,x
-		PLX
-		CMP #$00				;>Needed so it does not automatically compares X (PLX sets the N and Z flags), compare with A instead.
-		BEQ ...NoFlip
-		...Flip
-			LDA $03			;\Move tile X position by 8 pixels
-			SEC			;|
-			SBC #$08		;/
-			BRA ...Write
-		...NoFlip
-			LDA $03			;\Move tile X position by 8 pixels
-			CLC			;|
-			ADC #$08		;/
-		...Write
-			STA $03			;
-		INY			;\Next OAM slot
-		INY			;|
-		INY			;|
-		INY			;/
-		INX			;>Next graphical bar slot
-		CPX $02			;>...so it doesn't need to execute the subroutine repeatedly.
-		BCC ..OAMLoop
+				STA $03			;
+			INY			;\Next OAM slot
+			INY			;|
+			INY			;|
+			INY			;/
+			INX			;>Next graphical bar slot
+			CPX $02			;>...so it doesn't need to execute the subroutine repeatedly.
+			BCC ...OAMLoop
+			BRA ..Done
+	..VerticalBar
+		LDA $01
+		STA $03				;>Store the initial tile Y pos in $03 (this makes writing each tile in each 8 pixels to the right)
+		...OAMLoop
+			LDA $00						;\X pos
+			STA $0300|!addr,y				;/
+			
+			LDA $03						;\Y pos
+			STA $0301|!addr,y				;/
+			
+			LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\Tile number
+			STA $0302|!addr,y				;/
+			
+			....HandleYFlip
+				PHX
+				LDX $15E9|!addr
+				LDA !extra_byte_1,x
+				PLX
+				AND.b #%00000001			;>Bitwise operation
+				BEQ .....NoFlip
+				.....Flip
+					LDA.b #%10110001
+					BRA .....Write
+				.....NoFlip
+					LDA.b #%00110001
+				.....Write
+					STA $0303|!addr,y		;>YXPPCCCT
+		...Next
+			PHX
+			LDX $15E9|!addr
+			LDA !extra_byte_1,x
+			PLX
+			AND.b #%00000001			;>Bitwise operation
+			BEQ ....NoFlip
+			....Flip
+				LDA $03			;\Move tile X position by 8 pixels
+				CLC			;|
+				ADC #$08		;/
+				BRA ....Write
+			....NoFlip
+				LDA $03			;\Move tile X position by 8 pixels
+				SEC			;|
+				SBC #$08		;/
+			....Write
+				STA $03			;
+			INY			;\Next OAM slot
+			INY			;|
+			INY			;|
+			INY			;/
+			INX			;>Next graphical bar slot
+			CPX $02			;>...so it doesn't need to execute the subroutine repeatedly.
+			BCC ...OAMLoop
 	..Done
-	
-	LDX $15E9|!addr			;>Restore sprite slot
-	LDY #$00			;\Finish OAM
-	LDA $02				;|>Number of tiles to write, minus 1.
-	DEC				;|
-	JSL $01B7B3|!BankB		;/
-	RTS
+		LDX $15E9|!addr			;>Restore sprite slot
+		LDY #$00			;\Finish OAM
+		LDA $02				;|>Number of tiles to write, minus 1.
+		DEC				;|
+		JSL $01B7B3|!BankB		;/
+		RTS
