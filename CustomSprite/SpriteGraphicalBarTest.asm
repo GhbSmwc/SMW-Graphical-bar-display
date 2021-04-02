@@ -8,6 +8,13 @@ incsrc "../SharedSub_Defines/SubroutineDefs.asm"
 ; $01 = Horizontal graphical bar - fill leftwards (YXPPCCCT's X bit set to 1).
 ; $02 = Vertical graphical bar - fill upwards.
 ; $03 = Vertical graphical bar - fill downwards (YXPPCCCT's Y bit set to 1).
+;EXB2: Length of bar (number of middle tiles).
+
+;Note: A maximum of 16 OAM slots can be used (so up to 16 tiles can be drawn),
+;any higher results the 17th and beyond not being drawn. Also, there is a maximum
+;of 127 ($7F) pixel displacement from the sprite origin, which also prevent writing
+;such tiles (normally to prevent tiles wrapping the screen, OAM technically have a
+;9-bit X position).
 
 print "MAIN ",pc
 	PHB : PHK : PLB
@@ -38,7 +45,7 @@ DrawSpriteGraphicalBar:
 	STA !Scratchram_GraphicalBar_MiddlePiece		;/
 	LDA.b #!Default_RightPieces				;\Right end
 	STA !Scratchram_GraphicalBar_RightEndPiece		;/
-	LDA.b #!Default_MiddleLength				;\length (number of middle tiles)
+	LDA !extra_byte_2,x					;\length (number of middle tiles)
 	STA !Scratchram_GraphicalBar_TempLength			;/
 .ConvertToBar
 	PHX
