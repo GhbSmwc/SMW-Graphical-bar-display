@@ -2,6 +2,13 @@ incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 incsrc "../SharedSub_Defines/SubroutineDefs.asm"
 
+;Extra bytes note:
+;EXB1:
+; $00 = Horizontal graphical bar - fill rightwards.
+; $01 = Horizontal graphical bar - fill leftwards (YXPPCCCT's X bit set to 1).
+;
+;
+
 print "MAIN ",pc
 	PHB : PHK : PLB
 	JSR SpriteCode
@@ -63,25 +70,48 @@ DrawSpriteGraphicalBar:
 	INX
 	STX $02				;>Store number of tiles in $02.
 	LDA $00
-	STA $03				;>Store the inital tile X pos in $03 (this makes writing each tile in each 8 pixels to the right)
+	STA $03				;>Store the initial tile X pos in $03 (this makes writing each tile in each 8 pixels to the right)
 	LDX #$00
 	..OAMLoop
-		LDA $03
-		STA $0300|!addr,y
+		LDA $03						;\X pos
+		STA $0300|!addr,y				;/
 		
-		LDA $01
-		STA $0301|!addr,y
+		LDA $01						;\Y pos
+		STA $0301|!addr,y				;/
 		
-		LDA !Scratchram_GraphicalBar_FillByteTbl,x
-		STA $0302|!addr,y
+		LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\Tile number
+		STA $0302|!addr,y				;/
 		
-		LDA.b #%00110001
-		STA $0303|!addr,y
+		...HandleXFlip
+			PHX
+			LDX $15E9|!addr
+			LDA !extra_byte_1,x
+			PLX
+			BEQ ....NoFlip
+			....Flip
+				LDA.b #%01110001
+				BRA ....Write
+			....NoFlip
+				LDA.b #%00110001
+			....Write
+				STA $0303|!addr,y		;>YXPPCCCT
 	..Next
-		LDA $03			;\Move tile X position by 8 pixels
-		CLC			;|
-		ADC #$08		;|
-		STA $03			;/
+		PHX
+		LDX $15E9|!addr
+		LDA !extra_byte_1,x
+		PLX
+		BEQ ...NoFlip
+		...Flip
+			LDA $03			;\Move tile X position by 8 pixels
+			SEC			;|
+			SBC #$08		;/
+			BRA ...Write
+		...NoFlip
+			LDA $03			;\Move tile X position by 8 pixels
+			CLC			;|
+			ADC #$08		;/
+		...Write
+			STA $03			;
 		INY			;\Next OAM slot
 		INY			;|
 		INY			;|
