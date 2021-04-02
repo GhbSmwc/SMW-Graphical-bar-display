@@ -24,7 +24,7 @@ If you have replaced the table with the outlined fill edge, and you want the dia
 I've provided this backup table. Don't forget to open <kbd>StatusBarSettings.asm</kbd>, and change <kbd>Default_RightPieces</kbd>
 to <kbd>$06</kbd>.
 <table><tr><td><pre>	;These here are the same as above but intended for overworld border.
-		GraphicalBar_LeftEnd8x8sFillEdgeCross_Ow:
+		GraphicalBar_LeftEnd8x8sFillEdgeCross_Ow_L3:
 		db $80		;>Index: $00 (Filled amount: $00 out of $03)
 		db $81		;>Index: $01 (Filled amount: $01 out of $03)
 		db $82		;>Index: $02 (Filled amount: $02 out of $03)
@@ -37,7 +37,7 @@ to <kbd>$06</kbd>.
 		db $86		;>Index: $09 ($03 + $06 = Index: $09)
 		db $86		;>Index: $0A ($03 + $07 = Index: $0A)
 		db $86		;>Index: $0B ($03 + $08 = Index: $0B)
-		GraphicalBar_Middle8x8sFillEdgeCross_Ow:
+		GraphicalBar_Middle8x8sFillEdgeCross_Ow_L3:
 		db $87		;>Index: $00 (Filled amount: $00 out of $08)
 		db $88		;>Index: $01 (Filled amount: $01 out of $08)
 		db $89		;>Index: $02 (Filled amount: $02 out of $08)
@@ -55,7 +55,7 @@ to <kbd>$06</kbd>.
 		db $93		;>Index: $0E ($08 + $06 = Index: $0E)
 		db $93		;>Index: $0F ($08 + $07 = Index: $0F)
 		db $93		;>Index: $10 ($08 + $08 = Index: $10) Maximum value of next tile ($08 of next middle tile vs $03 of right end)
-		GraphicalBar_RightEnd8x8sFillEdgeCross_Ow:
+		GraphicalBar_RightEnd8x8sFillEdgeCross_Ow_L3:
 		db $94		;>Index: $00 (Filled amount: $00 out of $06)
 		db $95		;>Index: $01 (Filled amount: $01 out of $06)
 		db $96		;>Index: $02 (Filled amount: $02 out of $06)

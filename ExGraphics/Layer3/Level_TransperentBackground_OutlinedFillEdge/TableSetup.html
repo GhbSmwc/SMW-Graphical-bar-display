@@ -24,7 +24,7 @@ Replace the current table (for &ldquo;DiagonalFillEdge&rdquo;) with this table,
 and then open <kbd>StatusBarSettings.asm</kbd>, and change <kbd>Default_RightPieces</kbd>
 to <kbd>$04</kbd>.
 <table><tr><td><pre>	;This is for level:
-		GraphicalBar_LeftEnd8x8sFillEdgeCross:
+		GraphicalBar_LeftEnd8x8sFillEdgeCross_Lvl_L3:
 		db $36		;>Index: $00 (Filled amount: $00 out of $03)
 		db $37		;>Index: $01 (Filled amount: $01 out of $03)
 		db $38		;>Index: $02 (Filled amount: $02 out of $03)
@@ -37,7 +37,7 @@ to <kbd>$04</kbd>.
 		db $35		;>Index: $09 ($03 + $06 = Index: $09)
 		db $35		;>Index: $0A ($03 + $07 = Index: $0A)
 		db $35		;>Index: $0B ($03 + $08 = Index: $0B)
-		GraphicalBar_Middle8x8sFillEdgeCross:
+		GraphicalBar_Middle8x8sFillEdgeCross_Lvl_L3:
 		db $55		;>Index: $00 (Filled amount: $00 out of $08)
 		db $56		;>Index: $01 (Filled amount: $01 out of $08)
 		db $57		;>Index: $02 (Filled amount: $02 out of $08)
@@ -55,7 +55,7 @@ to <kbd>$04</kbd>.
 		db $5A		;>Index: $0E ($08 + $06 = Index: $0E)
 		db $5A		;>Index: $0F ($08 + $07 = Index: $0F)
 		db $5A		;>Index: $10 ($08 + $08 = Index: $10) Maximum value of next tile ($08 of next middle tile vs $03 of right end)
-		GraphicalBar_RightEnd8x8sFillEdgeCross:
+		GraphicalBar_RightEnd8x8sFillEdgeCross_Lvl_L3:
 		db $50		;>Index: $00 (Filled amount: $00 out of $04)
 		db $51		;>Index: $01 (Filled amount: $01 out of $04)
 		db $52		;>Index: $02 (Filled amount: $02 out of $04)

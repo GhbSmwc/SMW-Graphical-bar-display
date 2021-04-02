@@ -29,7 +29,6 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;  -#$02 = Overworld, layer 3
 ;  You can add more sets of bar tiles by adding a new table as well as adding code
 ;  to use the new table.
-;
 ; -!Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
 ;  the maximum amount of fill for this byte itself. If 0, it's not included in table.
 ; -!Scratchram_GraphicalBar_MiddlePiece: Same as above but each middle byte.
@@ -471,12 +470,18 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 ;ideal for outlined edges or slated edge fills.
 ;
 ;Works like this: Consider the fill amount: [$03, $01]
-;Now the "head" of the fill is on the second byte, to accomodate this, the first byte
+;Now the "head" of the fill is on the second byte, to accommodate this, the first byte
 ;will take that amount ($03) and add by the next tile ($01, which results $03 + $01 = $04).
 ;
 ;This by default, uses the slanted fill edge and not the outlined edge.
 ;
 ;Input:
+; -$00: What set of graphics to use. Under default setting and code:
+;  -#$00 = Level, layer 3
+;  -#$01 = Level, sprite
+;  -#$02 = Overworld, layer 3 (not added)
+;  You can add more sets of bar tiles by adding a new table as well as adding code
+;  to use the new table.
 ; -!Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
 ;  the maximum amount of fill for this byte itself. If 0, it's not included in table.
 ; -!Scratchram_GraphicalBar_MiddlePiece: Same as above but each middle byte.
@@ -502,7 +507,7 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 ;Use a rapid-flicker or don't use double-bar at all.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;This is for level:
-		GraphicalBar_LeftEnd8x8sFillEdgeCross:
+		GraphicalBar_LeftEnd8x8sFillEdgeCross_Lvl_L3:
 		db $36		;>Index: $00 (Filled amount: $00 out of $03)
 		db $37		;>Index: $01 (Filled amount: $01 out of $03)
 		db $38		;>Index: $02 (Filled amount: $02 out of $03)
@@ -515,7 +520,7 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 		db $47		;>Index: $09 ($03 + $06 = Index: $09)
 		db $47		;>Index: $0A ($03 + $07 = Index: $0A)
 		db $47		;>Index: $0B ($03 + $08 = Index: $0B)
-		GraphicalBar_Middle8x8sFillEdgeCross:
+		GraphicalBar_Middle8x8sFillEdgeCross_Lvl_L3:
 		db $4B		;>Index: $00 (Filled amount: $00 out of $08)
 		db $4C		;>Index: $01 (Filled amount: $01 out of $08)
 		db $4D		;>Index: $02 (Filled amount: $02 out of $08)
@@ -533,7 +538,7 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 		db $56		;>Index: $0E ($08 + $06 = Index: $0E)
 		db $56		;>Index: $0F ($08 + $07 = Index: $0F)
 		db $56		;>Index: $10 ($08 + $08 = Index: $10) Maximum value of next tile ($08 of next middle tile vs $03 of right end)
-		GraphicalBar_RightEnd8x8sFillEdgeCross:
+		GraphicalBar_RightEnd8x8sFillEdgeCross_Lvl_L3:
 		db $57		;>Index: $00 (Filled amount: $00 out of $06)
 		db $58		;>Index: $01 (Filled amount: $01 out of $06)
 		db $59		;>Index: $02 (Filled amount: $02 out of $06)
@@ -542,7 +547,7 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 		db $5C		;>Index: $05 (Filled amount: $05 out of $06)
 		db $5D		;>Index: $06 (Filled amount: $06 out of $06)
 	;These here are the same as above but intended for overworld border.
-		GraphicalBar_LeftEnd8x8sFillEdgeCross_Ow:
+		GraphicalBar_LeftEnd8x8sFillEdgeCross_Ow_L3:
 		db $80		;>Index: $00 (Filled amount: $00 out of $03)
 		db $81		;>Index: $01 (Filled amount: $01 out of $03)
 		db $82		;>Index: $02 (Filled amount: $02 out of $03)
@@ -555,7 +560,7 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 		db $86		;>Index: $09 ($03 + $06 = Index: $09)
 		db $86		;>Index: $0A ($03 + $07 = Index: $0A)
 		db $86		;>Index: $0B ($03 + $08 = Index: $0B)
-		GraphicalBar_Middle8x8sFillEdgeCross_Ow:
+		GraphicalBar_Middle8x8sFillEdgeCross_Ow_L3:
 		db $87		;>Index: $00 (Filled amount: $00 out of $08)
 		db $88		;>Index: $01 (Filled amount: $01 out of $08)
 		db $89		;>Index: $02 (Filled amount: $02 out of $08)
@@ -573,7 +578,7 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 		db $93		;>Index: $0E ($08 + $06 = Index: $0E)
 		db $93		;>Index: $0F ($08 + $07 = Index: $0F)
 		db $93		;>Index: $10 ($08 + $08 = Index: $10) Maximum value of next tile ($08 of next middle tile vs $03 of right end)
-		GraphicalBar_RightEnd8x8sFillEdgeCross_Ow:
+		GraphicalBar_RightEnd8x8sFillEdgeCross_Ow_L3:
 		db $94		;>Index: $00 (Filled amount: $00 out of $06)
 		db $95		;>Index: $01 (Filled amount: $01 out of $06)
 		db $96		;>Index: $02 (Filled amount: $02 out of $06)
@@ -591,23 +596,12 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 				JSL CountNumberOfTiles
 				TXA
 				STA $02
-		;Level or overworld?
-			.WhatTableToUse
-				STZ $00						;>Default to "Level"
-				LDA $0100|!addr					;\If gamemode value is #$0F or higher, that is level
-				CMP #$0F					;|
-				BCS ..Level					;/
-			
-				..Overworld
-					INC $00						;>Otherwise assume its overworld.
-			
-				..Level
-					if !Setting_GraphicalBar_IndexSize == 0
-						LDX #$00
-					else
-						REP #$10								;>16-bit XY
-						LDX #$0000								;>The index for what byte tile position to write.
-					endif
+				if !Setting_GraphicalBar_IndexSize == 0
+					LDX #$00
+				else
+					REP #$10								;>16-bit XY
+					LDX #$0000								;>The index for what byte tile position to write.
+				endif
 		;Left end
 			.LeftEndTranslate
 				LDA !Scratchram_GraphicalBar_LeftEndPiece	;\can only be either 0 or the correct number of pieces listed in the table.
@@ -623,10 +617,10 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 					SEP #$20
 				endif
 				LDA $00
-				BEQ ..Level
+				BEQ ..LevelLayer3
 				
-				..Overworld
-					...CheckNextTileForOutline
+				..OverworldLayer3
+					...CheckNextTileForFillEdge
 						INX							;>Next tile
 						CPX $02							;\If next tile is nonexistent (past the last tile),
 						BEQ ....Valid						;|treat as if you shouldn't add with it.
@@ -644,11 +638,11 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 							LDA !Scratchram_GraphicalBar_FillByteTbl,x	;>Load current tile without adding by an invalid value
 							TAY
 						....LoadTileNumber
-							LDA GraphicalBar_LeftEnd8x8sFillEdgeCross_Ow,y
+							LDA GraphicalBar_LeftEnd8x8sFillEdgeCross_Ow_L3,y
 							BRA ..WriteTable
 			
-				..Level
-					...CheckNextTileForOutline
+				..LevelLayer3
+					...CheckNextTileForFillEdge
 						INX							;>Next tile
 						CPX $02							;\If next tile is nonexistent (past the last tile),
 						BEQ ....Valid						;|treat as if you shouldn't add with it.
@@ -666,11 +660,11 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 							LDA !Scratchram_GraphicalBar_FillByteTbl,x	;>Load current tile without adding by an invalid value
 							TAY
 						....LoadTileNumber
-							LDA GraphicalBar_LeftEnd8x8sFillEdgeCross,y
+							LDA GraphicalBar_LeftEnd8x8sFillEdgeCross_Lvl_L3,y
 							BRA ..WriteTable
 				..WriteTable
-				STA !Scratchram_GraphicalBar_FillByteTbl		;/
-				INX							;>next tile byte
+					STA !Scratchram_GraphicalBar_FillByteTbl		;/
+					INX							;>next tile byte
 		;Middle
 			.MiddleTranslate
 				LDA !Scratchram_GraphicalBar_MiddlePiece	;\check if middle exist.
@@ -698,10 +692,10 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 						SEP #$20
 					endif
 					LDA $00
-					BEQ ...Level
+					BEQ ...LevelLayer3
 				
-					...Overworld
-						....CheckNextTileForOutline
+					...OverworldLayer3
+						....CheckNextTileForFillEdge
 						INX							;>Next tile
 						CPX $02							;\If next tile is nonexistent (past the last tile),
 						BEQ .....Valid						;|treat as if you shouldn't add with it.
@@ -719,11 +713,11 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 							LDA !Scratchram_GraphicalBar_FillByteTbl,x	;>Load current tile without adding by an invalid value
 							TAY
 						.....LoadTileNumber
-							LDA GraphicalBar_Middle8x8sFillEdgeCross_Ow,y
+							LDA GraphicalBar_Middle8x8sFillEdgeCross_Ow_L3,y
 							BRA ...WriteTable
 					
-					...Level
-						....CheckNextTileForOutline
+					...LevelLayer3
+						....CheckNextTileForFillEdge
 						INX							;>Next tile
 						CPX $02							;\If next tile is nonexistent (past the last tile),
 						BEQ .....Valid						;|treat as if you shouldn't add with it.
@@ -741,7 +735,7 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 							LDA !Scratchram_GraphicalBar_FillByteTbl,x	;>Load current tile without adding by an invalid value
 							TAY
 						.....LoadTileNumber
-							LDA GraphicalBar_Middle8x8sFillEdgeCross,y
+							LDA GraphicalBar_Middle8x8sFillEdgeCross_Lvl_L3,y
 					...WriteTable
 						STA !Scratchram_GraphicalBar_FillByteTbl,x	;/
 					
@@ -768,14 +762,14 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 					SEP #$20
 				endif
 				LDA $00
-				BEQ ..Level
+				BEQ ..LevelLayer3
 			
-				..Overworld
-					LDA GraphicalBar_RightEnd8x8sFillEdgeCross_Ow,y
+				..OverworldLayer3
+					LDA GraphicalBar_RightEnd8x8sFillEdgeCross_Ow_L3,y
 					BRA ..WriteTable
 			
-				..Level
-					LDA GraphicalBar_RightEnd8x8sFillEdgeCross,y
+				..LevelLayer3
+					LDA GraphicalBar_RightEnd8x8sFillEdgeCross_Lvl_L3,y
 				
 				..WriteTable
 					STA !Scratchram_GraphicalBar_FillByteTbl,x

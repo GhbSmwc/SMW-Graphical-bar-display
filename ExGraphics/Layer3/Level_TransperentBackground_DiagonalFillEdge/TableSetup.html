@@ -24,7 +24,7 @@ If you have replaced the table with the outlined fill edge, and you want the dia
 I've provided this backup table. Don't forget to open <kbd>StatusBarSettings.asm</kbd>, and change <kbd>Default_RightPieces</kbd>
 to <kbd>$06</kbd>.
 <table><tr><td><pre>	;This is for level:
-		GraphicalBar_LeftEnd8x8sFillEdgeCross:
+		GraphicalBar_LeftEnd8x8sFillEdgeCross_Lvl_L3:
 		db $36		;>Index: $00 (Filled amount: $00 out of $03)
 		db $37		;>Index: $01 (Filled amount: $01 out of $03)
 		db $38		;>Index: $02 (Filled amount: $02 out of $03)
@@ -37,7 +37,7 @@ to <kbd>$06</kbd>.
 		db $47		;>Index: $09 ($03 + $06 = Index: $09)
 		db $47		;>Index: $0A ($03 + $07 = Index: $0A)
 		db $47		;>Index: $0B ($03 + $08 = Index: $0B)
-		GraphicalBar_Middle8x8sFillEdgeCross:
+		GraphicalBar_Middle8x8sFillEdgeCross_Lvl_L3:
 		db $4B		;>Index: $00 (Filled amount: $00 out of $08)
 		db $4C		;>Index: $01 (Filled amount: $01 out of $08)
 		db $4D		;>Index: $02 (Filled amount: $02 out of $08)
@@ -55,7 +55,7 @@ to <kbd>$06</kbd>.
 		db $56		;>Index: $0E ($08 + $06 = Index: $0E)
 		db $56		;>Index: $0F ($08 + $07 = Index: $0F)
 		db $56		;>Index: $10 ($08 + $08 = Index: $10) Maximum value of next tile ($08 of next middle tile vs $03 of right end)
-		GraphicalBar_RightEnd8x8sFillEdgeCross:
+		GraphicalBar_RightEnd8x8sFillEdgeCross_Lvl_L3:
 		db $57		;>Index: $00 (Filled amount: $00 out of $06)
 		db $58		;>Index: $01 (Filled amount: $01 out of $06)
 		db $59		;>Index: $02 (Filled amount: $02 out of $06)
