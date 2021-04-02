@@ -14,17 +14,6 @@ SpriteCode:
 	PLB
 	RTS
 	
-	
-GraphicalBarTileOffset:
-	db $00
-	db $08
-	db $10
-	db $18
-	db $20
-	db $28
-	db $30
-	db $38
-	db $40
 DrawSpriteGraphicalBar:
 .InputRatio
 	LDA $14							;\Quantity
@@ -72,12 +61,12 @@ DrawSpriteGraphicalBar:
 
 	JSL !CountNumberOfTiles		;>Have this OUTSIDE the loop and have the information of how many tiles in $02...
 	INX
-	STX $02
+	STX $02				;>Store number of tiles in $02.
+	LDA $00
+	STA $03				;>Store the inital tile X pos in $03 (this makes writing each tile in each 8 pixels to the right)
 	LDX #$00
 	..OAMLoop
-		LDA $00
-		CLC
-		ADC GraphicalBarTileOffset,x
+		LDA $03
 		STA $0300|!addr,y
 		
 		LDA $01
@@ -89,6 +78,10 @@ DrawSpriteGraphicalBar:
 		LDA.b #%00110001
 		STA $0303|!addr,y
 	..Next
+		LDA $03			;\Move tile X position by 8 pixels
+		CLC			;|
+		ADC #$08		;|
+		STA $03			;/
 		INY			;\Next OAM slot
 		INY			;|
 		INY			;|
@@ -96,6 +89,8 @@ DrawSpriteGraphicalBar:
 		INX			;>Next graphical bar slot
 		CPX $02			;>...so it doesn't need to execute the subroutine repeatedly.
 		BCC ..OAMLoop
+	..Done
+	
 	LDX $15E9|!addr			;>Restore sprite slot
 	LDY #$00			;\Finish OAM
 	LDA $02				;|>Number of tiles to write, minus 1.
