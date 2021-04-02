@@ -69,7 +69,10 @@ DrawSpriteGraphicalBar:
 	;$0204 to $03FF = repeat of above every 4 bytes.
 	;
 	;We start at $0300 because I have a feeling that $0200-$02FF is used by something else.
-	
+
+	JSL !CountNumberOfTiles		;>Have this OUTSIDE the loop and have the information of how many tiles in $02...
+	INX
+	STX $02
 	LDX #$00
 	..OAMLoop
 		LDA $00
@@ -86,15 +89,16 @@ DrawSpriteGraphicalBar:
 		LDA.b #%00110001
 		STA $0303|!addr,y
 	..Next
-		INY
-		INY
-		INY
-		INY
-		INX
-		CPX #$09
+		INY			;\Next OAM slot
+		INY			;|
+		INY			;|
+		INY			;/
+		INX			;>Next graphical bar slot
+		CPX $02			;>...so it doesn't need to execute the subroutine repeatedly.
 		BCC ..OAMLoop
-	LDY #$00
-	LDA #$08
-	LDX $15E9|!addr
-	JSL $01B7B3|!BankB
+	LDX $15E9|!addr			;>Restore sprite slot
+	LDY #$00			;\Finish OAM
+	LDA $02				;|>Number of tiles to write, minus 1.
+	DEC				;|
+	JSL $01B7B3|!BankB		;/
 	RTS
