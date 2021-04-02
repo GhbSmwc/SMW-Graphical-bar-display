@@ -72,6 +72,7 @@ DrawSpriteGraphicalBar:
 	LDA $00
 	STA $03				;>Store the initial tile X pos in $03 (this makes writing each tile in each 8 pixels to the right)
 	LDX #$00
+	wdm
 	..OAMLoop
 		LDA $03						;\X pos
 		STA $0300|!addr,y				;/
@@ -87,6 +88,7 @@ DrawSpriteGraphicalBar:
 			LDX $15E9|!addr
 			LDA !extra_byte_1,x
 			PLX
+			CMP #$00				;>Needed so it does not automatically compares X (PLX sets the N and Z flags) compare with A instead.
 			BEQ ....NoFlip
 			....Flip
 				LDA.b #%01110001
@@ -100,6 +102,7 @@ DrawSpriteGraphicalBar:
 		LDX $15E9|!addr
 		LDA !extra_byte_1,x
 		PLX
+		CMP #$00				;>Needed so it does not automatically compares X (PLX sets the N and Z flags), compare with A instead.
 		BEQ ...NoFlip
 		...Flip
 			LDA $03			;\Move tile X position by 8 pixels
