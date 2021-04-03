@@ -20,7 +20,7 @@
 
 assert !OAMSlot%4 == 0, "Invalid OAM slot number."
 
-if !PatchMode != 0
+if !PatchMode == 0
 	org $00A2E6				;>$00A2E6 is the code that runs at the end of the frame, after ALL sprite tiles are written.
 	autoclean JML DrawGraphicalBar
 else
@@ -31,11 +31,12 @@ else
 	JSL $028AB1
 endif
 
-freecode
-
-DrawGraphicalBar:
-	.MainCode
-		;insert code here.
-	.Restore
-		JSL $028AB1		;>Restore the JSL
-		JML $00A2EA		;>Continue onwards
+if !PatchMode == 0
+	freecode
+	DrawGraphicalBar:
+		.MainCode
+			;insert code here.
+		.Restore
+			JSL $028AB1		;>Restore the JSL
+			JML $00A2EA		;>Continue onwards
+endif
