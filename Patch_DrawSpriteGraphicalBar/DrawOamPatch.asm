@@ -199,14 +199,15 @@ if !PatchMode == 0
 								SEP #$20
 								BPL ....Next	;/
 							.....XPos
-								wdm
 								LDA $04			;\Low 8 bits
 								STA $0200|!addr,y	;/
+								REP #$30
 								TYA
 								LSR #2			;\Handle 9th bit X position
 								PHY			;|
 								TAY			;|
 								LDA $05			;|
+								SEP #$20
 								AND.b #%00000001	;|
 								STA $0420|!addr,y	;/
 								PLY
