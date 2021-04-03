@@ -84,150 +84,151 @@ if !PatchMode == 0
 	;Main code
 	;;;;;;;;;;;;;;;;;;;;
 	DrawGraphicalBar:
-		PHB		;\In case if you are going to use tables using 16-bit addressing
-		PHK		;|
-		PLB		;/
+		.RestoreOverwrittenCode
+			JSL $028AB1		;>Restore the JSL (we write our own OAM after all sprite OAM of SMW are finished)
 		.MainCode
-		.InputRatio
-			LDA $14							;\Quantity
-			STA !Scratchram_GraphicalBar_FillByteTbl		;/
-			LDA #$00						;\High byte quantity
-			STA !Scratchram_GraphicalBar_FillByteTbl+1		;/
-			LDA #$FF						;\Max quantity
-			STA !Scratchram_GraphicalBar_FillByteTbl+2		;/
-			LDA #$00						;\High byte of max quantity
-			STA !Scratchram_GraphicalBar_FillByteTbl+3		;/
-		.InputGraphicalBarAttributes
-			LDA.b #!Default_LeftPieces				;\Left end normally have 3 pieces.
-			STA !Scratchram_GraphicalBar_LeftEndPiece		;/
-			LDA.b #!Default_MiddlePieces				;\Number of pieces in each middle byte/8x8 tile
-			STA !Scratchram_GraphicalBar_MiddlePiece		;/
-			LDA.b #!Default_RightPieces				;\Right end
-			STA !Scratchram_GraphicalBar_RightEndPiece		;/
-			LDA.b #5						;\length (number of middle tiles)
-			STA !Scratchram_GraphicalBar_TempLength			;/
-		.ConvertToBar
-			JSL !CalculateGraphicalBarPercentage				;>Get percentage
-			JSL !RoundAwayEmptyFull
-			JSL !DrawGraphicalBar						;>get bar values.
-			LDA #$01							;\Use Level-sprite tileset
-			STA $00								;/
-			JSL !ConvertBarFillAmountToTiles				;>Convert tiles.
-			JSL !CountNumberOfTiles		;>Have this OUTSIDE the loop and have the information of how many tiles in $02...
-			INX
-			STX $06				;>Store number of tiles in $06.
-			STZ $07
-			REP #$10
-			LDX $06				;>Load number of tiles as 16-bit X
-			PHX
-			JSR FindNFreeOAMSlot
-			PLX
-			BCC +
-			JMP .Restore			;>Not slots available, don't write any of the graphical bar (failsafe).
-			+
-			REP #$20			;\Write position
-			LDA.w #!XPos			;|
-			STA $00				;|
-			LDA.w #!Ypos			;|
-			STA $02				;|
-			SEP #$20			;/
-			wdm
-			;$00-$01 = X pos
-			;$02-$03 = Y pos
-			;$04-$05 = Displacement of each tile
-			;$06-$07 = Number of tiles to write.
-			;Y index = OAM index (inc by 4)
-			;X index = which tile of the graphical bar
-			LDX #$0000			;>Start loop
-			..HorizontalBar
-				LDA $00				;\Store the initial tile X pos in $03 (this makes writing each tile in each 8 pixels to the right)
-				STA $04				;/
-				LDY.w #!OAMSlot*4
-				...OAMLoop
-					;Check if OAM is used by something else, if yes, pick another OAM slot
-						....CheckOAMUsed
-							LDA $0201|!addr,y
-							CMP #$F0
-							BEQ .....NotUsed
-							
-							.....Used
-								INY
-								INY
-								INY
-								INY
-								BRA ....CheckOAMUsed
-							.....NotUsed
-					;Screen and positions
-						....CheckIfOnScreen
-							REP #$20	;\If offscreen, go to next tile of the graphical bar, and reuse the same OAM index
-							LDA $00		;|
-							CMP #$FFF8+1	;|
-							SEP #$20	;|
-							BMI ...Next	;|
-							REP #$20	;|
-							CMP #$0100	;|
-							SEP #$20	;|
-							BPL ...Next	;|
-							REP #$20	;|
-							LDA $02		;|
-							CMP #$FFF8+1	;|
-							SEP #$20	;|
-							BMI ...Next	;|
-							REP #$20	;|
-							CMP #$00E0	;|
-							SEP #$20
-							BPL ...Next	;/
-						....XPos
-							LDA $04			;\Low 8 bits
-							STA $0200|!addr,y	;/
-							TYA
-							LSR #2			;\Handle 9th bit X position
-							PHY			;|
-							TAY			;|
-							LDA $01			;|Bits 2-7 is dangerous to be set.
-							AND.b #%00000001	;|
-							STA $0420|!addr,y	;/
-							PLY
-						....YPos
-							LDA $02						;\Y pos
-							STA $0201|!addr,y				;/
-					;Tile stuff
-						LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\Tile number
-						STA $0202|!addr,y				;/
-						;YXPPCCCT
-						;(!Yflip<<7)+(!XFlip<<6)+(!Priority<<4)+(!Palette<<1)+(!PageNum<<0)
-						;!PageNum: (0-1) - page number
-						;!Palette: (0-7) - palette
-						;!Priority: (0-3) - priority
-						;!XFlip: (0-1) - X flip
-						;!YFlip: (0-1) - Y flip
-							LDA.b #(!Yflip<<7)+(!Default_LeftwardsBar<<6)+(3<<4)+(!Palette<<1)+(!PageNum<<0)
-							STA $0203|!addr,y		;>YXPPCCCT
-				...NextOamSlotAndBarTile
-					INY			;\Next OAM slot (only next if the OAM tile is onscreen)
-					INY			;|
-					INY			;|
-					INY			;/
-				...Next
-					REP #$20			;\Move tile position by 8 pixels
-					LDA $04				;|
-					if !Default_LeftwardsBar == 0
-						CLC			;|
-						ADC #$0008		;|
-					else
-						SEC			;|
-						SBC #$0008		;|
-					endif
-					STA $04				;|
-					SEP #$20			;/
-					INX				;>Next graphical bar slot
-					CPX $06				;\Loop until all graphical bar tiles are written.
-					BCC ...OAMLoop			;/
-			..Done
+				PHB		;\In case if you are going to use tables using 16-bit addressing
+				PHK		;|
+				PLB		;/
+			..InputRatio
+				LDA $14							;\Quantity
+				STA !Scratchram_GraphicalBar_FillByteTbl		;/
+				LDA #$00						;\High byte quantity
+				STA !Scratchram_GraphicalBar_FillByteTbl+1		;/
+				LDA #$FF						;\Max quantity
+				STA !Scratchram_GraphicalBar_FillByteTbl+2		;/
+				LDA #$00						;\High byte of max quantity
+				STA !Scratchram_GraphicalBar_FillByteTbl+3		;/
+			..InputGraphicalBarAttributes
+				LDA.b #!Default_LeftPieces				;\Left end normally have 3 pieces.
+				STA !Scratchram_GraphicalBar_LeftEndPiece		;/
+				LDA.b #!Default_MiddlePieces				;\Number of pieces in each middle byte/8x8 tile
+				STA !Scratchram_GraphicalBar_MiddlePiece		;/
+				LDA.b #!Default_RightPieces				;\Right end
+				STA !Scratchram_GraphicalBar_RightEndPiece		;/
+				LDA.b #5						;\length (number of middle tiles)
+				STA !Scratchram_GraphicalBar_TempLength			;/
+			..ConvertToBar
+				JSL !CalculateGraphicalBarPercentage				;>Get percentage
+				JSL !RoundAwayEmptyFull
+				JSL !DrawGraphicalBar						;>get bar values.
+				LDA #$01							;\Use Level-sprite tileset
+				STA $00								;/
+				JSL !ConvertBarFillAmountToTiles				;>Convert tiles.
+				JSL !CountNumberOfTiles		;>Have this OUTSIDE the loop and have the information of how many tiles in $02...
+				INX
+				STX $06				;>Store number of tiles in $06.
+				STZ $07
+				REP #$10
+				LDX $06				;>Load number of tiles as 16-bit X
+				PHX
+				JSR FindNFreeOAMSlot
+				PLX
+				BCC +
+				JMP .Restore			;>Not slots available, don't write any of the graphical bar (failsafe).
+				+
+				REP #$20			;\Write position
+				LDA.w #!XPos			;|
+				STA $00				;|
+				LDA.w #!Ypos			;|
+				STA $02				;|
+				SEP #$20			;/
+				wdm
+				;$00-$01 = X pos
+				;$02-$03 = Y pos
+				;$04-$05 = Displacement of each tile
+				;$06-$07 = Number of tiles to write.
+				;Y index = OAM index (inc by 4)
+				;X index = which tile of the graphical bar
+				LDX #$0000			;>Start loop
+				...HorizontalBar
+					LDA $00				;\Store the initial tile X pos in $03 (this makes writing each tile in each 8 pixels to the right)
+					STA $04				;/
+					LDY.w #!OAMSlot*4
+					....OAMLoop
+						;Check if OAM is used by something else, if yes, pick another OAM slot
+							.....CheckOAMUsed
+								LDA $0201|!addr,y
+								CMP #$F0
+								BEQ ......NotUsed
+								
+								......Used
+									INY
+									INY
+									INY
+									INY
+									BRA .....CheckOAMUsed
+								......NotUsed
+						;Screen and positions
+							.....CheckIfOnScreen
+								REP #$20	;\If offscreen, go to next tile of the graphical bar, and reuse the same OAM index
+								LDA $00		;|
+								CMP #$FFF8+1	;|
+								SEP #$20	;|
+								BMI ....Next	;|
+								REP #$20	;|
+								CMP #$0100	;|
+								SEP #$20	;|
+								BPL ....Next	;|
+								REP #$20	;|
+								LDA $02		;|
+								CMP #$FFF8+1	;|
+								SEP #$20	;|
+								BMI ....Next	;|
+								REP #$20	;|
+								CMP #$00E0	;|
+								SEP #$20
+								BPL ....Next	;/
+							.....XPos
+								LDA $04			;\Low 8 bits
+								STA $0200|!addr,y	;/
+								TYA
+								LSR #2			;\Handle 9th bit X position
+								PHY			;|
+								TAY			;|
+								LDA $01			;|Bits 2-7 is dangerous to be set.
+								AND.b #%00000001	;|
+								STA $0420|!addr,y	;/
+								PLY
+							.....YPos
+								LDA $02						;\Y pos
+								STA $0201|!addr,y				;/
+						;Tile stuff
+							LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\Tile number
+							STA $0202|!addr,y				;/
+							;YXPPCCCT
+							;(!Yflip<<7)+(!XFlip<<6)+(!Priority<<4)+(!Palette<<1)+(!PageNum<<0)
+							;!PageNum: (0-1) - page number
+							;!Palette: (0-7) - palette
+							;!Priority: (0-3) - priority
+							;!XFlip: (0-1) - X flip
+							;!YFlip: (0-1) - Y flip
+								LDA.b #(!Yflip<<7)+(!Default_LeftwardsBar<<6)+(3<<4)+(!Palette<<1)+(!PageNum<<0)
+								STA $0203|!addr,y		;>YXPPCCCT
+					....NextOamSlotAndBarTile
+						INY			;\Next OAM slot (only next if the OAM tile is onscreen)
+						INY			;|
+						INY			;|
+						INY			;/
+					....Next
+						REP #$20			;\Move tile position by 8 pixels
+						LDA $04				;|
+						if !Default_LeftwardsBar == 0
+							CLC			;|
+							ADC #$0008		;|
+						else
+							SEC			;|
+							SBC #$0008		;|
+						endif
+						STA $04				;|
+						SEP #$20			;/
+						INX				;>Next graphical bar slot
+						CPX $06				;\Loop until all graphical bar tiles are written.
+						BCC ....OAMLoop			;/
+				...Done
 		.Restore
 			SEP #$30
 			PLB
-			JSL $028AB1		;>Restore the JSL
 			JML $00A2EA		;>Continue onwards
 			
 	;;;;;;;;;;;;;
