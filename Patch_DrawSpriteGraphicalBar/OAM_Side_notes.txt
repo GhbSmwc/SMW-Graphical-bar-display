@@ -1,3 +1,7 @@
+This is just a note for myself and potentially others stumbled across a glitch related to
+writing OAM and wanted to debug it. It just contains a conversion table between slot numbers,
+indexes, and the RAM to write.
+
 Slot:       Index (increments of 4): $0200:      $0420
 +------------------------------------------------------
 0   ($00)   0   ($0000)              $0200-$0203 $0420

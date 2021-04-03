@@ -75,6 +75,7 @@ named <span class="NoLineBreak"><kbd>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</kb
 </ul>
 <ul>
 	<li><a href="#CustomSprites" id="CustomSprites_Back">Custom sprites (not: cluster, extended, minor extended, etc.)</li>
+	<li><a href="#DrawOamPatch" id="DrawOamPatch_Back">Drawing OAM using a patch.</a></li>
 </ul>
 <li><a href="#Notes" id="NotesBack">Notes</a></li>
 <li><a href="#Credits" id="CreditsBack">Credits</a></li>
@@ -1249,7 +1250,7 @@ would support sprite OAM.</p>
 </ul>
 <h3>Insertion process (test sprite)</h3>
 <ol>
-	<li>Shared subroutines patch</li>
+	<li><span id="SSInstallation">Shared subroutines patch</span></li>
 		<ol>
 			<li>Before you use Shared Subroutines patch, read the readme and several comments in there! A simple mistake can cause issues.</li><br>
 			<li>The routines in <kbd>GraphicalBarELITE.asm</kbd>, <kbd>GraphicalBarConvertToTile.asm</kbd>, and <kbd>GraphicalBarOtherRoutines.asm</kbd>, copy that (and only the subroutines, you CAN include the comments), paste it in a temporary blank
@@ -1299,7 +1300,7 @@ autoclean JML CountNumberOfTiles</pre></td></tr></table>
 		</ol>
 	<li>Custom sprite</li>
 		<ol>
-		<li>In the Shared Subroutines folder, you'll want a copy of <kbd>SharedSub_Defines</kbd> folder in pixi's main directory (where the exe is at, not in any
+		<li>In the Shared Subroutines folder, you'll want a copy of <kbd>SharedSub_Defines</kbd> <b>AND</b> <kbd>GraphicalBarDefines</kbd> folder in pixi's main directory (where the exe is at, not in any
 		subfolders).</li>
 		<li>Same goes with <kbd>GraphicalBarDefines</kbd> folder. Have it just like above.</li>
 		</ol>
@@ -1307,10 +1308,35 @@ autoclean JML CountNumberOfTiles</pre></td></tr></table>
 
 </p>
 <hr>
+<h2><a href="#DrawOamPatch_Back" id="DrawOamPatch">^</a>Drawing OAM using a patch.</h2>
+<p>This is similar to the sprite version, but written using a patch. Using a hijack at $00A2E6 and running the patch's OAM handler AFTER processing all sprites (including after $028AB1), gives
+the benefit of tile priority so that no other sprite will overlap the bar (OAM is handled so that the lower indexes have higher priority and is rendered in front of the high-indexed OAM slots).</p>
+What you need (very similar to the custom sprite one mentioned above):
+<ul>
+	<li>Asar</li>
+	<li>Shared subroutines patch</li>
+</ul>
+To install:
+<ol>
+	<li>Have your defines ready, by placing (copy and paste) these listed folders in the same directory as <kbd>SMW-Graphical-bar-display/Patch_DrawSpriteGraphicalBar</kbd>:
+		<ul>
+			<li><kbd>GraphicalBarDefines</kbd></li>
+			<li><kbd>SharedSub_Defines</kbd></li>
+			
+		</ul>
+	</li>
+	<li>Apply the shared subroutines patch, following the instructions as <a href="#SSInstallation">previously mentioned</a>.</li>
+	<li>Simply patch <kbd>SMW-Graphical-bar-display/Patch_DrawSpriteGraphicalBar/DrawOamPatch.asm</kbd> to your game.</li>
+</ol><br>
+
+You can uninstall it by simply opening the patch, and set <kbd>PatchMode</kbd> to <kbd>1</kbd>, and reapplying it.
+
+<hr>
 <h2><a href="#CreditsBack" id="Credits">^</a>Credits</h2>
 <ul>
 <li><a href="https://www.smwcentral.net/?p=profile&id=8691">Akaginite</a>, for making the math routines</li>
 <li><a href="https://www.smwcentral.net/?p=profile&id=41003">JamesD28</a>, of a sprite crashing bug experienced (<kbd>%GetDrawInfo()</kbd> uses a &ldquo;destroy return address&rdquo; (you pull out bytes pushed by the JSL/JSR just before the RTL/RTS, so that it exits out multiple subroutines upon hitting a RTL/RTS))</li>
+<li><a href="https://www.smwcentral.net/?p=profile&id=36308">KevinM</a> and <a href="https://www.smwcentral.net/?p=profile&id=12344">LX5</a>, for some knowledge of the technical bits of OAM writing.</li>
 <li><a href="https://www.w3schools.com/">W3Schools</a> and <a href="https://stackoverflow.com">stackoverflow</a><sup><a href="https://stackoverflow.com/questions/11409895/whats-the-most-elegant-way-to-cap-a-number-to-a-segment">[1]</a></sup>, for making a tutorial on how to make HTML and javascript codes.</li>
 <li><a href="https://developer.mozilla.org/en-US/">MDN web docs (by mozilla)</a>, for documenting a lot on JS</li>
 </ul>
