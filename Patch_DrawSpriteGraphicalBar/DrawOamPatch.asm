@@ -7,10 +7,13 @@
 !Yflip		= 0
  ;^YFlip, only use 0-1.
 
-;Position of the graphical bar, relative to the screen.
+;Position of the graphical bar.
 ;Note: Origin the where the fill starts, not always the top-left corner.
-!XPos = $0010
-!Ypos = $0050
+ !XPos = $FFF0
+ !YPos = $FFF8
+ !FollowPlayer	=	1
+  ;^0 = fixed on-screen position, relative to top-left
+  ; 1 = placed relative to player's on-screen position. XY pos will be the displacement from player.
 !PageNum = 1
  ;^Page number of sprite, only use 0-1.
 
@@ -106,7 +109,7 @@ if !PatchMode == 0
 				STA !Scratchram_GraphicalBar_MiddlePiece		;/
 				LDA.b #!Default_RightPieces				;\Right end
 				STA !Scratchram_GraphicalBar_RightEndPiece		;/
-				LDA.b #5						;\length (number of middle tiles)
+				LDA.b #10						;\length (number of middle tiles)
 				STA !Scratchram_GraphicalBar_TempLength			;/
 			..ConvertToBar
 				JSL !CalculateGraphicalBarPercentage				;>Get percentage
@@ -128,12 +131,26 @@ if !PatchMode == 0
 				JMP .Restore			;>Not slots available, don't write any of the graphical bar (failsafe).
 				+
 				REP #$20			;\Write position
-				LDA.w #!XPos			;|
-				STA $00				;|
-				LDA.w #!Ypos			;|
-				STA $02				;|
+				if !FollowPlayer == 0
+					LDA.w #!XPos			;|
+					STA $00				;|
+					LDA.w #!Ypos			;|
+					STA $02				;|
+				else
+					LDA $7E
+					if !XPos != 0
+						CLC
+						ADC.w #!XPos
+					endif
+					STA $00
+					LDA $80
+					if !YPos != 0
+						CLC
+						ADC.w #!YPos
+					endif
+					STA $02
+				endif
 				SEP #$20			;/
-				wdm
 				;$00-$01 = X pos
 				;$02-$03 = Y pos
 				;$04-$05 = Displacement of each tile
@@ -142,8 +159,10 @@ if !PatchMode == 0
 				;X index = which tile of the graphical bar
 				LDX #$0000			;>Start loop
 				...HorizontalBar
+					REP #$20
 					LDA $00				;\Store the initial tile X pos in $03 (this makes writing each tile in each 8 pixels to the right)
 					STA $04				;/
+					SEP #$20
 					LDY.w #!OAMSlot*4
 					....OAMLoop
 						;Check if OAM is used by something else, if yes, pick another OAM slot
@@ -162,7 +181,7 @@ if !PatchMode == 0
 						;Screen and positions
 							.....CheckIfOnScreen
 								REP #$20	;\If offscreen, go to next tile of the graphical bar, and reuse the same OAM index
-								LDA $00		;|
+								LDA $04		;|
 								CMP #$FFF8+1	;|
 								SEP #$20	;|
 								BMI ....Next	;|
@@ -180,13 +199,14 @@ if !PatchMode == 0
 								SEP #$20
 								BPL ....Next	;/
 							.....XPos
+								wdm
 								LDA $04			;\Low 8 bits
 								STA $0200|!addr,y	;/
 								TYA
 								LSR #2			;\Handle 9th bit X position
 								PHY			;|
 								TAY			;|
-								LDA $01			;|Bits 2-7 is dangerous to be set.
+								LDA $05			;|
 								AND.b #%00000001	;|
 								STA $0420|!addr,y	;/
 								PLY
