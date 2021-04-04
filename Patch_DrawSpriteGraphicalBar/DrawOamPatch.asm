@@ -1,3 +1,50 @@
+;This is the patch version that draws a OAM-based sprite graphical bar, without taking up any sprite slots.
+
+;This patch is based on:
+;-The mega man X HP bar by anonimzwx (https://www.smwcentral.net/?p=section&a=details&id=13994 )
+;-The DKR status bar by Ladida, WhiteYoshiEgg, and lx5 (https://www.smwcentral.net/?p=section&a=details&id=24026 )
+;and also the suggestion by lx5: https://discord.com/channels/161245277179609089/161247652946771969/827647409429151816
+
+;And yes, this may conflict with some sprite HUD patches because $00A2E6 is somewhat a common address to use.
+
+;You'd think this can be converted to just an uberasm tool code, but this is wrong. Uberasm tool code runs in between after transferring OAM
+;RAM ($0200-$041F and $0420-$049F) to SNES register (the code at $008449 does this) and before calling $7F8000 (clears OAM slots), so
+;therefore, writing OAM on uberasm tool will get cleared before drawn.
+
+;To use, have the shared subroutines patch, and defines ready:
+;Shared subroutines patch should have these:
+; SharedSub.asm:
+;  Obtaining defines (place under other incsrc's):
+;   incsrc "GraphicalBarDefines/GraphicalBarDefines.asm" ;>Get graphical bar defines.
+;  Subroutine list:
+;   ;; Graphical bar
+;   autoclean JML CalculateGraphicalBarPercentage
+;   autoclean JML RoundAwayEmpty
+;   autoclean JML RoundAwayFull
+;   autoclean JML RoundAwayEmptyFull
+;   autoclean JML DrawGraphicalBar
+;   autoclean JML DrawGraphicalBarSubtractionLoopEdition
+;   autoclean JML ConvertBarFillAmountToTiles
+;   autoclean JML ConvertBarFillAmountToTilesDoubleBar
+;   autoclean JML ConvertBarFillAmountToTilesEdgeOverMultipleTiles
+;   autoclean JML CountNumberOfTiles
+; SubroutineDefs.asm
+;  ; Graphical bar
+;  %SetDefine(CalculateGraphicalBarPercentage)
+;  %SetDefine(RoundAwayEmpty)
+;  %SetDefine(RoundAwayFull)
+;  %SetDefine(RoundAwayEmptyFull)
+;  %SetDefine(DrawGraphicalBar)
+;  %SetDefine(DrawGraphicalBarSubtractionLoopEdition)
+;  %SetDefine(ConvertBarFillAmountToTiles)
+;  %SetDefine(ConvertBarFillAmountToTilesDoubleBar)
+;  %SetDefine(ConvertBarFillAmountToTilesEdgeOverMultipleTiles)
+;  %SetDefine(CountNumberOfTiles)
+; Like what the readme says, make sure the orders of the subroutines list and the defines of the subroutines match!
+;
+;And have both the copies of "GraphicalBarDefines" and "SharedSub_Defines" folder at the
+;same directory as this ASM file you're reading.
+
 !PatchMode	= 0
  ;^0 = patch
  ; 1 = uninstall
@@ -6,6 +53,16 @@
  ;^Palette, only use 0-7.
 !Yflip		= 0
  ;^YFlip, only use 0-1.
+ 
+!Direction	= 0
+ ;^0 = fill rightwards
+ ; 1 = fill leftwards (YXPPCCCT's X bit set)
+ ; 2 = fill upwards
+ ; 3 = fill downwards (YXPPCCCT's Y bit set)
+ ; Note: The naming of left and right end tiles, are relative
+ ; to where the fill starts and ends as it increases, meaning
+ ; "left end" is where the fill starts and "right end" where
+ ; the fill ends, regardless of the direction of the bar.
 
 ;Position of the graphical bar.
 ;Note: Origin the where the fill starts, not always the top-left corner.
@@ -20,16 +77,6 @@
 !OAMSlot = 4
  ;^Starting slot number  to use (increments of 1), not to be confused with index (which increments by 4). Use only values 0-127 ($00-$7F).
 
-;This is the patch version that draws a OAM-based sprite graphical bar, without taking up any sprite slots.
-
-;This patch is based on the mega man X HP bar by anonimzwx (https://www.smwcentral.net/?p=profile&id=20832 ), and also the suggestion
-;by lx5: https://discord.com/channels/161245277179609089/161247652946771969/827647409429151816
-
-;And yes, this may conflict with some sprite HUD patches because $00A2E6 is somewhat a common address to use.
-
-;You'd think this can be converted to just an uberasm tool code, but this is wrong. Uberasm tool code runs in between after transferring OAM
-;RAM ($0200-$041F and $0420-$049F) to SNES register (the code at $008449 does this) and before calling $7F8000 (clears OAM slots), so
-;therefore, writing OAM on uberasm tool will get cleared before drawn.
 ;Don't touch these unless you know what you're doing
 	;Get defines
 		incsrc "SharedSub_Defines/SubroutineDefs.asm"
@@ -55,20 +102,14 @@
 			!bank = $000000
 			!sa1 = 1
 		endif
-;Macros
-	macro findSlot()
-		?loop:
-			;Output: Y = Slot to use
-			CPX #$0200			;\If slot index reaches the end, break (no slots available)
-			BEQ ?break			;/
-			LDA $0201|!addr,Y		;\If slot unused, use that slot
-			CMP #$F0			;|
-			BEQ ?break			;/
-			INX #4				;\Next slot
-			BRA ?loop			;/
-		?break:
-	endmacro
-
+	;Handle bar direction
+		!GraphicalBar_OAMXFlip = 0
+		!GraphicalBar_OAMYFlip = 0
+		if !Direction == 1
+			!GraphicalBar_OAMXFlip = 1
+		elseif !Direction == 3
+			!GraphicalBar_OAMYFlip = 1
+		endif
 ;Patch stuff
 if !PatchMode == 0
 	org $00A2E6				;>$00A2E6 is the code that runs at the end of the frame, after ALL sprite tiles are written.
@@ -153,14 +194,19 @@ if !PatchMode == 0
 				SEP #$20			;/
 				;$00-$01 = X pos
 				;$02-$03 = Y pos
-				;$04-$05 = Displacement of each tile
+				;$04-$05 = Displacement of each tile (increments or decrements by 8 for every tile)
+				;          displacement in whatever was set in !Direction.
 				;$06-$07 = Number of tiles to write.
 				;Y index = OAM index (inc by 4)
 				;X index = which tile of the graphical bar
 				LDX #$0000			;>Start loop
-				...HorizontalBar
+				...DrawBar
 					REP #$20
-					LDA $00				;\Store the initial tile X pos in $03 (this makes writing each tile in each 8 pixels to the right)
+					if !Direction < 2
+						LDA $00				;\Store the initial tile pos in $04 (this makes writing each tile in each 8 pixels to the right)
+					else
+						LDA $02
+					endif
 					STA $04				;/
 					SEP #$20
 					LDY.w #!OAMSlot*4
@@ -180,8 +226,12 @@ if !PatchMode == 0
 								......NotUsed
 						;Screen and positions
 							.....CheckIfOnScreen
-								REP #$20	;\If offscreen, go to next tile of the graphical bar, and reuse the same OAM index
-								LDA $04		;|
+								REP #$20	;\If offscreen, go to next tile of the graphical bar, and reuse the same OAM index (don't hog the slots for nothing)
+								if !Direction < 2
+									LDA $04		;|
+								else
+									LDA $00		;|
+								endif
 								CMP #$FFF8+1	;|
 								SEP #$20	;|
 								BMI ....Next	;|
@@ -190,7 +240,11 @@ if !PatchMode == 0
 								SEP #$20	;|
 								BPL ....Next	;|
 								REP #$20	;|
-								LDA $02		;|
+								if !Direction < 2
+									LDA $02		;|
+								else
+									LDA $04		;|
+								endif
 								CMP #$FFF8+1	;|
 								SEP #$20	;|
 								BMI ....Next	;|
@@ -199,20 +253,32 @@ if !PatchMode == 0
 								SEP #$20
 								BPL ....Next	;/
 							.....XPos
-								LDA $04			;\Low 8 bits
+								if !Direction < 2
+									LDA $04			;\Low 8 bits
+								else
+									LDA $00
+								endif
 								STA $0200|!addr,y	;/
 								REP #$30
 								TYA
 								LSR #2			;\Handle 9th bit X position
 								PHY			;|
 								TAY			;|
-								LDA $05			;|
+								if !Direction < 2
+									LDA $05			;|
+								else
+									LDA $01
+								endif
 								SEP #$20
 								AND.b #%00000001	;|
 								STA $0420|!addr,y	;/
 								PLY
 							.....YPos
-								LDA $02						;\Y pos
+								if !Direction < 2
+									LDA $02						;\Y pos
+								else
+									LDA $04
+								endif
 								STA $0201|!addr,y				;/
 						;Tile stuff
 							LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\Tile number
@@ -224,7 +290,7 @@ if !PatchMode == 0
 							;!Priority: (0-3) - priority
 							;!XFlip: (0-1) - X flip
 							;!YFlip: (0-1) - Y flip
-								LDA.b #(!Yflip<<7)+(!Default_LeftwardsBar<<6)+(3<<4)+(!Palette<<1)+(!PageNum<<0)
+								LDA.b #(!GraphicalBar_OAMYFlip<<7)+(!GraphicalBar_OAMXFlip<<6)+(3<<4)+(!Palette<<1)+(!PageNum<<0)
 								STA $0203|!addr,y		;>YXPPCCCT
 					....NextOamSlotAndBarTile
 						INY			;\Next OAM slot (only next if the OAM tile is onscreen)
@@ -234,7 +300,7 @@ if !PatchMode == 0
 					....Next
 						REP #$20			;\Move tile position by 8 pixels
 						LDA $04				;|
-						if !Default_LeftwardsBar == 0
+						if or(equal(!Direction, 0),equal(!Direction, 3))
 							CLC			;|
 							ADC #$0008		;|
 						else
