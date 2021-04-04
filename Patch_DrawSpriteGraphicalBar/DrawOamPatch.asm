@@ -13,6 +13,7 @@
 
 ;To use, have the shared subroutines patch, and defines ready:
 ;Shared subroutines patch should have these:
+; subroutinecode.asm should contain a copy of the code from GraphicalBarELITE.asm and GraphicalBarConvertToTile.asm.
 ; SharedSub.asm:
 ;  Obtaining defines (place under other incsrc's):
 ;   incsrc "GraphicalBarDefines/GraphicalBarDefines.asm" ;>Get graphical bar defines.
@@ -45,6 +46,10 @@
 ;
 ;And have both the copies of "GraphicalBarDefines" and "SharedSub_Defines" folder at the
 ;same directory as this ASM file you're reading.
+;
+; Also, insert the graphics from ExGraphics/Sprite. Which one to use depends on the setting of !PatchSprite_Direction in
+; /GraphicalBarDefines/SpriteOAMSettings.asm, it uses SP4 by default, but feel free to edit the tiles to use in
+; ConvertBarFillAmountToTiles.
 
 ;Don't touch these unless you know what you're doing
 	;Get defines

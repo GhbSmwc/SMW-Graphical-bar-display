@@ -23,10 +23,10 @@
    ;^Palette, only use 0-7.
    
   !PatchSprite_Direction	= 0
-   ;^0 = fill rightwards
-   ; 1 = fill leftwards (YXPPCCCT's X bit set)
-   ; 2 = fill upwards
-   ; 3 = fill downwards (YXPPCCCT's Y bit set)
+   ;^0 = fill rightwards (horizontal)
+   ; 1 = fill leftwards (horizontal, YXPPCCCT's X bit set)
+   ; 2 = fill upwards (vertical)
+   ; 3 = fill downwards (vertical, YXPPCCCT's Y bit set)
    ; Note: The naming of left and right end tiles, are relative
    ; to where the fill starts and ends as it increases, meaning
    ; "left end" is where the fill starts and "right end" where

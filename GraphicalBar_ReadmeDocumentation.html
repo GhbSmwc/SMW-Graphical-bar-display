@@ -74,8 +74,8 @@ named <span class="NoLineBreak"><kbd>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</kb
 	</ul>
 </ul>
 <ul>
-	<li><a href="#CustomSprites" id="CustomSprites_Back">Custom sprites (not: cluster, extended, minor extended, etc.)</li>
-	<li><a href="#DrawOamPatch" id="DrawOamPatch_Back">Drawing OAM using a patch.</a></li>
+	<li><a href="#CustomSprites" id="CustomSprites_Back">Drawing OAM (Custom sprites, not cluster, extended, minor extended, etc.)</li>
+	<li><a href="#DrawOamPatch" id="DrawOamPatch_Back">Drawing OAM (not using sprite slots, but patch using OAM).</a></li>
 </ul>
 <li><a href="#Notes" id="NotesBack">Notes</a></li>
 <li><a href="#Credits" id="CreditsBack">Credits</a></li>
@@ -1235,7 +1235,7 @@ the address write range is <kbd>DesiredLastTilePos-((NumberOfTiles-1)*!StatusBar
 address of the status bar (avoid placing the <kbd>DesiredLastTilePos</kbd> that would cause placing the tiles before the first byte of the status bar tiles).</p></li></ul>
 </ul>
 <hr>
-<h2><a href="#CustomSprites_Back" id="CustomSprites">^</a>Custom sprites (not: cluster, extended, minor extended, etc.)</h2>
+<h2><a href="#CustomSprites_Back" id="CustomSprites">^</a>Drawing OAM (Custom sprites, not cluster, extended, minor extended, etc.)</h2>
 <p>While this code library was originally meant to be used with layer 3 status bar on uberasm tool, I added a new feature that
 would support sprite OAM.</p>
 
@@ -1258,7 +1258,7 @@ would support sprite OAM.</p>
 			that routines in this package may already exist in the shared subroutines package, especially if you added even more subroutines, so one or the other copy of the subroutine can safely be omitted(but make sure the labels are right).<br><br>
 			
 			As of the time of writing this, I tested version 2.3 (added at 2019-04-18), the latest version, and no renaming labels was needed.</li><br>
-			<li>Once those labels and duplicate routines are fixed, copy that into the shared subroutines patch.</li><br>
+			<li>Once those labels and duplicate routines are fixed, copy that into the shared subroutines's <kbd>subroutinecode.asm</kbd>.</li><br>
 			<li>
 				Open SharedSubroutine's <kbd>sharedsub.asm</kbd>, goto where the <kbd>incsrc</kbd>s are at:
 <table><tr><td><pre>incsrc "SharedSub_Defines/OtherDefines.asm"
@@ -1300,15 +1300,21 @@ autoclean JML CountNumberOfTiles</pre></td></tr></table>
 		</ol>
 	<li>Custom sprite</li>
 		<ol>
-		<li>In the Shared Subroutines folder, you'll want a copy of <kbd>SharedSub_Defines</kbd> <b>AND</b> <kbd>GraphicalBarDefines</kbd> folder in pixi's main directory (where the exe is at, not in any
-		subfolders).</li>
-		<li>Same goes with <kbd>GraphicalBarDefines</kbd> folder. Have it just like above.</li>
+			<li>In the Shared Subroutines folder, you'll want a copy of <kbd>SharedSub_Defines</kbd> <b>AND</b> <kbd>GraphicalBarDefines</kbd> folder in pixi's main directory (where the exe is at, not in any
+			subfolders).</li>
+			<li>Same goes with <kbd>GraphicalBarDefines</kbd> folder. Have it just like above.</li>
+			<li>Copy all the files inside <kbd>Pixi_CustomSprite</kbd>, paste it in pixi's <kbd>sprites</kbd> folder. Now use the .exe to insert into your game</li>
+		</ol>
+	<li><span id="SpriteGraphicalBarGraphics">Graphics</span></li>
+		<ol>
+			<li>Go to <kbd>ExGraphics/Sprite</kbd>, copy one of those files (it depends if you want a horizontal bar or a vertical bar), paste it in your
+			ExGraphics folder. If you do not have them, press &ldquo;Quick Extract ExGFX from ROM&rdquo;, which is the blue mushroom to make the Exgraphics folder appear</li>
 		</ol>
 </ol>
 
 </p>
 <hr>
-<h2><a href="#DrawOamPatch_Back" id="DrawOamPatch">^</a>Drawing OAM using a patch.</h2>
+<h2><a href="#DrawOamPatch_Back" id="DrawOamPatch">^</a>Drawing OAM (not using sprite slots, but patch using OAM).</h2>
 <p>This is similar to the sprite version, but written using a patch. Using a hijack at $00A2E6 and running the patch's OAM handler AFTER processing all sprites (including after $028AB1), gives
 the benefit of tile priority so that no other sprite will overlap the bar (OAM is handled so that the lower indexes have higher priority and is rendered in front of the high-indexed OAM slots).</p>
 What you need (very similar to the custom sprite one mentioned above):
@@ -1327,6 +1333,7 @@ To install:
 	</li>
 	<li>Apply the shared subroutines patch, following the instructions as <a href="#SSInstallation">previously mentioned</a>.</li>
 	<li>Simply patch <kbd>SMW-Graphical-bar-display/Patch_DrawSpriteGraphicalBar/DrawOamPatch.asm</kbd> to your game.</li>
+	<li>Insert the graphics, the <a href="#SpriteGraphicalBarGraphics">same way</a> as previously mentioned as a pixi sprite</li>
 </ol><br>
 
 You can uninstall it by simply opening the patch, and set <kbd>PatchMode</kbd> to <kbd>1</kbd>, and reapplying it.
