@@ -15,16 +15,14 @@
  !Default_PatchSprite_MiddleLength = 4
  !Default_PatchSprite_RightEndPieces = 3
  ;Stuff unrelated to the graphical bar
-  !PatchMode	= 0
+  !PatchSprite_Uninstall	= 0
    ;^0 = patch
    ; 1 = uninstall (reverts the game to a state you haven't patch this)
    
-  !Palette	= 0
+  !PatchSprite_Palette	= 0
    ;^Palette, only use 0-7.
-  !Yflip		= 0
-   ;^YFlip, only use 0-1.
    
-  !Direction	= 0
+  !PatchSprite_Direction	= 0
    ;^0 = fill rightwards
    ; 1 = fill leftwards (YXPPCCCT's X bit set)
    ; 2 = fill upwards
@@ -36,10 +34,10 @@
   
   ;Position of the graphical bar.
   ;Note: Origin the where the fill starts, not always the top-left corner.
-   !XPos = $FFF0
-   !YPos = $FFF8
-   !FollowPlayer	=	1
-    ;^0 = fixed on-screen position, relative to top-left
+   !PatchSprite_BarXPos		= $FFF0
+   !PatchSprite_BarYPos		= $FFF8
+   !PatchSprite_BarOnPlayer	= 1
+    ;^0 = fixed on-screen position, relative to top-left of the screen.
     ; 1 = placed relative to player's on-screen position. XY pos will be the displacement from player.
   !PageNum = 1
    ;^Page number of sprite, only use 0-1.

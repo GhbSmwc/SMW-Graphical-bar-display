@@ -74,13 +74,13 @@
 	;Handle bar direction
 		!GraphicalBar_OAMXFlip = 0
 		!GraphicalBar_OAMYFlip = 0
-		if !Direction == 1
+		if !PatchSprite_Direction == 1
 			!GraphicalBar_OAMXFlip = 1
-		elseif !Direction == 3
+		elseif !PatchSprite_Direction == 3
 			!GraphicalBar_OAMYFlip = 1
 		endif
 ;Patch stuff
-if !PatchMode == 0
+if !PatchSprite_Uninstall == 0
 	org $00A2E6				;>$00A2E6 is the code that runs at the end of the frame, after ALL sprite tiles are written.
 	autoclean JML DrawGraphicalBar
 else
@@ -91,7 +91,7 @@ else
 	JSL $028AB1
 endif
 
-if !PatchMode == 0
+if !PatchSprite_Uninstall == 0
 	freecode
 	;;;;;;;;;;;;;;;;;;;;
 	;Main code
@@ -141,22 +141,22 @@ if !PatchMode == 0
 				JMP .Restore			;>Not slots available, don't write any of the graphical bar (failsafe).
 				+
 				REP #$20			;\Write position
-				if !FollowPlayer == 0
-					LDA.w #!XPos			;|
+				if !PatchSprite_BarOnPlayer == 0
+					LDA.w #!PatchSprite_BarXPos	;|
 					STA $00				;|
-					LDA.w #!Ypos			;|
+					LDA.w #!PatchSprite_BarYPos	;|
 					STA $02				;|
 				else
 					LDA $7E
-					if !XPos != 0
+					if !PatchSprite_BarXPos != 0
 						CLC
-						ADC.w #!XPos
+						ADC.w #!PatchSprite_BarXPos
 					endif
 					STA $00
 					LDA $80
-					if !YPos != 0
+					if !PatchSprite_BarYPos != 0
 						CLC
-						ADC.w #!YPos
+						ADC.w #!PatchSprite_BarYPos
 					endif
 					STA $02
 				endif
@@ -164,14 +164,14 @@ if !PatchMode == 0
 				;$00-$01 = X pos
 				;$02-$03 = Y pos
 				;$04-$05 = Displacement of each tile (increments or decrements by 8 for every tile)
-				;          displacement in whatever was set in !Direction.
+				;          displacement in whatever was set in !PatchSprite_Direction.
 				;$06-$07 = Number of tiles to write.
 				;Y index = OAM index (inc by 4)
 				;X index = which tile of the graphical bar
 				LDX #$0000			;>Start loop
 				...DrawBar
 					REP #$20
-					if !Direction < 2
+					if !PatchSprite_Direction < 2
 						LDA $00				;\Store the initial tile pos in $04 (this makes writing each tile in each 8 pixels to the right)
 					else
 						LDA $02
@@ -196,7 +196,7 @@ if !PatchMode == 0
 						;Screen and positions
 							.....CheckIfOnScreen
 								REP #$20	;\If offscreen, go to next tile of the graphical bar, and reuse the same OAM index (don't hog the slots for nothing)
-								if !Direction < 2
+								if !PatchSprite_Direction < 2
 									LDA $04		;|
 								else
 									LDA $00		;|
@@ -209,7 +209,7 @@ if !PatchMode == 0
 								SEP #$20	;|
 								BPL ....Next	;|
 								REP #$20	;|
-								if !Direction < 2
+								if !PatchSprite_Direction < 2
 									LDA $02		;|
 								else
 									LDA $04		;|
@@ -222,7 +222,7 @@ if !PatchMode == 0
 								SEP #$20
 								BPL ....Next	;/
 							.....XPos
-								if !Direction < 2
+								if !PatchSprite_Direction < 2
 									LDA $04			;\Low 8 bits
 								else
 									LDA $00
@@ -233,7 +233,7 @@ if !PatchMode == 0
 								LSR #2			;\Handle 9th bit X position
 								PHY			;|
 								TAY			;|
-								if !Direction < 2
+								if !PatchSprite_Direction < 2
 									LDA $05			;|
 								else
 									LDA $01
@@ -243,7 +243,7 @@ if !PatchMode == 0
 								STA $0420|!addr,y	;/
 								PLY
 							.....YPos
-								if !Direction < 2
+								if !PatchSprite_Direction < 2
 									LDA $02						;\Y pos
 								else
 									LDA $04
@@ -253,13 +253,13 @@ if !PatchMode == 0
 							LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\Tile number
 							STA $0202|!addr,y				;/
 							;YXPPCCCT
-							;(!Yflip<<7)+(!XFlip<<6)+(!Priority<<4)+(!Palette<<1)+(!PageNum<<0)
+							;(!Yflip<<7)+(!XFlip<<6)+(!Priority<<4)+(!PatchSprite_Palette<<1)+(!PageNum<<0)
 							;!PageNum: (0-1) - page number
 							;!Palette: (0-7) - palette
 							;!Priority: (0-3) - priority
 							;!XFlip: (0-1) - X flip
 							;!YFlip: (0-1) - Y flip
-								LDA.b #(!GraphicalBar_OAMYFlip<<7)+(!GraphicalBar_OAMXFlip<<6)+(3<<4)+(!Palette<<1)+(!PageNum<<0)
+								LDA.b #(!GraphicalBar_OAMYFlip<<7)+(!GraphicalBar_OAMXFlip<<6)+(3<<4)+(!PatchSprite_Palette<<1)+(!PageNum<<0)
 								STA $0203|!addr,y		;>YXPPCCCT
 					....NextOamSlotAndBarTile
 						INY			;\Next OAM slot (only next if the OAM tile is onscreen)
@@ -269,7 +269,7 @@ if !PatchMode == 0
 					....Next
 						REP #$20			;\Move tile position by 8 pixels
 						LDA $04				;|
-						if or(equal(!Direction, 0),equal(!Direction, 3))
+						if or(equal(!PatchSprite_Direction, 0),equal(!PatchSprite_Direction, 3))
 							CLC			;|
 							ADC #$0008		;|
 						else
