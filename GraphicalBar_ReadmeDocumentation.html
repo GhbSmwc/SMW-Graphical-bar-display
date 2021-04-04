@@ -93,7 +93,7 @@ named <span class="NoLineBreak"><kbd>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</kb
 <ul>
 <li><a href="https://www.smwcentral.net/?p=section&a=details&id=16031">Super Status Bar patch</a>, SMW's status bar (or, heads-up display (HUD)) space is really small.</li>
 <li><a href="https://www.smwcentral.net/?p=section&a=details&id=15222">Overworld Border plus</a>, required if you want to display a graphical bar on the overworld border
-(i.e <kbd>ExampleUsage/Gamemode0E_OWBorderTest.asm</kbd>)</li>
+(i.e <kbd>UberasmTool_ExampleUsage/Gamemode0E_OWBorderTest.asm</kbd>)</li>
 </ul>
 <h2>Javascript tools</h2>
 <ul><li><a id="TopJSLink" href="readme_files/JS_GraphicalBarCalculator2.html">Link to javascript memory usage calculator</a>.</li></ul>
@@ -120,7 +120,7 @@ regardless of the formats, will likely enable you to edit their tile properties,
 <ul>
 <li><kbd>GraphicalBarDefines</kbd> (the folder itself) &rightarrow; Uberasm tool's main directory (same area as the .exe)</li>
 <li><kbd>GraphicalBarELITE.asm</kbd> &rightarrow; Uberasm tool's <kbd>library</kbd>.</li>
-<li><b>Inside</b> the folder <kbd>ExampleUsage</kbd>, they go to their respective locations based on their filename.</li>
+<li><b>Inside</b> the folder <kbd>UberasmTool_ExampleUsage</kbd>, they go to their respective locations based on their filename.</li>
 </ul></li>
 <li>Open uberasm tool's <kbd>list.txt</kbd>, and paste these so that the codes get inserted:
 <table><tr><td><pre>; Level list. Valid values: 000-1FF.
@@ -1108,7 +1108,7 @@ routine before you call <kbd>CalculateGraphicalBarPercentage</kbd>.
 <tr><td><kbd>$04</kbd> to <kbd>$05</kbd></td><td align="center" valign="center">2</td><td>The maximum quantity (subtracted by minimal quantity), this is also the size of the range. <kbd>ZeroBasedMaxQuaitity = MaxQuantity - MinQuantity</kbd></td><td><kbd>!Scratchram_GraphicalBar_FillByteTbl+2</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl+3</kbd></td></tr>
 </table><br>
 
-I've made a test file <kbd>Level_RangeBased.asm</kbd> (located in <kbd>ExampleUsage</kbd> folder) that demonstrates this.
+I've made a test file <kbd>Level_RangeBased.asm</kbd> (located in <kbd>UberasmTool_ExampleUsage</kbd> folder) that demonstrates this.
 </li><br><br>
 
 <li><a href="#InvertQuantity_Back" id="InvertQuantity">^</a><kbd>InvertQuantity</kbd>: Inverts the quantity (example: 12/100 &rightarrow; 88/100). This is useful

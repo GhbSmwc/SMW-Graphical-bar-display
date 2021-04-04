@@ -16,6 +16,7 @@
 ; SharedSub.asm:
 ;  Obtaining defines (place under other incsrc's):
 ;   incsrc "GraphicalBarDefines/GraphicalBarDefines.asm" ;>Get graphical bar defines.
+;   incsrc "GraphicalBarDefines/SpriteOAMSettings.asm"
 ;  Subroutine list:
 ;   ;; Graphical bar
 ;   autoclean JML CalculateGraphicalBarPercentage
@@ -45,43 +46,11 @@
 ;And have both the copies of "GraphicalBarDefines" and "SharedSub_Defines" folder at the
 ;same directory as this ASM file you're reading.
 
-!PatchMode	= 0
- ;^0 = patch
- ; 1 = uninstall
- 
-!Palette	= 0
- ;^Palette, only use 0-7.
-!Yflip		= 0
- ;^YFlip, only use 0-1.
- 
-!Direction	= 0
- ;^0 = fill rightwards
- ; 1 = fill leftwards (YXPPCCCT's X bit set)
- ; 2 = fill upwards
- ; 3 = fill downwards (YXPPCCCT's Y bit set)
- ; Note: The naming of left and right end tiles, are relative
- ; to where the fill starts and ends as it increases, meaning
- ; "left end" is where the fill starts and "right end" where
- ; the fill ends, regardless of the direction of the bar.
-
-;Position of the graphical bar.
-;Note: Origin the where the fill starts, not always the top-left corner.
- !XPos = $FFF0
- !YPos = $FFF8
- !FollowPlayer	=	1
-  ;^0 = fixed on-screen position, relative to top-left
-  ; 1 = placed relative to player's on-screen position. XY pos will be the displacement from player.
-!PageNum = 1
- ;^Page number of sprite, only use 0-1.
-
-!OAMSlot = 4
- ;^Starting slot number  to use (increments of 1), not to be confused with index (which increments by 4). Use only values 0-127 ($00-$7F).
-
 ;Don't touch these unless you know what you're doing
 	;Get defines
 		incsrc "SharedSub_Defines/SubroutineDefs.asm"
 		incsrc "GraphicalBarDefines/GraphicalBarDefines.asm"
-		incsrc "GraphicalBarDefines/StatusBarSettings.asm"
+		incsrc "GraphicalBarDefines/SpriteOAMSettings.asm"
 	;SA-1
 		!dp = $0000
 		!addr = $0000
@@ -144,13 +113,13 @@ if !PatchMode == 0
 				LDA #$00						;\High byte of max quantity
 				STA !Scratchram_GraphicalBar_FillByteTbl+3		;/
 			..InputGraphicalBarAttributes
-				LDA.b #!Default_LeftPieces				;\Left end normally have 3 pieces.
+				LDA.b #!Default_PatchSprite_LeftEndPieces		;\Left end normally have 3 pieces.
 				STA !Scratchram_GraphicalBar_LeftEndPiece		;/
-				LDA.b #!Default_MiddlePieces				;\Number of pieces in each middle byte/8x8 tile
+				LDA.b #!Default_PatchSprite_MiddlePieces		;\Number of pieces in each middle byte/8x8 tile
 				STA !Scratchram_GraphicalBar_MiddlePiece		;/
-				LDA.b #!Default_RightPieces				;\Right end
+				LDA.b #!Default_PatchSprite_RightEndPieces		;\Right end
 				STA !Scratchram_GraphicalBar_RightEndPiece		;/
-				LDA.b #10						;\length (number of middle tiles)
+				LDA.b #!Default_PatchSprite_MiddleLength		;\length (number of middle tiles)
 				STA !Scratchram_GraphicalBar_TempLength			;/
 			..ConvertToBar
 				JSL !CalculateGraphicalBarPercentage				;>Get percentage

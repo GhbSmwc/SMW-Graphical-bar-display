@@ -1,5 +1,5 @@
 incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
-incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
+incsrc "../GraphicalBarDefines/SpriteOAMSettings.asm"
 incsrc "../SharedSub_Defines/SubroutineDefs.asm"
 
 ;Extra bytes note:
@@ -39,11 +39,11 @@ DrawSpriteGraphicalBar:
 		LDA #$00						;\High byte of max quantity
 		STA !Scratchram_GraphicalBar_FillByteTbl+3		;/
 	.InputGraphicalBarAttributes
-		LDA.b #!Default_LeftPieces				;\Left end normally have 3 pieces.
+		LDA.b #!Default_PixiSprite_LeftEndPieces		;\Left end normally have 3 pieces.
 		STA !Scratchram_GraphicalBar_LeftEndPiece		;/
-		LDA.b #!Default_MiddlePieces				;\Number of pieces in each middle byte/8x8 tile
+		LDA.b #!Default_PixiSprite_MiddlePieces			;\Number of pieces in each middle byte/8x8 tile
 		STA !Scratchram_GraphicalBar_MiddlePiece		;/
-		LDA.b #!Default_RightPieces				;\Right end
+		LDA.b #!Default_PixiSprite_RightEndPieces		;\Right end
 		STA !Scratchram_GraphicalBar_RightEndPiece		;/
 		LDA !extra_byte_2,x					;\length (number of middle tiles)
 		STA !Scratchram_GraphicalBar_TempLength			;/

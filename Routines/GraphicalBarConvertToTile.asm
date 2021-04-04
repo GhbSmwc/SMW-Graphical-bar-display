@@ -479,7 +479,7 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 ; -$00: What set of graphics to use. Under default setting and code:
 ;  -#$00 = Level, layer 3
 ;  -#$01 = Level, sprite
-;  -#$02 = Overworld, layer 3 (not added)
+;  -#$02 = Overworld, layer 3
 ;  You can add more sets of bar tiles by adding a new table as well as adding code
 ;  to use the new table.
 ; -!Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
