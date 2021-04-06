@@ -350,7 +350,8 @@ in this order: [n] bytes being at their set maximums (full bytes, if any), [none
 the order of their maximums (3, 8, 8, 8, 8...):<br>
 <img src="readme_files/FillAmountDividedUnevenlyToTileBytes.png"><br>
 As an analogy, you fill the cup with water until it's full, then fill the next cup until it's full, until you got all the cups full or run out of water. The reason for this being
-treated as segmented is because the SNES' graphics are all tile-based, so we have to deal with them tile-by-tile.<br><br>
+treated as segmented parts is because the SNES' graphics are all tile-based, (most modern games rely on texture-based rendering often drawing polygons that get the width of the fill region)
+so we have to deal with them tile-by-tile. <br><br>
 
 Here are the formulas on how each are calculated:<br><br>
 
