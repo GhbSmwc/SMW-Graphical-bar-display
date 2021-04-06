@@ -159,7 +159,11 @@ if !PatchSprite_Uninstall == 0
 					STA $02
 				endif
 				SEP #$20			;/
-				LDA.b #!GraphicalBar_OAMXFlip
+				if !PatchSprite_Direction < 2
+					LDA.b #!GraphicalBar_OAMXFlip
+				else
+					LDA.b #!GraphicalBar_OAMYFlip
+				endif
 				STA $06
 				LDA.b #(!GraphicalBar_OAMYFlip<<7)+(!GraphicalBar_OAMXFlip<<6)+(3<<4)+(!PatchSprite_Palette<<1)+(!PageNum<<0)
 				STA $07
