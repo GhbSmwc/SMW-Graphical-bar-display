@@ -84,7 +84,6 @@
 		elseif !PatchSprite_Direction == 3
 			!GraphicalBar_OAMYFlip = 1
 		endif
-		print "test................", dec(!GraphicalBar_OAMYFlip)
 ;Patch stuff
 if !PatchSprite_Uninstall == 0
 	org $00A2E6				;>$00A2E6 is the code that runs at the end of the frame, after ALL sprite tiles are written.
