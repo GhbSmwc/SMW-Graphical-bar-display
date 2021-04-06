@@ -42,5 +42,5 @@
   !PageNum = 1
    ;^Page number of sprite, only use 0-1.
   
-  !OAMSlot = 4
+  !GraphicalBar_OAMSlot = 4
    ;^Starting slot number  to use (increments of 1), not to be confused with index (which increments by 4). Use only values 0-127 ($00-$7F).

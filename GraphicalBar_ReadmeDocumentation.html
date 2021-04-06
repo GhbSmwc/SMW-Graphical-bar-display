@@ -1253,7 +1253,7 @@ would support sprite OAM.</p>
 	<li><span id="SSInstallation">Shared subroutines patch</span></li>
 		<ol>
 			<li>Before you use Shared Subroutines patch, read the readme and several comments in there! A simple mistake can cause issues.</li><br>
-			<li>The routines in <kbd>GraphicalBarELITE.asm</kbd>, <kbd>GraphicalBarConvertToTile.asm</kbd>, and <kbd>GraphicalBarOtherRoutines.asm</kbd>, copy that (and only the subroutines, you CAN include the comments), paste it in a temporary blank
+			<li>The routines in <kbd>GraphicalBarELITE.asm</kbd>, <kbd>GraphicalBarConvertToTile.asm</kbd>, <kbd>GraphicalBarOtherRoutines.asm</kbd>, and <kbd>GraphicalBarWriteToOam.asm</kbd> copy that (and only the subroutines, you CAN include the comments), paste it in a temporary blank
 			document, and check for any potential label conflicts (two identical labels to jump to) between that and the already-included routines in Shared Subroutines patch's <kbd>subroutinecode.asm</kbd>, if the are, then rename them. It is also possible
 			that routines in this package may already exist in the shared subroutines package, especially if you added even more subroutines, so one or the other copy of the subroutine can safely be omitted(but make sure the labels are right).<br><br>
 			
@@ -1264,7 +1264,8 @@ would support sprite OAM.</p>
 <table><tr><td><pre>incsrc "SharedSub_Defines/OtherDefines.asm"
 incsrc "SharedSub_Defines/SubroutineDefs.asm"</pre></td></tr></table>
 				Under it, add this:
-<table><tr><td><pre>incsrc "GraphicalBarDefines/GraphicalBarDefines.asm"</pre></td></tr></table>
+<table><tr><td><pre>incsrc "GraphicalBarDefines/GraphicalBarDefines.asm"
+incsrc "GraphicalBarDefines/SpriteOAMSettings.asm"</pre></td></tr></table>
 			</li><br>
 			<li>Now copy the folder <kbd>GraphicalBarDefines</kbd>, and paste it in the main directory (not in any subfolders) of the shared subroutines folder (same area as <kbd>sharedsub.asm</kbd>)</li><br>
 			<li>
@@ -1279,7 +1280,9 @@ autoclean JML DrawGraphicalBarSubtractionLoopEdition
 autoclean JML ConvertBarFillAmountToTiles
 autoclean JML ConvertBarFillAmountToTilesDoubleBar
 autoclean JML ConvertBarFillAmountToTilesEdgeOverMultipleTiles
-autoclean JML CountNumberOfTiles</pre></td></tr></table>
+autoclean JML CountNumberOfTiles
+autoclean JML DrawOamGraphicalBarHoriz
+autoclean JML DrawOamGraphicalBarVert</pre></td></tr></table>
 			</li><br>
 			<li>
 				Do a similar thing, but for defines for <kbd>SharedSub_Defines/SubroutineDefs.asm</kbd><sup>1</sup>:
@@ -1293,7 +1296,9 @@ autoclean JML CountNumberOfTiles</pre></td></tr></table>
 %SetDefine(ConvertBarFillAmountToTiles)
 %SetDefine(ConvertBarFillAmountToTilesDoubleBar)
 %SetDefine(ConvertBarFillAmountToTilesEdgeOverMultipleTiles)
-%SetDefine(CountNumberOfTiles)</pre></td></tr></table>
+%SetDefine(CountNumberOfTiles)
+%SetDefine(DrawOamGraphicalBarHoriz)
+%SetDefine(DrawOamGraphicalBarVert)</pre></td></tr></table>
 				<sup>1</sup>If you renamed the labels, these have to be renamed so they match. Otherwise asar complains that labels not found.
 			</li><br>
 			<li>Now patch <kbd>sharedsub.asm</kbd>.</li><br>
