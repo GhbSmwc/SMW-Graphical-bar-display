@@ -72,6 +72,11 @@ named <span class="NoLineBreak"><kbd>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</kb
 		<li><a href="#MapRangeToStartAt0" id="MapRangeToStartAt0_Back"><kbd>MapRangeToStartAt0</kbd></a></li>
 		<li><a href="#InvertQuantity" id="InvertQuantity_Back"><kbd>InvertQuantity</kbd></a></li>
 	</ul>
+	<li><a href="#GraphicalBarWriteToOam" id="GraphicalBarWriteToOam_Back"><kbd>GraphicalBarWriteToOam.asm</kbd></a></li>
+	<ul>
+		<li><a href="#DrawOamGraphicalBarHoriz" id="DrawOamGraphicalBarHoriz_Back"><kbd>DrawOamGraphicalBarHoriz</kbd></a></li>
+		<li><a href="#DrawOamGraphicalBarVert" id="DrawOamGraphicalBarVert_Back"><kbd>DrawOamGraphicalBarVert</kbd></a></li>
+	</ul>
 </ul>
 <ul>
 	<li><a href="#CustomSprites" id="CustomSprites_Back">Drawing OAM (Custom sprites, not cluster, extended, minor extended, etc.)</li>
@@ -1343,7 +1348,45 @@ To install:
 </ol><br>
 
 You can uninstall it by simply opening <kbd>GraphicalBarDefines/SpriteOAMSettings.asm</kbd>, and set <kbd>!PatchSprite_Uninstall</kbd> to <kbd>1</kbd>, and then reapplying it.
+<hr>
+<h2><a href="#GraphicalBarWriteToOam_Back" id="GraphicalBarWriteToOam">^</a>GraphicalBarWriteToOam</h2>
 
+<p>This routine, unlike the status bar routines, writes the graphical bar tiles as <b>sprite OAM</b>. This is very useful for sprite HUD or HUD placed on a character (rather than static
+on-screen position, a bar that is placed relative to the character, such as on top of the character's head).</p>
+
+<ul>
+	<li><a href="#DrawOamGraphicalBarHoriz_Back" id="DrawOamGraphicalBarHoriz">^</a><kbd>DrawOamGraphicalBarHoriz</kbd>: Draws a horizontal graphical bar:
+	<table>
+	<tr><th>Input</th><th>Number of bytes</th><th>Description</th></tr>
+	<tr><td><kbd>$00</kbd> to <kbd>$01</kbd></td><td align="center">2</td><td>X position, relative to screen border.</td></tr>
+	<tr><td><kbd>$02</kbd> to <kbd>$03</kbd></td><td align="center">2</td><td>Y position, relative to screen border.</td></tr>
+	<tr><td><kbd>$04</kbd> to <kbd>$05</kbd></td><td align="center">2</td><td>Number of tiles to write.</td></tr>
+	<tr><td><kbd>$06</kbd></td><td align="center">1</td><td>Fill direction (as it increases): <kbd>#$00</kbd> = left to right, <kbd>#$02</kbd> = right to left (YXPPCCCT's X bit set)</td></tr>
+	<tr><td><kbd>$07</kbd></td><td align="center">1</td><td>Properties (YXPPCCCT)</td></tr>
+	</table><br>
+	
+	<table>
+	<tr><th>Destroyed</th><th>Number of bytes</th><th>Description</th></tr>
+	<tr><td><kbd>$08</kbd> to <kbd>$09</kbd></td><td align="center">2</td><td>Displacement of each tile, from the origin.</td></tr>
+	</table>
+	</li><br>
+	<li><a href="#DrawOamGraphicalBarVert_Back" id="DrawOamGraphicalBarVert">^</a><kbd>DrawOamGraphicalBarVert</kbd>: Draws a vertical graphical bar:
+	<table>
+	<tr><th>Input</th><th>Number of bytes</th><th>Description</th></tr>
+	<tr><td><kbd>$00</kbd> to <kbd>$01</kbd></td><td align="center">2</td><td>X position, relative to screen border.</td></tr>
+	<tr><td><kbd>$02</kbd> to <kbd>$03</kbd></td><td align="center">2</td><td>Y position, relative to screen border.</td></tr>
+	<tr><td><kbd>$04</kbd> to <kbd>$05</kbd></td><td align="center">2</td><td>Number of tiles to write.</td></tr>
+	<tr><td><kbd>$06</kbd></td><td align="center">1</td><td>Fill direction (as it increases): <kbd>#$00</kbd> = bottom to top, <kbd>#$02</kbd> = top to bottom (YXPPCCCT's Y bit set)</td></tr>
+	<tr><td><kbd>$07</kbd></td><td align="center">1</td><td>Properties (YXPPCCCT)</td></tr>
+	</table><br>
+	
+	<table>
+	<tr><th>Destroyed</th><th>Number of bytes</th><th>Description</th></tr>
+	<tr><td><kbd>$08</kbd> to <kbd>$09</kbd></td><td align="center">2</td><td>Displacement of each tile, from the origin.</td></tr>
+	</table>
+	</li>
+
+</ul>
 <hr>
 <h2><a href="#CreditsBack" id="Credits">^</a>Credits</h2>
 <ul>
