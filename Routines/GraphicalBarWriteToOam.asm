@@ -4,6 +4,10 @@ incsrc "GraphicalBarDefines/SpriteOAMSettings.asm"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;This writes the graphical bar tiles to OAM (horizontal).
 ;
+;Note: Not to be used for “normal sprites” (the generally
+;interactable sprites such as SMW or pixi sprites using 12 (22 for
+;SA-1) slots). This writes OAM directly like most sprite status bar
+;patches.
 ;
 ;Input
 ; -$00 to $01: X position, relative to screen border
@@ -135,6 +139,10 @@ DrawOamGraphicalBarHoriz:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;This writes the graphical bar tiles to OAM (vertical).
 ;
+;Note: Not to be used for “normal sprites” (the generally
+;interactable sprites such as SMW or pixi sprites using 12 (22 for
+;SA-1) slots). This writes OAM directly like most sprite status bar
+;patches.
 ;
 ;Input
 ; -$00 to $01: X position, relative to screen border

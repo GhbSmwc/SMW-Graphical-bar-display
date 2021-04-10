@@ -76,6 +76,7 @@ named <span class="NoLineBreak"><kbd>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</kb
 	<ul>
 		<li><a href="#DrawOamGraphicalBarHoriz" id="DrawOamGraphicalBarHoriz_Back"><kbd>DrawOamGraphicalBarHoriz</kbd></a></li>
 		<li><a href="#DrawOamGraphicalBarVert" id="DrawOamGraphicalBarVert_Back"><kbd>DrawOamGraphicalBarVert</kbd></a></li>
+		<li><a href="#FindNFreeOAMSlot" id="FindNFreeOAMSlot_Back"><kbd>FindNFreeOAMSlot</kbd></a></li>
 	</ul>
 </ul>
 <ul>
@@ -1349,11 +1350,14 @@ To install:
 
 You can uninstall it by simply opening <kbd>GraphicalBarDefines/SpriteOAMSettings.asm</kbd>, and set <kbd>!PatchSprite_Uninstall</kbd> to <kbd>1</kbd>, and then reapplying it.
 <hr>
-<h2><a href="#GraphicalBarWriteToOam_Back" id="GraphicalBarWriteToOam">^</a>GraphicalBarWriteToOam</h2>
+<h2><a href="#GraphicalBarWriteToOam_Back" id="GraphicalBarWriteToOam">^</a>GraphicalBarWriteToOam.asm</h2>
 
 <p>This routine, unlike the status bar routines, writes the graphical bar tiles as <b>sprite OAM</b>. This is very useful for sprite HUD or HUD placed on a character (rather than static
 on-screen position, a bar that is placed relative to the character, such as on top of the character's head).</p>
 
+<p>Note: The following routines are not to be used for &ldquo;normal sprites&rdquo;, as they use the OAM directly (&ldquo;normal sprites&rdquo; is a term I refer to the type of sprites
+that are often interactable, such as enemies, platforms, items, etc. that are SMW or pixi-made, that are part of the 12 (or 22 for sa-1 hacks)-sprite slot limit) and are intended to
+function similarly to most sprite status bar patches</p>
 <ul>
 	<li><a href="#DrawOamGraphicalBarHoriz_Back" id="DrawOamGraphicalBarHoriz">^</a><kbd>DrawOamGraphicalBarHoriz</kbd>: Draws a horizontal graphical bar:
 	<table>
@@ -1383,10 +1387,28 @@ on-screen position, a bar that is placed relative to the character, such as on t
 	<table>
 	<tr><th>Destroyed</th><th>Number of bytes</th><th>Description</th></tr>
 	<tr><td><kbd>$08</kbd> to <kbd>$09</kbd></td><td align="center">2</td><td>Displacement of each tile, from the origin.</td></tr>
-	</table>
+	</table><br>
 	</li>
 
-</ul>
+
+<li><a href="#FindNFreeOAMSlot_Back" id="FindNFreeOAMSlot">^</a><kbd>FindNFreeOAMSlot</kbd>: This routine is only used by <kbd>DrawOamGraphicalBarHoriz</kbd> and <kbd>DrawOamGraphicalBarVert</kbd>, checks if there are sufficient OAM slots available of a given number.
+The purpose of this is to act as a failsafe by simply not drawing the graphical bar at all if there are insufficient number of slots unavailable. This is to prevent drawing a bar with missing tiles (only show all the tiles or none).
+	<table>
+	<tr><th>Input</th><th>Number of bytes</th><th>Description</th></tr>
+	<tr><td><kbd>$04</kbd> to <kbd>$05</kbd></td><td align="center">2</td><td>The number of slots to find. 16-bit because <abbr title="There are 128 slots, numbered from 0-127 ($00-$7F). Therefore the index must be 0-508 ($0000-$01FC), a range that an 8-bit integer cannot support. Also, both X and Y index registers cannot use different 8 or 16-bit sizes.">OAM indexing are increments of 4<abbr></td></tr>
+	</table><br>
+
+	<table>
+	<tr><th>Output</th><th>Number of bytes</th><th>Description</th></tr>
+	<tr><td>
+	<kbd>Carry bit</kbd></td><td align="center">N/A</td><td>If no slot is available:
+	<ul>
+	<li>Clear (<kbd>0</kbd>) = Enough slots found</li>
+	<li>Set (<kbd>1</kbd>) = Not enough slots available.</li>
+	</ul>
+	</td></tr>
+	</table><br>
+	</ul></li>
 <hr>
 <h2><a href="#CreditsBack" id="Credits">^</a>Credits</h2>
 <ul>
