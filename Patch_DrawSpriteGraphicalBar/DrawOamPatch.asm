@@ -50,6 +50,9 @@
 ; Also, insert the graphics from ExGraphics/Sprite. Which one to use depends on the setting of !PatchSprite_Direction in
 ; /GraphicalBarDefines/SpriteOAMSettings.asm, it uses SP4 by default, but feel free to edit the tiles to use in
 ; ConvertBarFillAmountToTiles.
+;
+;The code here is largely the same as the layer 3 version, but the only difference is that instead of writing to layer 3, it
+;is writing to OAM instead, therefore the final steps to draw a graphical bar is different.
 
 ;Don't touch these unless you know what you're doing
 	;Get defines
@@ -176,8 +179,4 @@ if !PatchSprite_Uninstall == 0
 			SEP #$30
 			PLB
 			JML $00A2EA		;>Continue onwards
-			
-	;;;;;;;;;;;;;
-	;Subroutines
-	;;;;;;;;;;;;;
 endif

@@ -375,7 +375,7 @@ To install:
 			<li>Insert the graphics, the <a href="#SpriteGraphicalBarGraphics">same way</a> as previously mentioned as a pixi sprite.</li>
 		</ol>
 	</li>
-	<li>And you are done.</li>
+	<li>And you are done. Feel free to take a look at the contents of <kbd>DrawOamPatch.asm</kbd> to learn how it works. Most of the codes are the same as the layer 3 version, but writes to OAM instead.</li>
 </ol><br>
 
 You can uninstall it by simply opening <kbd>GraphicalBarDefines/SpriteOAMSettings.asm</kbd>, and set <kbd>!PatchSprite_Uninstall</kbd> to <kbd>1</kbd>, and then reapplying it.
@@ -1189,7 +1189,17 @@ to calculate where to place the bar when using <kbd>BarExtendLeft</kbd> as well 
 <table>
 <tr><th>Output</th><th>Number of bytes</th><th>Description</th></tr>
 <tr><td><kbd><span class="NoLineBreak">X register</span></kbd></td><td>1 (not stored)</td><td>The number of tiles, minus 1 (if the bar has 9 tiles, X would be <kbd>$08</kbd>). Returns <kbd>$FF</kbd> if 0 tiles exist (the whole bar set to 0 pieces in total)</td></tr>
-</table>
+</table><br>
+
+This subroutine also exists in <kbd>GraphicalBarConvertToTile.asm</kbd> because of one simple inconvenient reason: several subroutines in that and <kbd>GraphicalBarWriteToStatusBar.asm</kbd> uses this subroutine and you cannot
+have one <kbd>library</kbd> ASM file have labels referring to another ASM file in that library (you cannot have one code in a library call another ASM file code), as stated in the readme:
+<table><tr><td><pre>The second one is that you can't call other libraries codes from a
+library file. For example, if you have a windowing HDMA code and you
+need to call a sqrt routine, which is located on the math library, you
+can't do that, because UberASM Tool can't guess what labels each file
+will generate nor what labels each library .asm file will depend from
+each other. So unfortunately the library files are pretty much
+isolated from each one.</pre></td></tr></table>
 
 </li><br>
 <li><a href="#WriteDoubleEndedBar_Back" id="WriteDoubleEndedBar">^</a><kbd>WriteDoubleEndedBar</kbd>: Writes a mirrored version of the left-to-right bar and places it to the left of that bar. This is intended to display double-ended bars that as the fill increases, it starts in the center
