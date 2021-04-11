@@ -271,26 +271,28 @@ would support sprite OAM.</p>
 </ul>
 <h3>Insertion process (test sprite)</h3>
 <ol>
-	<li><span id="SSInstallation">Shared subroutines patch</span></li>
+	<li>ASM stuff
 		<ol>
-			<li>Before you use Shared Subroutines patch, read the readme and several comments in there! A simple mistake can cause issues.</li><br>
-			<li>The routines in <kbd>GraphicalBarELITE.asm</kbd>, <kbd>GraphicalBarConvertToTile.asm</kbd>, <kbd>GraphicalBarOtherRoutines.asm</kbd>, and <kbd>GraphicalBarWriteToOam.asm</kbd> copy that (and only the subroutines, you CAN include the comments), paste it in a temporary blank
-			document, and check for any potential label conflicts (two identical labels to jump to) between that and the already-included routines in Shared Subroutines patch's <kbd>subroutinecode.asm</kbd>, if the are, then rename them. It is also possible
-			that routines in this package may already exist in the shared subroutines package, especially if you added even more subroutines, so one or the other copy of the subroutine can safely be omitted(but make sure the labels are right).<br><br>
-			
-			As of the time of writing this, I tested version 2.3 (added at 2019-04-18), the latest version, and no renaming labels was needed.</li><br>
-			<li>Once those labels and duplicate routines are fixed, copy that into the shared subroutines's <kbd>subroutinecode.asm</kbd>.</li><br>
-			<li>
-				Open SharedSubroutine's <kbd>sharedsub.asm</kbd>, goto where the <kbd>incsrc</kbd>s are at:
+			<li><span id="SSInstallation">Shared subroutines patch</span>
+				<ol>
+					<li>Before you use Shared Subroutines patch, read the readme and several comments in there! A simple mistake can cause issues.</li><br>
+					<li>The routines in <kbd>GraphicalBarELITE.asm</kbd>, <kbd>GraphicalBarConvertToTile.asm</kbd>, <kbd>GraphicalBarOtherRoutines.asm</kbd>, and <kbd>GraphicalBarWriteToOam.asm</kbd> copy that (and only the subroutines, you CAN include the comments), paste it in a temporary blank
+					document, and check for any potential label conflicts (two identical labels to jump to) between that and the already-included routines in Shared Subroutines patch's <kbd>subroutinecode.asm</kbd>, if the are, then rename them. It is also possible
+					that routines in this package may already exist in the shared subroutines package, especially if you added even more subroutines, so one or the other copy of the subroutine can safely be omitted(but make sure the labels are right).<br><br>
+					
+					As of the time of writing this, I tested version 2.3 (added at 2019-04-18), the latest version, and no renaming labels was needed.</li><br>
+					<li>Once those labels and duplicate routines are fixed, copy that into the shared subroutines's <kbd>subroutinecode.asm</kbd>.</li><br>
+					<li>
+						Open SharedSubroutine's <kbd>sharedsub.asm</kbd>, goto where the <kbd>incsrc</kbd>s are at:
 <table><tr><td><pre>incsrc "SharedSub_Defines/OtherDefines.asm"
 incsrc "SharedSub_Defines/SubroutineDefs.asm"</pre></td></tr></table>
-				Under it, add this:
+					Under it, add this:
 <table><tr><td><pre>incsrc "GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "GraphicalBarDefines/SpriteOAMSettings.asm"</pre></td></tr></table>
-			</li><br>
-			<li>Now copy the folder <kbd>GraphicalBarDefines</kbd>, and paste it in the main directory (not in any subfolders) of the shared subroutines folder (same area as <kbd>sharedsub.asm</kbd>)</li><br>
-			<li>
-				In <kbd>sharedsub.asm</kbd>, add this to the subroutine list (preferably below all others),<sup>1</sup>:
+					</li><br>
+					<li>Now copy the folder <kbd>GraphicalBarDefines</kbd>, and paste it in the main directory (not in any subfolders) of the shared subroutines folder (same area as <kbd>sharedsub.asm</kbd>)</li><br>
+					<li>
+						In <kbd>sharedsub.asm</kbd>, add this to the subroutine list (preferably below all others),<sup>1</sup>:
 <table><tr><td><pre>; Graphical bar
 autoclean JML CalculateGraphicalBarPercentage
 autoclean JML RoundAwayEmpty
@@ -304,9 +306,9 @@ autoclean JML ConvertBarFillAmountToTilesEdgeOverMultipleTiles
 autoclean JML CountNumberOfTiles
 autoclean JML DrawOamGraphicalBarHoriz
 autoclean JML DrawOamGraphicalBarVert</pre></td></tr></table>
-			</li><br>
-			<li>
-				Do a similar thing, but for defines for <kbd>SharedSub_Defines/SubroutineDefs.asm</kbd><sup>1</sup>:
+					</li><br>
+					<li>
+						Do a similar thing, but for defines for <kbd>SharedSub_Defines/SubroutineDefs.asm</kbd><sup>1</sup>:
 <table><tr><td><pre>; Graphical bar
 %SetDefine(CalculateGraphicalBarPercentage)
 %SetDefine(RoundAwayEmpty)
@@ -320,24 +322,29 @@ autoclean JML DrawOamGraphicalBarVert</pre></td></tr></table>
 %SetDefine(CountNumberOfTiles)
 %SetDefine(DrawOamGraphicalBarHoriz)
 %SetDefine(DrawOamGraphicalBarVert)</pre></td></tr></table>
-				<sup>1</sup>If you renamed the labels, these have to be renamed so they match. Otherwise asar complains that labels not found.
-			</li><br>
-			<li>Now patch <kbd>sharedsub.asm</kbd>.</li><br>
+						<sup>1</sup>If you renamed the labels, these have to be renamed so they match. Otherwise asar complains that labels not found.
+					</li><br>
+					<li>Now patch <kbd>sharedsub.asm</kbd>.</li><br>
+				</ol>
+			</li>
+			<li>Custom sprite
+				<ol>
+					<li>In the Shared Subroutines folder, you'll want a copy of <kbd>SharedSub_Defines</kbd> <b>AND</b> <kbd>GraphicalBarDefines</kbd> folder in pixi's main directory (where the exe is at, not in any
+					subfolders).</li>
+					<li>Same goes with <kbd>GraphicalBarDefines</kbd> folder. Have it just like above.</li>
+					<li>Copy all the files inside <kbd>Pixi_CustomSprite</kbd>, paste it in pixi's <kbd>sprites</kbd> folder. Now use the .exe to insert into your game</li>
+				</ol>
+			</li>
 		</ol>
-	<li>Custom sprite</li>
-		<ol>
-			<li>In the Shared Subroutines folder, you'll want a copy of <kbd>SharedSub_Defines</kbd> <b>AND</b> <kbd>GraphicalBarDefines</kbd> folder in pixi's main directory (where the exe is at, not in any
-			subfolders).</li>
-			<li>Same goes with <kbd>GraphicalBarDefines</kbd> folder. Have it just like above.</li>
-			<li>Copy all the files inside <kbd>Pixi_CustomSprite</kbd>, paste it in pixi's <kbd>sprites</kbd> folder. Now use the .exe to insert into your game</li>
-		</ol>
-	<li><span id="SpriteGraphicalBarGraphics">Graphics</span></li>
+	</li>
+	<li><span id="SpriteGraphicalBarGraphics">Graphics</span>
 		<ol>
 			<li>Go to <kbd>ExGraphics/Sprite</kbd>, copy one of those files (it depends if you want a horizontal bar or a vertical bar), paste it in your
-			ExGraphics folder. If you do not have them, press &ldquo;Quick Extract ExGFX from ROM&rdquo;, which is the blue mushroom to make the Exgraphics folder appear</li>
+			ExGraphics folder. If you do not have them, press &ldquo;Quick Extract ExGFX from ROM&rdquo;, which is the blue mushroom to make the Exgraphics folder appear.</li>
 		</ol>
+	</li>
+	<li>And you are done.</li>
 </ol>
-
 </p>
 <hr>
 <h2><a href="#DrawOamPatch_Back" id="DrawOamPatch">^</a>Drawing OAM (not using sprite slots, but patch using OAM).</h2>
@@ -350,16 +357,25 @@ What you need (very similar to the custom sprite one mentioned above):
 </ul>
 To install:
 <ol>
-	<li>Have your defines ready, by placing (copy and paste) these listed folders in the same directory as <kbd>SMW-Graphical-bar-display/Patch_DrawSpriteGraphicalBar</kbd>:
-		<ul>
-			<li><kbd>GraphicalBarDefines</kbd></li>
-			<li><kbd>SharedSub_Defines</kbd></li>
-			
-		</ul>
+	<li>ASM:
+		<ol>
+			<li>Have your defines ready, by placing (copy and paste) these listed folders in the same directory as <kbd>SMW-Graphical-bar-display/Patch_DrawSpriteGraphicalBar</kbd>:
+				<ul>
+					<li><kbd>GraphicalBarDefines</kbd></li>
+					<li><kbd>SharedSub_Defines</kbd></li>
+					
+				</ul>
+			</li>
+			<li>Apply the shared subroutines patch, following the instructions as <a href="#SSInstallation">previously mentioned</a>.</li>
+			<li>Simply patch <kbd>SMW-Graphical-bar-display/Patch_DrawSpriteGraphicalBar/DrawOamPatch.asm</kbd> to your game.</li>
+		</ol>
 	</li>
-	<li>Apply the shared subroutines patch, following the instructions as <a href="#SSInstallation">previously mentioned</a>.</li>
-	<li>Simply patch <kbd>SMW-Graphical-bar-display/Patch_DrawSpriteGraphicalBar/DrawOamPatch.asm</kbd> to your game.</li>
-	<li>Insert the graphics, the <a href="#SpriteGraphicalBarGraphics">same way</a> as previously mentioned as a pixi sprite.</li>
+	<li>Graphics:
+		<ol>
+			<li>Insert the graphics, the <a href="#SpriteGraphicalBarGraphics">same way</a> as previously mentioned as a pixi sprite.</li>
+		</ol>
+	</li>
+	<li>And you are done.</li>
 </ol><br>
 
 You can uninstall it by simply opening <kbd>GraphicalBarDefines/SpriteOAMSettings.asm</kbd>, and set <kbd>!PatchSprite_Uninstall</kbd> to <kbd>1</kbd>, and then reapplying it.
