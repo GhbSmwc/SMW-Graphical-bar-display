@@ -1409,7 +1409,7 @@ function similarly to most sprite status bar patches</p>
 The purpose of this is to act as a failsafe by simply not drawing the graphical bar at all if there are insufficient number of slots unavailable. This is to prevent drawing a bar with missing tiles (only show all the tiles or none).
 	<table>
 	<tr><th>Input</th><th>Number of bytes</th><th>Description</th></tr>
-	<tr><td><kbd>$04</kbd> to <kbd>$05</kbd></td><td align="center">2</td><td>The number of slots to find. 16-bit because <abbr title="There are 128 slots, numbered from 0-127 ($00-$7F). Therefore the index must be 0-508 ($0000-$01FC), a range that an 8-bit integer cannot support. Also, both X and Y index registers cannot use different 8 or 16-bit sizes.">OAM indexing are increments of 4<abbr></td></tr>
+	<tr><td><kbd>$04</kbd> to <kbd>$05</kbd></td><td align="center">2</td><td>The number of slots to find. 16-bit because <abbr title="There are 128 slots, numbered from 0-127 ($00-$7F). Therefore the index must be 0-508 ($0000-$01FC), a range that an 8-bit integer cannot support. Another reason is that both X and Y index registers cannot use different 8 or 16-bit sizes.">OAM indexing are increments of 4<abbr></td></tr>
 	</table><br>
 
 	<table>
