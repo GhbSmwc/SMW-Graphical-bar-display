@@ -305,7 +305,9 @@ autoclean JML ConvertBarFillAmountToTilesDoubleBar
 autoclean JML ConvertBarFillAmountToTilesEdgeOverMultipleTiles
 autoclean JML CountNumberOfTiles
 autoclean JML DrawOamGraphicalBarHoriz
-autoclean JML DrawOamGraphicalBarVert</pre></td></tr></table>
+autoclean JML DrawOamGraphicalBarVert
+autoclean JML DrawSpriteGraphicalBarHoriz
+autoclean JML DrawSpriteGraphicalBarVert</pre></td></tr></table>
 					</li><br>
 					<li>
 						Do a similar thing, but for defines for <kbd>SharedSub_Defines/SubroutineDefs.asm</kbd><sup>1</sup>:
@@ -321,7 +323,9 @@ autoclean JML DrawOamGraphicalBarVert</pre></td></tr></table>
 %SetDefine(ConvertBarFillAmountToTilesEdgeOverMultipleTiles)
 %SetDefine(CountNumberOfTiles)
 %SetDefine(DrawOamGraphicalBarHoriz)
-%SetDefine(DrawOamGraphicalBarVert)</pre></td></tr></table>
+%SetDefine(DrawOamGraphicalBarVert)
+%SetDefine(DrawSpriteGraphicalBarHoriz)
+%SetDefine(DrawSpriteGraphicalBarVert)</pre></td></tr></table>
 						<sup>1</sup>If you renamed the labels, these have to be renamed so they match. Otherwise asar complains that labels not found.
 					</li><br>
 					<li>Now patch <kbd>sharedsub.asm</kbd>.</li><br>

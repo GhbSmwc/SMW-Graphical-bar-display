@@ -7,7 +7,7 @@ incsrc "GraphicalBarDefines/SpriteOAMSettings.asm"
 ;Note: Not to be used for “normal sprites” (the generally
 ;interactable sprites such as SMW or pixi sprites using 12 (22 for
 ;SA-1) slots). This writes OAM directly like most sprite status bar
-;patches.
+;patches. Instead, use DrawSpriteGraphicalBarHoriz instead.
 ;
 ;Input
 ; -$00 to $01: X position, relative to screen border
@@ -299,3 +299,159 @@ FindNFreeOAMSlot:
 	.Done
 		PLY
 		RTS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;This writes the graphical bar tiles to OAM (horizontal).
+;
+;To be used for “normal sprites” only.
+;
+;Before calling this subroutine:
+;-Call GetDrawInfo to obtain the Y index of which OAM to use (increments of 4).
+;-XY register must be 16-bit (REP #$10)
+;
+;After calling this subroutine:
+;-It is not recommend to call GetDrawInfo and finishing the OAM routine more than once.
+; Therefore having the sprite GFX and graphical bar GFX together after GetDrawInfo and
+; before FinishOAMWrite is better suited.
+;-When finishing the OAM write, make sure you add the total number (without the minus 1s on EACH)
+; number of OAM tiles used, and THEN subtract by 1 (don't subtract by 1 for the sprite itself
+; and the graphical bar, you'll total the subtraction by 2 instead of 1).
+;-X index is used for which tile byte of the bar, so make sure you restore X in some way (PHX,
+; call this subroutine, PLX or use LDX $15E9).
+;
+;Input
+; -$02: X position
+; -$03: Y position
+; -$04 to $05: Number of tiles to write
+; -$06: Direction of increasing fill:
+;  -#$00 = left to right
+;  -#$01 = right to left (YXPPCCCT's X bit being set)
+; -$07: Properties (YXPPCCCT).
+;Destroyed:
+; $08: Displacement of each tile during processing.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+DrawSpriteGraphicalBarHoriz:
+	.HorizontalBar
+		LDX #$00
+		LDA $02							;\Initialize displacement loop
+		STA $08							;/
+		..OAMLoop
+			LDA $08						;\X pos
+			STA $0300|!addr,y				;/
+			
+			LDA $03						;\Y pos
+			STA $0301|!addr,y				;/
+			
+			LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\Tile number
+			STA $0302|!addr,y				;/
+			
+			...HandleXFlip
+				LDA $06
+				BEQ ....NoFlip
+				....Flip
+					LDA $07
+					ORA.b #%01000000
+					BRA ....Write
+				....NoFlip
+					LDA $07
+				....Write
+					STA $0303|!addr,y		;>YXPPCCCT
+		..Next
+			LDA $06
+			BEQ ...NoFlip
+			...Flip
+				LDA $08			;\Move tile X position by 8 pixels
+				SEC			;|
+				SBC #$08		;/
+				BRA ...Write
+			...NoFlip
+				LDA $08			;\Move tile X position by 8 pixels
+				CLC			;|
+				ADC #$08		;/
+			...Write
+				STA $08			;
+			INY			;\Next OAM slot
+			INY			;|
+			INY			;|
+			INY			;/
+			INX			;>Next graphical bar slot
+			CPX $04			;>...so it doesn't need to execute the subroutine repeatedly.
+			BCC ..OAMLoop
+			RTL
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;This writes the graphical bar tiles to OAM (vertical).
+;
+;To be used for “normal sprites” only.
+;
+;Before calling this subroutine:
+;-Call GetDrawInfo to obtain the Y index of which OAM to use (increments of 4).
+;-XY register must be 16-bit (REP #$10)
+;
+;After calling this subroutine:
+;-It is not recommend to call GetDrawInfo and finishing the OAM routine more than once.
+; Therefore having the sprite GFX and graphical bar GFX together after GetDrawInfo and
+; before FinishOAMWrite is better suited.
+;-When finishing the OAM write, make sure you add the total number (without the minus 1s on EACH)
+; number of OAM tiles used, and THEN subtract by 1 (don't subtract by 1 for the sprite itself
+; and the graphical bar, you'll total the subtraction by 2 instead of 1).
+;-X index is used for which tile byte of the bar, so make sure you restore X in some way (PHX,
+; call this subroutine, PLX or use LDX $15E9).
+;
+;Input
+; -$02: X position
+; -$03: Y position
+; -$04 to $05: Number of tiles to write
+; -$06: Direction of increasing fill:
+;  -#$00 = bottom to top
+;  -#$01 = top to bottom
+; -$07: Properties (YXPPCCCT).
+;Destroyed:
+; $08: Displacement of each tile during processing.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+DrawSpriteGraphicalBarVert:
+	.verticalBar
+		LDX #$00
+		LDA $03							;\Initialize displacement loop
+		STA $08							;/
+		..OAMLoop
+			LDA $02						;\X pos
+			STA $0300|!addr,y				;/
+			
+			LDA $08						;\Y pos
+			STA $0301|!addr,y				;/
+			
+			LDA !Scratchram_GraphicalBar_FillByteTbl,x	;\Tile number
+			STA $0302|!addr,y				;/
+			
+			...HandleYFlip
+				LDA $06
+				BEQ ....NoFlip
+				....Flip
+					LDA $07
+					ORA.b #%10000000
+					BRA ....Write
+				....NoFlip
+					LDA $07
+				....Write
+					STA $0303|!addr,y		;>YXPPCCCT
+		..Next
+			LDA $06
+			BEQ ...NoFlip
+			...Flip
+				LDA $08			;\Move tile Y position by 8 pixels
+				CLC			;|
+				ADC #$08		;/
+				BRA ...Write
+			...NoFlip
+				LDA $08			;\Move tile Y position by 8 pixels
+				SEC			;|
+				SBC #$08		;/
+			...Write
+				STA $08			;
+			INY			;\Next OAM slot
+			INY			;|
+			INY			;|
+			INY			;/
+			INX			;>Next graphical bar slot
+			CPX $04			;>...so it doesn't need to execute the subroutine repeatedly.
+			BCC ..OAMLoop
+			RTL
