@@ -79,6 +79,7 @@ named <span class="NoLineBreak"><kbd>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</kb
 		<li><a href="#DrawOamGraphicalBarHoriz" id="DrawOamGraphicalBarHoriz_Back"><kbd>DrawOamGraphicalBarHoriz</kbd></a></li>
 		<li><a href="#DrawOamGraphicalBarVert" id="DrawOamGraphicalBarVert_Back"><kbd>DrawOamGraphicalBarVert</kbd></a></li>
 		<li><a href="#FindNFreeOAMSlot" id="FindNFreeOAMSlot_Back"><kbd>FindNFreeOAMSlot</kbd></a></li>
+		<li><a href="#DrawSpriteGraphicalBarHorizVert" id="DrawSpriteGraphicalBarHorizVert_Back"><kbd>DrawSpriteGraphicalBarHoriz</kbd> and <kbd>DrawSpriteGraphicalBarVert</kbd></a></li>
 	</ul>
 </ul>
 <li><a href="#Notes" id="NotesBack">Notes</a></li>
@@ -1383,7 +1384,7 @@ address of the status bar (avoid placing the <kbd>DesiredLastTilePos</kbd> that 
 <p>This routine, unlike the status bar routines, writes the graphical bar tiles as <b>sprite OAM</b>. This is very useful for sprite HUD or HUD placed on a character (rather than static
 on-screen position, a bar that is placed relative to the character, such as on top of the character's head).</p>
 
-<p>Note: The following routines are not to be used for &ldquo;normal sprites&rdquo;, as they use the OAM directly (&ldquo;normal sprites&rdquo; is a term I refer to the type of sprites
+<p>Note: The two following routines are not to be used for &ldquo;normal sprites&rdquo;, as they use the OAM directly (&ldquo;normal sprites&rdquo; is a term I refer to the type of sprites
 that are often interactable, such as enemies, platforms, items, etc. that are SMW or pixi-made, that are part of the 12 (or 22 for sa-1 hacks)-sprite slot limit) and are intended to
 function similarly to most sprite status bar patches</p>
 <ul>
@@ -1437,10 +1438,40 @@ The purpose of this is to act as a failsafe by simply not drawing the graphical 
 	</td></tr>
 	</table><br>
 	</ul></li>
+<li><a href="#DrawSpriteGraphicalBarHorizVert_Back" id="DrawSpriteGraphicalBarHorizVert">^</a><kbd>DrawSpriteGraphicalBarHoriz</kbd> and <kbd>DrawSpriteGraphicalBarVert</kbd>: The &ldquo;normal sprite&rdquo; versions of above.
+To be called after calling <kbd>%GetDrawInfo()</kbd> and before <kbd>$01B7B3</kbd> or <kbd>%FinishOAMWrite()</kbd>:
+<table>
+<tr><th>Input</th><th>Number of Bytes</th><th>Description</th></tr>
+<tr><td><kbd>$02</kbd></td><td align="center">1</td><td>X position (similar to $00)</td></tr>
+<tr><td><kbd>$03</kbd></td><td align="center">1</td><td>Y position (similar to $01)</td></tr>
+<tr><td><kbd>$04</kbd> to <kbd>$05</kbd></td><td align="center">2</td><td>Number of tiles.</td></tr>
+<tr><td><kbd>$06</kbd></td><td align="center">1</td><td>Direction:
+For horizontal (using <kbd>DrawSpriteGraphicalBarHoriz</kbd>):
+<ul>
+<li><kbd>$00</kbd> = Left to right</li>
+<li><kbd>$01</kbd> = Right to left (YXPPCCCT's X bit set)</li>
+</ul>
+For vertical (<kbd>DrawSpriteGraphicalBarVert</kbd>):
+<ul>
+<li><kbd>$00</kbd> = Bottom to top</li>
+<li><kbd>$01</kbd> = Top to bottom (YXPPCCCT's Y bit set)</li>
+</ul>
+</td></tr>
+<tr><td><kbd>$07</kbd></td><td align="center">1</td><td>Properties (YXPPCCCT)</td></tr>
+</table><br>
+
+<table>
+<tr><th>Destroyed</th><th>Number of Bytes</th><th>Description</th></tr>
+<tr><td><kbd>$08</kbd></td><td align="center">1</td><td>Used for offsetting each tile during processing</td></tr>
+</table>
+
+</li>
 <hr>
 <h2><a href="#CreditsBack" id="Credits">^</a>Credits</h2>
 <ul>
 <li><a href="https://www.smwcentral.net/?p=profile&id=8691">Akaginite</a>, for making the math routines</li>
+<li><a href="https://www.smwcentral.net/?p=profile&id=4842">Ladida</a>, I borrowed a few lines of her code (and asked for permission):<br>
+<img src="readme_files/LadidaPermission.png"></li>
 <li><a href="https://www.smwcentral.net/?p=profile&id=41003">JamesD28</a>, of a sprite crashing bug experienced (<kbd>%GetDrawInfo()</kbd> uses a &ldquo;destroy return address&rdquo; (you pull out bytes pushed by the JSL/JSR just before the RTL/RTS, so that it exits out multiple subroutines upon hitting a RTL/RTS))</li>
 <li><a href="https://www.smwcentral.net/?p=profile&id=36308">KevinM</a> and <a href="https://www.smwcentral.net/?p=profile&id=12344">LX5</a>, for some knowledge of the technical bits of OAM writing.</li>
 <li><a href="https://www.w3schools.com/">W3Schools</a> and <a href="https://stackoverflow.com">stackoverflow</a><sup><a href="https://stackoverflow.com/questions/11409895/whats-the-most-elegant-way-to-cap-a-number-to-a-segment">[1]</a></sup>, for making a tutorial on how to make HTML and javascript codes.</li>
