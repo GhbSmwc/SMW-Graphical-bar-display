@@ -55,20 +55,22 @@ DrawSpriteGraphicalBar:
 		LDA !extra_byte_3,x					;\length (number of middle tiles)
 		STA !Scratchram_GraphicalBar_TempLength			;/
 	.ConvertToBar
-		PHX
+		PHX								;>Preserve sprite slot index
 		JSL !CalculateGraphicalBarPercentage				;>Get percentage
 		JSL !RoundAwayEmptyFull
 		JSL !DrawGraphicalBar						;>get bar values.
 		LDA #$01							;\Use Level-sprite tileset
 		STA $00								;/
 		JSL !ConvertBarFillAmountToTiles				;>Convert tiles.
-		PLX
+		PLX								;>Restore sprite slot index
+		
+		;Beyond this point is whats different unlike the layer 3 version.
 		
 		%GetDrawInfo()	;Y = OAM index, $00 = sprite scrn X pos, $01 = sprite scrn Y pos
 		;Note to self:
-		;%GetDrawInfo() uses a destroy-return-address to "double-out" the subroutine upon returning, by "pulling" before the RTL.
-		;This results in using the 2nd-last return address (pull, then RTL uses the previous return address, not the current one)
-		;Pushing and not pulling afterwards before calling %GetDrawInfo() can cause the game to crash due to now other data is in the stack
+		;%GetDrawInfo() uses a destroy-return-address to "double-out" the subroutine upon returning, by "pulling" (PLA 3 times) before the RTL.
+		;This results in using the 2nd-last return address instead of the normal behavior or JSL->RTL
+		;Pushing and then not pulling afterwards before calling %GetDrawInfo() can cause the game to crash due to now other data is in the stack
 		;to destroy the return address. Give thanks to JamesD28.
 		;
 		;We start at $0300 because I have a feeling that $0200-$02FF is used by something else.
@@ -78,7 +80,6 @@ DrawSpriteGraphicalBar:
 		STX $04				;|
 		STZ $05				;/
 		
-		wdm
 		LDX $15E9|!addr			;>Sprite index
 		
 		LDA $00				;\X position
