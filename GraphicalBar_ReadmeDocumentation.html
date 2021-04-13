@@ -526,7 +526,8 @@ for the left end, and then write 11 back to the remaining fill amount. Then [11 
 <tr><td><kbd>$7F844D</kbd> (<kbd>Address+3</kbd>)</td><td><font color="#00FF00">Middle 3</font></td><td bgcolor="grey"><kbd>0</kbd> (<kbd>$00</kbd>)</td><td align="center"><kbd>8</kbd></td><td><kbd>0 - 8 = (-8)</kbd> subtraction failed!</td><td>0 &rightarrow; 0</td></tr>
 <tr><td><kbd>$7F844E</kbd> (<kbd>Address+4</kbd>)</td><td><font color="#00FF00">Middle 4</font></td><td bgcolor="grey"><kbd>0</kbd> (<kbd>$00</kbd>)</td><td align="center"><kbd>8</kbd></td><td><kbd>0 - 8 = (-8)</kbd> subtraction failed!</td><td>0 &rightarrow; 0</td></tr>
 <tr><td colspan="6">...&downarrow; continues failing subtractions and setting the fill amount of each bytes to 0.</td></tr>
-</table></li></ul>
+</table></li></ul><br>
+<img src="readme_files/RepeatedSubtraction.png" width="1200">
 <br><br>
 This is known as repeated subtraction, it keeps subtracting until no more is left. This is performed in <kbd>DrawGraphicalBarSubtractionLoopEdition</kbd> which is explained later.</p>
 
