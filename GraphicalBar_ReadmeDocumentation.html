@@ -512,7 +512,7 @@ on the first middle tile if there are no full middle tiles, if the entire middle
 </ul>
 </ul><br>
 <p>Another way is by taking the given fill amount, subtract by the tile byte maximum starting at the first byte going towards the last byte, if the subtraction was successful (subtracted without going in the negatives), would write
-the maximum amount to the byte in the table and writes the difference back to the remaining fill amount, otherwise would write the remaining fill amount into byte in the table and
+the maximum amount to the byte in the table and writes the difference back to the remaining fill amount, otherwise (if it fails) it would write the remaining fill amount (the last difference before going negative) into byte in the table and
 set the remaining fill amount to 0. After this, this then repeats until all tile bytes are finished.<br><br>
 
 <ul><li>For example: using the same attributes as examples above, [14 - 3 = 11]. Subtraction successful, write 3 (maximum)
