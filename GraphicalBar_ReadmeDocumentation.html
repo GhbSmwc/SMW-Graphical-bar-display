@@ -356,14 +356,14 @@ autoclean JML DrawSpriteGraphicalBarVert</pre></td></tr></table>
 		<ul>
 			<li>The total number of tiles it uses. Before calling the &ldquo;finish OAM write&rdquo; (done by calling <kbd>JSL $01B7B3</kbd> or <kbd>%FinishOAMWrite()</kbd>), you'll need
 			to find out the total number of tiles, including the bar itself. I recommend getting the total (sprite's body + graphical bar) first, and then subtract by 1, and avoid subtracting
-			by 1 of the body and the graphical bar.</li>
+			by 1 of the body and the graphical bar (you'll subtract by 2 which isn't what you want).</li>
 			<li>The tile sizes, whether or not uses 8x8, 16x16 or in rare cases both.</li>
 		</ul>
 	</li>
 	<li>If you happen to want a graphical bar on a sprite that is composed of at least 1 16x16 OAM tile (most sprites are like that, by the way), there is a good chance you'll have to
 	manually handle the size of editing <kbd>$0460</kbd> in the sprite code (a mixture of 8x8s and 16x16, like the timed lift sprite (the platform itself is 2 16x16s and the number is a single 8x8.)):
 <table><tr><td><pre>;Manually set sprite tile size to 16x16
-	PHY		;&gt;Push OAM index
+	PHY		;&gt;Push OAM index (You'll need this if you are still using the Y OAM index afterwards, especially if you are writing multiple tiles via a loop).
 	TYA			;\Convert index to OAM slot numbering
 	LSR #2			;|
 	TAY 			;/
