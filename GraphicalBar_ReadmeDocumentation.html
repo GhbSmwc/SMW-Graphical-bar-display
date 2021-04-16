@@ -1412,7 +1412,7 @@ address of the status bar (avoid placing the <kbd>DesiredLastTilePos</kbd> that 
 <hr>
 <h2><a href="#GraphicalBarWriteToOam_Back" id="GraphicalBarWriteToOam">^</a>GraphicalBarWriteToOam.asm</h2>
 
-<p>This routine, unlike the status bar routines, writes the graphical bar tiles as <b>sprite OAM</b>. This is very useful for sprite HUD or HUD placed on a character (rather than static
+<p>These routines, unlike the status bar routines, writes the graphical bar tiles as <b>sprite OAM</b>. This is very useful for sprite HUD or HUD placed on a character (rather than static
 on-screen position, a bar that is placed relative to the character, such as on top of the character's head).</p>
 
 <p>Note: The two following routines are not to be used for &ldquo;normal sprites&rdquo;, as they use the OAM directly (&ldquo;normal sprites&rdquo; is a term I refer to the type of sprites
@@ -1468,12 +1468,13 @@ The purpose of this is to act as a failsafe by simply not drawing the graphical 
 	</ul>
 	</td></tr>
 	</table><br>
-	</ul></li>
+	</li>
 <li><a href="#DrawSpriteGraphicalBarHorizVert_Back" id="DrawSpriteGraphicalBarHorizVert">^</a><kbd>DrawSpriteGraphicalBarHoriz</kbd> and <kbd>DrawSpriteGraphicalBarVert</kbd>: The &ldquo;normal sprite&rdquo; versions of above.
 To be called after calling <kbd>%GetDrawInfo()</kbd> and before <kbd>$01B7B3</kbd> or <kbd>%FinishOAMWrite()</kbd>. Note: These always write 8x8 tiles, and when finishing the OAM write, Y must be $FF (indicating you are manually
 setting the tile size) should your sprite use both 8x8 and 16x16 tile sizes.
 <table>
 <tr><th>Input</th><th>Number of Bytes</th><th>Description</th></tr>
+<tr><td><kbd>Y index</kbd></td><td align="center">1 (not stored)</td><td>OAM index to use (start from <kbd>$0300</kbd>/<kbd>$0460</kbd>, not <kbd>$0200</kbd>/<kbd>$0420</kbd>)</td></tr>
 <tr><td><kbd>$02</kbd></td><td align="center">1</td><td>X position (similar to $00)</td></tr>
 <tr><td><kbd>$03</kbd></td><td align="center">1</td><td>Y position (similar to $01)</td></tr>
 <tr><td><kbd>$04</kbd> to <kbd>$05</kbd></td><td align="center">2</td><td>Number of tiles.</td></tr>
@@ -1493,11 +1494,17 @@ For vertical (<kbd>DrawSpriteGraphicalBarVert</kbd>):
 </table><br>
 
 <table>
+<tr><th>Output</th><th>Number of Bytes</th><th>Description</th></tr>
+<tr><td><kbd>Y index</kbd></td><td align="center">1 (not stored)</td><td>OAM index to use, a slot after writing the last tile of the bar.</td></tr>
+</table><br>
+
+<table>
 <tr><th>Destroyed</th><th>Number of Bytes</th><th>Description</th></tr>
 <tr><td><kbd>$08</kbd></td><td align="center">1</td><td>Used for offsetting each tile during processing</td></tr>
 </table>
 
 </li>
+</ul>
 <hr>
 <h2><a href="#CreditsBack" id="Credits">^</a>Credits</h2>
 <ul>
