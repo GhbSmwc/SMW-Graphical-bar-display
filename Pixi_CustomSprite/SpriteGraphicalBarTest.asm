@@ -65,7 +65,7 @@ DrawSpriteGraphicalBar:
 		PLX								;>Restore sprite slot index
 		
 		;Beyond this point is whats different unlike the layer 3 version.
-		
+	.DrawSprite
 		%GetDrawInfo()	;Y = OAM index, $00 = sprite scrn X pos, $01 = sprite scrn Y pos
 		;Note to self:
 		;%GetDrawInfo() uses a destroy-return-address to "double-out" the subroutine upon returning, by "pulling" (PLA 3 times) before the RTL.
@@ -73,8 +73,13 @@ DrawSpriteGraphicalBar:
 		;Pushing and then not pulling afterwards before calling %GetDrawInfo() can cause the game to crash due to now other data is in the stack
 		;to destroy the return address. Give thanks to JamesD28.
 		;
-		;We start at $0300 because I have a feeling that $0200-$02FF is used by something else.
-
+		;We start at $0300/$0460 (slots 64-127, latter half of the array) because I have a feeling that $0200-$02FF and $0420-$045F is used by something else.
+		;
+		;Because we are writing at increasing OAM indexes (INY #4 instead of DEY #4), the first tile written will be written “on top” (in front) of the next
+		;tile when they overlap and every subsequent tile will be placed underneath (behind). So if you have the code draw the bar first (such as this example
+		;shown here), and then the body of the sprite afterwards, the bar will be written on top of the body of the sprite.
+	..GraphicalBar
+		wdm
 		JSL !CountNumberOfTiles		;\Get number of tiles of the graphical bar
 		INX				;|
 		STX $04				;|
@@ -102,11 +107,28 @@ DrawSpriteGraphicalBar:
 		else
 			JSL !DrawSpriteGraphicalBarVert
 		endif
+		;^After DrawSpriteGraphicalBarHoriz or DrawSpriteGraphicalBarVert,
+		; Y is already the correct next OAM index after the last bar tile written.
+	..DrawSpriteBody
+		LDA $00				;\X pos
+		STA $0300|!addr,y		;/
+		LDA $01				;\Y pos
+		STA $0301|!addr,y		;/
+		LDA #$00			;\Tile number
+		STA $0302|!addr,y		;/
+		LDA.b #%00010001		;\Properties
+		STA $0303|!addr,y		;/
+		TYA				;\Convert OAM index to slot number.
+		LSR #2				;|(we only need to preserve (PHY) and restore (PLY) the Y index if we need it back afterwards)
+		TAY				;/
+		LDA $0460|!addr,y		;\Manually set the size bit to 16x16
+		ORA.b #%00000010		;|
+		STA $0460|!addr,y		;/
 
-		..Done
-			LDX $15E9|!addr			;>Restore sprite slot
-			LDY #$00			;\Finish OAM
-			LDA $04				;|>Total number of tiles to write, minus 1.
-			DEC				;|
-			JSL $01B7B3|!BankB		;/
-			RTS
+	..Done
+		LDX $15E9|!addr			;>Restore sprite slot
+		LDY #$FF			;\Finish OAM
+		LDA $04				;|>Total number of tiles (main body plus bar) to write, minus 1.
+		;DEC				;|We could do INC and then DEC, but that can be simplified to just removing both as they both cancel each other out.
+		JSL $01B7B3|!BankB		;/
+		RTS

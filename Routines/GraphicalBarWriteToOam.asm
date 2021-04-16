@@ -322,7 +322,8 @@ FindNFreeOAMSlot:
 ;-X index is used for which tile byte of the bar, so make sure you restore X in some way (PHX,
 ; call this subroutine, PLX or use LDX $15E9).
 ;
-;Input
+;Input:
+; -Y index: The OAM index (increments of 4)
 ; -$02: X position
 ; -$03: Y position
 ; -$04 to $05: Number of tiles to write
@@ -330,6 +331,8 @@ FindNFreeOAMSlot:
 ;  -#$00 = left to right
 ;  -#$01 = right to left (YXPPCCCT's X bit being set)
 ; -$07: Properties (YXPPCCCT).
+;Output:
+; -Y index: The OAM index after writing the last tile of the bar.
 ;Destroyed:
 ; $08: Displacement of each tile during processing.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -413,7 +416,8 @@ DrawSpriteGraphicalBarHoriz:
 ;-X index is used for which tile byte of the bar, so make sure you restore X in some way (PHX,
 ; call this subroutine, PLX or use LDX $15E9).
 ;
-;Input
+;Input:
+; -Y index: The OAM index (increments of 4)
 ; -$02: X position
 ; -$03: Y position
 ; -$04 to $05: Number of tiles to write
@@ -421,6 +425,8 @@ DrawSpriteGraphicalBarHoriz:
 ;  -#$00 = bottom to top
 ;  -#$01 = top to bottom
 ; -$07: Properties (YXPPCCCT).
+;Output:
+; -Y index: The OAM index after writing the last tile of the bar.
 ;Destroyed:
 ; $08: Displacement of each tile during processing.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
