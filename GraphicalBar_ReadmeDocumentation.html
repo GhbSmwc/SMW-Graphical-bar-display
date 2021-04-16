@@ -1308,6 +1308,102 @@ to handle the literal quantity amounts instead of the percentage fill amounts to
 </ol>
 
 <hr>
+<h2><a href="#GraphicalBarWriteToOam_Back" id="GraphicalBarWriteToOam">^</a>GraphicalBarWriteToOam.asm</h2>
+
+<p>These routines, unlike the status bar routines, writes the graphical bar tiles as <b>sprite OAM</b>. This is very useful for sprite HUD or HUD placed on a character (rather than static
+on-screen position, a bar that is placed relative to the character, such as on top of the character's head).</p>
+
+<p>Note: The two following routines are not to be used for &ldquo;normal sprites&rdquo;, as they use the OAM directly (&ldquo;normal sprites&rdquo; is a term I refer to the type of sprites
+that are often interactable, such as enemies, platforms, items, etc. that are SMW or pixi-made, that are part of the 12 (or 22 for sa-1 hacks)-sprite slot limit) and are intended to
+function similarly to most sprite status bar patches</p>
+<ul>
+	<li><a href="#DrawOamGraphicalBarHoriz_Back" id="DrawOamGraphicalBarHoriz">^</a><kbd>DrawOamGraphicalBarHoriz</kbd>: Draws a horizontal graphical bar:
+	<table>
+	<tr><th>Input</th><th>Number of bytes</th><th>Description</th></tr>
+	<tr><td><kbd>$00</kbd> to <kbd>$01</kbd></td><td align="center">2</td><td>X position, relative to screen border.</td></tr>
+	<tr><td><kbd>$02</kbd> to <kbd>$03</kbd></td><td align="center">2</td><td>Y position, relative to screen border.</td></tr>
+	<tr><td><kbd>$04</kbd> to <kbd>$05</kbd></td><td align="center">2</td><td>Number of tiles to write.</td></tr>
+	<tr><td><kbd>$06</kbd></td><td align="center">1</td><td>Fill direction (as it increases): <kbd>#$00</kbd> = left to right, <kbd>#$02</kbd> = right to left (YXPPCCCT's X bit set)</td></tr>
+	<tr><td><kbd>$07</kbd></td><td align="center">1</td><td>Properties (YXPPCCCT)</td></tr>
+	</table><br>
+	
+	<table>
+	<tr><th>Destroyed</th><th>Number of bytes</th><th>Description</th></tr>
+	<tr><td><kbd>$08</kbd> to <kbd>$09</kbd></td><td align="center">2</td><td>Displacement of each tile, from the origin.</td></tr>
+	</table>
+	</li><br>
+	<li><a href="#DrawOamGraphicalBarVert_Back" id="DrawOamGraphicalBarVert">^</a><kbd>DrawOamGraphicalBarVert</kbd>: Draws a vertical graphical bar:
+	<table>
+	<tr><th>Input</th><th>Number of bytes</th><th>Description</th></tr>
+	<tr><td><kbd>$00</kbd> to <kbd>$01</kbd></td><td align="center">2</td><td>X position, relative to screen border.</td></tr>
+	<tr><td><kbd>$02</kbd> to <kbd>$03</kbd></td><td align="center">2</td><td>Y position, relative to screen border.</td></tr>
+	<tr><td><kbd>$04</kbd> to <kbd>$05</kbd></td><td align="center">2</td><td>Number of tiles to write.</td></tr>
+	<tr><td><kbd>$06</kbd></td><td align="center">1</td><td>Fill direction (as it increases): <kbd>#$00</kbd> = bottom to top, <kbd>#$02</kbd> = top to bottom (YXPPCCCT's Y bit set)</td></tr>
+	<tr><td><kbd>$07</kbd></td><td align="center">1</td><td>Properties (YXPPCCCT)</td></tr>
+	</table><br>
+	
+	<table>
+	<tr><th>Destroyed</th><th>Number of bytes</th><th>Description</th></tr>
+	<tr><td><kbd>$08</kbd> to <kbd>$09</kbd></td><td align="center">2</td><td>Displacement of each tile, from the origin.</td></tr>
+	</table><br>
+	</li>
+
+
+<li><a href="#FindNFreeOAMSlot_Back" id="FindNFreeOAMSlot">^</a><kbd>FindNFreeOAMSlot</kbd>: This routine is only used by <kbd>DrawOamGraphicalBarHoriz</kbd> and <kbd>DrawOamGraphicalBarVert</kbd>, checks if there are sufficient OAM slots available of a given number.
+The purpose of this is to act as a failsafe by simply not drawing the graphical bar at all if there are insufficient number of slots unavailable. This is to prevent drawing a bar with missing tiles (only show all the tiles or none).
+	<table>
+	<tr><th>Input</th><th>Number of bytes</th><th>Description</th></tr>
+	<tr><td><kbd>$04</kbd> to <kbd>$05</kbd></td><td align="center">2</td><td>The number of slots to find. 16-bit because <abbr title="There are 128 slots, numbered from 0-127 ($00-$7F). Therefore the index must be 0-508 ($0000-$01FC), a range that an 8-bit integer cannot support. Another reason is that both X and Y index registers cannot use different 8 or 16-bit sizes.">OAM indexing are increments of 4<abbr></td></tr>
+	</table><br>
+
+	<table>
+	<tr><th>Output</th><th>Number of bytes</th><th>Description</th></tr>
+	<tr><td>
+	<kbd>Carry bit</kbd></td><td align="center">N/A</td><td>If no slot is available:
+	<ul>
+	<li>Clear (<kbd>0</kbd>) = Enough slots found</li>
+	<li>Set (<kbd>1</kbd>) = Not enough slots available.</li>
+	</ul>
+	</td></tr>
+	</table><br>
+	</li>
+<li><a href="#DrawSpriteGraphicalBarHorizVert_Back" id="DrawSpriteGraphicalBarHorizVert">^</a><kbd>DrawSpriteGraphicalBarHoriz</kbd> and <kbd>DrawSpriteGraphicalBarVert</kbd>: The &ldquo;normal sprite&rdquo; versions of above.
+To be called after calling <kbd>%GetDrawInfo()</kbd> and before <kbd>$01B7B3</kbd> or <kbd>%FinishOAMWrite()</kbd>. Note: These always write 8x8 tiles, and when finishing the OAM write, Y must be $FF (indicating you are manually
+setting the tile size) should your sprite use both 8x8 and 16x16 tile sizes.
+<table>
+<tr><th>Input</th><th>Number of Bytes</th><th>Description</th></tr>
+<tr><td><kbd>Y index</kbd></td><td align="center">1 (not stored)</td><td>OAM index to use (start from <kbd>$0300</kbd>/<kbd>$0460</kbd>, not <kbd>$0200</kbd>/<kbd>$0420</kbd>)</td></tr>
+<tr><td><kbd>$02</kbd></td><td align="center">1</td><td>X position (similar to $00)</td></tr>
+<tr><td><kbd>$03</kbd></td><td align="center">1</td><td>Y position (similar to $01)</td></tr>
+<tr><td><kbd>$04</kbd> to <kbd>$05</kbd></td><td align="center">2</td><td>Number of tiles.</td></tr>
+<tr><td><kbd>$06</kbd></td><td align="center">1</td><td>Direction:
+For horizontal (using <kbd>DrawSpriteGraphicalBarHoriz</kbd>):
+<ul>
+<li><kbd>$00</kbd> = Left to right</li>
+<li><kbd>$01</kbd> = Right to left (YXPPCCCT's X bit set)</li>
+</ul>
+For vertical (<kbd>DrawSpriteGraphicalBarVert</kbd>):
+<ul>
+<li><kbd>$00</kbd> = Bottom to top</li>
+<li><kbd>$01</kbd> = Top to bottom (YXPPCCCT's Y bit set)</li>
+</ul>
+</td></tr>
+<tr><td><kbd>$07</kbd></td><td align="center">1</td><td>Properties (YXPPCCCT)</td></tr>
+</table><br>
+
+<table>
+<tr><th>Output</th><th>Number of Bytes</th><th>Description</th></tr>
+<tr><td><kbd>Y index</kbd></td><td align="center">1 (not stored)</td><td>OAM index to use, a slot after writing the last tile of the bar.</td></tr>
+</table><br>
+
+<table>
+<tr><th>Destroyed</th><th>Number of Bytes</th><th>Description</th></tr>
+<tr><td><kbd>$08</kbd></td><td align="center">1</td><td>Used for offsetting each tile during processing</td></tr>
+</table>
+
+</li>
+</ul>
+<hr>
 <h2><a href="#NotesBack" id="Notes">^</a>Notes</h2>
 <ul>
 
@@ -1408,102 +1504,6 @@ would need a bar that is more than 255 tile bytes long (So a 16-bit addressing w
 <ul><li><p>However, if you are using the &ldquo;extend leftwards&rdquo; (not to be confused with a leftwards <b>filling bar</b>; the bar that extends leftwards as you increase the length),
 the address write range is <kbd>DesiredLastTilePos-((NumberOfTiles-1)*!StatusBarFormat)</kbd> to <kbd>DesiredLastTilePos</kbd>, so be careful not to have the bar data be written past the starting RAM
 address of the status bar (avoid placing the <kbd>DesiredLastTilePos</kbd> that would cause placing the tiles before the first byte of the status bar tiles).</p></li></ul>
-</ul>
-<hr>
-<h2><a href="#GraphicalBarWriteToOam_Back" id="GraphicalBarWriteToOam">^</a>GraphicalBarWriteToOam.asm</h2>
-
-<p>These routines, unlike the status bar routines, writes the graphical bar tiles as <b>sprite OAM</b>. This is very useful for sprite HUD or HUD placed on a character (rather than static
-on-screen position, a bar that is placed relative to the character, such as on top of the character's head).</p>
-
-<p>Note: The two following routines are not to be used for &ldquo;normal sprites&rdquo;, as they use the OAM directly (&ldquo;normal sprites&rdquo; is a term I refer to the type of sprites
-that are often interactable, such as enemies, platforms, items, etc. that are SMW or pixi-made, that are part of the 12 (or 22 for sa-1 hacks)-sprite slot limit) and are intended to
-function similarly to most sprite status bar patches</p>
-<ul>
-	<li><a href="#DrawOamGraphicalBarHoriz_Back" id="DrawOamGraphicalBarHoriz">^</a><kbd>DrawOamGraphicalBarHoriz</kbd>: Draws a horizontal graphical bar:
-	<table>
-	<tr><th>Input</th><th>Number of bytes</th><th>Description</th></tr>
-	<tr><td><kbd>$00</kbd> to <kbd>$01</kbd></td><td align="center">2</td><td>X position, relative to screen border.</td></tr>
-	<tr><td><kbd>$02</kbd> to <kbd>$03</kbd></td><td align="center">2</td><td>Y position, relative to screen border.</td></tr>
-	<tr><td><kbd>$04</kbd> to <kbd>$05</kbd></td><td align="center">2</td><td>Number of tiles to write.</td></tr>
-	<tr><td><kbd>$06</kbd></td><td align="center">1</td><td>Fill direction (as it increases): <kbd>#$00</kbd> = left to right, <kbd>#$02</kbd> = right to left (YXPPCCCT's X bit set)</td></tr>
-	<tr><td><kbd>$07</kbd></td><td align="center">1</td><td>Properties (YXPPCCCT)</td></tr>
-	</table><br>
-	
-	<table>
-	<tr><th>Destroyed</th><th>Number of bytes</th><th>Description</th></tr>
-	<tr><td><kbd>$08</kbd> to <kbd>$09</kbd></td><td align="center">2</td><td>Displacement of each tile, from the origin.</td></tr>
-	</table>
-	</li><br>
-	<li><a href="#DrawOamGraphicalBarVert_Back" id="DrawOamGraphicalBarVert">^</a><kbd>DrawOamGraphicalBarVert</kbd>: Draws a vertical graphical bar:
-	<table>
-	<tr><th>Input</th><th>Number of bytes</th><th>Description</th></tr>
-	<tr><td><kbd>$00</kbd> to <kbd>$01</kbd></td><td align="center">2</td><td>X position, relative to screen border.</td></tr>
-	<tr><td><kbd>$02</kbd> to <kbd>$03</kbd></td><td align="center">2</td><td>Y position, relative to screen border.</td></tr>
-	<tr><td><kbd>$04</kbd> to <kbd>$05</kbd></td><td align="center">2</td><td>Number of tiles to write.</td></tr>
-	<tr><td><kbd>$06</kbd></td><td align="center">1</td><td>Fill direction (as it increases): <kbd>#$00</kbd> = bottom to top, <kbd>#$02</kbd> = top to bottom (YXPPCCCT's Y bit set)</td></tr>
-	<tr><td><kbd>$07</kbd></td><td align="center">1</td><td>Properties (YXPPCCCT)</td></tr>
-	</table><br>
-	
-	<table>
-	<tr><th>Destroyed</th><th>Number of bytes</th><th>Description</th></tr>
-	<tr><td><kbd>$08</kbd> to <kbd>$09</kbd></td><td align="center">2</td><td>Displacement of each tile, from the origin.</td></tr>
-	</table><br>
-	</li>
-
-
-<li><a href="#FindNFreeOAMSlot_Back" id="FindNFreeOAMSlot">^</a><kbd>FindNFreeOAMSlot</kbd>: This routine is only used by <kbd>DrawOamGraphicalBarHoriz</kbd> and <kbd>DrawOamGraphicalBarVert</kbd>, checks if there are sufficient OAM slots available of a given number.
-The purpose of this is to act as a failsafe by simply not drawing the graphical bar at all if there are insufficient number of slots unavailable. This is to prevent drawing a bar with missing tiles (only show all the tiles or none).
-	<table>
-	<tr><th>Input</th><th>Number of bytes</th><th>Description</th></tr>
-	<tr><td><kbd>$04</kbd> to <kbd>$05</kbd></td><td align="center">2</td><td>The number of slots to find. 16-bit because <abbr title="There are 128 slots, numbered from 0-127 ($00-$7F). Therefore the index must be 0-508 ($0000-$01FC), a range that an 8-bit integer cannot support. Another reason is that both X and Y index registers cannot use different 8 or 16-bit sizes.">OAM indexing are increments of 4<abbr></td></tr>
-	</table><br>
-
-	<table>
-	<tr><th>Output</th><th>Number of bytes</th><th>Description</th></tr>
-	<tr><td>
-	<kbd>Carry bit</kbd></td><td align="center">N/A</td><td>If no slot is available:
-	<ul>
-	<li>Clear (<kbd>0</kbd>) = Enough slots found</li>
-	<li>Set (<kbd>1</kbd>) = Not enough slots available.</li>
-	</ul>
-	</td></tr>
-	</table><br>
-	</li>
-<li><a href="#DrawSpriteGraphicalBarHorizVert_Back" id="DrawSpriteGraphicalBarHorizVert">^</a><kbd>DrawSpriteGraphicalBarHoriz</kbd> and <kbd>DrawSpriteGraphicalBarVert</kbd>: The &ldquo;normal sprite&rdquo; versions of above.
-To be called after calling <kbd>%GetDrawInfo()</kbd> and before <kbd>$01B7B3</kbd> or <kbd>%FinishOAMWrite()</kbd>. Note: These always write 8x8 tiles, and when finishing the OAM write, Y must be $FF (indicating you are manually
-setting the tile size) should your sprite use both 8x8 and 16x16 tile sizes.
-<table>
-<tr><th>Input</th><th>Number of Bytes</th><th>Description</th></tr>
-<tr><td><kbd>Y index</kbd></td><td align="center">1 (not stored)</td><td>OAM index to use (start from <kbd>$0300</kbd>/<kbd>$0460</kbd>, not <kbd>$0200</kbd>/<kbd>$0420</kbd>)</td></tr>
-<tr><td><kbd>$02</kbd></td><td align="center">1</td><td>X position (similar to $00)</td></tr>
-<tr><td><kbd>$03</kbd></td><td align="center">1</td><td>Y position (similar to $01)</td></tr>
-<tr><td><kbd>$04</kbd> to <kbd>$05</kbd></td><td align="center">2</td><td>Number of tiles.</td></tr>
-<tr><td><kbd>$06</kbd></td><td align="center">1</td><td>Direction:
-For horizontal (using <kbd>DrawSpriteGraphicalBarHoriz</kbd>):
-<ul>
-<li><kbd>$00</kbd> = Left to right</li>
-<li><kbd>$01</kbd> = Right to left (YXPPCCCT's X bit set)</li>
-</ul>
-For vertical (<kbd>DrawSpriteGraphicalBarVert</kbd>):
-<ul>
-<li><kbd>$00</kbd> = Bottom to top</li>
-<li><kbd>$01</kbd> = Top to bottom (YXPPCCCT's Y bit set)</li>
-</ul>
-</td></tr>
-<tr><td><kbd>$07</kbd></td><td align="center">1</td><td>Properties (YXPPCCCT)</td></tr>
-</table><br>
-
-<table>
-<tr><th>Output</th><th>Number of Bytes</th><th>Description</th></tr>
-<tr><td><kbd>Y index</kbd></td><td align="center">1 (not stored)</td><td>OAM index to use, a slot after writing the last tile of the bar.</td></tr>
-</table><br>
-
-<table>
-<tr><th>Destroyed</th><th>Number of Bytes</th><th>Description</th></tr>
-<tr><td><kbd>$08</kbd></td><td align="center">1</td><td>Used for offsetting each tile during processing</td></tr>
-</table>
-
-</li>
 </ul>
 <hr>
 <h2><a href="#CreditsBack" id="Credits">^</a>Credits</h2>
