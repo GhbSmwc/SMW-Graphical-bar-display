@@ -304,6 +304,10 @@ FindNFreeOAMSlot:
 ;
 ;To be used for “normal sprites” only.
 ;
+;Note: If you are combining this with sprites using 2 different
+;tile sizes (8x8 and 16x16), you'll have to manually set the tile
+;sizes for $0460 (and also have Y=$FF when finishing the OAM write)
+;
 ;Before calling this subroutine:
 ;-Call GetDrawInfo to obtain the Y index of which OAM to use (increments of 4).
 ;-XY register must be 16-bit (REP #$10)
@@ -355,6 +359,15 @@ DrawSpriteGraphicalBarHoriz:
 					LDA $07
 				....Write
 					STA $0303|!addr,y		;>YXPPCCCT
+			...HandleTileSize
+				PHY			;\Set tile size to 8x8.
+				TYA			;|
+				LSR			;|
+				TAY			;|
+				LDA $0460|!addr,y	;|
+				AND.b #%11111101	;|
+				STA $0460|!addr,y	;|
+				PLY			;/
 		..Next
 			LDA $06
 			BEQ ...NoFlip
@@ -381,6 +394,10 @@ DrawSpriteGraphicalBarHoriz:
 ;This writes the graphical bar tiles to OAM (vertical).
 ;
 ;To be used for “normal sprites” only.
+;
+;Note: If you are combining this with sprites using 2 different
+;tile sizes (8x8 and 16x16), you'll have to manually set the tile
+;sizes for $0460 (and also have Y=$FF when finishing the OAM write)
 ;
 ;Before calling this subroutine:
 ;-Call GetDrawInfo to obtain the Y index of which OAM to use (increments of 4).
@@ -433,6 +450,15 @@ DrawSpriteGraphicalBarVert:
 					LDA $07
 				....Write
 					STA $0303|!addr,y		;>YXPPCCCT
+			...HandleTileSize
+				PHY			;\Set tile size to 8x8.
+				TYA			;|
+				LSR			;|
+				TAY			;|
+				LDA $0460|!addr,y	;|
+				AND.b #%11111101	;|
+				STA $0460|!addr,y	;|
+				PLY			;/
 		..Next
 			LDA $06
 			BEQ ...NoFlip

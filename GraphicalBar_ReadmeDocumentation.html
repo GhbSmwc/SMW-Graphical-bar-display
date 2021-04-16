@@ -348,7 +348,35 @@ autoclean JML DrawSpriteGraphicalBarVert</pre></td></tr></table>
 			ExGraphics folder. If you do not have them, press &ldquo;Quick Extract ExGFX from ROM&rdquo;, which is the blue mushroom to make the Exgraphics folder appear.</li>
 		</ol>
 	</li>
-	<li>And you are done.</li>
+	<li>And you are done. If you are planning to use this code within the custom sprite's code, continue doing the steps below.</li>
+</ol>
+<h3>Programming with existing custom sprites</h3>
+<ol>
+	<li>Go to the graphics portion of the code (thankfully, they are conveniently named and 99% of the time use <kbd>%GetDrawInfo()</kbd>. You want to know these information
+		<ul>
+			<li>The number of tiles it uses.</li>
+			<li>The tile sizes, whether or not uses 8x8, 16x16 or in rare cases both.</li>
+		</ul>
+	</li>
+	<li>If you happen to want a graphical bar on a sprite that is composed of at least 1 16x16 OAM tile (most sprites are like that, by the way), there is a good chance you'll have to
+	manually handle the size of editing <kbd>$0460</kbd> in the sprite code:
+<table><tr><td><pre>;Manually set sprite tile size to 16x16
+	PHY		;&gt;Push OAM index
+	TYA			;\Convert index to OAM slot numbering
+	LSR #2			;|
+	TAY 			;/
+	LDA $0460		;\Manually set the size bit to 16x16
+	ORA.b #%00000010	;|
+	STA $0460,y		;/
+	PLY			;&gt;Restore OAM index
+	;[...]
+;Finish OAM write:
+	LDY #$FF		;&gt;The graphical bar tiles are always 8x8, but the sprite's body isn't always 8x8 or 16x16.
+	;A = number of tiles to write, -1
+	&lt;instruction to get the number of tiles, minus 1, into the A register&gt;
+	&lt;Either call using JSL $01B7B3, or use %FinishOAMWrite().&gt;</pre></td></tr></table>
+	</li>
+
 </ol>
 </p>
 <hr>
@@ -1440,7 +1468,8 @@ The purpose of this is to act as a failsafe by simply not drawing the graphical 
 	</table><br>
 	</ul></li>
 <li><a href="#DrawSpriteGraphicalBarHorizVert_Back" id="DrawSpriteGraphicalBarHorizVert">^</a><kbd>DrawSpriteGraphicalBarHoriz</kbd> and <kbd>DrawSpriteGraphicalBarVert</kbd>: The &ldquo;normal sprite&rdquo; versions of above.
-To be called after calling <kbd>%GetDrawInfo()</kbd> and before <kbd>$01B7B3</kbd> or <kbd>%FinishOAMWrite()</kbd>:
+To be called after calling <kbd>%GetDrawInfo()</kbd> and before <kbd>$01B7B3</kbd> or <kbd>%FinishOAMWrite()</kbd>. Note: These always write 8x8 tiles, and when finishing the OAM write, Y must be $FF (indicating you are manually
+setting the tile size) should your sprite use both 8x8 and 16x16 tile sizes.
 <table>
 <tr><th>Input</th><th>Number of Bytes</th><th>Description</th></tr>
 <tr><td><kbd>$02</kbd></td><td align="center">1</td><td>X position (similar to $00)</td></tr>
