@@ -1,3 +1,8 @@
+incsrc "../../GraphicalBarDefines/GraphicalBarDefines.asm"
+incsrc "../../GraphicalBarDefines/SpriteOAMSettings.asm"
+incsrc "../../SharedSub_Defines/SubroutineDefs.asm"
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Bowser Jr., by dahnamics
 ;;
@@ -8,8 +13,8 @@
 ;; Note: When rideable, clipping tables values should be: 03 0A FE 0E
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-!FireballNumber = $01       ; Custom sprite number for the fireball (from list.txt).
-!RockNumber = $02           ; Custom sprite number for the rock (from list.txt).
+!FireballNumber = $02       ; Custom sprite number for the fireball (from list.txt).
+!RockNumber = $03           ; Custom sprite number for the rock (from list.txt).
 !NormalNumber1 = $00        ; The first normal sprite to spawn when a green shell throws 2 sprites.
 !NormalNumber2 = $00        ; The second normal sprite to spawn when a green shell throws 2 sprites.
 
@@ -1095,30 +1100,114 @@ Tilemap: dw .green,.fire,.rocks,.jumping,.walking
     db $00,$02,$24,$26,$44,$46,$64,$66
     db $00,$02,$20,$22,$40,$42,$60,$62
     db $00,$02,$24,$26,$44,$46,$64,$66
-
+GraphicalBarXDisp:	;[GraphicalBar_For_HP]
+	db $E8,$E0
 Graphics:
-    PHA
-    ASL A
-    TAY
-    REP #$20
-    LDA X_Disp,y
-    STA $04
-    LDA Y_Disp,y
-    STA $06
-    LDA Tilemap,y
-    STA $08
-    LDA Properties,y
-    STA $0A
-    SEP #$20
+	;[GraphicalBar_For_HP]
+	STA $0F		;>You cannot push, call GetDrawInfo, then pull, bc GetDrawInfo contains a code that destroy the return address, which will crash the game.
+			; This is the graphics state, different from "State" as some of the frames are walking and the other is in its shell
+			;A < $04 means in shell
+			;A >= $04 means standing upright
+	;Here is the newly added code, because this is before GetDrawInfo, we only get the bar values and will do the OAM
+	;after GetDrawInfo. Some stuff must be preserved and restored due to most routines and mine uses scratch RAM $00-$0F.
+		.InputRatio
+			LDA #!HitPoints						;\Quantity (HP)
+			SEC							;|
+			SBC !1534,x						;|
+			STA !Scratchram_GraphicalBar_FillByteTbl		;/
+			LDA #$00						;\High byte quantity
+			STA !Scratchram_GraphicalBar_FillByteTbl+1		;/
+			LDA #!HitPoints						;\Max quantity
+			STA !Scratchram_GraphicalBar_FillByteTbl+2		;/
+			LDA #$00						;\High byte of max quantity
+			STA !Scratchram_GraphicalBar_FillByteTbl+3		;/
+		.InputGraphicalBarAttributes
+			LDA.b #!Default_PixiSprite_LeftEndPieces		;\Left end normally have 3 pieces.
+			STA !Scratchram_GraphicalBar_LeftEndPiece		;/
+			LDA.b #!Default_PixiSprite_MiddlePieces			;\Number of pieces in each middle byte/8x8 tile
+			STA !Scratchram_GraphicalBar_MiddlePiece		;/
+			LDA.b #!Default_PixiSprite_RightEndPieces		;\Right end
+			STA !Scratchram_GraphicalBar_RightEndPiece		;/
+			LDA #$07						;\length (number of middle tiles)
+			STA !Scratchram_GraphicalBar_TempLength			;/
+		.ConvertToBar
+			PHX								;>Preserve sprite slot index
+			JSL !CalculateGraphicalBarPercentage				;>Get percentage
+			JSL !RoundAwayEmptyFull
+			JSL !DrawGraphicalBar						;>get bar values.
+			LDA #$01							;\Use Level-sprite tileset
+			STA $00								;/
+			JSL !ConvertBarFillAmountToTiles				;>Convert tiles.
+			PLX								;>Restore sprite slot index
+	;I have to rearrange or use the stack (tons of push and pull) to avoid scratch RAM conflicts, I choose to rearrange the code.
+		%GetDrawInfo()		;>We need: Y: OAM index, $00 and $01: Position.
+		
+		JSL !CountNumberOfTiles		;\Get number of tiles of the graphical bar
+		INX				;|
+		STX $04				;|
+		STZ $05				;/
+		
+		LDX $15E9|!addr			;>Sprite index
+		;When standing upright, the visual center point is not where the sprite's X-origin position, so we need to condition
+		;the X-position.
+			LDA $0F
+			CMP #$04
+			BCS .StandUpright
+			
+			.InShell
+			LDA $00				;\X position
+			CLC				;|
+			ADC #$E4			;|
+			STA $02				;/
+			BRA +
+			
+			.StandUpright
+			PHY
+			LDA !157C,x
+			TAY
+			LDA $00
+			CLC
+			ADC GraphicalBarXDisp,y
+			STA $02
+			PLY
+		+
+		LDA $01				;\Y position
+		CLC				;|
+		ADC #$10			;|
+		STA $03				;/
+		
+		LDA #$00			;\Set direction
+		STA $06				;/
+		
+		LDA.b #%00111001		;\Properties
+		STA $07				;/
+		
+		JSL !DrawSpriteGraphicalBarHoriz
+		
+		LDA $0F			;\Push graphic state
+		PHA			;/
+		PHY			;>Preserve OAM index
+		ASL A			;\Index the sprite's state.
+		TAY			;/
+		REP #$20		;\These sets up the table addresses for the following code below
+		LDA X_Disp,y		;|using indirect (you load a RAM that contains an address and load that)
+		STA $04			;|($xx),y
+		LDA Y_Disp,y		;|
+		STA $06			;|
+		LDA Tilemap,y		;|
+		STA $08			;|
+		LDA Properties,y	;|
+		STA $0A			;|
+		SEP #$20		;/
+		PLY			;>Restore OAM index
 
-    %GetDrawInfo()
 
     LDA !sprite_smash_status,x
     STA $03                     ; | $03 = index to frame start (0 or 4)
 
-    PLA
-    CMP #$04
-    BCS AlternateFrames
+    PLA					;\Pull state
+    CMP #$04				;/
+    BCS AlternateFrames		;>AlternateFrames is the state the sprite is standing upright
     LDA #$03
     STA $0F
     LDA $14                     ;\ Frame counter ..
@@ -1155,6 +1244,16 @@ ContinueGraphics:
 
     LDA ($08),y
     STA $0302|!Base2,x
+    
+	;[GraphicalBar_For_HP] Manuelly set tile size for the main body of the sprite
+	PHX
+	TXA
+	LSR #2
+	TAX
+	LDA $0460|!addr,x
+	ORA.b #%00000010
+	STA $0460|!addr,x
+	PLX
 
     PHY
     LDY $02
@@ -1173,8 +1272,11 @@ ContinueGraphics:
 
     PLX                         ; Pull back the sprite index! We pushed it at the beginning of the routine.
 
-    LDY #$02                    ; Y ends with the tile size .. 02 means it's 16x16
+    LDY #$FF                    ;[GraphicalBar_For_HP] Y ends with the tile size .. 02 means it's 16x16 (Edit: the bar is 8x8s so a mixture was needed)
     LDA $0F                     ; A -> number of tiles drawn - 1.
+	;Since there is now a bar tile, wee need to add that in.
+	CLC
+	ADC #$09
                                 ; I drew 2 tiles, so 2-1 = 1. A = 01.
     JSL $01B7B3|!BankB          ; Call the routine that draws the sprite.
     RTS
