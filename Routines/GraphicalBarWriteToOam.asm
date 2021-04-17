@@ -365,7 +365,7 @@ DrawSpriteGraphicalBarHoriz:
 			...HandleTileSize
 				PHY			;\Set tile size to 8x8.
 				TYA			;|
-				LSR			;|
+				LSR #2			;|
 				TAY			;|
 				LDA $0460|!addr,y	;|
 				AND.b #%11111101	;|
@@ -459,7 +459,7 @@ DrawSpriteGraphicalBarVert:
 			...HandleTileSize
 				PHY			;\Set tile size to 8x8.
 				TYA			;|
-				LSR			;|
+				LSR #2			;|
 				TAY			;|
 				LDA $0460|!addr,y	;|
 				AND.b #%11111101	;|
