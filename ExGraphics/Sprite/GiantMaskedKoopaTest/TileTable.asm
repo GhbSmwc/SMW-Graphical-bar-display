@@ -1,5 +1,7 @@
-;Because of the boss's sprite body takes up a somewhat considerable amount of tile space, I made another table for bar tiles
-;to accommodate this (so you don't have to set the table yourself).
+;Because of the boss's sprite body takes up a somewhat considerable amount of tile space, tile relocation is needed so I made
+;another table for bar tiles to accommodate this (so you don't have to set the table yourself). Just open shared subroutine
+;and the code you pasted earlier is "ConvertBarFillAmountToTiles" and look for "GraphicalBar_LeftEnd8x8s_Lvl_Spr" and
+replace the table with this:
 			GraphicalBar_LeftEnd8x8s_Lvl_Spr:
 			;Left end fill amount tile numbers:
 			db $88		;>Fill amount/index: $00

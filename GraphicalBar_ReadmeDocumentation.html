@@ -43,7 +43,7 @@ named <span class="NoLineBreak"><kbd>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</kb
 <ul>
 <li><a href="#Installation" id="InstallationBack">Installation (test run)</a></li>
 <li><a href="#OwnGraphicalBar" id="OwnGraphicalBarBack">Displaying your own value as a graphical bar (Layer 3)</a></li>
-<li><a href="#CustomSprites" id="CustomSprites_Back">Drawing OAM (Custom sprites, not cluster, extended, minor extended, etc.)</li>
+<li><a href="#CustomSprites" id="CustomSprites_Back">Drawing OAM (Normal sprites (SMW sprites or pixi), not cluster, extended, minor extended, etc.)</li>
 <li><a href="#DrawOamPatch" id="DrawOamPatch_Back">Drawing OAM (not using sprite slots, but patch using OAM).</a></li>
 <li><a href="#AsmDocumentation" id="AsmDocumentationBack">ASM Documentation</a></li>
 <ul>
@@ -257,7 +257,7 @@ the SNES is <a href="https://en.wikipedia.org/wiki/Endianness">little-endian</a>
 
 </ul>
 <hr>
-<h2><a href="#CustomSprites_Back" id="CustomSprites">^</a>Drawing OAM (Custom sprites, not cluster, extended, minor extended, etc.)</h2>
+<h2><a href="#CustomSprites_Back" id="CustomSprites">^</a>Drawing OAM (Normal sprites (SMW sprites or pixi), not cluster, extended, minor extended, etc.)</h2>
 <p>While this code library was originally meant to be used with layer 3 status bar on uberasm tool, I added a new feature that
 would support sprite OAM.</p>
 
@@ -337,33 +337,75 @@ autoclean JML DrawSpriteGraphicalBarVert</pre></td></tr></table>
 					<li>In the Shared Subroutines folder, you'll want a copy of <kbd>SharedSub_Defines</kbd> <b>AND</b> <kbd>GraphicalBarDefines</kbd> folder in pixi's main directory (where the exe is at, not in any
 					subfolders).</li>
 					<li>Same goes with <kbd>GraphicalBarDefines</kbd> folder. Have it just like above.</li>
-					<li>Copy all the files inside <kbd>Pixi_CustomSprite/SimpleTest</kbd>, paste it in pixi's <kbd>sprites</kbd> folder. Now use the .exe to insert into your game</li>
+					<li>Copy all the files inside <kbd>Pixi_CustomSprite/GraphicalBarSimpleTest</kbd>, paste it in pixi's <kbd>sprites</kbd> folder. Now use the .exe to insert into your game</li>
 				</ol>
 			</li>
 		</ol>
 	</li>
 	<li><span id="SpriteGraphicalBarGraphics">Graphics</span>
 		<ol>
-			<li>Go to <kbd>ExGraphics/Sprite/SimpleTest</kbd>, copy one of those files (it depends if you want a horizontal bar or a vertical bar), paste it in your
+			<li>Go to <kbd>ExGraphics/Sprite/GraphicalBarSimpleTest</kbd>, copy one of those files (it depends if you want a horizontal bar or a vertical bar), paste it in your
 			ExGraphics folder. If you do not have them, press &ldquo;Quick Extract ExGFX from ROM&rdquo;, which is the blue mushroom to make the Exgraphics folder appear.</li>
 		</ol>
 	</li>
 	<li>And you are done. If you are planning to use this code within the custom sprite's code, continue doing the steps below.</li>
 </ol>
 <h3>Programming with existing custom sprites</h3>
+<p>Note: You must have some mid-level of knowledge of ASM, as here you must learn how to:
+<ul>
+<li>Know which scratch RAM is currently used for other purpose during code execution, and be able to relocate them to another RAM should they conflict (2+ different data using the same address(es)) or use
+the stack (PHA...PLA)</li><br>
+<li>Position and rearrange the code if structured in a certain way, such as certain values like indexes are needed both for the sprite's body tile and the graphical bar (like OAM indexes,
+which is obtained after calling <kbd>%GetDrawInfo()</kbd>).</li><br>
+</ul>
+Many sprites on the sprite section on SMWC can be complex and have different coding styles, but following the principals above should make it possible to implement to your sprites.
+Another important note is that the routine <kbd>%GetDrawInfo()</kbd> uses <b>a destroy-return-address</b>. A stack-manipulation technique to &ldquo;double-exit&rdquo; the subroutine, consider this simple example shown below:
+<table>
+<tr><td><pre>	JSR Subroutine
+	STZ $00
+	RTL
+	
+	Subroutine:
+	JSR InnerSubroutine		
+	NOP		;\Just for demonstration purposes, it does nothing.
+	NOP		;|
+	NOP		;/
+	RTS
+	
+	InnerSubroutine:
+	PLA		;\Pull 2 bytes out (the amount of bytes pushed when JSR'ing)
+	PLA		;/This destroys the return address to where the 3 NOPs are at in the stack.
+	RTS		;&gt;Upon executing this, instead of going to where the 3 NOPs are at, it goes to the STZ $00 after "JSR Subroutine".
+	
+	;What it executes, it performs in this order:
+	;(1) JSR Subroutine
+	;(2) JSR InnerSubroutine
+	;(3) PLA
+	;(4) PLA
+	;(5) RTS
+	;(6) STZ $00
+	;(7) RTL
+	;JSR pushes 2 bytes of address into the stack (more specifically, the next instruction's location, minus 1 into the stack)
+	;RTS pulls 2 bytes of address out of the stack (specifically, the location address in the stack. Takes that, add 1, and sets the program counter to jump there)
+	;The same applies to JSL and RTL, but 3 bytes instead.
+</pre></td></tr>
+</table>
+Therefore, if you push something, you must pull before calling <kbd>%GetDrawInfo()</kbd> as the game will crash upon the sprite going offscreen (it will skip the essential pull that is after <kbd>%GetDrawInfo()</kbd>).
+</p>
 <ol>
-	<li>Go to the graphics portion of the code (thankfully, they are conveniently named and 99% of the time use <kbd>%GetDrawInfo()</kbd>. You want to know these informations
+	<li>Go to the graphics portion of the code (thankfully, they are conveniently named and 99.99% of the time use <kbd>%GetDrawInfo()</kbd>. You want to know these informations
 		<ul>
 			<li>The total number of tiles it uses. Before calling the &ldquo;finish OAM write&rdquo; (done by calling <kbd>JSL $01B7B3</kbd> or <kbd>%FinishOAMWrite()</kbd>), you'll need
 			to find out the total number of tiles, including the bar itself. I recommend getting the total (sprite's body + graphical bar) first, and then subtract by 1, and avoid subtracting
-			by 1 of the body and the graphical bar (you'll subtract by 2 which isn't what you want).</li>
-			<li>The tile sizes, whether or not uses 8x8, 16x16 or in rare cases both.</li>
+			by 1 of the body and the graphical bar (you'll subtract by 2 which isn't what you want). Another method is by taking the number of tiles on the sprite's body, minus 1, and then add by number of tiles
+			of the bar, which also results the correct value for the &ldquo;finish OAM write&rdquo;</li><br>
+			<li>The tile sizes, whether or not uses 8x8, 16x16 or in rare cases both. Most sprites on SMWC are composed of 16x16 tiles, so you'll have to manually set the size for address <kbd>$0460</kbd></li><br>
 		</ul>
 	</li>
 	<li>If you happen to want a graphical bar on a sprite that is composed of at least 1 16x16 OAM tile (most sprites are like that, by the way), there is a good chance you'll have to
 	manually handle the size of editing <kbd>$0460</kbd> in the sprite code (a mixture of 8x8s and 16x16, like the timed lift sprite (the platform itself is 2 16x16s and the number is a single 8x8.)):
-<table><tr><td><pre>;Manually set sprite tile size to 16x16
-	PHY		;&gt;Push OAM index (You'll need this if you are still using the Y OAM index afterwards, especially if you are writing multiple tiles via a loop).
+<table><tr><td><pre>;Manually set sprite tile size to 16x16 (this is for the main body of the sprite).
+	PHY			;&gt;Push OAM index (You'll need this if you are still using the Y OAM index afterwards, especially if you are writing multiple tiles via a loop).
 	TYA			;\Convert index to OAM slot numbering
 	LSR #2			;|
 	TAY 			;/
@@ -373,14 +415,17 @@ autoclean JML DrawSpriteGraphicalBarVert</pre></td></tr></table>
 	PLY			;&gt;Restore OAM index
 	;[...]
 ;Finish OAM write:
-	LDY #$FF		;&gt;The graphical bar tiles are always 8x8, but the sprite's body isn't always 8x8 or 16x16.
-	;A = number of tiles to write, -1
+	LDY #$FF		;&gt;The graphical bar tiles are always 8x8, but the sprite's body isn't always 8x8 or 16x16. Y=$FF means mixture
+	;A = total number of tiles to write, -1
 	&lt;instruction to get the number of tiles, minus 1, into the A register&gt;
 	&lt;Either call using JSL $01B7B3, or use %FinishOAMWrite().&gt;</pre></td></tr></table>
 	</li>
+</ol><br></p>
 
-</ol>
-</p>
+<p>I've made another example test, using the <a href="https://www.smwcentral.net/?p=section&a=details&id=13144">Giant Masked Koopa boss</a>, please note that this document only covers these sprites included because
+due to their complexity (and not just that, their coding style are vastly different) of 3rd party sprites found elseware on SMWC's sprite section. You should be able to find it, as I conveniently named the folders.
+The ASM and graphics are separated, however (they're in <kbd>ExGraphics/Sprite/GiantMaskedKoopaTest</kbd>). Instructions are similar to <kbd>GraphicalBarSimpleTest</kbd> (you'll need the shared subroutines patch, pixi
+insert the graphics, etc.). Open the ASM file <kbd>giant_masked_koopa.asm</kbd>, and there will be comments I added to show an example on how to implement a sprite graphical bar (in this example, a HP bar).</p>
 <hr>
 <h2><a href="#DrawOamPatch_Back" id="DrawOamPatch">^</a>Drawing OAM (not using sprite slots, but patch using OAM).</h2>
 <p>This is similar to the sprite version, but written using a patch. Using a hijack at $00A2E6 and running the patch's OAM handler AFTER processing all sprites (including after $028AB1), gives
