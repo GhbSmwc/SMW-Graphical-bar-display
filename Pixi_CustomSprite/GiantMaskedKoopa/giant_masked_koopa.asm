@@ -1101,8 +1101,8 @@ Tilemap: dw .green,.fire,.rocks,.jumping,.walking
     db $00,$02,$20,$22,$40,$42,$60,$62
     db $00,$02,$24,$26,$44,$46,$64,$66
 GraphicalBarXDisp:	;[GraphicalBar_For_HP]
-	db $EC		;>Facing right
-	db $DC		;>Facing left
+	db !Default_GiantMaskedKoopa_GraphicalBar_XPosOffset_StandFaceRight	;>Facing right
+	db !Default_GiantMaskedKoopa_GraphicalBar_XPosOffset_StandFaceLeft	;>Facing left
 Graphics:
 	;[GraphicalBar_For_HP]
 	STA $0F		;>You cannot push, call GetDrawInfo, then pull, bc GetDrawInfo contains a code that destroy the return address, which will crash the game.
@@ -1123,14 +1123,14 @@ Graphics:
 			LDA #$00						;\High byte of max quantity
 			STA !Scratchram_GraphicalBar_FillByteTbl+3		;/
 		.InputGraphicalBarAttributes
-			LDA.b #!Default_PixiSprite_LeftEndPieces		;\Left end normally have 3 pieces.
-			STA !Scratchram_GraphicalBar_LeftEndPiece		;/
-			LDA.b #!Default_PixiSprite_MiddlePieces			;\Number of pieces in each middle byte/8x8 tile
-			STA !Scratchram_GraphicalBar_MiddlePiece		;/
-			LDA.b #!Default_PixiSprite_RightEndPieces		;\Right end
-			STA !Scratchram_GraphicalBar_RightEndPiece		;/
-			LDA #$07						;\length (number of middle tiles)
-			STA !Scratchram_GraphicalBar_TempLength			;/
+			LDA.b #!Default_GiantMaskedKoopa_GraphicalBar_LeftEndPieces		;\Left end normally have 3 pieces.
+			STA !Scratchram_GraphicalBar_LeftEndPiece				;/
+			LDA.b #!Default_GiantMaskedKoopa_GraphicalBar_MiddlePieces		;\Number of pieces in each middle byte/8x8 tile
+			STA !Scratchram_GraphicalBar_MiddlePiece				;/
+			LDA.b #!Default_GiantMaskedKoopa_GraphicalBar_RightEndPieces		;\Right end
+			STA !Scratchram_GraphicalBar_RightEndPiece				;/
+			LDA.b #!Default_GiantMaskedKoopa_GraphicalBar_MiddleLength		;\length (number of middle tiles)
+			STA !Scratchram_GraphicalBar_TempLength					;/
 		.ConvertToBar
 			PHX								;>Preserve sprite slot index
 			JSL !CalculateGraphicalBarPercentage				;>Get percentage
@@ -1156,10 +1156,10 @@ Graphics:
 			BCS .StandUpright
 			
 			.InShell
-			LDA $00				;\X position
-			CLC				;|
-			ADC #$E4			;|
-			STA $02				;/
+			LDA $00								;\X position
+			CLC								;|
+			ADC #!Default_GiantMaskedKoopa_GraphicalBar_XPosOffset_InShell	;|
+			STA $02								;/
 			BRA +
 			
 			.StandUpright
@@ -1172,19 +1172,21 @@ Graphics:
 			STA $02
 			PLY
 		+
-		LDA $01				;\Y position
-		CLC				;|
-		ADC #$10			;|
-		STA $03				;/
+		LDA $01							;\Y position
+		CLC							;|
+		ADC #!Default_GiantMaskedKoopa_GraphicalBar_YPosOffset	;|
+		STA $03							;/
 		
-		LDA #$00			;\Set direction
-		STA $06				;/
+		LDA #!Default_GiantMaskedKoopa_GraphicalBar_Flipped	;\Set direction
+		STA $06							;/
 		
-		LDA.b #%00111001		;\Properties
-		STA $07				;/
-		
-		JSL !DrawSpriteGraphicalBarHoriz
-		
+		LDA.b #!Default_GiantMaskedKoopa_GraphicalBar_Properties	;\Properties
+		STA $07								;/
+		if !Default_GiantMaskedKoopa_GraphicalBar_HorizOrVert == 0
+			JSL !DrawSpriteGraphicalBarHoriz
+		else
+			JSL !DrawSpriteGraphicalBarVert
+		endif
 		LDA $0F			;\Push graphic state
 		PHA			;/
 		PHY			;>Preserve OAM index
@@ -1275,11 +1277,15 @@ ContinueGraphics:
 
     LDY #$FF                    ;[GraphicalBar_For_HP] Y ends with the tile size .. 02 means it's 16x16 (Edit: the bar is 8x8s so a mixture was needed)
     LDA $0F                     ; A -> number of tiles drawn - 1.
-	;Since there is now a bar tile, wee need to add that in.
+	;Since there is now a bar tile, we need to add that in.
 	CLC
-	ADC #$09
+	ADC.b #!GiantMaskedKoopa_GraphicalBar_TotalTiles
+		;$0F is the total number number of tiles of the main body of the sprite, minus 1,
+		;we then add that by the graphical bar's tile count. Because we already -1 the number of tiles,
+		;we don't need to do it again [(SpriteBodyTileCount + BarTileCount) - 1] results the same number as
+		;[(SpriteBodyTileCount - 1) + BarTileCount]
                                 ; I drew 2 tiles, so 2-1 = 1. A = 01.
-    JSL $01B7B3|!BankB          ; Call the routine that draws the sprite.
+    JSL $01B7B3|!BankB          ; Call the routine that draws the sprite (finish OAM write).
     RTS
 
 AlternateFrames:
