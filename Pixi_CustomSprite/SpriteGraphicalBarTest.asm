@@ -31,11 +31,11 @@ print "MAIN ",pc
 
 SpriteCode:
 	PHB : PHK : PLB
-	JSR DrawSpriteGraphicalBar
+	JSR DrawSprite
 	PLB
 	RTS
 	
-DrawSpriteGraphicalBar:
+DrawSprite:
 	.InputRatio
 		LDA $14							;\Quantity
 		STA !Scratchram_GraphicalBar_FillByteTbl		;/
@@ -79,7 +79,6 @@ DrawSpriteGraphicalBar:
 		;tile when they overlap and every subsequent tile will be placed underneath (behind). So if you have the code draw the bar first (such as this example
 		;shown here), and then the body of the sprite afterwards, the bar will be written on top of the body of the sprite.
 	..GraphicalBar
-		wdm
 		JSL !CountNumberOfTiles		;\Get number of tiles of the graphical bar
 		INX				;|
 		STX $04				;|
