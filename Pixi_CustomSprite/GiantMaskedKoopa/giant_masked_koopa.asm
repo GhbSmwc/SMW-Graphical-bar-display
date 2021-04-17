@@ -2,7 +2,7 @@ incsrc "../../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../../GraphicalBarDefines/SpriteOAMSettings.asm"
 incsrc "../../SharedSub_Defines/SubroutineDefs.asm"
 
-
+;Note, to view my changes for the graphical bar, CTRL+F “[GraphicalBar_For_HP]” (without quotes).
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Bowser Jr., by dahnamics
 ;;
@@ -1101,7 +1101,8 @@ Tilemap: dw .green,.fire,.rocks,.jumping,.walking
     db $00,$02,$20,$22,$40,$42,$60,$62
     db $00,$02,$24,$26,$44,$46,$64,$66
 GraphicalBarXDisp:	;[GraphicalBar_For_HP]
-	db $E8,$E0
+	db $EC		;>Facing right
+	db $DC		;>Facing left
 Graphics:
 	;[GraphicalBar_For_HP]
 	STA $0F		;>You cannot push, call GetDrawInfo, then pull, bc GetDrawInfo contains a code that destroy the return address, which will crash the game.
@@ -1163,7 +1164,7 @@ Graphics:
 			
 			.StandUpright
 			PHY
-			LDA !157C,x
+			LDA !157C,x			;>Sprite facing direction
 			TAY
 			LDA $00
 			CLC
