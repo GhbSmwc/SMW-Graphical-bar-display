@@ -436,4 +436,5 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
  -ConvertBarFillAmountToTiles have been revamped to not check $0100 (game mode), rather have $00 as an input to
   determine what sets of fill graphics to use, allowing multiple sets of graphics in the same game mode (such
   as a layer 3 graphical bar and a sprite graphical bar).
- -Added sprite OAM support (as a custom sprite code).
+ -Added sprite OAM support (as a custom sprite code, and as a "sprite status bar").
+ --Comes with a GMK boss sprite test.

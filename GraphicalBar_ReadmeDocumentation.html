@@ -35,14 +35,12 @@ length of the bar.<br><br>
 <li>This HTML uses <a href="https://en.wikipedia.org/wiki/ASCII_art">ASCII art</a> to represent something, so make sure you have your browser setting for <a href="https://en.wikipedia.org/wiki/Monospaced_font">fixed-width font</a> such as
 &ldquo;Consolas&rdquo; so it displays properly.</li>
 <li>You must have at least some ASM knowledge. See this ASM tutorial <a href="https://www.smwcentral.net/?p=section&a=details&id=14268">here.</a></li>
-<li>Routines presented here assumes you are using uberasm tool and does not expect you to use on other things like sprites, so routine calls that are outside the routine files are
-named <span class="NoLineBreak"><kbd>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</kbd></span> as opposed to just <span class="NoLineBreak"><kbd>&lt;RoutineName&gt;</kbd></span>.</li>
 </ul>
 <hr>
 <h2>Quick jumps:</h2>
 <ul>
 <li><a href="#Installation" id="InstallationBack">Installation (test run)</a></li>
-<li><a href="#OwnGraphicalBar" id="OwnGraphicalBarBack">Displaying your own value as a graphical bar (Layer 3)</a></li>
+<li><a href="#OwnGraphicalBar" id="OwnGraphicalBarBack">Displaying your own value as a graphical bar (Uberasm tool, Layer 3)</a></li>
 <li><a href="#CustomSprites" id="CustomSprites_Back">Drawing OAM (Normal sprites (SMW sprites or pixi), not cluster, extended, minor extended, etc.)</li>
 <li><a href="#DrawOamPatch" id="DrawOamPatch_Back">Drawing OAM (not using sprite slots, but patch using OAM).</a></li>
 <li><a href="#AsmDocumentation" id="AsmDocumentationBack">ASM Documentation</a></li>
@@ -92,7 +90,7 @@ named <span class="NoLineBreak"><kbd>&lt;ASMFilename&gt;_&lt;RoutineName&gt;</kb
 <ul>
 <li><a href="https://www.smwcentral.net/?p=section&a=details&id=18113">Uberasm tool</a>, needed for codes to run every frame.</li>
 <li><a href="https://www.smwcentral.net/?p=section&a=details&id=18716">Lunar Magic</a>, for level testing purposes.</li>
-</ul><br>
+</ul>
 <h2>Stuff you MAY need</h2>
 <ul>
 <li><a href="https://www.smwcentral.net/?p=section&a=details&id=19545">Shared subroutines patch</a></li>
@@ -180,7 +178,7 @@ but thats intentional as SMW's status bar is very limited.
 </li>
 </ol>
 <hr>
-<h2><a href="#OwnGraphicalBarBack" id="OwnGraphicalBar">^</a>Displaying your own value as a graphical bar (Layer 3)</h2>
+<h2><a href="#OwnGraphicalBarBack" id="OwnGraphicalBar">^</a>Displaying your own value as a graphical bar (Uberasm tool, Layer 3)</h2>
 Perhaps if you want to display something other than the provided examples above, here are the templates:
 
 <ul>

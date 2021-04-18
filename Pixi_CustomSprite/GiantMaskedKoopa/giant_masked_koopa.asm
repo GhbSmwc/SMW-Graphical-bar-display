@@ -1216,6 +1216,8 @@ Graphics:
 	;for the Y, $00 and $01, so no concerns on those stuff. We can set up drawing the bar BEFORE we start using $04-$0B
 	;for indirect addressing.
 		%GetDrawInfo()		;>We need: Y: OAM index, $00 and $01: Position. Like I said, don't push, then call this without pulling in between pushing and calling GetDrawInfo.
+		;Like I said, what's first drawn in code-order is to be in front (top) of another sprite, due to after writing each tile, the OAM index gets INC by 4 (rather than DEC).
+		;Therefore of the GMK's body and the bar overlaps, the bar will be on top since that is processed first.
 		
 		JSL !CountNumberOfTiles		;\Get number of tiles of the graphical bar
 		INX				;|This is important because FinishOamWrite needs the total tiles (the body of the sprite and the HP bar), minus 1.

@@ -109,6 +109,7 @@ DrawSprite:
 		;^After DrawSpriteGraphicalBarHoriz or DrawSpriteGraphicalBarVert,
 		; Y is already the correct next OAM index after the last bar tile written.
 	..DrawSpriteBody
+		;This draws the main body of the sprite, so this is not part of the bar.
 		LDA $00				;\X pos
 		STA $0300|!addr,y		;/
 		LDA $01				;\Y pos
