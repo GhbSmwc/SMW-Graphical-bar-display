@@ -1116,31 +1116,35 @@ GraphicalBarXDisp:	;[GraphicalBar_For_HP]
 	db !Default_GiantMaskedKoopa_GraphicalBar_XPosOffset_StandFaceLeft	;>Facing left
 Graphics:
 	;[GraphicalBar_For_HP]
+	;It's best to have this graphical bar code at the very start of "Graphics" so that branches would not skip
+	;over this code and cause the bar to disappear.
 	STA $0F		;>You cannot push, call GetDrawInfo, then pull, because GetDrawInfo contains a code that destroy the return address,
 			;which will crash the game when the sprite goes offscreen.
 			; This is the graphics "image state" (what it shows), separate from "Behavior State" (what it does physically) as
 			;some of the frames are walking and the other is in its shell:
 			;A < $04 means in shell
 			;A >= $04 means standing upright
-	;Here is the newly added code, because this is before GetDrawInfo, we only get the bar values and will do the OAM
-	;after GetDrawInfo. Some stuff must be preserved and restored due to most routines and mine uses scratch RAM $00-$0F.
+			;Since this is used before and after calling %GetDrawInfo(), I choose to store it at $0F, an unused RAM at the moment.
+	;Here is the newly added code, because this is before GetDrawInfo, we can only get the bar values here and will do the OAM
+	;after calling GetDrawInfo.
 	;To obtain the graphical bar data, (like the amount of fill, the attributes and all that stuff), is virtually no different
 	;compared to the layer 3 version. The only difference is writing to OAM as opposed to layer 3 tiles.
 		.InputRatio
 			;Quantity (HP)
-			;$1534 is the damage counter, therefore this sprite uses an "inverted health system". To convert to HP: HP = NumberOfHitsToKill - DamageCount
-			;I could use InvertQuantity, but because the sprite always take 1 damage from stomps with no other types of damage
-			;and that its damage counter and !HitPoints (the fixed number of hits to defeat) are 1-byte, it is not needed, as this is faster.
-				LDA #!HitPoints						
-				SEC							
-				SBC !1534,x						
-				STA !Scratchram_GraphicalBar_FillByteTbl		
-			LDA #$00						;\High byte quantity
-			STA !Scratchram_GraphicalBar_FillByteTbl+1		;/
+			;$1534 is the damage counter (increase by 1 on each hit, and dies when reaching a certain value (!HitPoints)),
+			;therefore this sprite uses an "inverted health system".
+			;To convert damage count to HP: HP = NumberOfHitsToKill - DamageCount
+			;I could use InvertQuantity, but because the sprite always take 1 damage from stomps and no other types of damage exists,
+			;and that its damage counter and !HitPoints (the fixed number of hits to defeat) are 8-bit, it is not needed, as this is faster.
+				LDA #!HitPoints					;\HP = NumberOfHitsToKill - DamageCount
+				SEC						;|
+				SBC !1534,x					;|
+				STA !Scratchram_GraphicalBar_FillByteTbl	;/Store HP into quantity.
+			LDA #$00						;>Set these following data to 0 since HP is 8-bit
+			STA !Scratchram_GraphicalBar_FillByteTbl+1		;>High byte quantity
+			STA !Scratchram_GraphicalBar_FillByteTbl+3		;>High byte max quantity
 			LDA #!HitPoints						;\Max quantity
 			STA !Scratchram_GraphicalBar_FillByteTbl+2		;/
-			LDA #$00						;\High byte of max quantity
-			STA !Scratchram_GraphicalBar_FillByteTbl+3		;/
 		.InputGraphicalBarAttributes
 			LDA.b #!Default_GiantMaskedKoopa_GraphicalBar_LeftEndPieces		;\Left end normally have 3 pieces.
 			STA !Scratchram_GraphicalBar_LeftEndPiece				;/
@@ -1153,9 +1157,9 @@ Graphics:
 		.ConvertToBar
 			PHX								;>Preserve sprite slot index
 			JSL !CalculateGraphicalBarPercentage				;>Get percentage
-			JSL !RoundAwayEmptyFull
-			;$00 = HP percentage
-			;$1570 = Previous HP percentage
+			JSL !RoundAwayEmptyFull						;>Round away from empty and full for fill amount
+			;$00 = HP percentage (FirstFill)
+			;$1570 = Previous HP percentage (SecondFill), or the increasing fill amount to display when healing/battle starts.
 			if !GiantMaskedKoopa_DisplayPreviousHP != 0
 				LDX $15E9|!addr	;>Get sprite index
 				LDA !1570,x
@@ -1164,11 +1168,14 @@ Graphics:
 				BEQ ..ShowCurrent
 
 				..Decrease
+					;Decrease, causes $1570 as a transperent bar to decrease towards HP percentage.
 					LDA !1558,x		;\Don't decrease SecondFill until delay runs out.
 					BNE ..Flicker		;/
 					DEC !1570,x
 					BRA ..Flicker
 				..Increase
+					;In this state, when $1570 less than current HP percentage,
+					;do the filling animation by having $00 contain the value of $1558 every frame and the SFX.
 					INC !1570,x
 					LDA $13
 					AND.b #%00000001
@@ -1177,13 +1184,17 @@ Graphics:
 					STA $1DFC|!addr
 					BRA ..ShowPrev
 				..Flicker
-					LDA $13
-					AND.b #%00000001
-					BEQ ..ShowCurrent
+					;In this state, every other frame displays previous HP
+					;(because HP percentage gets subtracted on every damage,
+					;while $1558 keeps its value temporary across frames),
+					;giving a transperent look
+						LDA $13
+						AND.b #%00000001
+						BEQ ..ShowCurrent
 					
 				..ShowPrev
-					LDA !1570,x
-					STA $00
+					LDA !1570,x		;\When filling upwards or on every odd frames, $00 will contain the value
+					STA $00			;/of $1570, showing a filling animation or previous HP percentage instead of current HP percentage.
 					
 					..ShowCurrent
 			endif
@@ -1192,9 +1203,19 @@ Graphics:
 			STA $00								;/
 			JSL !ConvertBarFillAmountToTiles				;>Convert tiles.
 			PLX								;>Restore sprite slot index
-	;I have to rearrange or use the stack (tons of push and pull) to avoid scratch RAM conflicts, I choose to rearrange the code (this is before the vast
-	;majority of scratch RAM to be used for table indexing using indirect addressing (LDA ($xx),y)).
-		%GetDrawInfo()		;>We need: Y: OAM index, $00 and $01: Position.
+	;[GraphicalBar_For_HP] I rearrange the code and pushing values into the stack was needed because scratch RAM is going to be used:
+	;Y: Oam index
+	;$00: Tile X position
+	;$01: Tile Y position
+	;$04-$0B: Scratch RAM containing the address for indirect addressing (<opcode> ($xx),y)
+	; $04-$05: 16-bit address table starting address location for X_Disp.
+	; $06-$07: Same as above but for Y_Disp.
+	; $08-$09: Same but for Tilemap.
+	; $0A-$0B: Same but Properties.
+	;The routines !DrawSpriteGraphicalBarHoriz and !DrawSpriteGraphicalBarVert already have the same type of information
+	;for the Y, $00 and $01 data, so no concerns on those stuff. We can set up drawing the bar BEFORE we start using $04-$0B
+	;for table starting addresses.
+		%GetDrawInfo()		;>We need: Y: OAM index, $00 and $01: Position. Like I said, don't push, then call this without pulling in between pushing and calling GetDrawInfo.
 		
 		JSL !CountNumberOfTiles		;\Get number of tiles of the graphical bar
 		INX				;|This is important because FinishOamWrite needs the total tiles (the body of the sprite and the HP bar), minus 1.
@@ -1202,8 +1223,20 @@ Graphics:
 		STZ $05				;/
 		
 		LDX $15E9|!addr			;>Sprite index
-		;When standing upright, the visual center point is not where the sprite's X-origin position, so we need to condition
-		;the X-position offset based on its facing direction
+		;Because the sprite's origin is not always centered with the sprite's body, especially when it changes its image state and have different alignments,
+		;which may have the minimum bounding box be shifted relative to its origin, we need to have a code that also shifts the bar to remain centered with
+		;the sprite's body.
+		;
+		;The good news is that the bottom of the sprite does not shift, so the Y position of the bar can be a fixed value relative to the sprite's origin position
+		;so we can place it under its feet. But the X centering position is what we need to condition the X-position offset based on its image states.
+		;
+		;There are 3 alignments to consider:
+		;-When the koopa is in its shell form: The very start of the phase waiting for the player to get close or chasing the player like a yellow disco shell.
+		;-When the koopa is standing upright, facing right
+		;-When the koopa is standing upright, facing left.
+		;For other sprites, there is a very high chance you'll have to trial-and-error the X and Y position offset so that it centers correctly with the sprite,
+		;mainly because the origin position of each sprites may be different in SMWC's sprite section and the fact that the shape of the sprite
+		;can differ.
 			LDA $0F			;>We got our sprite image state
 			CMP #$04
 			BCS .StandUpright
@@ -1240,6 +1273,11 @@ Graphics:
 		else
 			JSL !DrawSpriteGraphicalBarVert
 		endif
+		;[GraphicalBar_For_HP]
+		;Now I am done using $02-$08 after calling DrawSpriteGraphicalBarHoriz or DrawSpriteGraphicalBarVert. Therefore, those are now free to use for other things.
+		;Here, this is where $04-$0B is going to be used as an indirect addressing (get a value at an address that was stored in an address; <opcode> ($xx),y)
+		;First, it loads the 16-bit values representing the locations of each table (or "sub-table") into $04, $06, $08 and $0A.
+		;Then later, uses them (like ADC ($04),y).
 		LDA $0F			;\Push graphic state
 		PHA			;/
 		PHY			;>Preserve OAM index
@@ -1302,9 +1340,10 @@ ContinueGraphics: ;This is where scratch RAM is being used for indirect addressi
     STA $0302|!Base2,x
     
 	;[GraphicalBar_For_HP] Manually set tile size for the main body of the sprite
-	;Because like many other sprites composed of 16x16 tiles, and the bar being 8x8s,
-	;you need to manually set the size as the sprite is now necessary a mixture between 8x8 and 16x16.
-	;Because X and Y values are swapped, we need to use X and not Y.
+	;Because most sprites are composed of 16x16 OAM tiles, and the bar being 8x8s, The GMK boss is NO exception.
+	;It is really not that hard, just preserve X or Y, depending on the sprite (GMK boss uses X, in this example),
+	;then take X or Y, whichever holds the OAM index (increments of 4), LSR #2 to convert to slot numbering
+	;(increments of 1), and SET $0460, indexed by slot numbering's bit 1 (the 2nd last bit from the right) to 1.
 	PHX			;>Preserve OAM index
 	TXA			;\Convert OAM index numbering to slot numbering (increments of 1)
 	LSR #2			;|
@@ -1331,18 +1370,21 @@ ContinueGraphics: ;This is where scratch RAM is being used for indirect addressi
 
     PLX                         ; Pull back the sprite index! We pushed it at the beginning of the routine.
 
-    LDY #$FF                    ;[GraphicalBar_For_HP] Y ends with the tile size .. 02 means it's 16x16 (Edit: the bar is 8x8s, and the body of the sprite is 16x16, so a mixture was needed; Y=$FF means Manuel)
-    LDA $0F                     ; A -> number of tiles drawn - 1.
-	;Since there is now a bar tile, we need to add that in.
+	;[GraphicalBar_For_HP] This is the last steps on working with OAM handling.
+	;Like I said, most sprites are composed of 16x16 tiles, and having a bar made of 8x8s means we are manually setting the tile sizes.
+	;When finishing OAM write, the inputs are:
+	; Y = size: $00 = 8x8s, $02 = 16x16s, $FF manuel
+	; A = Number of OAM slots used, minus 1.
+	;So have Y=$FF, unless in 0.01% chance you are having a PURE 8x8 sprite, then leave Y=$00.
+	;For A, we need the total number of tiles, which is the sprite's main body plus the bar itself, minus 1.
+	;It is very easy to know how many tiles the bar is, go check out the defines in GraphicalBarDefines/SpriteOAMSettings.asm
+	;and under "Giant Masked koopa tile count" contains a formula of counting the the number tiles for left end, middle, and right end.
+	;Since $0F contains the number of tiles, minus 1, we don't need to decrease it by 1 again (decrease by 1 again means we subtracted
+	;by 2 and that is the wrong amount). Therefore [(SpriteBodyTileCount + BarTileCount) - 1] is the same as [(SpriteBodyTileCount - 1) + BarTileCount].
+		LDY #$FF                    ; Y ends with the tile size .. 02 means it's 16x16 (Edit: the bar is 8x8s, and the body of the sprite is 16x16, so a mixture was needed; Y=$FF means Manuel)
+		LDA $0F                     ; A -> number of tiles drawn - 1.
 		CLC
 		ADC.b #!GiantMaskedKoopa_GraphicalBar_TotalTiles
-		;$0F is the total number number of tiles of the main body of the sprite, minus 1,
-		;we then add that by the graphical bar's tile count. Because we already -1 the number of tiles,
-		;we don't need to do it again [(SpriteBodyTileCount + BarTileCount) - 1] results the same number as
-		;[(SpriteBodyTileCount - 1) + BarTileCount]
-		;
-		;Thankfully it is unlikely you'll ever have a changing-width bar in-game, so we can just use a fixed number, to add by
-		;to always obtain the correct number of tiles, minus 1.
                                 ; I drew 2 tiles, so 2-1 = 1. A = 01.
     JSL $01B7B3|!BankB          ; Call the routine that draws the sprite (finish OAM write).
     RTS

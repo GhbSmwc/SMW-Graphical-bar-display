@@ -77,13 +77,16 @@
    
 ;Defines you shouldn't touch unless you know what you're doing.
  ;Giant Masked koopa tile count
+  ;Explanation: if these tiles don't exist (pieces set to 0, and/or middle length set to 0)
+  ;They're not written, so they are not counted. If they do exist (pieces set to any nonzero values),
+  ;that counts as a tile. After knowing if they exist or not we add all them.
   !GiantMaskedKoopa_GraphicalBar_LeftEndExist = 0
-  !GiantMaskedKoopa_GraphicalBar_MiddleExist = 0
+  !GiantMaskedKoopa_GraphicalBar_MiddleExist = 0		;>How many middle tiles
   !GiantMaskedKoopa_GraphicalBar_RightEndExist = 0
   if !Default_GiantMaskedKoopa_GraphicalBar_LeftEndPieces != 0
    !GiantMaskedKoopa_GraphicalBar_LeftEndExist = 1
   endif
-  if and(notequal(!Default_GiantMaskedKoopa_GraphicalBar_MiddlePieces, 0),notequal(!Default_GiantMaskedKoopa_GraphicalBar_MiddleLength, 0))
+  if and(notequal(!Default_GiantMaskedKoopa_GraphicalBar_MiddlePieces, 0),notequal(!Default_GiantMaskedKoopa_GraphicalBar_MiddleLength, 0))	;>Number of middle tiles AND number of middle pieces MUST be nonzero to include them
    !GiantMaskedKoopa_GraphicalBar_MiddleExist = !Default_GiantMaskedKoopa_GraphicalBar_MiddleLength
   endif
   if !Default_PatchSprite_RightEndPieces != 0
