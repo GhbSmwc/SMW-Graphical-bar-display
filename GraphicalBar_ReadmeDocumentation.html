@@ -104,7 +104,11 @@ length of the bar.<br><br>
 (i.e <kbd>UberasmTool_ExampleUsage/Gamemode0E_OWBorderTest.asm</kbd>)</li>
 </ul>
 <h2>Javascript tools</h2>
-<ul><li><a id="TopJSLink" href="readme_files/JS_GraphicalBarCalculator2.html">Link to javascript memory usage calculator</a>.</li></ul>
+<ul>
+<li><a id="TopJSLink" href="readme_files/JS_GraphicalBarCalculator2.html">Link to javascript memory usage calculator</a>.</li>
+<li><a id="OAMNotes" href="readme_files/OAM_Side_notes.html">OAM table and conversion sheet</a></li>
+<li><a id="SpriteProps" href="readme_files/YXPPCCCT.html">Sprite YXPPCCCT converter</a></li>
+</ul>
 <hr>
 <h2><a href="#InstallationBack" id="Installation">^</a>Installation (test run)</h2>
 <ol>
@@ -361,8 +365,8 @@ the stack (PHA...PLA)</li><br>
 <li>Finding an appropriate place or rearranging to insert the code, due to certain values like indexes and scratch RAM are still being used for a specified purpose (for example: if scratch RAM is used for indirect addressing,
 we don't want to put our code there, instead we place it at a location that is <i>before</i> scratch RAM becomes reserved for addressing).</li><br>
 </ul>
-Many sprites on the sprite section on SMWC can be complex and have different coding styles, but following the principals above should make it possible to implement on any sprite.
-Another important note is that the routine <kbd>%GetDrawInfo()</kbd> uses <b>a destroy-return-address</b>. A stack-manipulation technique to &ldquo;double-exit&rdquo; the subroutine, consider this simple example shown below:
+Many sprites on the sprite section on SMWC can be complex and have different coding styles, but following the principals above should make it possible to implement on any sprite.<br>
+Another important note is that the routine <kbd>%GetDrawInfo()</kbd> uses <b>a destroy-return-address</b>-- A stack-manipulation technique to &ldquo;double-exit&rdquo; the subroutine upon returning (RTS/RTL), consider this simple example shown below:
 <table>
 <tr><td><pre>	JSR Subroutine
 	STZ $00
@@ -371,7 +375,7 @@ Another important note is that the routine <kbd>%GetDrawInfo()</kbd> uses <b>a d
 	Subroutine:
 	JSR InnerSubroutine		
 	NOP		;\Just for demonstration purposes, it does nothing.
-	NOP		;|
+	NOP		;|These will not be executed
 	NOP		;/
 	RTS
 	
@@ -381,11 +385,15 @@ Another important note is that the routine <kbd>%GetDrawInfo()</kbd> uses <b>a d
 	RTS		;&gt;Upon executing this, instead of going to where the 3 NOPs are at, it goes to the STZ $00 after "JSR Subroutine".
 	
 	;What it executes, it performs in this order:
-	;(1) JSR Subroutine
-	;(2) JSR InnerSubroutine
-	;(3) PLA
-	;(4) PLA
-	;(5) RTS
+	;[] = a byte in memory
+	;[--] = other stuff in the stack or potentially garbage
+	;[SS] = Return address location after JSR Subroutine
+	;[II] = Return address location after JSR InnerSubroutine
+	;(1) JSR Subroutine		;&gt;stack: [--][--][--][--][SS][SS]
+	;(2) JSR InnerSubroutine	;&gt;stack: [--][--][II][II][SS][SS]
+	;(3) PLA			;\stack: [--][--][--][--][SS][SS] (we destroyed [II][II])
+	;(4) PLA			;/
+	;(5) RTS			;&gt;stack: [--][--][--][--][--][--] (jumps to after "JSR Subroutine" ([SS][SS]))
 	;(6) STZ $00
 	;(7) RTL
 	;JSR pushes 2 bytes of address into the stack (more specifically, the next instruction's location, minus 1 into the stack)
@@ -393,7 +401,7 @@ Another important note is that the routine <kbd>%GetDrawInfo()</kbd> uses <b>a d
 	;The same applies to JSL and RTL, but 3 bytes instead.
 </pre></td></tr>
 </table>
-Therefore, if you push something, you must pull before calling <kbd>%GetDrawInfo()</kbd> as the game will crash upon the sprite going offscreen (it will skip the essential pull that is after <kbd>%GetDrawInfo()</kbd>).
+Therefore, if you push something, you must pull before calling <kbd>%GetDrawInfo()</kbd> as the game will crash upon the sprite going offscreen (it doubles-out if the sprite goes offscreen, else it keeps the return address).
 </p>
 <ol>
 	<li>Go to the graphics portion of the code (thankfully, they are conveniently named and 99.99% of the time use <kbd>%GetDrawInfo()</kbd>). You want to know these informations
