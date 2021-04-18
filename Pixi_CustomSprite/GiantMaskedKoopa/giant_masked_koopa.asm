@@ -5,6 +5,9 @@ incsrc "../../SharedSub_Defines/SubroutineDefs.asm"
 ;Note, to view my changes and other info for the graphical bar, CTRL+F “[GraphicalBar_For_HP]” (without quotes).
 ;See graphics at ExGraphics/Sprite/GiantMaskedKoopaTest and you'll need to replace the table of
 ;tile numbers due to tile relocation.
+;When displaying previous HP is enabled (displaying a double-bar to show damage):
+; $1558 (decrements itself per frame): is the amount of delay before the bar's SecondFill decreases to FirstFill
+; $1570: is the SecondFill amount displaying its previous HP percentage.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Bowser Jr., by dahnamics
 ;;
@@ -263,6 +266,10 @@ ClippingDone:
     LDA #$A0                    ;\ Set ThrowFire timer
     STA !sprite_stun_timer,x    ;/
     INC !1534,x                 ; increment sprite hit counter
+	if !GiantMaskedKoopa_DisplayPreviousHP != 0	;[GraphicalBar_For_HP] everytime the boss takes damage, set delay to show how much HP percentage loss.
+		LDA #!GiantMaskedKoopa_PrevHPDelay
+		STA !1558,x
+	endif
     LDA !1534,x                 ;\ If it has incremented to the "max", do death animation.
     CMP.b #!HitPoints           ; |
     BEQ SpriteDead              ;/
@@ -1120,10 +1127,14 @@ Graphics:
 	;To obtain the graphical bar data, (like the amount of fill, the attributes and all that stuff), is virtually no different
 	;compared to the layer 3 version. The only difference is writing to OAM as opposed to layer 3 tiles.
 		.InputRatio
-			LDA #!HitPoints						;\Quantity (HP)
-			SEC							;|$1534 is the damage counter, therefore this sprite uses an "inverted health system". To convert to HP: HP = NumberOfHitsToKill - DamageCount
-			SBC !1534,x						;|I could use InvertQuantity, but because the sprite always take 1 damage from stomps with no other types of damage
-			STA !Scratchram_GraphicalBar_FillByteTbl		;/and that its damage counter and !HitPoints (the fixed number of hits to defeat) are 1-byte, it is not needed, as this is faster.
+			;Quantity (HP)
+			;$1534 is the damage counter, therefore this sprite uses an "inverted health system". To convert to HP: HP = NumberOfHitsToKill - DamageCount
+			;I could use InvertQuantity, but because the sprite always take 1 damage from stomps with no other types of damage
+			;and that its damage counter and !HitPoints (the fixed number of hits to defeat) are 1-byte, it is not needed, as this is faster.
+				LDA #!HitPoints						
+				SEC							
+				SBC !1534,x						
+				STA !Scratchram_GraphicalBar_FillByteTbl		
 			LDA #$00						;\High byte quantity
 			STA !Scratchram_GraphicalBar_FillByteTbl+1		;/
 			LDA #!HitPoints						;\Max quantity
@@ -1143,6 +1154,39 @@ Graphics:
 			PHX								;>Preserve sprite slot index
 			JSL !CalculateGraphicalBarPercentage				;>Get percentage
 			JSL !RoundAwayEmptyFull
+			;$00 = HP percentage
+			;$1570 = Previous HP percentage
+			if !GiantMaskedKoopa_DisplayPreviousHP != 0
+				LDX $15E9|!addr	;>Get sprite index
+				LDA !1570,x
+				CMP $00
+				BCC ..Increase
+				BEQ ..ShowCurrent
+
+				..Decrease
+					LDA !1558,x		;\Don't decrease SecondFill until delay runs out.
+					BNE ..Flicker		;/
+					DEC !1570,x
+					BRA ..Flicker
+				..Increase
+					INC !1570,x
+					LDA $13
+					AND.b #%00000001
+					BNE ..ShowPrev
+					LDA #$23
+					STA $1DFC|!addr
+					BRA ..ShowPrev
+				..Flicker
+					LDA $13
+					AND.b #%00000001
+					BEQ ..ShowCurrent
+					
+				..ShowPrev
+					LDA !1570,x
+					STA $00
+					
+					..ShowCurrent
+			endif
 			JSL !DrawGraphicalBar						;>get bar values.
 			LDA #$01							;\Use Level-sprite tileset
 			STA $00								;/

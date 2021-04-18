@@ -30,6 +30,14 @@
   !Default_GiantMaskedKoopa_GraphicalBar_HorizOrVert = 0
    ;^0 = horizontal
    ; 1 = vertical
+ ;DoubleBar stuff
+  !GiantMaskedKoopa_DisplayPreviousHP = 1
+   ;^0 = only show current HP
+   ; 1 = every time damage is taken, shows a pseudo transparent rapid-flicker
+   ;     bar indicating the amount of damage ($1570 acts as a second fill)
+  !GiantMaskedKoopa_PrevHPDelay = 60
+   ;^Amount of frames (1/60th of a second) SecondFill of the bar freezes before
+   ; before decreasing towards its current HP percentage.
 ;Patch sprite settings
  !Default_PatchSprite_LeftEndPieces = 3
  !Default_PatchSprite_MiddlePieces = 8
