@@ -25,11 +25,15 @@ By <a href="https://www.smwcentral.net/?p=profile&id=18802">GreenHammerBro</a><b
 See <a href="https://github.com/GhbSmwc/SMW-Graphical-bar-display">github</a>.</center>
 
 <h2>Introduction</h2>
-This is a guide on how to setup a display of a value of something as a graphical bar (or progress bar) that you see in many games. Unlike some hacks like
+<p>This is a guide on how to setup a display of a value of something as a graphical bar (or progress bar) that you see in many games. Unlike some hacks like
 SMWCP2 and brutal Mario (both as health bars), which are 1-unit (or piece) per tile being displayed, this package contains code to display multiple units
 per tile (8 units normally), as well as representing a ratio of something with any number (1-65535) as the max. This means that this can have more accurate
 representation of a value (say it approximate to the nearest pixel instead of 8x8 tile) as a percentage and have any maximum amount without affecting the
-length of the bar.<br><br>
+length of the bar.<p>
+
+<p>It supports both layer 3 and sprite OAM.</p>
+
+
 <h2>Notes</h2>
 <ul>
 <li>This HTML uses <a href="https://en.wikipedia.org/wiki/ASCII_art">ASCII art</a> to represent something, so make sure you have your browser setting for <a href="https://en.wikipedia.org/wiki/Monospaced_font">fixed-width font</a> such as
@@ -96,18 +100,23 @@ length of the bar.<br><br>
 <li><a href="https://www.smwcentral.net/?p=section&a=details&id=19545">Shared subroutines patch</a></li>
 <li><a href="https://www.smwcentral.net/?p=section&a=details&id=25953">Asar</a></li>
 <li><a href="https://www.smwcentral.net/?p=section&a=details&id=26026">pixi</a></li>
+<li><a href="https://www.smwcentral.net/?p=section&a=details&id=15222">Overworld Border plus</a>, required if you want to display a graphical bar on the overworld border
+(i.e <kbd>UberasmTool_ExampleUsage/Gamemode0E_OWBorderTest.asm</kbd>)</li>
 </ul>
 <h3>Recommended resources</h3>
 <ul>
 <li><a href="https://www.smwcentral.net/?p=section&a=details&id=16031">Super Status Bar patch</a>, SMW's status bar (or, heads-up display (HUD)) space is really small.</li>
-<li><a href="https://www.smwcentral.net/?p=section&a=details&id=15222">Overworld Border plus</a>, required if you want to display a graphical bar on the overworld border
-(i.e <kbd>UberasmTool_ExampleUsage/Gamemode0E_OWBorderTest.asm</kbd>)</li>
 </ul>
 <h2>Javascript tools</h2>
 <ul>
-<li><a id="TopJSLink" href="readme_files/JS_GraphicalBarCalculator2.html">Link to javascript that calculates the graphical bar's memory usage</a>.</li>
+<li><a id="TopJSLink" href="readme_files/JS_GraphicalBarCalculator2.html">Calculate the graphical bar's memory usage</a></li>
 <li><a id="OAMNotes" href="readme_files/OAM_Side_notes.html">OAM table and conversion sheet</a></li>
-<li><a id="SpriteProps" href="readme_files/YXPPCCCT.html">Sprite YXPPCCCT converter</a></li>
+<li>Tile property converters. Note they're not the same, rather similar, layer 3 has 2-bits (0-3) for page number and 1-bit (0-1) for priority, while sprites
+have 1-bit for page number and 2-bits of priority:</li>
+<ul>
+<li><a id="Layer3Props" href="readme_files/YXPCCCTT.html">Layer 3 properties (YXPCCCTT) converter</a></li>
+<li><a id="SpriteProps" href="readme_files/YXPPCCCT.html">Sprite properties (YXPPCCCT) converter</a></li>
+</ul>
 </ul>
 <hr>
 <h2><a href="#InstallationBack" id="Installation">^</a>Installation (test run)</h2>
@@ -265,8 +274,7 @@ the SNES is <a href="https://en.wikipedia.org/wiki/Endianness">little-endian</a>
 </ul>
 <hr>
 <h2><a href="#CustomSprites_Back" id="CustomSprites">^</a>Drawing OAM (Normal sprites (SMW sprites or pixi), not cluster, extended, minor extended, etc.)</h2>
-<p>While this code library was originally meant to be used with layer 3 status bar on uberasm tool, I added a new feature that
-would support sprite OAM.</p>
+<p>While this code library was originally meant to be used with layer 3 status bar on uberasm tool, I added new features that would support sprite OAM.</p>
 
 <p>What you need are:
 <ul>
@@ -357,6 +365,7 @@ autoclean JML DrawSpriteGraphicalBarVert</pre></td></tr></table>
 	</li>
 	<li>And you are done. If you are planning to use this code within the custom sprite's code, continue doing the steps below.</li>
 </ol>
+<p>Feel free to view the code in <kbd>Pixi_CustomSprite/GraphicalBarSimpleTest/SpriteGraphicalBarTest.asm</kbd> with a text editor, it is intended to show a yoshi egg graphic representing the sprite origin and where would the bar would be placed at.</p>
 <h3>Programming with existing custom sprites</h3>
 <p>Note: You must have some mid-level of knowledge of ASM, as here you must learn how to:
 <ul>
