@@ -266,7 +266,7 @@ would support sprite OAM.</p>
 <li><a href="https://www.smwcentral.net/?p=section&a=details&id=26026">Pixi</a> obviously.</li>
 	<li>
 		<a href="https://www.smwcentral.net/?p=section&a=details&id=19545">Shared subroutines patch</a>. I really hated the way how pixi's routines work: it functions the same as GPS (Gopher Popcorn Stew), meaning you
-		cannot have multiple subroutines in the same ASM file, they have to separate and that labels/sublabels inside those subroutines leak out. Plus, it is possible that hacks may have a graphical bar as both a sprite
+		cannot have multiple subroutines in the same ASM file, they have to separate and that labels/sublabels inside those subroutines leak out (may even break if using <kbd>?.MacroSublabels</kbd>). Plus, it is possible that hacks may have a graphical bar as both a sprite
 		and layer 3, so by having a shared subroutines patch, you don't need to have two copies one for sprite routines and for uberasm tool.
 	</li>
 </ul>
