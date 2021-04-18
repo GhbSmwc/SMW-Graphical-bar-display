@@ -1213,8 +1213,8 @@ Graphics:
 	; $08-$09: Same but for Tilemap.
 	; $0A-$0B: Same but Properties.
 	;The routines !DrawSpriteGraphicalBarHoriz and !DrawSpriteGraphicalBarVert already have the same type of information
-	;for the Y, $00 and $01 data, so no concerns on those stuff. We can set up drawing the bar BEFORE we start using $04-$0B
-	;for table starting addresses.
+	;for the Y, $00 and $01, so no concerns on those stuff. We can set up drawing the bar BEFORE we start using $04-$0B
+	;for indirect addressing.
 		%GetDrawInfo()		;>We need: Y: OAM index, $00 and $01: Position. Like I said, don't push, then call this without pulling in between pushing and calling GetDrawInfo.
 		
 		JSL !CountNumberOfTiles		;\Get number of tiles of the graphical bar
@@ -1342,8 +1342,8 @@ ContinueGraphics: ;This is where scratch RAM is being used for indirect addressi
 	;[GraphicalBar_For_HP] Manually set tile size for the main body of the sprite
 	;Because most sprites are composed of 16x16 OAM tiles, and the bar being 8x8s, The GMK boss is NO exception.
 	;It is really not that hard, just preserve X or Y, depending on the sprite (GMK boss uses X, in this example),
-	;then take X or Y, whichever holds the OAM index (increments of 4), LSR #2 to convert to slot numbering
-	;(increments of 1), and SET $0460, indexed by slot numbering's bit 1 (the 2nd last bit from the right) to 1.
+	;then take X or Y, whichever holds the OAM index (increments of 4) TXA or TYA, LSR #2, TAX or TAY to convert
+	;to slot numbering (increments of 1), and SET $0460, indexed by slot numbering's bit 1 (the 2nd last bit from the right) to 1.
 	PHX			;>Preserve OAM index
 	TXA			;\Convert OAM index numbering to slot numbering (increments of 1)
 	LSR #2			;|

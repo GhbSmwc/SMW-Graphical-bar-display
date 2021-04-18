@@ -355,10 +355,10 @@ autoclean JML DrawSpriteGraphicalBarVert</pre></td></tr></table>
 <ul>
 <li>Know which scratch RAM is currently used for other purpose during code execution, and be able to relocate them to another RAM should they conflict (2+ different data using the same address(es)) or use
 the stack (PHA...PLA)</li><br>
-<li>Position and rearrange the code if structured in a certain way, such as certain values like indexes are needed both for the sprite's body tile and the graphical bar (like OAM indexes,
-which is obtained after calling <kbd>%GetDrawInfo()</kbd>).</li><br>
+<li>Finding an appropriate place or rearranging to insert the code, due to certain values like indexes and scratch RAM are still being used for a specified purpose (for example: if scratch RAM is used for indirect addressing,
+we don't want to put our code there, instead we place it at a location that is <i>before</i> scratch RAM becomes reserved for addressing).</li><br>
 </ul>
-Many sprites on the sprite section on SMWC can be complex and have different coding styles, but following the principals above should make it possible to implement to your sprites.
+Many sprites on the sprite section on SMWC can be complex and have different coding styles, but following the principals above should make it possible to implement on any sprite.
 Another important note is that the routine <kbd>%GetDrawInfo()</kbd> uses <b>a destroy-return-address</b>. A stack-manipulation technique to &ldquo;double-exit&rdquo; the subroutine, consider this simple example shown below:
 <table>
 <tr><td><pre>	JSR Subroutine
@@ -396,10 +396,11 @@ Therefore, if you push something, you must pull before calling <kbd>%GetDrawInfo
 	<li>Go to the graphics portion of the code (thankfully, they are conveniently named and 99.99% of the time use <kbd>%GetDrawInfo()</kbd>). You want to know these informations
 		<ul>
 			<li>The total number of tiles it uses. Before calling the &ldquo;finish OAM write&rdquo; (done by calling <kbd>JSL $01B7B3</kbd> or <kbd>%FinishOAMWrite()</kbd>), you'll need
-			to find out the total number of tiles, including the bar itself. I recommend getting the total (sprite's body + graphical bar) first, and then subtract by 1, and avoid subtracting
-			by 1 of the body and the graphical bar (you'll subtract by 2 which isn't what you want). Another method is by taking the number of tiles on the sprite's body, minus 1, and then add by number of tiles
-			of the bar, which also results the correct value for the &ldquo;finish OAM write&rdquo;</li><br>
-			<li>The tile sizes, whether or not uses 8x8, 16x16 or in rare cases both. Most sprites on SMWC are composed of 16x16 tiles, so you'll have to manually set the size for address <kbd>$0460</kbd></li><br>
+			to find out the total number of tiles, including the bar itself, and subtract by 1. One method to do so is by getting the total (sprite's body + graphical bar) first, and then subtract by 1, and avoid subtracting
+			by 1 for both the body and the graphical bar (you'll subtract by 2 which isn't what you want) therefore resulting <kbd>(SpriteBodyTileCount + BarTileCount) - 1</kbd>. Another method is by taking the number of
+			tiles on the sprite's body, minus 1, and then add by number of tiles of the bar (<kbd>(SpriteBodyTileCount - 1) + BarTileCount</kbd>), which also works.</li><br>
+			
+			<li>The tile sizes. Most sprites on SMWC are composed of 16x16 tiles, so you'll likely need to manually set the tile size</li><br>
 		</ul>
 	</li>
 	<li>If you happen to want a graphical bar on a sprite that is composed of at least 1 16x16 OAM tile (most sprites are like that, by the way), there is a good chance you'll have to
@@ -431,8 +432,9 @@ Therefore, if you push something, you must pull before calling <kbd>%GetDrawInfo
 <p>I've made another example test, using the <a href="https://www.smwcentral.net/?p=section&a=details&id=13144">Giant Masked Koopa boss</a>. Please remember that this document only covers these sprites as examples
 that will be similar to many other sprites, as their coding style are vastly different by 3rd party users that programmed their sprites on SMWC's sprite section.</p>
 
-<p>You should be able to find it, as I conveniently named the folders. The ASM and graphics are separated, however (they're in <kbd>ExGraphics/Sprite/GiantMaskedKoopaTest</kbd>). Instructions are similar to <kbd>GraphicalBarSimpleTest</kbd> (you'll need the shared subroutines patch, pixi,
-insert the graphics, etc.). Open the ASM file <kbd>giant_masked_koopa.asm</kbd>, and there will be comments I added to show an example on how to implement a sprite graphical bar (in this example, a HP bar).</p>
+<p>I conveniently named the folders, so it shouldn't be difficult. The ASM and graphics are separated, however (graphics are in <kbd>ExGraphics/Sprite/GiantMaskedKoopaTest</kbd>). Everything is effectively the same as
+<kbd>GraphicalBarSimpleTest</kbd> except the bar having an actual purpose and the sprite is a boss sprite. Open the ASM file <kbd>giant_masked_koopa.asm</kbd>, and there will be comments I added to show an example
+on how to implement a sprite graphical bar (in this example, a HP bar).</p>
 <hr>
 <h2><a href="#DrawOamPatch_Back" id="DrawOamPatch">^</a>Drawing OAM (not using sprite slots, but patch using OAM).</h2>
 <p>This is similar to the sprite version, but written using a patch. Using a hijack at $00A2E6 and running the patch's OAM handler AFTER processing all sprites (including after $028AB1), gives
