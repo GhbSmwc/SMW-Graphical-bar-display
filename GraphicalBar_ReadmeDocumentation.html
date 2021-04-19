@@ -661,6 +661,10 @@ input here is <kbd>$00</kbd>:<br><br>
 The total number of pieces (full amount) in the bar is calculated as: <kbd>[FullAmount = LeftEndPiece + (MiddlePiece * MiddleLength) + RightEndPiece]</kbd>,
 for example: 62 = 3 + (7 * 8) + 3</td>
 </tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_LeftEndPiece</kbd></td><td align="center" valign="center">1</td><td rowspan="4">Graphical bar attributes, same as <kbd>CalculateGraphicalBarPercentage</kbd></td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_MiddlePiece</kbd></td><td align="center" valign="center">1</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_RightEndPiece</kbd></td><td align="center" valign="center">1</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_TempLength</kbd></td><td align="center" valign="center">1</td></tr>
 </table>
 Result:
 <table>
@@ -966,7 +970,7 @@ need to be rewritten). Note that this DOES modifies the values in <kbd>!Scratchr
 <th>Number of bytes</th>
 <th>Description</th>
 </tr>
-<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td><td>The graphical bar tile byte array</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td><td>The graphical bar tile byte array</td></tr>
 <tr>
 <td><kbd>$00</kbd></td>
 <td align="center" valign="center">1</td>
@@ -1150,6 +1154,26 @@ Of course, the default graphics included here are pixel-column-based, meaning ea
 
 Note that this does not support overworld graphics unlike above, as there are even more tiles used than the status bar.</li><br><br>
 
+<table>
+<tr><th>Input</th><th>Number of Bytes</th><th>Description</th></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td><kbd>LeftEnd + MiddleLength + RightEnd</kbd></td><td>The graphical bar tile byte array (SecondFill).</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl + !Setting_GraphicalBar_SecondFillByteTableOffset</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + (((LeftEnd + MiddleLength + RightEnd) - 1) + !Setting_GraphicalBar_SecondFillByteTableOffset)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd></td><td>The graphical bar tile byte array (FirstFill).</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_LeftEndPiece</kbd></td><td align="center" valign="center">1</td><td rowspan="4">Graphical bar attributes, same as <kbd>CalculateGraphicalBarPercentage</kbd></td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_MiddlePiece</kbd></td><td align="center" valign="center">1</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_RightEndPiece</kbd></td><td align="center" valign="center">1</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_TempLength</kbd></td><td align="center" valign="center">1</td></tr>
+</table><br>
+
+<table>
+<tr><th>Output</th><th>Number of Bytes</th><th>Description</th></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td><kbd>LeftEnd + MiddleLength + RightEnd</kbd></td><td>Tile array containing tile numbers representing both first and second fills.</td></tr>
+</table><br>
+
+<table>
+<tr><th>Overwritten</th><th>Number of Bytes</th><th>Description</th></tr>
+<tr><td><kbd>$00</kbd></td><td align="center">1</td><td>Used to keep track if all the middle tiles are processed.</td></tr>
+</table><br>
+
 <li><a href="#ConvertBarFillAmountToTilesEdgeOverMultipleTiles_Back" id="ConvertBarFillAmountToTilesEdgeOverMultipleTiles">^</a><kbd>ConvertBarFillAmountToTilesEdgeOverMultipleTiles</kbd>: Due to the way <kbd>DrawGraphicalBar</kbd>'s format of having only a single fraction tile byte exist, this subroutine makes having
 the fill edge covering multiple 8x8 tiles possible. This is often used for slanted, rounded, or outlined fill edge graphic:<br>
 <img src="readme_files/MultiPartiallyFilled.png"><br>
@@ -1160,7 +1184,7 @@ See explanation <a href="readme_files/FillEdgeCrossingTileBorder.html" id="FillE
 tables are no longer &ldquo;fixed&rdquo;, which is useful for things like sprite tile remapping.
 <table>
 <tr><th>Input</th><th>Number of Bytes</th><th>Description</th></tr>
-<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td><td>The graphical bar tile byte array</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td><td>The graphical bar tile byte array.</td></tr>
 <tr><td><kbd>$00</kbd> to <kbd>$02</kbd></td><td align="center">3</td><td>Address location of where the table of tile number for left end.</td></tr>
 <tr><td><kbd>$03</kbd> to <kbd>$05</kbd></td><td align="center">3</td><td>Address location of where the table of tile number for middles.</td></tr>
 <tr><td><kbd>$06</kbd> to <kbd>$08</kbd></td><td align="center">3</td><td>Address location of where the table of tile number for right end.</td></tr>
@@ -1171,7 +1195,7 @@ tables are no longer &ldquo;fixed&rdquo;, which is useful for things like sprite
 </table><br>
 <table>
 <tr><th>Output</th><th>Number of Bytes</th><th>Description</th></tr>
-<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td>
+<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td>
 <td>The graphical bar tile byte array</td></tr>
 </table><br>
 Destroyed:
@@ -1184,7 +1208,7 @@ Destroyed:
 and just like above, have a relocatable table that you can manually set.
 <table>
 <tr><th>Input</th><th>Number of Bytes</th><th>Description</th></tr>
-<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td><td>The graphical bar tile byte array</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td><td>The graphical bar tile byte array</td></tr>
 <tr><td><kbd>$00</kbd> to <kbd>$02</kbd></td><td align="center">3</td><td>Address location of where the table of tile number for left end.</td></tr>
 <tr><td><kbd>$03</kbd> to <kbd>$05</kbd></td><td align="center">3</td><td>Address location of where the table of tile number for middles.</td></tr>
 <tr><td><kbd>$06</kbd> to <kbd>$08</kbd></td><td align="center">3</td><td>Address location of where the table of tile number for right end.</td></tr>
@@ -1195,7 +1219,7 @@ and just like above, have a relocatable table that you can manually set.
 </table><br>
 <table>
 <tr><th>Output</th><th>Number of Bytes</th><th>Description</th></tr>
-<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td>
+<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td>
 <td>The graphical bar tile byte array</td></tr>
 </table><br>
 

@@ -251,6 +251,21 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;Convert fill amount in bar to tile numbers, double-bar edition
 ;Inputs and outputs the same as above.
 ;
+;Input:
+; -!Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1:
+;  SecondFill tile array.
+; -!Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset to
+;  ((!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1)+!Setting_GraphicalBar_SecondFillByteTableOffset:
+;  FirstFill tile array
+; -!Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
+;  the maximum amount of fill for this byte itself. If 0, it's not included in table.
+; -!Scratchram_GraphicalBar_MiddlePiece: Same as above but each middle byte.
+; -!Scratchram_GraphicalBar_RightEndPiece: Same as above but for right end.
+; -!Scratchram_GraphicalBar_TempLength: The length of the bar (only counts
+;   middle bytes)
+;Output:
+; -!Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1:
+;  Tile array containing tile numbers representing both first and second fills.
 ;Overwritten:
 ; -$00: Needed to tell if all the middle tiles are done
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
