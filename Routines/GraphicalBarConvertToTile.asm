@@ -22,6 +22,8 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ; $13-$14 covers level load and level.
 ;
 ;Input:
+; -!Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1:
+;  fill amount array to convert to tile numbers.
 ; -$00: What set of graphics to use. Under default setting and code:
 ;  -#$00 = Level, layer 3
 ;  -#$01 = Level, sprite
@@ -38,7 +40,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+x:
 ;  converted to tile numbers.
 ;Overwritten/Destroyed:
-; -$01 Needed to convert the middle tiles
+; -$01: Needed to tell if all the middle tiles are done
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;These are tile numbers. Each number, starting from the
 	;left represent each tile of pieces ordered from empty
@@ -248,6 +250,9 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Convert fill amount in bar to tile numbers, double-bar edition
 ;Inputs and outputs the same as above.
+;
+;Overwritten:
+; -$00: Needed to tell if all the middle tiles are done
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;How this works in relation of using the table (regarding each 8x8 byte section):
 ;1) Amount of FirstFill multiply by the number of pieces +1 (example: LeftEndFirstFill*4).
@@ -331,131 +336,131 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 		LDX #$0000								;>The index for what byte tile position to write.
 	endif
 	.LeftEndTranslate
-	LDA !Scratchram_GraphicalBar_LeftEndPiece				;\Check if left end exist
-	BEQ .MiddleTranslate							;/
-	if !sa1 == 0
-		INC												;>Pieces + 1
-		STA $4202											;>(Pieces + 1) times...
-		LDA !Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset	;\...FirstFill (remember Commutative property means same result regardless of order)
-		STA $4203											;/
-		JSR WaitCalculation										;>Wait 12 cycles in total (8 is minimum needed)
-		LDA $4216											;>Load product (low byte only)
-	else
-		LDA #$00											;\Multiply mode
-		STA $2250											;/
-		LDA !Scratchram_GraphicalBar_LeftEndPiece							;\Pieces + 1
-		INC												;/
-		STA $2251											;\(Pieces + 1) times...
-		STZ $2252											;/
-		LDA !Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset	;\...FirstFill (remember Commutative property means same result regardless of order)
-		STA $2253											;|
-		STZ $2254											;/
-		NOP												;\Wait 5 cycles until calculation is done
-		BRA $00												;/
-		LDA $2306											;>Load product (low byte only)
-	endif
-	CLC									;\Add by SecondFill
-	ADC !Scratchram_GraphicalBar_FillByteTbl				;/
-	if !Setting_GraphicalBar_IndexSize != 0
-		REP #$20								;\Rid the high byte
-		AND #$00FF								;|
-		SEP #$20								;/
-	endif
-	TAY									;>Transfer #$00XX fill value to y
-	LDA GraphicalBar_LeftEnd8x8sDoubleBar_Lvl_L3,y					;\Convert left end
-	STA !Scratchram_GraphicalBar_FillByteTbl				;/
-	INX									;>next tile
+		LDA !Scratchram_GraphicalBar_LeftEndPiece				;\Check if left end exist
+		BEQ .MiddleTranslate							;/
+		if !sa1 == 0
+			INC												;>Pieces + 1
+			STA $4202											;>(Pieces + 1) times...
+			LDA !Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset	;\...FirstFill (remember Commutative property means same result regardless of order)
+			STA $4203											;/
+			JSR WaitCalculation										;>Wait 12 cycles in total (8 is minimum needed)
+			LDA $4216											;>Load product (low byte only)
+		else
+			LDA #$00											;\Multiply mode
+			STA $2250											;/
+			LDA !Scratchram_GraphicalBar_LeftEndPiece							;\Pieces + 1
+			INC												;/
+			STA $2251											;\(Pieces + 1) times...
+			STZ $2252											;/
+			LDA !Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset	;\...FirstFill (remember Commutative property means same result regardless of order)
+			STA $2253											;|
+			STZ $2254											;/
+			NOP												;\Wait 5 cycles until calculation is done
+			BRA $00												;/
+			LDA $2306											;>Load product (low byte only)
+		endif
+		CLC									;\Add by SecondFill
+		ADC !Scratchram_GraphicalBar_FillByteTbl				;/
+		if !Setting_GraphicalBar_IndexSize != 0
+			REP #$20								;\Rid the high byte
+			AND #$00FF								;|
+			SEP #$20								;/
+		endif
+		TAY									;>Transfer #$00XX fill value to y
+		LDA GraphicalBar_LeftEnd8x8sDoubleBar_Lvl_L3,y					;\Convert left end
+		STA !Scratchram_GraphicalBar_FillByteTbl				;/
+		INX									;>next tile
 
 	.MiddleTranslate
 
-	LDA !Scratchram_GraphicalBar_MiddlePiece	;\check if middle exist.
-	BEQ .RightEndTranslate				;|
-	LDA !Scratchram_GraphicalBar_TempLength		;|
-	BEQ .RightEndTranslate				;/
-	
-	LDA !Scratchram_GraphicalBar_TempLength
-	STA $00
-	
-	..Loop
-	if !sa1 == 0
-		LDA !Scratchram_GraphicalBar_MiddlePiece							;\Pieces + 1
-		INC												;/
-		STA $4202											;>(Pieces + 1) times...
-		LDA !Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset,x	;\...FirstFill (remember Commutative property means same result reguardless of order)
-		STA $4203											;/(+1 because it starts on the first middle tile, after the left end)
-		JSR WaitCalculation										;>Wait 12 cycles in total (8 is minimum needed)
-		LDA $4216											;>Load product (low byte only)
-	else
-		LDA #$00											;\Multiply mode
-		STA $2250											;/
-		LDA !Scratchram_GraphicalBar_MiddlePiece							;\Pieces + 1
-		INC												;/
-		STA $2251											;\(Pieces + 1) times...
-		STZ $2252											;/
-		LDA !Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset,x	;\...FirstFill (remember Commutative property means same result reguardless of order)
-		STA $2253											;|
-		STZ $2254											;/
-		NOP												;\Wait 5 cycles until calculation is done
-		BRA $00												;/
-		LDA $2306											;>Load product (low byte only)
-	endif
-	CLC													;\Add by SecondFill
-	ADC !Scratchram_GraphicalBar_FillByteTbl,x								;/
-	if !Setting_GraphicalBar_IndexSize != 0
-		REP #$20								;\Rid the high byte
-		AND #$00FF								;|
-		SEP #$20								;/
-	endif
-	TAY									;>Transfer #$00XX fill value to y
-	LDA GraphicalBar_Middle8x8sDoubleBar_Lvl_L3,y					;\Convert middle tile
-	STA !Scratchram_GraphicalBar_FillByteTbl,x				;/
-	
-	...Next
-	INX						;>Next byte or 8x8 tile
-	DEC $00						;\loop until all middles done
-	BNE ..Loop					;/
-	
-	
+		LDA !Scratchram_GraphicalBar_MiddlePiece	;\check if middle exist.
+		BEQ .RightEndTranslate				;|
+		LDA !Scratchram_GraphicalBar_TempLength		;|
+		BEQ .RightEndTranslate				;/
+		
+		LDA !Scratchram_GraphicalBar_TempLength
+		STA $00
+		
+		..Loop
+		if !sa1 == 0
+			LDA !Scratchram_GraphicalBar_MiddlePiece							;\Pieces + 1
+			INC												;/
+			STA $4202											;>(Pieces + 1) times...
+			LDA !Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset,x	;\...FirstFill (remember Commutative property means same result reguardless of order)
+			STA $4203											;/(+1 because it starts on the first middle tile, after the left end)
+			JSR WaitCalculation										;>Wait 12 cycles in total (8 is minimum needed)
+			LDA $4216											;>Load product (low byte only)
+		else
+			LDA #$00											;\Multiply mode
+			STA $2250											;/
+			LDA !Scratchram_GraphicalBar_MiddlePiece							;\Pieces + 1
+			INC												;/
+			STA $2251											;\(Pieces + 1) times...
+			STZ $2252											;/
+			LDA !Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset,x	;\...FirstFill (remember Commutative property means same result reguardless of order)
+			STA $2253											;|
+			STZ $2254											;/
+			NOP												;\Wait 5 cycles until calculation is done
+			BRA $00												;/
+			LDA $2306											;>Load product (low byte only)
+		endif
+		CLC													;\Add by SecondFill
+		ADC !Scratchram_GraphicalBar_FillByteTbl,x								;/
+		if !Setting_GraphicalBar_IndexSize != 0
+			REP #$20								;\Rid the high byte
+			AND #$00FF								;|
+			SEP #$20								;/
+		endif
+		TAY									;>Transfer #$00XX fill value to y
+		LDA GraphicalBar_Middle8x8sDoubleBar_Lvl_L3,y					;\Convert middle tile
+		STA !Scratchram_GraphicalBar_FillByteTbl,x				;/
+		
+		...Next
+		INX						;>Next byte or 8x8 tile
+		DEC $00						;\loop until all middles done
+		BNE ..Loop					;/
+		
+		
 	.RightEndTranslate
-	LDA !Scratchram_GraphicalBar_RightEndPiece
-	BEQ .Done
-	if !sa1 == 0
 		LDA !Scratchram_GraphicalBar_RightEndPiece
-		INC												;>Pieces + 1
-		STA $4202											;>(Pieces + 1) times...
-		LDA !Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset,x	;\...FirstFill (remember Commutative property means same result reguardless of order)
-		STA $4203											;/
-		JSR WaitCalculation										;>Wait 12 cycles in total (8 is minimum needed)
-		LDA $4216											;>Load product (low byte only)
-	else
-		LDA #$00											;\Multiply mode
-		STA $2250											;/
-		LDA !Scratchram_GraphicalBar_RightEndPiece							;\Pieces + 1
-		INC												;/
-		STA $2251											;\(Pieces + 1) times...
-		STZ $2252											;/
-		LDA !Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset,x	;\...FirstFill (remember Commutative property means same result reguardless of order)
-		STA $2253											;|
-		STZ $2254											;/
-		NOP												;\Wait 5 cycles until calculation is done
-		BRA $00												;/
-		LDA $2306											;>Load product (low byte only)
-	endif
-	CLC									;\Add by SecondFill
-	ADC !Scratchram_GraphicalBar_FillByteTbl,x				;/
-	if !Setting_GraphicalBar_IndexSize != 0
-		REP #$20								;\Rid the high byte
-		AND #$00FF								;|
-		SEP #$20								;/
-	endif
-	TAY									;>Transfer #$00XX fill value to y
-	LDA GraphicalBar_RightEnd8x8sDoubleBar_Lvl_L3,y						;\Convert middle tile
-	STA !Scratchram_GraphicalBar_FillByteTbl,x				;/
+		BEQ .Done
+		if !sa1 == 0
+			LDA !Scratchram_GraphicalBar_RightEndPiece
+			INC												;>Pieces + 1
+			STA $4202											;>(Pieces + 1) times...
+			LDA !Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset,x	;\...FirstFill (remember Commutative property means same result reguardless of order)
+			STA $4203											;/
+			JSR WaitCalculation										;>Wait 12 cycles in total (8 is minimum needed)
+			LDA $4216											;>Load product (low byte only)
+		else
+			LDA #$00											;\Multiply mode
+			STA $2250											;/
+			LDA !Scratchram_GraphicalBar_RightEndPiece							;\Pieces + 1
+			INC												;/
+			STA $2251											;\(Pieces + 1) times...
+			STZ $2252											;/
+			LDA !Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset,x	;\...FirstFill (remember Commutative property means same result reguardless of order)
+			STA $2253											;|
+			STZ $2254											;/
+			NOP												;\Wait 5 cycles until calculation is done
+			BRA $00												;/
+			LDA $2306											;>Load product (low byte only)
+		endif
+		CLC									;\Add by SecondFill
+		ADC !Scratchram_GraphicalBar_FillByteTbl,x				;/
+		if !Setting_GraphicalBar_IndexSize != 0
+			REP #$20								;\Rid the high byte
+			AND #$00FF								;|
+			SEP #$20								;/
+		endif
+		TAY									;>Transfer #$00XX fill value to y
+		LDA GraphicalBar_RightEnd8x8sDoubleBar_Lvl_L3,y						;\Convert middle tile
+		STA !Scratchram_GraphicalBar_FillByteTbl,x				;/
 	
 	.Done
-	SEP #$10								;>8-bit XY
-	PLB									;>Restore bank
-	RTL
+		SEP #$10								;>8-bit XY
+		PLB									;>Restore bank
+		RTL
 	
 	if !sa1 == 0
 		WaitCalculation:	;>The register to perform multiplication and division takes 8/16 cycles to complete.
@@ -475,6 +480,8 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 ;This by default, uses the slanted fill edge and not the outlined edge.
 ;
 ;Input:
+; -!Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1:
+;  fill amount array to convert to tile numbers.
 ; -$00: What set of graphics to use. Under default setting and code:
 ;  -#$00 = Level, layer 3
 ;  -#$01 = Level, sprite
@@ -819,6 +826,8 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 ;of tile number tables to use, this lets you manually set the tile number
 ;table to use outside this subroutine.
 ;Input:
+; -!Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1:
+;  fill amount array to convert to tile numbers.
 ; -$00 to $02: 24-bit address representing the (starting) location of the table containing the left end
 ; -$03 to $05: 24-bit address representing the (starting) location of the table containing the middles
 ; -$06 to $08: 24-bit address representing the (starting) location of the table containing the right end
@@ -920,6 +929,8 @@ db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
 ;of tile number tables to use, this lets you manually set the tile number
 ;table to use outside this subroutine.
 ;Input:
+; -!Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1:
+;  fill amount array to convert to tile numbers.
 ; -$00 to $02: 24-bit address representing the (starting) location of the table containing the left end
 ; -$03 to $05: 24-bit address representing the (starting) location of the table containing the middles
 ; -$06 to $08: 24-bit address representing the (starting) location of the table containing the right end
