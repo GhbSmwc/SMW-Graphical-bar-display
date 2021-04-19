@@ -61,6 +61,8 @@ length of the bar.<p>
 		<li><a href="#ConvertBarFillAmountToTiles" id="ConvertBarFillAmountToTiles_Back"><kbd>ConvertBarFillAmountToTiles</kbd></a></li>
 		<li><a href="#ConvertBarFillAmountToTilesDoubleBar" id="ConvertBarFillAmountToTilesDoubleBar_Back"><kbd>ConvertBarFillAmountToTilesDoubleBar</kbd></a></li>
 		<li><a href="#ConvertBarFillAmountToTilesEdgeOverMultipleTiles" id="ConvertBarFillAmountToTilesEdgeOverMultipleTiles_Back"><kbd>ConvertBarFillAmountToTilesEdgeOverMultipleTiles</kbd></a></li>
+		<li><a href="#ConvertBarFillAmountToTilesIndirectAddressTable" id="ConvertBarFillAmountToTilesIndirectAddressTable_Back"><kbd>ConvertBarFillAmountToTilesIndirectAddressTable</kbd></a></li>
+		<li><a href="#ConvertBarFillAmountToTilesEdgeOverMultipleTilesIndirectAddressTable" id="ConvertBarFillAmountToTilesEdgeOverMultipleTilesIndirectAddressTable_Back"><kbd>ConvertBarFillAmountToTilesEdgeOverMultipleTilesIndirectAddressTable</kbd></a></li>
 	</ul>
 	<li><a href="#GraphicalBarWriteToStatusBar" id="GraphicalBarWriteToStatusBarBack"><kbd>GraphicalBarWriteToStatusBar.asm</kbd></li>
 	<ul>
@@ -574,11 +576,14 @@ If max quantity is 0, a division by zero occurs, and outputs <kbd>$FFFF</kbd>.</
 See more information <a id="RoundAwayFromComplete" href="readme_files/RoundAwayFromComplete.html">here</a>.
 </ul></td>
 </tr>
+</table>
+Destroyed:
+<table>
+<tr><th>Destroyed</th><th>Number of Bytes</th><th>Description</th></tr>
 <tr>
 <td><kbd><span class="NoLineBreak"><b>$02</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$09</b></span></kbd></td>
 <td align="center" valign="center">8</td>
 <td>Overwritten by math routines. Contains garbage values.</td>
-</tr>
 </tr>
 </table>
 
@@ -961,6 +966,7 @@ need to be rewritten). Note that this DOES modifies the values in <kbd>!Scratchr
 <th>Number of bytes</th>
 <th>Description</th>
 </tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td><td>The graphical bar tile byte array</td></tr>
 <tr>
 <td><kbd>$00</kbd></td>
 <td align="center" valign="center">1</td>
@@ -1003,7 +1009,11 @@ Output:
 <td>The converted table from fill amounts to tile numbers.</td>
 </tr>
 </table>
-
+Destroyed:
+<table>
+<tr><th>Destroyed</th><th>Number of Bytes</th><th>Description</th></tr>
+<tr><td><kbd>$01</kbd></td><td align="center">1</td><td>Used to keep track if all the middle tiles are processed.</td></tr>
+</table>
 What it looks like:
 <table>
 <tr>
@@ -1144,6 +1154,57 @@ Note that this does not support overworld graphics unlike above, as there are ev
 the fill edge covering multiple 8x8 tiles possible. This is often used for slanted, rounded, or outlined fill edge graphic:<br>
 <img src="readme_files/MultiPartiallyFilled.png"><br>
 See explanation <a href="readme_files/FillEdgeCrossingTileBorder.html" id="FillEdgeCrossingTileBorder">here</a> Inputs and outputs are the same as <kbd>ConvertBarFillAmountToTiles</kbd>.
+</li>
+
+<li><a href="#ConvertBarFillAmountToTilesIndirectAddressTable_Back" id="ConvertBarFillAmountToTilesIndirectAddressTable">^</a><kbd>ConvertBarFillAmountToTilesIndirectAddressTable</kbd>: Does the same thing as <kbd>ConvertBarFillAmountToTiles</kbd>, but tile
+tables are no longer &ldquo;fixed&rdquo;, which is useful for things like sprite tile remapping.
+<table>
+<tr><th>Input</th><th>Number of Bytes</th><th>Description</th></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td><td>The graphical bar tile byte array</td></tr>
+<tr><td><kbd>$00</kbd> to <kbd>$02</kbd></td><td align="center">3</td><td>Address location of where the table of tile number for left end.</td></tr>
+<tr><td><kbd>$03</kbd> to <kbd>$05</kbd></td><td align="center">3</td><td>Address location of where the table of tile number for middles.</td></tr>
+<tr><td><kbd>$06</kbd> to <kbd>$08</kbd></td><td align="center">3</td><td>Address location of where the table of tile number for right end.</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_LeftEndPiece</kbd></td><td align="center">1</td><td rowspan="4">Needed to convert each tile by identifying the left end, middle (and how many middle tiles), and right end.</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_MiddlePiece</kbd></td><td align="center">1</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_RightEndPiece</kbd></td><td align="center">1</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_TempLength</kbd></td><td align="center">1</td></tr>
+</table><br>
+<table>
+<tr><th>Output</th><th>Number of Bytes</th><th>Description</th></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td>
+<td>The graphical bar tile byte array</td></tr>
+</table><br>
+Destroyed:
+<table>
+<tr><th>Destroyed</th><th>Number of bytes</th><th>Description</th></tr>
+<tr><td><kbd>$09</kbd></td><td align="center">1</td><td>Used to track the middle tiles if all of them are done.</td></tr>
+</table>
+</li>
+<li><a href="#ConvertBarFillAmountToTilesEdgeOverMultipleTilesIndirectAddressTable_Back" id="ConvertBarFillAmountToTilesEdgeOverMultipleTilesIndirectAddressTable">^</a><kbd>ConvertBarFillAmountToTilesEdgeOverMultipleTilesIndirectAddressTable</kbd>: same as <kbd>ConvertBarFillAmountToTilesEdgeOverMultipleTiles</kbd>
+and just like above, have a relocatable table that you can manually set.
+<table>
+<tr><th>Input</th><th>Number of Bytes</th><th>Description</th></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td><td>The graphical bar tile byte array</td></tr>
+<tr><td><kbd>$00</kbd> to <kbd>$02</kbd></td><td align="center">3</td><td>Address location of where the table of tile number for left end.</td></tr>
+<tr><td><kbd>$03</kbd> to <kbd>$05</kbd></td><td align="center">3</td><td>Address location of where the table of tile number for middles.</td></tr>
+<tr><td><kbd>$06</kbd> to <kbd>$08</kbd></td><td align="center">3</td><td>Address location of where the table of tile number for right end.</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_LeftEndPiece</kbd></td><td align="center">1</td><td rowspan="4">Needed to convert each tile by identifying the left end, middle (and how many middle tiles), and right end.</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_MiddlePiece</kbd></td><td align="center">1</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_RightEndPiece</kbd></td><td align="center">1</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_TempLength</kbd></td><td align="center">1</td></tr>
+</table><br>
+<table>
+<tr><th>Output</th><th>Number of Bytes</th><th>Description</th></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td>
+<td>The graphical bar tile byte array</td></tr>
+</table><br>
+
+Destroyed:
+<table>
+<tr><th>Destroyed</th><th>Number of bytes</th><th>Description</th></tr>
+<tr><td><kbd>$09</kbd></td><td align="center">1</td><td>Used to track the middle tiles if all of them are done.</td></tr>
+<tr><td><kbd>$0A</kbd></td><td align="center">1</td><td>Needed to prevent taking the last tile, and adding by an invalid data after that.</td></tr>
+</table>
 </li>
 
 </ul><br>
