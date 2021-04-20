@@ -433,9 +433,12 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
 3/26/2021 to [insert date here]
  -The javascript html's hex input now reacts to up/down arrow keys, therefore behaving closer to how number inputs
   work (up increases the value, down decreases).
- -ConvertBarFillAmountToTiles have been revamped to not check $0100 (game mode), rather have $00 as an input to
-  determine what sets of fill graphics to use, allowing multiple sets of graphics in the same game mode (such
-  as a layer 3 graphical bar and a sprite graphical bar).
+ -ConvertBarFillAmountToTiles and ConvertBarFillAmountToTilesEdgeOverMultipleTiles have been revamped to not check
+  $0100 (game mode), rather have $00 as an input to determine what sets of fill graphics to use, allowing multiple
+  sets of graphics in the same game mode (such as a layer 3 graphical bar and a sprite graphical bar).
+ -Added ConvertBarFillAmountToTilesIndirectAddressTable and ConvertBarFillAmountToTilesEdgeOverMultipleTilesIndirectAddressTable
+  which are a more-flexible versions of ConvertBarFillAmountToTiles and ConvertBarFillAmountToTilesEdgeOverMultipleTiles,
+  enabling the user to manually use any table anywhere by inputting their 24-bit (3-byte) table addresses into $00, $03, and $06.
  -Added sprite OAM support (as a custom sprite code, and as a "sprite status bar").
  --Comes with a GMK boss sprite test.
  -Various missing information such as inputs for many subroutines were fixed, either because I forgot them or
