@@ -1251,7 +1251,7 @@ To write such address into RAM with the labels in existence, you do this:
 	LDA.b #GraphicalBar_RightEnd8x8s_Lvl_Spr&gt;&gt;16		;|
 	STA $08							;/
 	
-	;Labels represents the address (or position) in the ROM. LDA #Label when Label is at location $1234, that means it will
+	;Labels represents the address (or position) in the ROM. LDA.w #Label when Label is at location $1234, that means it will
 	;be LDA #$1234. If you don't have that hash symbol, it would be LDA Label -&gt; LDA $1234 (which loads RAM instead of &ldquo;Immediate&rdquo;)</pre></td></tr></table><br>
 </p>
 </li>
