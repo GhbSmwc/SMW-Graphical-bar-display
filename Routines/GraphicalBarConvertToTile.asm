@@ -985,24 +985,24 @@ ConvertBarFillAmountToTilesEdgeOverMultipleTilesIndirectAddressTable:
 					TAY
 					SEP #$20
 				endif
-				...CheckNextTileForFillEdge
+				..CheckNextTileForFillEdge
 					INX							;>Next tile
 					CPX $0A							;\If next tile is nonexistent (past the last tile),
-					BEQ ....Valid						;|treat as if you shouldn't add with it.
-					BCS ....Invalid						;/
+					BEQ ...Valid						;|treat as if you shouldn't add with it.
+					BCS ...Invalid						;/
 					
-					....Valid
+					...Valid
 						LDA !Scratchram_GraphicalBar_FillByteTbl,x		;>Next tile's fill amount...
 						DEX							;>Back to current tile
 						CLC							;\...Add with current tile's amount
 						ADC !Scratchram_GraphicalBar_FillByteTbl,x		;/
 						TAY							;>The combined index into Y.
-						BRA ....LoadTileNumber
-					....Invalid
+						BRA ...LoadTileNumber
+					...Invalid
 						DEX						;>Back to current tile
 						LDA !Scratchram_GraphicalBar_FillByteTbl,x	;>Load current tile without adding by an invalid value
 						TAY
-					....LoadTileNumber
+					...LoadTileNumber
 						LDA [$00],y
 					STA !Scratchram_GraphicalBar_FillByteTbl		;/
 					INX							;>next tile byte
@@ -1044,7 +1044,7 @@ ConvertBarFillAmountToTilesEdgeOverMultipleTilesIndirectAddressTable:
 							CLC							;\...Add with current tile's amount
 							ADC !Scratchram_GraphicalBar_FillByteTbl,x		;/
 							TAY							;>The combined index into Y.
-							BRA .....LoadTileNumber
+							BRA ....LoadTileNumber
 						....Invalid
 							DEX						;>Back to current tile
 							LDA !Scratchram_GraphicalBar_FillByteTbl,x	;>Load current tile without adding by an invalid value
@@ -1077,12 +1077,8 @@ ConvertBarFillAmountToTilesEdgeOverMultipleTilesIndirectAddressTable:
 					TAY
 					SEP #$20
 				endif
-				LDA $00
-				BEQ ..LevelLayer3
-			
-				..OverworldLayer3
-					LDA [$06],y
-					STA !Scratchram_GraphicalBar_FillByteTbl,x
+				LDA [$06],y
+				STA !Scratchram_GraphicalBar_FillByteTbl,x
 		;Done
 			.Done
 				SEP #$30					;>Just in case
