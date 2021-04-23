@@ -21,9 +21,9 @@
 			input[type='number'] { font-family: monospace;}
 		</style>
 	</head>
-	<a href="../GraphicalBar_ReadmeDocumentation.html#Layer3Props">Back</a>
-<h1>YXPCCCTT converter</h1>
-<p>I made this in case if you needed to debug should there be problems with the YXPCCCTT data of layer 3. Reason of making this is because most debuggers never show data in a memory as binary but only hex, and this tool will
+	<a href="../GraphicalBar_ReadmeDocumentation.html#SpriteProps">Back</a>
+<h1>YXPPCCCT converter</h1>
+<p>I made this in case if you needed to debug should there be problems with the YXPPCCCT data of the sprite OAM. Reason of making this is because most debuggers never show data in a memory as binary but only hex, and this tool will
 automatically convert the data into binary and also splitting them into individual parts (X flip, Y flip, priority, palette, and page)</p>
 <table>
 <tr>
@@ -31,9 +31,9 @@ automatically convert the data into binary and also splitting them into individu
 <td>
 Binary: <kbd>%</kbd><input type="text" onchange="UserInputBin()" class="BinNumberInput" id="PropertiesBinInput">
 <ul>
-<li><label for="InputPageNumber">Page (0-3): </label><input type="number" id="InputPageNumber" min="0" max="3" onchange="InputPropertiesData()"></li>
-<li><label for="InputPaletteNumber">Palette (0-7): </label><input type="number" id="InputPaletteNumber" min="0" max="7" onchange="InputPropertiesData()"></li>
-<li><label for="InputPriorityNumber">Priority: </label><input type="checkbox" id="InputPriorityNumber" onchange="InputPropertiesData()"></li>
+<li><label for="InputPageNumber">Page: </label><input type="checkbox" id="InputPageNumber" onchange="InputPropertiesData()"></li>
+<li><label for="InputPaletteNumber">Palette (0-7): </label><input type="number" id="InputPaletteNumber" min="0" max="7" onchange="InputPropertiesData()"> (to convert LM palette row numbering to here, just subtract it by 8).</li>
+<li><label for="InputPriorityNumber">Priority (0-3): </label><input type="number" id="InputPriorityNumber" min="0" max="3" onchange="InputPropertiesData()"></li>
 <li><label for="InputXFlipNumber">X Flip: </label><input type="checkbox" id="InputXFlipNumber" onchange="InputPropertiesData()"></li>
 <li><label for="InputYFlipNumber">Y Flip: </label><input type="checkbox" id="InputYFlipNumber" onchange="InputPropertiesData()"></li>
 </ul>
@@ -54,7 +54,7 @@ Binary: <kbd>%</kbd><input type="text" onchange="UserInputBin()" class="BinNumbe
 			}
 		}
 		function keyHandler(e) {
-			if (((e.code == "ArrowUp")||e.code == "ArrowDown")&&(document.activeElement.className == "HexNumberInput")) {
+			if (((e.code == "ArrowUp")||e.code == "ArrowDown")&&((/(^|\s.*?)HexNumberInput($|\s.*?)/).test(document.activeElement.className))) {
 				var target;
 				var InputNumber = BigInt(CorrectHexBigIntValue(document.activeElement.value))
 				if (!e) var e = window.event;
@@ -87,9 +87,9 @@ Binary: <kbd>%</kbd><input type="text" onchange="UserInputBin()" class="BinNumbe
 		function Reset() {
 			document.getElementById("PropertiesHexInput").value = "00"
 			document.getElementById("PropertiesBinInput").value = "00000000"
-			document.getElementById("InputPageNumber").value = "0"
+			document.getElementById("InputPageNumber").checked = false
 			document.getElementById("InputPaletteNumber").value = "0"
-			document.getElementById("InputPriorityNumber").checked = false
+			document.getElementById("InputPriorityNumber").value = "0"
 			document.getElementById("InputXFlipNumber").checked = false
 			document.getElementById("InputYFlipNumber").checked = false
 		}
@@ -142,16 +142,16 @@ Binary: <kbd>%</kbd><input type="text" onchange="UserInputBin()" class="BinNumbe
 		}
 		function InputPropertiesData() { //Individual data
 			//Page number
-				var PageNumb = BigintClamp(CorrectDecBigIntValue(document.getElementById("InputPageNumber").value), 0n, 3n)
-				document.getElementById("InputPageNumber").value = PageNumb.toString(10)
+				var PageNumb = 0n
+				if (document.getElementById("InputPageNumber").checked == true) {
+					PageNumb = 1n
+				}
 			//Palette
 				var PaletteNumb = BigintClamp(CorrectDecBigIntValue(document.getElementById("InputPaletteNumber").value), 0n, 7n)
 				document.getElementById("InputPaletteNumber").value = PaletteNumb.toString(10)
 			//Priority
-				var PriorityNumb = 0n
-				if (document.getElementById("InputPriorityNumber").checked == true) {
-					PriorityNumb = 1n
-				}
+				var PriorityNumb = BigintClamp(CorrectDecBigIntValue(document.getElementById("InputPriorityNumber").value), 0n, 3n)
+				document.getElementById("InputPriorityNumber").value = PriorityNumb.toString(10)
 			//XFlip
 				var XFlipNumb = 0n
 				if (document.getElementById("InputXFlipNumber").checked == true) {
@@ -163,28 +163,28 @@ Binary: <kbd>%</kbd><input type="text" onchange="UserInputBin()" class="BinNumbe
 					YFlipNumb = 1n
 				}
 			//Assemble byte
-				var PropByte = (YFlipNumb << 7n) + (XFlipNumb << 6n) + (PriorityNumb << 5n) + (PaletteNumb << 2n) + PageNumb
+				var PropByte = (YFlipNumb << 7n) + (XFlipNumb << 6n) + (PriorityNumb << 4n) + (PaletteNumb << 1n) + PageNumb
 				document.getElementById("PropertiesHexInput").value = pad(PropByte.toString(16).toUpperCase(), 2)
 				document.getElementById("PropertiesBinInput").value = pad(PropByte.toString(2).toUpperCase(), 8)
 		}
 	//Update the properties data
 		function PropertiesData(InputProp) {
-			var PageNumb = InputProp & 3n //the TT in YXPCCCTT
-			var PaletteNumb = ((InputProp >> 2n) & 7n) //The CCC
-			var PriorityNumb = ((InputProp >> 5n) & 1n) //P
+			var PageNumb = InputProp & 1n //the T in YXPPCCCT
+			var PaletteNumb = ((InputProp >> 1n) & 7n) //The CCC
+			var PriorityNumb = ((InputProp >> 4n) & 3n) //PP
 			var XFlipNumb = ((InputProp >> 6n) & 1n) //X
 			var YFlipNumb = ((InputProp >> 7n) & 1n) //Y
 			
 			//Page number
-				document.getElementById("InputPageNumber").value = PageNumb.toString(10)
+				if (PageNumb == 0n) {
+					document.getElementById("InputPageNumber").checked = false
+				} else {
+					document.getElementById("InputPageNumber").checked = true
+				}
 			//Palette
 				document.getElementById("InputPaletteNumber").value = PaletteNumb.toString(10)
 			//Priority
-				if (PriorityNumb == 0n) {
-					document.getElementById("InputPriorityNumber").checked = false
-				} else {
-					document.getElementById("InputPriorityNumber").checked = true
-				}
+				document.getElementById("InputPriorityNumber").value = PriorityNumb.toString(10)
 			//Xflip
 				if (XFlipNumb == 0n) {
 					document.getElementById("InputXFlipNumber").checked = false

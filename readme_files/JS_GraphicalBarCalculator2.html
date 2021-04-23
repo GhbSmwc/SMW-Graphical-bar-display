@@ -105,7 +105,7 @@
 		}
 	
 		function keyHandler(e) {
-			if (((e.code == "ArrowUp")||e.code == "ArrowDown")&&(document.activeElement.className == "HexNumberInput")) {
+			if (((e.code == "ArrowUp")||e.code == "ArrowDown")&&((/(^|\s.*?)HexNumberInput($|\s.*?)/).test(document.activeElement.className))) {
 				var target;
 				var InputNumber = BigInt(CorrectHexBigIntValue(document.activeElement.value))
 				if (!e) var e = window.event;
