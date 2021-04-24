@@ -377,10 +377,10 @@ autoclean JML DrawSpriteGraphicalBarVert</pre></td></tr></table>
 <ul>
 <li>Know which scratch RAM is currently used for other purpose during code execution, and be able to relocate them to another RAM should they conflict (2+ different data using the same address(es)) or use
 the stack (PHA...PLA)</li><br>
-<li>Finding an appropriate place or rearranging to insert the code, due to certain values like indexes and scratch RAM are still being used for a specified purpose (for example: if scratch RAM is used for indirect addressing,
-we don't want to put our code there, instead we place it at a location that is <i>before</i> scratch RAM becomes reserved for addressing).</li><br>
+<li>Finding an appropriate place or rearranging to insert the code, due to certain values like indexes and scratch RAM are still being used for a specified purpose (for example: if scratch RAM is used for indirect addressing to write an array of sprite tiles,
+we don't want to put our code there, instead we place it at a location that is <i>before</i> (or <i>after</i>, depending on the code structure of the sprite) scratch RAM becomes reserved for addressing).</li><br>
 </ul>
-Many sprites on the sprite section on SMWC can be complex and have different coding styles, but following the principals above should make it possible to implement on any sprite.<br>
+Many sprites on the sprite section on SMWC can be complex and have different coding structures, but following the principals above should make it possible to implement on any sprite.<br>
 Another important note is that the routine <kbd>%GetDrawInfo()</kbd> uses <b>a destroy-return-address</b>-- A stack-manipulation technique to &ldquo;double-exit&rdquo; the subroutine upon returning (RTS/RTL), consider this simple example shown below:
 <table>
 <tr><td><pre>	JSR Subroutine
@@ -422,9 +422,10 @@ Therefore, if you push something, you must pull before calling <kbd>%GetDrawInfo
 	<li>Go to the graphics portion of the code (thankfully, they are conveniently named and 99.99% of the time use <kbd>%GetDrawInfo()</kbd>). You want to know these informations
 		<ul>
 			<li>The total number of tiles it uses. Before calling the &ldquo;finish OAM write&rdquo; (done by calling <kbd>JSL $01B7B3</kbd> or <kbd>%FinishOAMWrite()</kbd>), you'll need
-			to find out the total number of tiles, including the bar itself, and subtract by 1. One method to do so is by getting the total (sprite's body + graphical bar) first, and then subtract by 1, and avoid subtracting
-			by 1 for both the body and the graphical bar (you'll subtract by 2 which isn't what you want) therefore resulting <kbd>(SpriteBodyTileCount + BarTileCount) - 1</kbd>. Another method is by taking the number of
-			tiles on the sprite's body, minus 1, and then add by number of tiles of the bar (<kbd>(SpriteBodyTileCount - 1) + BarTileCount</kbd>), which also works.</li><br>
+			to find out the total number of tiles, including the bar itself, and subtract by 1. A common method, is by taking the number of tiles on the sprite's body, minus 1, and then
+			add by number of tiles of the bar, without the minus 1 on that itself (<kbd>(SpriteBodyTileCount - 1) + BarTileCount</kbd>), Another method to do so is by getting the total
+			(sprite's body + graphical bar) first, and then subtract by 1, and avoid subtracting
+			by 1 again for the graphical bar (you'll subtract by 2 which isn't what you want) therefore resulting <kbd>(SpriteBodyTileCount + BarTileCount) - 1</kbd>.</li><br>
 			
 			<li>The tile sizes. Most sprites on SMWC are composed of 16x16 tiles, so you'll likely need to manually set the tile size</li><br>
 		</ul>
@@ -455,8 +456,8 @@ Therefore, if you push something, you must pull before calling <kbd>%GetDrawInfo
 	</li>
 </ol><br></p>
 
-<p>I've made another example test, using the <a href="https://www.smwcentral.net/?p=section&a=details&id=13144">Giant Masked Koopa boss</a>. Please remember that this document only covers these sprites as examples
-that will be similar to many other sprites, as their coding style are vastly different by 3rd party users that programmed their sprites on SMWC's sprite section.</p>
+<p>I've made another example test, using the <a href="https://www.smwcentral.net/?p=section&a=details&id=13144">Giant Masked Koopa boss</a>, this time showing edits on a third-party sprite on actual
+boss sprite. Please remember that this document only covers these sprites as examples that will be similar to many other sprites, as their coding style are vastly different by 3rd party users that programmed their sprites on SMWC's sprite section.</p>
 
 <p>I conveniently named the folders, so it shouldn't be difficult. The ASM and graphics are separated, however (graphics are in <kbd>ExGraphics/Sprite/GiantMaskedKoopaTest</kbd>). Everything is effectively the same as
 <kbd>GraphicalBarSimpleTest</kbd> except the bar having an actual purpose and the sprite is a boss sprite. Open the ASM file <kbd>giant_masked_koopa.asm</kbd>, and there will be comments I added to show an example
@@ -595,9 +596,96 @@ Destroyed:
 in this order: [n] bytes being at their set maximums (full bytes, if any), [none or 1] fraction byte (no fraction if bar is full), and then [n] empty bytes (if any), while keeping
 the order of their maximums (3, 8, 8, 8, 8...):<br>
 <img src="readme_files/FillAmountDividedUnevenlyToTileBytes.png"><br>
+
 As an analogy, you fill the cup with water until it's full, then fill the next cup until it's full, until you got all the cups full or run out of water. The reason for this being
 treated as segmented parts is because the SNES' graphics are all tile-based, (most modern games rely on texture-based rendering often drawing polygons that get the width of the fill region)
 so we have to deal with them tile-by-tile. <br><br>
+
+<table>
+<tr>
+<th>Input</th>
+<th>Number of bytes</th>
+<th>Description</th>
+</tr>
+<tr>
+<td><kbd><span class="NoLineBreak"><b>$00</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$01</b></span></kbd></td>
+<td align="center" valign="center">2</td>
+<td>The amount of fill in the bar, as in, the total number of pieces filled.<br><br>
+
+The total number of pieces (full amount) in the bar is calculated as: <kbd>[FullAmount = LeftEndPiece + (MiddlePiece * MiddleLength) + RightEndPiece]</kbd>,
+for example: 62 = 3 + (7 * 8) + 3</td>
+</tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_LeftEndPiece</kbd></td><td align="center" valign="center">1</td><td rowspan="4">Graphical bar attributes, same as <kbd>CalculateGraphicalBarPercentage</kbd></td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_MiddlePiece</kbd></td><td align="center" valign="center">1</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_RightEndPiece</kbd></td><td align="center" valign="center">1</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_TempLength</kbd></td><td align="center" valign="center">1</td></tr>
+</table>
+Result:
+<table>
+<tr>
+<th>Output</th>
+<th>Number of bytes</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>
+<kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl</b></span></kbd> to <kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl + ((<abbr title="0 if no left end, 1 if set to any nonzero number of pieces">LeftEnd</abbr> +
+<abbr title="Equals to !Scratchram_GraphicalBar_TempLength if middle pieces is nonzero, 0 otherwise">MiddleLength</abbr> + <abbr title="0 if no right end, 1 if set to any nonzero number of pieces">RightEnd</abbr>) - 1)</b></span></kbd>
+</td>
+<td align="center" valign="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td>
+<td>
+The table containing a series of bytes ordered from full, then one containing a fraction byte (it ranges from <kbd>0</kbd> to <kbd>max-1</kbd>), then a series of empty bytes.
+If the bar's fill amount be greater than maximum (say, 63 out of 62 pieces), the values stored in this table will act as if the bar is full and does not write additional bytes.<br><br>
+
+Number of bytes taken is <kbd>LeftEnd + Middle + RightEnd</kbd> where LeftEnd and RightEnd equals to 1 when set to nonzero number of pieces or 0 otherwise, and middle is equal to <kbd>!Scratchram_GraphicalBar_TempLength</kbd>
+if MiddlePieces (number of pieces in each middle tile) is nonzero, otherwise it is 0. The JavaScript file linked previously will show how many bytes and memory address range it will occupy.<br><br>
+
+Because the SNES screen is 32 8x8 tiles wide, there is no need to have a bar more than 32 tiles wide (the bar will extend past the border of the screen).
+
+If you are using &ldquo;DoubleBar&rdquo;, it is the duplicate table of above, just located
+nth bytes after depending on what you set <span class="NoLineBreak"><kbd>!Setting_GraphicalBar_SecondFillByteTableOffset</kbd></span>.
+See <a href="readme_files/DoubleBarInfo.html#SecondTable" target="_blank">this information</a> for what I mean.
+</td>
+</tr>
+<tr>
+<td>
+<kbd><span class="NoLineBreak"><b>$08</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$09</b></span></kbd>
+</td>
+<td align="center" valign="center">2</td>
+<td>
+The amount of fill that was <kbd><span class="NoLineBreak"><b>$00</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$01</b></span></kbd> was originally before calling this routine, the value is not
+capped, so inputting a number 63 when there are 62 pieces will have this RAM address storing the value 63. Can be used on such things like &ldquo;multi-bars&rdquo; that multiple bars are shown, and the
+fills advances to the next bar: <img src="readme_files/MultiBar.gif"
+</td>
+</tr>
+</table><br>
+
+<table>
+<th>Destroyed</th>
+<th>Number of bytes</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>
+<kbd><span class="NoLineBreak"><b>$00</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$07</b></span></kbd>
+</td>
+<td align="center" valign="center">8</td>
+<td>
+Garbage:
+<ul>
+<li><kbd><span class="NoLineBreak"><b>$00</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$01</b></span></kbd>:</li>
+<ul>
+<li>If the right end exist without regards of the middle and left end, will contain the right end amount.</li>
+<li>#$00 if right end does not exist and middle exist.</li>
+<li>If the left end only exist and middle and right are not, contains the left end amount.</li>
+</ul>
+
+<li><kbd><span class="NoLineBreak"><b>$02</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$07</b></span></kbd>: Needed to move the values to another
+address due to subroutines as well as outputs of the subroutines.</li>
+</ul>
+</td>
+</tr>
+</table>
 
 Here are the formulas on how each are calculated:<br><br>
 
@@ -651,84 +739,6 @@ The inputs are similar to the previously mentioned routine (such as requiring th
 <i>fill amounts</i>, to be indexed into tile numbers (to allow different tile graphic locations for the same routine (such as different format on the overworld compared to level)). The only different
 input here is <kbd>$00</kbd>:<br><br>
 
-<table>
-<tr>
-<th>Input</th>
-<th>Number of bytes</th>
-<th>Description</th>
-</tr>
-<tr>
-<td><kbd><span class="NoLineBreak"><b>$00</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$01</b></span></kbd></td>
-<td align="center" valign="center">2</td>
-<td>The amount of fill in the bar, as in, the total number of pieces filled.<br><br>
-
-The total number of pieces (full amount) in the bar is calculated as: <kbd>[FullAmount = LeftEndPiece + (MiddlePiece * MiddleLength) + RightEndPiece]</kbd>,
-for example: 62 = 3 + (7 * 8) + 3</td>
-</tr>
-<tr><td><kbd>!Scratchram_GraphicalBar_LeftEndPiece</kbd></td><td align="center" valign="center">1</td><td rowspan="4">Graphical bar attributes, same as <kbd>CalculateGraphicalBarPercentage</kbd></td></tr>
-<tr><td><kbd>!Scratchram_GraphicalBar_MiddlePiece</kbd></td><td align="center" valign="center">1</td></tr>
-<tr><td><kbd>!Scratchram_GraphicalBar_RightEndPiece</kbd></td><td align="center" valign="center">1</td></tr>
-<tr><td><kbd>!Scratchram_GraphicalBar_TempLength</kbd></td><td align="center" valign="center">1</td></tr>
-</table>
-Result:
-<table>
-<tr>
-<th>Output</th>
-<th>Number of bytes</th>
-<th>Description</th>
-</tr>
-<tr>
-<td>
-<kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl</b></span></kbd> to <kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl + ((<abbr title="0 if no left end, 1 if set to any nonzero number of pieces">LeftEnd</abbr> +
-<abbr title="Equals to !Scratchram_GraphicalBar_TempLength if middle pieces is nonzero, 0 otherwise">MiddleLength</abbr> + <abbr title="0 if no right end, 1 if set to any nonzero number of pieces">RightEnd</abbr>) - 1)</b></span></kbd>
-</td>
-<td align="center" valign="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td>
-<td>
-The table containing a series of bytes ordered from full, then one containing a fraction byte (it ranges from <kbd>0</kbd> to <kbd>max-1</kbd>), then a series of empty bytes.
-If the bar's fill amount be greater than maximum (say, 63 out of 62 pieces), the values stored in this table will act as if the bar is full and does not write additional bytes.<br><br>
-
-Number of bytes taken is <kbd>LeftEnd + Middle + RightEnd</kbd> where LeftEnd and RightEnd equals to 1 when set to nonzero number of pieces or 0 otherwise, and middle is equal to <kbd>!Scratchram_GraphicalBar_TempLength</kbd>
-if MiddlePieces (number of pieces in each middle tile) is nonzero, otherwise it is 0. The JavaScript file linked previously will show how many bytes and memory address range it will occupy.<br><br>
-
-Because the SNES screen is 32 8x8 tiles wide, there is no need to have a bar more than 32 tiles wide (the bar will extend past the border of the screen).
-
-If you are using &ldquo;DoubleBar&rdquo;, it is the duplicate table of above, just located
-nth bytes after depending on what you set <span class="NoLineBreak"><kbd>!Setting_GraphicalBar_SecondFillByteTableOffset</kbd></span>.
-See <a href="readme_files/DoubleBarInfo.html#SecondTable" target="_blank">this information</a> for what I mean.
-</td>
-</tr>
-<tr>
-<td>
-<kbd><span class="NoLineBreak"><b>$00</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$07</b></span></kbd>
-</td>
-<td align="center" valign="center">8</td>
-<td>
-Garbage:
-<ul>
-<li><kbd><span class="NoLineBreak"><b>$00</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$01</b></span></kbd>:</li>
-<ul>
-<li>If the right end exist without regards of the middle and left end, will contain the right end amount.</li>
-<li>#$00 if right end does not exist and middle exist.</li>
-<li>If the left end only exist and middle and right are not, contains the left end amount.</li>
-</ul>
-
-<li><kbd><span class="NoLineBreak"><b>$02</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$07</b></span></kbd>: Needed to move the values to another
-address due to subroutines as well as outputs of the subroutines.</li>
-</ul>
-</td>
-</tr>
-<tr>
-<td>
-<kbd><span class="NoLineBreak"><b>$08</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$09</b></span></kbd>
-</td>
-<td align="center" valign="center">2</td>
-<td>
-The amount of fill that was <kbd><span class="NoLineBreak"><b>$00</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$01</b></span></kbd> was originally before calling this routine, the value is not
-capped, so inputting a number 63 when there are 62 pieces will have this RAM address storing the value 63. Can be used on such things like &ldquo;multi-bars&rdquo; that multiple bars are shown, and the
-fills advances to the next bar: <img src="readme_files/MultiBar.gif"
-</td>
-</tr>
-</table>
 This is what it looks like as an example:
 <ul>
 <li><font color="cyan">Cyan</font> means the left end tile byte.</li>
@@ -974,7 +984,7 @@ need to be rewritten). Note that this DOES modifies the values in <kbd>!Scratchr
 <th>Number of bytes</th>
 <th>Description</th>
 </tr>
-<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td><td>The graphical bar tile byte array</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td><td>The fill amount array to be converted to tile numbers.</td></tr>
 <tr>
 <td><kbd>$00</kbd></td>
 <td align="center" valign="center">1</td>
@@ -1014,7 +1024,7 @@ Output:
 <td><kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl</b></span></kbd> to <kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl + ((<abbr title="0 if no left end, 1 if set to any nonzero number of pieces">LeftEnd</abbr> +
 <abbr title="Equals to !Scratchram_GraphicalBar_TempLength if middle pieces is nonzero, 0 otherwise">MiddleLength</abbr> + <abbr title="0 if no right end, 1 if set to any nonzero number of pieces">RightEnd</abbr>) - 1)</b></span></kbd></td>
 <td align="center" valign="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td>
-<td>The converted table from fill amounts to tile numbers.</td>
+<td>Tile array containing tile numbers representing both first and second fills.</td>
 </tr>
 </table>
 Destroyed:
@@ -1160,8 +1170,8 @@ Note that this does not support overworld graphics unlike above, as there are ev
 
 <table>
 <tr><th>Input</th><th>Number of Bytes</th><th>Description</th></tr>
-<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td><kbd>LeftEnd + MiddleLength + RightEnd</kbd></td><td>The graphical bar tile byte array (SecondFill).</td></tr>
-<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl + !Setting_GraphicalBar_SecondFillByteTableOffset</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + (((LeftEnd + MiddleLength + RightEnd) - 1) + !Setting_GraphicalBar_SecondFillByteTableOffset)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd></td><td>The graphical bar tile byte array (FirstFill).</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td><kbd>LeftEnd + MiddleLength + RightEnd</kbd></td><td>The fill amount array to be converted to tile numbers. (SecondFill).</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl + !Setting_GraphicalBar_SecondFillByteTableOffset</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + (((LeftEnd + MiddleLength + RightEnd) - 1) + !Setting_GraphicalBar_SecondFillByteTableOffset)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd></td><td>The fill amount array to be converted to tile numbers. (FirstFill).</td></tr>
 <tr><td><kbd>!Scratchram_GraphicalBar_LeftEndPiece</kbd></td><td align="center" valign="center">1</td><td rowspan="4">Graphical bar attributes, same as <kbd>CalculateGraphicalBarPercentage</kbd></td></tr>
 <tr><td><kbd>!Scratchram_GraphicalBar_MiddlePiece</kbd></td><td align="center" valign="center">1</td></tr>
 <tr><td><kbd>!Scratchram_GraphicalBar_RightEndPiece</kbd></td><td align="center" valign="center">1</td></tr>
@@ -1188,7 +1198,7 @@ See explanation <a href="readme_files/FillEdgeCrossingTileBorder.html" id="FillE
 tables are no longer &ldquo;fixed&rdquo; (no need to edit the routine's code to check $00's newer values and adding new tables around that area), which is useful for things like sprite tile remapping.
 <table>
 <tr><th>Input</th><th>Number of Bytes</th><th>Description</th></tr>
-<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td><td>The graphical bar tile byte array.</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td><td>The fill amount array to be converted to tile numbers..</td></tr>
 <tr><td><kbd>$00</kbd> to <kbd>$02</kbd></td><td align="center">3</td><td>Address location of where the table of tile numbers for left end.</td></tr>
 <tr><td><kbd>$03</kbd> to <kbd>$05</kbd></td><td align="center">3</td><td>Address location of where the table of tile numbers for middles.</td></tr>
 <tr><td><kbd>$06</kbd> to <kbd>$08</kbd></td><td align="center">3</td><td>Address location of where the table of tile numbers for right end.</td></tr>
@@ -1200,7 +1210,7 @@ tables are no longer &ldquo;fixed&rdquo; (no need to edit the routine's code to 
 <table>
 <tr><th>Output</th><th>Number of Bytes</th><th>Description</th></tr>
 <tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td>
-<td>The graphical bar tile byte array</td></tr>
+<td>The tile number array that was previously the fill amounts.</td></tr>
 </table><br>
 Destroyed:
 <table>
@@ -1263,7 +1273,7 @@ To write such address into RAM with the labels in existence, you do this:
 and just like <kbd><a href="#ConvertBarFillAmountToTilesIndirectAddressTable">ConvertBarFillAmountToTilesIndirectAddressTable</a></kbd>, have a relocatable table that you can manually set.
 <table>
 <tr><th>Input</th><th>Number of Bytes</th><th>Description</th></tr>
-<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td><td>The graphical bar tile byte array</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td><td>The fill amount array to be converted to tile numbers.</td></tr>
 <tr><td><kbd>$00</kbd> to <kbd>$02</kbd></td><td align="center">3</td><td>Address location of where the table of tile numbers for left end.</td></tr>
 <tr><td><kbd>$03</kbd> to <kbd>$05</kbd></td><td align="center">3</td><td>Address location of where the table of tile numbers for middles.</td></tr>
 <tr><td><kbd>$06</kbd> to <kbd>$08</kbd></td><td align="center">3</td><td>Address location of where the table of tile numbers for right end.</td></tr>
@@ -1275,7 +1285,7 @@ and just like <kbd><a href="#ConvertBarFillAmountToTilesIndirectAddressTable">Co
 <table>
 <tr><th>Output</th><th>Number of Bytes</th><th>Description</th></tr>
 <tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td>
-<td>The graphical bar tile byte array</td></tr>
+<td>The tile number array that was previously the fill amounts.</td></tr>
 </table><br>
 
 Destroyed:
