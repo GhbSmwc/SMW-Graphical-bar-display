@@ -1184,14 +1184,14 @@ the fill edge covering multiple 8x8 tiles possible. This is often used for slant
 See explanation <a href="readme_files/FillEdgeCrossingTileBorder.html" id="FillEdgeCrossingTileBorder">here</a> Inputs and outputs are the same as <kbd>ConvertBarFillAmountToTiles</kbd>.
 </li>
 
-<li><a href="#ConvertBarFillAmountToTilesIndirectAddressTable_Back" id="ConvertBarFillAmountToTilesIndirectAddressTable">^</a><kbd>ConvertBarFillAmountToTilesIndirectAddressTable</kbd>: Does the same thing as <kbd>ConvertBarFillAmountToTiles</kbd>, but tile
-tables are no longer &ldquo;fixed&rdquo;, which is useful for things like sprite tile remapping.
+<li><a href="#ConvertBarFillAmountToTilesIndirectAddressTable_Back" id="ConvertBarFillAmountToTilesIndirectAddressTable">^</a><kbd>ConvertBarFillAmountToTilesIndirectAddressTable</kbd>: Does the same thing as <kbd><a href="#ConvertBarFillAmountToTiles">ConvertBarFillAmountToTiles</a></kbd>, but tile
+tables are no longer &ldquo;fixed&rdquo; (no need to edit the routine's code to check $00's newer values and adding new tables around that area), which is useful for things like sprite tile remapping.
 <table>
 <tr><th>Input</th><th>Number of Bytes</th><th>Description</th></tr>
 <tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td><td>The graphical bar tile byte array.</td></tr>
-<tr><td><kbd>$00</kbd> to <kbd>$02</kbd></td><td align="center">3</td><td>Address location of where the table of tile number for left end.</td></tr>
-<tr><td><kbd>$03</kbd> to <kbd>$05</kbd></td><td align="center">3</td><td>Address location of where the table of tile number for middles.</td></tr>
-<tr><td><kbd>$06</kbd> to <kbd>$08</kbd></td><td align="center">3</td><td>Address location of where the table of tile number for right end.</td></tr>
+<tr><td><kbd>$00</kbd> to <kbd>$02</kbd></td><td align="center">3</td><td>Address location of where the table of tile numbers for left end.</td></tr>
+<tr><td><kbd>$03</kbd> to <kbd>$05</kbd></td><td align="center">3</td><td>Address location of where the table of tile numbers for middles.</td></tr>
+<tr><td><kbd>$06</kbd> to <kbd>$08</kbd></td><td align="center">3</td><td>Address location of where the table of tile numbers for right end.</td></tr>
 <tr><td><kbd>!Scratchram_GraphicalBar_LeftEndPiece</kbd></td><td align="center">1</td><td rowspan="4">Needed to convert each tile by identifying the left end, middle (and how many middle tiles), and right end.</td></tr>
 <tr><td><kbd>!Scratchram_GraphicalBar_MiddlePiece</kbd></td><td align="center">1</td></tr>
 <tr><td><kbd>!Scratchram_GraphicalBar_RightEndPiece</kbd></td><td align="center">1</td></tr>
@@ -1259,14 +1259,14 @@ To write such address into RAM with the labels in existence, you do this:
 	;be LDA #$1234. If you don't have that hash symbol, it would be LDA Label -&gt; LDA $1234 (which loads RAM instead of &ldquo;Immediate&rdquo;)</pre></td></tr></table><br>
 </p>
 </li>
-<li><a href="#ConvertBarFillAmountToTilesEdgeOverMultipleTilesIndirectAddressTable_Back" id="ConvertBarFillAmountToTilesEdgeOverMultipleTilesIndirectAddressTable">^</a><kbd>ConvertBarFillAmountToTilesEdgeOverMultipleTilesIndirectAddressTable</kbd>: same as <kbd>ConvertBarFillAmountToTilesEdgeOverMultipleTiles</kbd>
-and just like above, have a relocatable table that you can manually set.
+<li><a href="#ConvertBarFillAmountToTilesEdgeOverMultipleTilesIndirectAddressTable_Back" id="ConvertBarFillAmountToTilesEdgeOverMultipleTilesIndirectAddressTable">^</a><kbd>ConvertBarFillAmountToTilesEdgeOverMultipleTilesIndirectAddressTable</kbd>: same as <kbd><a href="#ConvertBarFillAmountToTilesEdgeOverMultipleTiles">ConvertBarFillAmountToTilesEdgeOverMultipleTiles</a></kbd>
+and just like <kbd><a href="#ConvertBarFillAmountToTilesIndirectAddressTable">ConvertBarFillAmountToTilesIndirectAddressTable</a></kbd>, have a relocatable table that you can manually set.
 <table>
 <tr><th>Input</th><th>Number of Bytes</th><th>Description</th></tr>
 <tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td><td>The graphical bar tile byte array</td></tr>
-<tr><td><kbd>$00</kbd> to <kbd>$02</kbd></td><td align="center">3</td><td>Address location of where the table of tile number for left end.</td></tr>
-<tr><td><kbd>$03</kbd> to <kbd>$05</kbd></td><td align="center">3</td><td>Address location of where the table of tile number for middles.</td></tr>
-<tr><td><kbd>$06</kbd> to <kbd>$08</kbd></td><td align="center">3</td><td>Address location of where the table of tile number for right end.</td></tr>
+<tr><td><kbd>$00</kbd> to <kbd>$02</kbd></td><td align="center">3</td><td>Address location of where the table of tile numbers for left end.</td></tr>
+<tr><td><kbd>$03</kbd> to <kbd>$05</kbd></td><td align="center">3</td><td>Address location of where the table of tile numbers for middles.</td></tr>
+<tr><td><kbd>$06</kbd> to <kbd>$08</kbd></td><td align="center">3</td><td>Address location of where the table of tile numbers for right end.</td></tr>
 <tr><td><kbd>!Scratchram_GraphicalBar_LeftEndPiece</kbd></td><td align="center">1</td><td rowspan="4">Needed to convert each tile by identifying the left end, middle (and how many middle tiles), and right end.</td></tr>
 <tr><td><kbd>!Scratchram_GraphicalBar_MiddlePiece</kbd></td><td align="center">1</td></tr>
 <tr><td><kbd>!Scratchram_GraphicalBar_RightEndPiece</kbd></td><td align="center">1</td></tr>
