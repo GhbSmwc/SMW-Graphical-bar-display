@@ -80,8 +80,7 @@ length of the bar.<p>
 	</ul>
 	<li><a href="#GraphicalBarWriteToOam" id="GraphicalBarWriteToOam_Back"><kbd>GraphicalBarWriteToOam.asm</kbd></a></li>
 	<ul>
-		<li><a href="#DrawOamGraphicalBarHoriz" id="DrawOamGraphicalBarHoriz_Back"><kbd>DrawOamGraphicalBarHoriz</kbd></a></li>
-		<li><a href="#DrawOamGraphicalBarVert" id="DrawOamGraphicalBarVert_Back"><kbd>DrawOamGraphicalBarVert</kbd></a></li>
+		<li><a href="#DrawOamGraphicalBarHorizVert" id="DrawOamGraphicalBarHorizVert_Back"><kbd>DrawOamGraphicalBarHoriz</kbd> and <kbd>DrawOamGraphicalBarVert</kbd></a></li>
 		<li><a href="#FindNFreeOAMSlot" id="FindNFreeOAMSlot_Back"><kbd>FindNFreeOAMSlot</kbd></a></li>
 		<li><a href="#DrawSpriteGraphicalBarHorizVert" id="DrawSpriteGraphicalBarHorizVert_Back"><kbd>DrawSpriteGraphicalBarHoriz</kbd> and <kbd>DrawSpriteGraphicalBarVert</kbd></a></li>
 	</ul>
@@ -1538,41 +1537,44 @@ to handle the literal quantity amounts instead of the percentage fill amounts to
 
 <p>These routines, unlike the status bar routines, writes the graphical bar tiles as <b>sprite OAM</b>. This is very useful for sprite HUD or HUD placed on a character (rather than static
 on-screen position, a bar that is placed relative to the character, such as on top of the character's head).</p>
-
-<p>Note: The two following routines are not to be used for &ldquo;normal sprites&rdquo;, as they use the OAM directly (&ldquo;normal sprites&rdquo; is a term I refer to the type of sprites
+<h3>Sprite-status bar-styled HUD (placed at highest priority)</h3>
+<p>Note: The three following routines are not to be used for &ldquo;normal sprites&rdquo;, as they use the OAM directly (&ldquo;normal sprites&rdquo; is a term I refer to the type of sprites
 that are often interactable, such as enemies, platforms, items, etc. that are SMW or pixi-made, that are part of the 12 (or 22 for sa-1 hacks)-sprite slot limit) and are intended to
 function similarly to most sprite status bar patches</p>
 <ul>
-	<li><a href="#DrawOamGraphicalBarHoriz_Back" id="DrawOamGraphicalBarHoriz">^</a><kbd>DrawOamGraphicalBarHoriz</kbd>: Draws a horizontal graphical bar:
+	<li><a href="#DrawOamGraphicalBarHorizVert_Back" id="DrawOamGraphicalBarHorizVert">^</a><kbd>DrawOamGraphicalBarHoriz</kbd> and <kbd>DrawOamGraphicalBarVert</kbd>: Draws a horizontal/vertical graphical bar:
 	<table>
 	<tr><th>Input</th><th>Number of bytes</th><th>Description</th></tr>
-	<tr><td><kbd>$00</kbd> to <kbd>$01</kbd></td><td align="center">2</td><td>X position, relative to screen border.</td></tr>
-	<tr><td><kbd>$02</kbd> to <kbd>$03</kbd></td><td align="center">2</td><td>Y position, relative to screen border.</td></tr>
+	<tr><td><kbd>$00</kbd> to <kbd>$01</kbd></td><td align="center">2</td><td rowspan="2">X and Y position, relative to screen border. Note: The XY position origin is the top-left of a tile where the fill starts at<sup>1</sup>.</td></tr>
+	<tr><td><kbd>$02</kbd> to <kbd>$03</kbd></td><td align="center">2</td></tr>
 	<tr><td><kbd>$04</kbd> to <kbd>$05</kbd></td><td align="center">2</td><td>Number of tiles to write.</td></tr>
-	<tr><td><kbd>$06</kbd></td><td align="center">1</td><td>Fill direction (as it increases): <kbd>#$00</kbd> = left to right, <kbd>#$02</kbd> = right to left (YXPPCCCT's X bit set)</td></tr>
+	<tr>
+	<td><kbd>$06</kbd></td>
+	<td align="center">1</td>
+	<td>Direction:
+	For horizontal (using <kbd>DrawOamGraphicalBarHoriz</kbd>):
+	<ul>
+	<li><kbd>$00</kbd> = Left to right</li>
+	<li><kbd>$01</kbd> = Right to left (YXPPCCCT's X bit set)</li>
+	</ul>
+	For vertical (<kbd>DrawOamGraphicalBarVert</kbd>):
+	<ul>
+	<li><kbd>$00</kbd> = Bottom to top</li>
+	<li><kbd>$01</kbd> = Top to bottom (YXPPCCCT's Y bit set)</li>
+	</ul>
+	</td>
+	</tr>
 	<tr><td><kbd>$07</kbd></td><td align="center">1</td><td>Properties (YXPPCCCT)</td></tr>
 	</table><br>
 	
 	<table>
 	<tr><th>Destroyed</th><th>Number of bytes</th><th>Description</th></tr>
-	<tr><td><kbd>$08</kbd> to <kbd>$09</kbd></td><td align="center">2</td><td>Displacement of each tile, from the origin.</td></tr>
+	<tr><td><kbd>$08</kbd> to <kbd>$09</kbd></td><td align="center">2</td><td>Displacement of each tile of the bar, from the origin.</td></tr>
 	</table>
 	</li><br>
-	<li><a href="#DrawOamGraphicalBarVert_Back" id="DrawOamGraphicalBarVert">^</a><kbd>DrawOamGraphicalBarVert</kbd>: Draws a vertical graphical bar:
-	<table>
-	<tr><th>Input</th><th>Number of bytes</th><th>Description</th></tr>
-	<tr><td><kbd>$00</kbd> to <kbd>$01</kbd></td><td align="center">2</td><td>X position, relative to screen border.</td></tr>
-	<tr><td><kbd>$02</kbd> to <kbd>$03</kbd></td><td align="center">2</td><td>Y position, relative to screen border.</td></tr>
-	<tr><td><kbd>$04</kbd> to <kbd>$05</kbd></td><td align="center">2</td><td>Number of tiles to write.</td></tr>
-	<tr><td><kbd>$06</kbd></td><td align="center">1</td><td>Fill direction (as it increases): <kbd>#$00</kbd> = bottom to top, <kbd>#$02</kbd> = top to bottom (YXPPCCCT's Y bit set)</td></tr>
-	<tr><td><kbd>$07</kbd></td><td align="center">1</td><td>Properties (YXPPCCCT)</td></tr>
-	</table><br>
-	
-	<table>
-	<tr><th>Destroyed</th><th>Number of bytes</th><th>Description</th></tr>
-	<tr><td><kbd>$08</kbd> to <kbd>$09</kbd></td><td align="center">2</td><td>Displacement of each tile, from the origin.</td></tr>
-	</table><br>
-	</li>
+	<sup>1</sup> When I mean the top left of the tile where the fill starts, it is this:<br>
+	<img src="readme_files/SpriteGraphicalBar_origin.png"><br>
+	Note the orange dot is the very specific pixel of the 8x8 tile representing the origin of that tile.<br><br>
 
 
 <li><a href="#FindNFreeOAMSlot_Back" id="FindNFreeOAMSlot">^</a><kbd>FindNFreeOAMSlot</kbd>: This routine is only used by <kbd>DrawOamGraphicalBarHoriz</kbd> and <kbd>DrawOamGraphicalBarVert</kbd>, checks if there are sufficient OAM slots available of a given number.
@@ -1593,6 +1595,9 @@ The purpose of this is to act as a failsafe by simply not drawing the graphical 
 	</td></tr>
 	</table><br>
 	</li>
+<h3>Pixi sprite OAM</h3>
+<p>These are the routines to use for &ldquo;normal sprites&rdquo;. Useful if you want to display HP bar next to the main body of the sprite.</p>
+
 <li><a href="#DrawSpriteGraphicalBarHorizVert_Back" id="DrawSpriteGraphicalBarHorizVert">^</a><kbd>DrawSpriteGraphicalBarHoriz</kbd> and <kbd>DrawSpriteGraphicalBarVert</kbd>: The &ldquo;normal sprite&rdquo; versions of above.
 To be called after calling <kbd>%GetDrawInfo()</kbd> and before <kbd>$01B7B3</kbd> or <kbd>%FinishOAMWrite()</kbd>. Note: These always write 8x8 tiles, and when finishing the OAM write, Y must be $FF (indicating you are manually
 setting the tile size) should your sprite use both 8x8 and 16x16 tile sizes.
@@ -1624,7 +1629,7 @@ For vertical (<kbd>DrawSpriteGraphicalBarVert</kbd>):
 
 <table>
 <tr><th>Destroyed</th><th>Number of Bytes</th><th>Description</th></tr>
-<tr><td><kbd>$08</kbd></td><td align="center">1</td><td>Used for offsetting each tile during processing</td></tr>
+<tr><td><kbd>$08</kbd></td><td align="center">1</td><td>Displacement of each tile of the bar, from the origin.</td></tr>
 </table>
 
 </li>
