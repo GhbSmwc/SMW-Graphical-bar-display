@@ -32,7 +32,7 @@ automatically convert the data into binary and also splitting them into individu
 Binary: <kbd>%</kbd><input type="text" onchange="UserInputBin()" class="BinNumberInput" id="PropertiesBinInput">
 <ul>
 <li><label for="InputPageNumber">Page: </label><input type="checkbox" id="InputPageNumber" onchange="InputPropertiesData()"></li>
-<li><label for="InputPaletteNumber">Palette (0-7): </label><input type="number" id="InputPaletteNumber" min="0" max="7" onchange="InputPropertiesData()"> (to convert LM palette row numbering to here, just subtract it by 8).</li>
+<li><label for="InputPaletteNumber">Palette (0-7): </label><input type="number" id="InputPaletteNumber" min="0" max="7" onchange="InputPropertiesData()"><label for="InputLunarMagicPaletteNumber">(Lunar magic palette ($08-$0F):</label> <kbd>$</kbd><input type="text" class="HexNumberInput" id="InputLunarMagicPaletteNumber" onchange="InputLunarMagicPaletteNumber()">)</li>
 <li><label for="InputPriorityNumber">Priority (0-3): </label><input type="number" id="InputPriorityNumber" min="0" max="3" onchange="InputPropertiesData()"></li>
 <li><label for="InputXFlipNumber">X Flip: </label><input type="checkbox" id="InputXFlipNumber" onchange="InputPropertiesData()"></li>
 <li><label for="InputYFlipNumber">Y Flip: </label><input type="checkbox" id="InputYFlipNumber" onchange="InputPropertiesData()"></li>
@@ -75,6 +75,9 @@ Binary: <kbd>%</kbd><input type="text" onchange="UserInputBin()" class="BinNumbe
 					if (document.activeElement.id == "PropertiesHexInput") {
 						UserInputHex()
 					}
+					if (document.activeElement.id == "InputLunarMagicPaletteNumber") {
+						InputLunarMagicPaletteNumber()
+					}
 			}
 			
 		}
@@ -89,6 +92,7 @@ Binary: <kbd>%</kbd><input type="text" onchange="UserInputBin()" class="BinNumbe
 			document.getElementById("PropertiesBinInput").value = "00000000"
 			document.getElementById("InputPageNumber").checked = false
 			document.getElementById("InputPaletteNumber").value = "0"
+			document.getElementById("InputLunarMagicPaletteNumber").value = "8"
 			document.getElementById("InputPriorityNumber").value = "0"
 			document.getElementById("InputXFlipNumber").checked = false
 			document.getElementById("InputYFlipNumber").checked = false
@@ -140,6 +144,14 @@ Binary: <kbd>%</kbd><input type="text" onchange="UserInputBin()" class="BinNumbe
 			document.getElementById("PropertiesHexInput").value = pad(InputProp.toString(16).toUpperCase(), 2)
 			PropertiesData(InputProp)
 		}
+		function InputLunarMagicPaletteNumber() {
+			//Convert offset +8 to 0-based palette numbering
+				var PaletteLunarMagicNumb = BigintClamp(CorrectHexBigIntValue(document.getElementById("InputLunarMagicPaletteNumber").value), 8n, 15n)
+				document.getElementById("InputLunarMagicPaletteNumber").value = PaletteLunarMagicNumb.toString(16).toUpperCase()
+				document.getElementById("InputPaletteNumber").value = (PaletteLunarMagicNumb - 8n).toString(10)
+			//Update info
+				InputPropertiesData()
+		}
 		function InputPropertiesData() { //Individual data
 			//Page number
 				var PageNumb = 0n
@@ -148,6 +160,7 @@ Binary: <kbd>%</kbd><input type="text" onchange="UserInputBin()" class="BinNumbe
 				}
 			//Palette
 				var PaletteNumb = BigintClamp(CorrectDecBigIntValue(document.getElementById("InputPaletteNumber").value), 0n, 7n)
+				document.getElementById("InputLunarMagicPaletteNumber").value = (PaletteNumb + 8n).toString(16).toUpperCase()
 				document.getElementById("InputPaletteNumber").value = PaletteNumb.toString(10)
 			//Priority
 				var PriorityNumb = BigintClamp(CorrectDecBigIntValue(document.getElementById("InputPriorityNumber").value), 0n, 3n)
