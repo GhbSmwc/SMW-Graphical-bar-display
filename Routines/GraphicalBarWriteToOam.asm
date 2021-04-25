@@ -10,6 +10,8 @@ incsrc "GraphicalBarDefines/SpriteOAMSettings.asm"
 ;patches. Instead, use DrawSpriteGraphicalBarHoriz instead.
 ;
 ;Input
+; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl + (NumberOfTiles -1)
+;  the tile numbers to write.
 ; -$00 to $01: X position, relative to screen border
 ; -$02 to $03: Y position, same as above but Y position
 ; -$04 to $05: Number of tiles to write
@@ -145,6 +147,8 @@ DrawOamGraphicalBarHoriz:
 ;patches.
 ;
 ;Input
+; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl + (NumberOfTiles -1)
+;  the tile numbers to write.
 ; -$00 to $01: X position, relative to screen border
 ; -$02 to $03: Y position, same as above but Y position
 ; -$04 to $05: Number of tiles to write
@@ -323,6 +327,8 @@ FindNFreeOAMSlot:
 ; call this subroutine, PLX or use LDX $15E9).
 ;
 ;Input:
+; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl + (NumberOfTiles -1)
+;  the tile numbers to write.
 ; -Y index: The OAM index (increments of 4)
 ; -$02: X position
 ; -$03: Y position
@@ -417,6 +423,8 @@ DrawSpriteGraphicalBarHoriz:
 ; call this subroutine, PLX or use LDX $15E9).
 ;
 ;Input:
+; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl + (NumberOfTiles -1)
+;  the tile numbers to write.
 ; -Y index: The OAM index (increments of 4)
 ; -$02: X position
 ; -$03: Y position

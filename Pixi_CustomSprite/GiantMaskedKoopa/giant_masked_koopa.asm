@@ -1282,7 +1282,7 @@ Graphics:
 		;Here, this is where $04-$0B is going to be used as an indirect addressing (get a value at an address that was stored in an address; <opcode> ($xx),y)
 		;First, it loads the 16-bit values representing the locations of each table (or "sub-table") into $04, $06, $08 and $0A.
 		;Then later, uses them (like ADC ($04),y).
-		LDA $0F			;\Push graphic state
+		LDA $0F			;\Save graphic state
 		PHA			;/
 		PHY			;>Preserve OAM index
 		ASL A			;\Index the sprite's state.

@@ -1,0 +1,247 @@
+<a href="../GraphicalBar_ReadmeDocumentation.html#GMKBossSummary_Back">Back</a>
+
+<html>
+	<head>
+		<style>
+			html {
+			background-color: #000207;
+			color: white;
+			font-family: sans-serif;
+			}
+			
+			table, th, td {
+			border: 1px solid white;
+			border-collapse: collapse;
+			}
+			
+			span.NoLineBreak {
+				white-space: nowrap;
+			}
+			
+			abbr{cursor: help;}
+		</style>
+	</head>
+<body>
+
+<h1><center>Giant Masked Koopa boss summary</center></h1>
+
+<p>This document is a summary of how I implement the non-static
+(placed on the body of the sprite rather than a fixed position on the screen) sprite-based HP bar for the giant masked koopa boss.</p>
+
+<h2>Getting it to represent its HP</h2>
+
+<h3>The value representing its damage/HP</h3>
+<p>There has to be some sort of information stored of some value tracking its HP, else technically it would have infinite HP or just die in one hit:
+<ul>
+	<li>This value could start at 0 increasing on damage until it hits a certain value, and it dies-- also known as a damage counter.</li><br>
+	<li>or start at a specified value and decreases towards 0, and it dies, also known as health counter.</li><br>
+</ul>
+
+So how do find what sprite table or any RAM being used for that? Well we can look in the ASM file to see how it tracks it:<br>
+<br>
+At the top of the ASM file, there are defines, this one in particular shows something:
+<table><tr><td><pre>; How much hits to defeat. Do note that the hit counter, $1534, increments.
+!HitPoints = $09</pre></td></tr></table><br>
+
+Thankfully, the comment gives out the information that tracks its damage, which is RAM $1534, otherwise you would need to look at how this
+define is being used, by CTRL+F the define for its HP: &ldquo;<kbd>!HitPoints</kbd>&rdquo; and seeing how the code interacts with it.
+How it is being used?, well, lets take a look (this is before I edited the sprite to show its HP):
+<table><tr><td><pre>   JSR StompPoints             ; give Mario points
+    LDA.b #!HurtSFX             ;\ sound effect
+    STA.w !HurtBank             ;/
+    LDA #$A0                    ;\ Set ThrowFire timer
+    STA !sprite_stun_timer,x    ;/
+    <font color="red">INC !1534,x                 ; increment sprite hit counter
+    LDA !1534,x                 ;\ If it has incremented to the "max", do death animation.
+    CMP.b #!HitPoints           ; |
+    BEQ SpriteDead              ;/</font></pre></td></tr></table><br>
+It is an 8-bit value representing a damage counter, it increments by 1 by its only damage-- stomping on it when it is standing up.
+As a side note, when a sprite spawns (such as from a block, or enters from the edge of the screen or during level load), all of its
+values are initialized, meaning its sprite table values are all zeroes. So no need to <kbd>STZ !1534,x</kbd> on the inital code.<br>
+<br>
+We can see here that if <kbd>!1534</kbd> increments, and equals to whatever the user specifies <kbd>!HitPoints</kbd> to (default is $09), the boss dies (not
+immediately, it waits until the timer goes to zero, then it performs a &ldquo;desperate attack&rdquo;--the boss lunges into the player, and
+when it crashes into a wall, it dies).<br><br>
+
+Now how do we represent this? Well <i>displaying</i> HP is just merely using graphics to show to the player. Therefore, we should go to its graphics routine, the area
+that draws stuff on to the screen.</p>
+<h3>Graphics</h3>
+<p>Like most ASM files, they often use labels and comments making it easier for the programmer to understand how the code runs. This shouldn't be hard to find its graphics
+routine, we can CTRL+F &ldquo;<kbd>Graphics</kbd>&rdquo; and...
+<table><tr><td><pre>;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; graphics routine
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+Properties: dw .green,.fire,.rocks,.jumping,.walking
+.green      db $7B,$3B
+.fire       db $79,$39
+.rocks      db $75,$35
+.jumping    db $77,$37
+.walking    db $7B,$3B
+
+X_Disp: dw .green,.fire,.rocks,.jumping,.walking
+.green
+;[...] (a large table, but keep scrolling down and you'll get to the code)
+Graphics:
+    PHA
+    ASL A
+    TAY
+    REP #$20
+    LDA X_Disp,y
+    STA $04
+    LDA Y_Disp,y
+    STA $06
+    LDA Tilemap,y
+    STA $08
+    LDA Properties,y
+    STA $0A
+    SEP #$20</pre></td></tr></table><br><br>
+This is where it sets up the graphics to draw into OAM. On this method, it stores a 16-bit address (<kbd>$**<u>XXXX</u></kbd>, using indirect-addressing, indexed,
+like <kbd>LDA ($XX),y</kbd>) onto $04-$05 for its X position displacement, $06-$07 for Y displacement, $08-$09 for tilemap, and properties for $0A-$0B, then later, stores it
+state in $03 (the image state showing if the koopa is walking or inside of its shell), then perform loops to write each tile information.<br><br>
+
+Notice that the routine uses whatever was stored in A (accumulator) on the first 3 lines, which is later going to be used for indexing for indirect. So my solution is store it into $0F,
+since that is not used for anything else at the moment, then load that up later after calculating the graphical bar.<br><br>
+
+We want to include our code to display its HP bar, but we have to do so without interfering with its code. We could write our calculation
+routines before the very start of the routine (before $03-$0B becomes used for a specified purpose), and move several scratch RAM out of
+the way or position our code away from that if our routines uses those scratch RAM (this one is a hybrid supporting double-bar (rapid-flicker)):
+<table><tr><td><pre>Graphics:
+	;[GraphicalBar_For_HP]
+	;It's best to have this graphical bar code at the very start of "Graphics" so that branches would not skip
+	;over this code and cause the bar to disappear.
+	STA $0F		;&gt;You cannot push, call GetDrawInfo, then pull, because GetDrawInfo contains a code that destroy the return address,
+			;which will crash the game when the sprite goes offscreen.
+			; This is the graphics "image state" (what it shows), separate from "Behavior State" (what it does physically) as
+			;some of the frames are walking and the other is in its shell:
+			;A &lt; $04 means in shell
+			;A &gt;= $04 means standing upright
+			;Since this is used before and after calling %GetDrawInfo(), I choose to store it at $0F, an unused RAM at the moment.
+	;Here is the newly added code, because this is before GetDrawInfo, we can only get the bar values here and will do the OAM
+	;after calling GetDrawInfo.
+	;To obtain the graphical bar data, (like the amount of fill, the attributes and all that stuff), is virtually no different
+	;compared to the layer 3 version. The only difference is writing to OAM as opposed to layer 3 tiles.
+		.InputRatio
+			;Quantity (HP)
+			;$1534 is the damage counter (increase by 1 on each hit, and dies when reaching a certain value (!HitPoints)),
+			;therefore this sprite uses an "inverted health system".
+			;To convert damage count to HP: HP = NumberOfHitsToKill - DamageCount
+			;I could use InvertQuantity, but because the sprite always take 1 damage from stomps and no other types of damage exists,
+			;and that its damage counter and !HitPoints (the fixed number of hits to defeat) are 8-bit, it is not needed, as this is faster.
+				LDA #!HitPoints					;\HP = NumberOfHitsToKill - DamageCount
+				SEC						;|
+				SBC !1534,x					;|
+				STA !Scratchram_GraphicalBar_FillByteTbl	;/Store HP into quantity.
+			LDA #$00						;&gt;Set these following data to 0 since HP is 8-bit
+			STA !Scratchram_GraphicalBar_FillByteTbl+1		;&gt;High byte quantity
+			STA !Scratchram_GraphicalBar_FillByteTbl+3		;&gt;High byte max quantity
+			LDA #!HitPoints						;\Max quantity
+			STA !Scratchram_GraphicalBar_FillByteTbl+2		;/
+		.InputGraphicalBarAttributes
+			LDA.b #!Default_GiantMaskedKoopa_GraphicalBar_LeftEndPieces		;\Left end normally have 3 pieces.
+			STA !Scratchram_GraphicalBar_LeftEndPiece				;/
+			LDA.b #!Default_GiantMaskedKoopa_GraphicalBar_MiddlePieces		;\Number of pieces in each middle byte/8x8 tile
+			STA !Scratchram_GraphicalBar_MiddlePiece				;/
+			LDA.b #!Default_GiantMaskedKoopa_GraphicalBar_RightEndPieces		;\Right end
+			STA !Scratchram_GraphicalBar_RightEndPiece				;/
+			LDA.b #!Default_GiantMaskedKoopa_GraphicalBar_MiddleLength		;\length (number of middle tiles)
+			STA !Scratchram_GraphicalBar_TempLength					;/
+		.ConvertToBar
+			PHX								;&gt;Preserve sprite slot index
+			JSL !CalculateGraphicalBarPercentage				;&gt;Get percentage
+			JSL !RoundAwayEmptyFull						;&gt;Round away from empty and full for fill amount
+			;$00 = HP percentage (FirstFill)
+			;$1570 = Previous HP percentage (SecondFill), or the increasing fill amount to display when healing/battle starts.
+			if !GiantMaskedKoopa_DisplayPreviousHP != 0
+				LDX $15E9|!addr	;&gt;Get sprite index
+				LDA !1570,x
+				CMP $00
+				BCC ..Increase
+				BEQ ..ShowCurrent
+
+				..Decrease
+					;Decrease, causes $1570 as a transperent bar to decrease towards HP percentage.
+					LDA !1558,x		;\Don't decrease SecondFill until delay runs out.
+					BNE ..Flicker		;/
+					DEC !1570,x
+					BRA ..Flicker
+				..Increase
+					;In this state, when $1570 less than current HP percentage,
+					;do the filling animation by having $00 contain the value of $1558 every frame and the SFX.
+					INC !1570,x
+					LDA $13
+					AND.b #%00000001
+					BNE ..ShowPrev
+					LDA #$23
+					STA $1DFC|!addr
+					BRA ..ShowPrev
+				..Flicker
+					;In this state, every other frame displays previous HP
+					;(because HP percentage gets subtracted on every damage,
+					;while $1558 keeps its value temporary across frames),
+					;giving a transperent look
+						LDA $13
+						AND.b #%00000001
+						BEQ ..ShowCurrent
+					
+				..ShowPrev
+					LDA !1570,x		;\When filling upwards or on every odd frames, $00 will contain the value
+					STA $00			;/of $1570, showing a filling animation or previous HP percentage instead of current HP percentage.
+					
+					..ShowCurrent
+			endif
+			JSL !DrawGraphicalBar						;&gt;get bar values.
+			LDA #$01							;\Use Level-sprite tileset
+			STA $00								;/
+			JSL !ConvertBarFillAmountToTiles				;&gt;Convert tiles.
+			PLX								;&gt;Restore sprite slot index
+			;[...]</pre></td></tr></table><br>
+Now note: the calculation is before we call <kbd>%GetDrawInfo()</kbd>, an essential routine to get the OAM index. Most of the codes here are the same as the graphical bar code for the layer 3 status bar and overworld border,
+but with some key differences:
+<ul>
+	<li>Because its &ldquo;HP&rdquo; is a damage counter, we need to reverse it by doing <kbd>!HitPoints - !1543</kbd> (as in, <kbd>HP = NumberOfHitsToKill - HitsTaken</kbd>). We could use <kbd>InvertQuantity</kbd>,
+	however, its hit counter and kill check are all 8-bit value. After reversing the damage counter, we write it to <kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd>, and have <kbd>!Scratchram_GraphicalBar_FillByteTbl+1</kbd>
+	set to <kbd>$00</kbd>.</li><br>
+	
+	<li>This is using sprite tiles, not layer 3 graphics. So don't use any routines that pertains to layer 3.</li>
+</ul>
+To draw the bar on OAM, we must place our OAM writing code <i>after</i> <kbd>%GetDrawInfo()</kbd> (the OAM indexing and other info are needed). We can get our whatever-was-written-to-A by simply loading $0F:
+<table><tr><td><pre>    <font color="red">REP #$20
+    LDA X_Disp,y
+    STA $04
+    LDA Y_Disp,y
+    STA $06
+    LDA Tilemap,y
+    STA $08
+    LDA Properties,y
+    STA $0A
+    SEP #$20</font>
+
+    %GetDrawInfo()
+
+    LDA !sprite_smash_status,x
+    STA $03                     ; | $03 = index to frame start (0 or 4)
+
+    PLA
+    CMP #$04
+    BCS AlternateFrames
+    LDA #$03
+    STA $0F
+    LDA $14                     ;\ Frame counter ..
+    LSR #3                      ; | Add in frame animation rate; More LSRs for slower animation.
+    AND #$03                    ; | 01 means we animate between 2 frames (00 and 01).
+    ASL #2                      ; | ASL x2 (0-4) makes it switch between the first byte and fifth byte,
+    STA $03                     ;/ i.e. first animation and second animation. The result is stored into $03.</pre></td></tr></table><br>
+
+$03-0B is being used <i>before and after</i> <kbd>%GetDrawInfo()</kbd>. Therefore they shouldn't be modified by the routine in between, therefore it's okay to have this code marked in red placed after <kbd>%GetDrawInfo()</kbd>.<br><br>
+
+As a reminder, <kbd>%GetDrawInfo()</kbd> output these info:
+<table>
+<tr><th>Output</th><th>Number of Bytes</th><th>Description</th></tr>
+<tr><td>Y register</td><td align="center">1 (not stored)</td><td>Oam index</td></tr>
+<tr><td>$00</td><td align="center">1</td><td>X position, relative to screen border</td></tr>
+<tr><td>$01</td><td align="center">1</td><td>Y position, relative to screen border</td></tr>
+</table><br>
+After <kbd>%GetDrawInfo()</kbd>, we should set up all the values for the inputs for routines <kbd><a href="../GraphicalBar_ReadmeDocumentation.html#CountNumberOfTiles">!CountNumberOfTiles</a></kbd>, and <a href="../GraphicalBar_ReadmeDocumentation.html#DrawSpriteGraphicalBarHorizVert"><kbd>!DrawSpriteGraphicalBarHoriz</kbd> or <kbd>!DrawSpriteGraphicalBarVert</kbd></a>, and just 
+
+</p>

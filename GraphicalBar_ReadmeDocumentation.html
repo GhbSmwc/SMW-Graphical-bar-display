@@ -459,7 +459,8 @@ Therefore, if you push something, you must pull before calling <kbd>%GetDrawInfo
 </ol><br></p>
 
 <p>I've made another example test, using the <a href="https://www.smwcentral.net/?p=section&a=details&id=13144">Giant Masked Koopa boss</a>, this time showing edits on a third-party sprite on actual
-boss sprite. Please remember that this document only covers these sprites as examples that will be similar to many other sprites, as their coding style are vastly different by 3rd party users that programmed their sprites on SMWC's sprite section.</p>
+boss sprite. Please remember that this document only covers these sprites as examples that will be similar to many other sprites, as their coding style are vastly different by 3rd party users that programmed their sprites on SMWC's sprite section.
+<a href="readme_files/GMKBossSummary.html" id="GMKBossSummary_Back">View this page for a summary of my edits</a></p>
 
 <p>I conveniently named the folders, so it shouldn't be difficult. The ASM and graphics are separated, however (graphics are in <kbd>ExGraphics/Sprite/GiantMaskedKoopaTest</kbd>). Everything is effectively the same as
 <kbd>GraphicalBarSimpleTest</kbd> except the bar having an actual purpose and the sprite is a boss sprite. Open the ASM file <kbd>giant_masked_koopa.asm</kbd>, and there will be comments I added to show an example
@@ -1026,7 +1027,7 @@ Output:
 <td><kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl</b></span></kbd> to <kbd><span class="NoLineBreak"><b>!Scratchram_GraphicalBar_FillByteTbl + ((<abbr title="0 if no left end, 1 if set to any nonzero number of pieces">LeftEnd</abbr> +
 <abbr title="Equals to !Scratchram_GraphicalBar_TempLength if middle pieces is nonzero, 0 otherwise">MiddleLength</abbr> + <abbr title="0 if no right end, 1 if set to any nonzero number of pieces">RightEnd</abbr>) - 1)</b></span></kbd></td>
 <td align="center" valign="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td>
-<td>Tile array containing tile numbers representing both first and second fills.</td>
+<td>Tile array containing tile numbers.</td>
 </tr>
 </table>
 Destroyed:
@@ -1200,7 +1201,7 @@ See explanation <a href="readme_files/FillEdgeCrossingTileBorder.html" id="FillE
 tables are no longer &ldquo;fixed&rdquo; (no need to edit the routine's code to check $00's newer values and adding new tables around that area), which is useful for things like sprite tile remapping.
 <table>
 <tr><th>Input</th><th>Number of Bytes</th><th>Description</th></tr>
-<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td><td>The fill amount array to be converted to tile numbers..</td></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td><td>The fill amount array to be converted to tile numbers.</td></tr>
 <tr><td><kbd>$00</kbd> to <kbd>$02</kbd></td><td align="center">3</td><td>Address location of where the table of tile numbers for left end.</td></tr>
 <tr><td><kbd>$03</kbd> to <kbd>$05</kbd></td><td align="center">3</td><td>Address location of where the table of tile numbers for middles.</td></tr>
 <tr><td><kbd>$06</kbd> to <kbd>$08</kbd></td><td align="center">3</td><td>Address location of where the table of tile numbers for right end.</td></tr>
@@ -1212,7 +1213,7 @@ tables are no longer &ldquo;fixed&rdquo; (no need to edit the routine's code to 
 <table>
 <tr><th>Output</th><th>Number of Bytes</th><th>Description</th></tr>
 <tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td align="center"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td>
-<td>The tile number array that was previously the fill amounts.</td></tr>
+<td>Tile array containing tile numbers.</td></tr>
 </table><br>
 Destroyed:
 <table>
@@ -1546,6 +1547,7 @@ function similarly to most sprite status bar patches</p>
 	<li><a href="#DrawOamGraphicalBarHorizVert_Back" id="DrawOamGraphicalBarHorizVert">^</a><kbd>DrawOamGraphicalBarHoriz</kbd> and <kbd>DrawOamGraphicalBarVert</kbd>: Draws a horizontal/vertical graphical bar:
 	<table>
 	<tr><th>Input</th><th>Number of bytes</th><th>Description</th></tr>
+	<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td><kbd>LeftEnd + MiddleLength + RightEnd</kbd></td><td>Tile numbers to write.</td></tr>
 	<tr><td><kbd>$00</kbd> to <kbd>$01</kbd></td><td align="center">2</td><td rowspan="2">X and Y position, relative to screen border. Note: The XY position origin is the top-left of a tile where the fill starts at<sup>1</sup>.</td></tr>
 	<tr><td><kbd>$02</kbd> to <kbd>$03</kbd></td><td align="center">2</td></tr>
 	<tr><td><kbd>$04</kbd> to <kbd>$05</kbd></td><td align="center">2</td><td>Number of tiles to write.</td></tr>
@@ -1604,6 +1606,7 @@ To be called after calling <kbd>%GetDrawInfo()</kbd> and before <kbd>$01B7B3</kb
 setting the tile size) should your sprite use both 8x8 and 16x16 tile sizes.
 <table>
 <tr><th>Input</th><th>Number of Bytes</th><th>Description</th></tr>
+<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td><kbd>LeftEnd + MiddleLength + RightEnd</kbd></td><td>Tile numbers to write.</td></tr>
 <tr><td><kbd>Y index</kbd></td><td align="center">1 (not stored)</td><td>OAM index to use (start from <kbd>$0300</kbd>/<kbd>$0460</kbd>, not <kbd>$0200</kbd>/<kbd>$0420</kbd>)</td></tr>
 <tr><td><kbd>$02</kbd></td><td align="center">1</td><td rowspan="2">X and Y position, relative to screen border. Note: The XY position origin is the top-left of a tile where the fill starts at.</td></tr>
 <tr><td><kbd>$03</kbd></td><td align="center">1</td></tr>
