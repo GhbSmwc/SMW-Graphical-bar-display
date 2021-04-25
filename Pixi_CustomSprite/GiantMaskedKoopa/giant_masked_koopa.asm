@@ -1270,11 +1270,13 @@ Graphics:
 		
 		LDA.b #!Default_GiantMaskedKoopa_GraphicalBar_Properties	;\Properties
 		STA $07								;/
+		PHX
 		if !Default_GiantMaskedKoopa_GraphicalBar_HorizOrVert == 0
 			JSL !DrawSpriteGraphicalBarHoriz
 		else
 			JSL !DrawSpriteGraphicalBarVert
 		endif
+		PLX
 		;[GraphicalBar_For_HP]
 		;Now I am done using $02-$08 after calling DrawSpriteGraphicalBarHoriz or DrawSpriteGraphicalBarVert. Therefore, those are now free to use for other things.
 		;Here, this is where $04-$0B is going to be used as an indirect addressing (get a value at an address that was stored in an address; <opcode> ($xx),y)
