@@ -242,6 +242,14 @@ As a reminder, <kbd>%GetDrawInfo()</kbd> output these info:
 <tr><td>$00</td><td align="center">1</td><td>X position, relative to screen border</td></tr>
 <tr><td>$01</td><td align="center">1</td><td>Y position, relative to screen border</td></tr>
 </table><br>
-After <kbd>%GetDrawInfo()</kbd>, we should set up all the values for the inputs for routines <kbd><a href="../GraphicalBar_ReadmeDocumentation.html#CountNumberOfTiles">!CountNumberOfTiles</a></kbd>, and <a href="../GraphicalBar_ReadmeDocumentation.html#DrawSpriteGraphicalBarHorizVert"><kbd>!DrawSpriteGraphicalBarHoriz</kbd> or <kbd>!DrawSpriteGraphicalBarVert</kbd></a>, and just 
+After <kbd>%GetDrawInfo()</kbd>, we should set up all the values for the inputs for routines <kbd><a href="../GraphicalBar_ReadmeDocumentation.html#CountNumberOfTiles">!CountNumberOfTiles</a></kbd>, and <a href="../GraphicalBar_ReadmeDocumentation.html#DrawSpriteGraphicalBarHorizVert"><kbd>!DrawSpriteGraphicalBarHoriz</kbd> or <kbd>!DrawSpriteGraphicalBarVert</kbd></a>, and just
+restore some values for the sprite's code afterwards (such as loading $0F that we preserved).
+</p>
+<h3>Setup for the bar graphics</h3>
+<p>A lot can be explained by looking at the code in <kbd>SMW-Graphical-bar-display/Pixi_CustomSprite/GiantMaskedKoopa/giant_masked_koopa.asm</kbd> using a text editor (preferbly using notepad++ and using <kbd>syntax-highlighting</kbd> found in asar's
+<kbd>asar181/ext/notepad-plus-plus</kbd>), and CTRL+F &ldquo;<kbd>[GraphicalBar_For_HP]</kbd>&rdquo; (without quotes)</p>
 
+<p>For the XY positioning of the health bar to be center-aligned with the main body of the sprite, consider looking at the image of how I found out:<br>
+<img src="GraphicalBar_Offsetting_GMK.png">
+Where &ldquo;<kbd>[GraphicalBar_For_HP_Centering]</kbd>&rdquo; (use CTRL+F) is the code that positions the HP bar so that it is aligned with the sprite.
 </p>

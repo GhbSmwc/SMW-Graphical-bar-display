@@ -1225,6 +1225,7 @@ Graphics:
 		STZ $05				;/
 		
 		LDX $15E9|!addr			;>Sprite index
+		;[GraphicalBar_For_HP_Centering]
 		;Because the sprite's origin is not always centered with the sprite's body, especially when it changes its image state and have different alignments,
 		;which may have the minimum bounding box be shifted relative to its origin, we need to have a code that also shifts the bar to remain centered with
 		;the sprite's body.
