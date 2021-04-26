@@ -250,6 +250,36 @@ restore some values for the sprite's code afterwards (such as loading $0F that w
 <kbd>asar181/ext/notepad-plus-plus</kbd>), and CTRL+F &ldquo;<kbd>[GraphicalBar_For_HP]</kbd>&rdquo; (without quotes)</p>
 
 <p>For the XY positioning of the health bar to be center-aligned with the main body of the sprite, consider looking at the image of how I found out:<br>
-<img src="GraphicalBar_Offsetting_GMK.png">
+<img src="GraphicalBar_Offsetting_GMK.png"><br>
 Where &ldquo;<kbd>[GraphicalBar_For_HP_Centering]</kbd>&rdquo; (use CTRL+F) is the code that positions the HP bar so that it is aligned with the sprite.
 </p>
+<h3>8x8 and 16x16 tiles used together</h3>
+<p>Like I said, most sprites on SMWC is made up of 16x16, and the bar itself are 8x8s, so we need to manually set the size bit:
+<table><tr><td><pre>    LDA ($08),y
+    STA $0302|!Base2,x
+    
+	;[GraphicalBar_For_HP] Manually set tile size for the main body of the sprite
+	;Because most sprites are composed of 16x16 OAM tiles, and the bar being 8x8s, The GMK boss is NO exception.
+	;It is really not that hard, just preserve X or Y, depending on the sprite (GMK boss uses X, in this example),
+	;then take X or Y, whichever holds the OAM index (increments of 4) TXA or TYA, LSR #2, TAX or TAY to convert
+	;to slot numbering (increments of 1), and SET $0460, indexed by slot numbering's bit 1 (the 2nd last bit from the right) to 1.
+	PHX			;>Preserve OAM index
+	TXA			;\Convert OAM index numbering to slot numbering (increments of 1)
+	LSR #2			;|
+	TAX			;/
+	LDA $0460|!addr,x	;\Force the size bit of the OAM extra bit to be 16x16 instead of potentially be 8x8
+	ORA.b #%00000010	;|
+	STA $0460|!addr,x	;/
+	PLX			;>Restore OAM index</pre></td></tr></table><br>
+However, since XY are swapped due opcode limitations: <kbd>LDA ($xx),x</kbd> does not exist, we simply use the X register instead of Y.</p>
+
+<h3>Finish OAM write</h3>
+<p>Because we set the size bit, the FinishOAMWrite (either by calling <kbd>JSL $01B7B3|!BankB</kbd> or <kbd>%FinishOAMWrite()</kbd>), the Y input must be $FF, and for the number of tiles, thankfully, this isn't too hard,
+the number of tiles to write, minus 1, is stored in $0F already. It is easy to simply add by the number of tiles the bar uses:
+<table><tr><td><pre>		LDY #$FF                    ; Y ends with the tile size .. 02 means it's 16x16 (Edit: the bar is 8x8s, and the body of the sprite is 16x16, so a mixture was needed; Y=$FF means Manuel)
+		LDA $0F                     ; A -> number of tiles drawn - 1.
+		CLC
+		ADC.b #!GiantMaskedKoopa_GraphicalBar_TotalTiles
+                                ; I drew 2 tiles, so 2-1 = 1. A = 01.
+    JSL $01B7B3|!BankB          ; Call the routine that draws the sprite (finish OAM write).
+    RTS</pre></td></tr></table></p>
