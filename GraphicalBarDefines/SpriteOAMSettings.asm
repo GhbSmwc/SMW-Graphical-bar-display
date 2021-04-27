@@ -79,7 +79,7 @@
  ;Giant Masked koopa tile count
   ;Explanation: if these tiles don't exist (pieces set to 0, and/or middle length set to 0)
   ;They're not written, so they are not counted. If they do exist (pieces set to any nonzero values),
-  ;that counts as a tile. After knowing if they exist or not we add all them.
+  ;that counts as a tile. After knowing if they exist or not we add all of them.
   !GiantMaskedKoopa_GraphicalBar_LeftEndExist = 0
   !GiantMaskedKoopa_GraphicalBar_MiddleExist = 0		;>How many middle tiles
   !GiantMaskedKoopa_GraphicalBar_RightEndExist = 0

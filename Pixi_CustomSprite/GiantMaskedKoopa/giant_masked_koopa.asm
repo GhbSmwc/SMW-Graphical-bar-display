@@ -1215,7 +1215,7 @@ Graphics:
 	;The routines !DrawSpriteGraphicalBarHoriz and !DrawSpriteGraphicalBarVert already have the same type of information
 	;for the Y, $00 and $01, so no concerns on those stuff. We can set up drawing the bar BEFORE we start using $04-$0B
 	;for indirect addressing.
-		%GetDrawInfo()		;>We need: Y: OAM index, $00 and $01: Position. Like I said, don't push, then call this without pulling in between pushing and calling GetDrawInfo.
+		%GetDrawInfo()		;>We need: Y: OAM index, $00 and $01: Position. It does not mess with any other data in $02-$0F. Like I said, don't push, then call this without pulling in between pushing and calling GetDrawInfo.
 		;Like I said, what's first drawn in code-order is to be in front (top) of another sprite, due to after writing each tile, the OAM index gets INC by 4 (rather than DEC).
 		;Therefore of the GMK's body and the bar overlaps, the bar will be on top since that is processed first.
 		
@@ -1240,7 +1240,7 @@ Graphics:
 		;For other sprites, there is a very high chance you'll have to trial-and-error the X and Y position offset so that it centers correctly with the sprite,
 		;mainly because the origin position of each sprites may be different in SMWC's sprite section and the fact that the shape of the sprite
 		;can differ.
-			LDA $0F			;>We got our sprite image state
+			LDA $0F			;>We got our sprite image state previously stored in $0F, so using this can help detect how our HP bar is positioned correctly.
 			CMP #$04
 			BCS .StandUpright
 			
@@ -1389,7 +1389,7 @@ ContinueGraphics: ;This is where scratch RAM is being used for indirect addressi
 		LDY #$FF                    ; Y ends with the tile size .. 02 means it's 16x16 (Edit: the bar is 8x8s, and the body of the sprite is 16x16, so a mixture was needed; Y=$FF means Manuel)
 		LDA $0F                     ; A -> number of tiles drawn - 1.
 		CLC
-		ADC.b #!GiantMaskedKoopa_GraphicalBar_TotalTiles
+		ADC.b #!GiantMaskedKoopa_GraphicalBar_TotalTiles ; Add by the number of tiles of the graphical bar (no need to subtract by 1, else we are doing it twice).
                                 ; I drew 2 tiles, so 2-1 = 1. A = 01.
     JSL $01B7B3|!BankB          ; Call the routine that draws the sprite (finish OAM write).
     RTS

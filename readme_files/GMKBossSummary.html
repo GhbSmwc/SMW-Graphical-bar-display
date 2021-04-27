@@ -19,6 +19,7 @@
 			}
 			
 			abbr{cursor: help;}
+			
 		</style>
 	</head>
 <body>
@@ -33,19 +34,19 @@
 <h3>The value representing its damage/HP</h3>
 <p>There has to be some sort of information stored of some value tracking its HP, else technically it would have infinite HP or just die in one hit:
 <ul>
-	<li>This value could start at 0 increasing on damage until it hits a certain value, and it dies-- also known as a damage counter.</li><br>
+	<li>This value could start at 0, and increases (commonly by 1) on damage until it hits a certain value, and it dies-- also known as a damage counter.</li><br>
 	<li>or start at a specified value and decreases towards 0, and it dies, also known as health counter.</li><br>
 </ul>
 
-So how do find what sprite table or any RAM being used for that? Well we can look in the ASM file to see how it tracks it:<br>
+So how do we find what sprite table or any RAM being used for that? Well we can look in the ASM file to see how it tracks it:<br>
 <br>
 At the top of the ASM file, there are defines, this one in particular shows something:
 <table><tr><td><pre>; How much hits to defeat. Do note that the hit counter, $1534, increments.
 !HitPoints = $09</pre></td></tr></table><br>
 
-Thankfully, the comment gives out the information that tracks its damage, which is RAM $1534, otherwise you would need to look at how this
-define is being used, by CTRL+F the define for its HP: &ldquo;<kbd>!HitPoints</kbd>&rdquo; and seeing how the code interacts with it.
-How it is being used?, well, lets take a look (this is before I edited the sprite to show its HP):
+Thankfully, the comment gives out the information that tracks its damage (well, I did updated it to fixed some bugs and added comments, but not all boss sprites have comments),
+which is RAM $1534, otherwise you would need to look at how this define is being used, by CTRL+F the define for its HP: &ldquo;<kbd>!HitPoints</kbd>&rdquo; (or something similar)
+and seeing how the code interacts with it. How it is being used?, well, lets take a look (this is before I edited the sprite to show its HP):
 <table><tr><td><pre>   JSR StompPoints             ; give Mario points
     LDA.b #!HurtSFX             ;\ sound effect
     STA.w !HurtBank             ;/
@@ -57,13 +58,13 @@ How it is being used?, well, lets take a look (this is before I edited the sprit
     BEQ SpriteDead              ;/</font></pre></td></tr></table><br>
 It is an 8-bit value representing a damage counter, it increments by 1 by its only damage-- stomping on it when it is standing up.
 As a side note, when a sprite spawns (such as from a block, or enters from the edge of the screen or during level load), all of its
-values are initialized, meaning its sprite table values are all zeroes. So no need to <kbd>STZ !1534,x</kbd> on the inital code.<br>
+values are initialized, meaning its sprite table values are all zeroes. So no need to <kbd>STZ !1534,x</kbd> on the initial code.<br>
 <br>
 We can see here that if <kbd>!1534</kbd> increments, and equals to whatever the user specifies <kbd>!HitPoints</kbd> to (default is $09), the boss dies (not
-immediately, it waits until the timer goes to zero, then it performs a &ldquo;desperate attack&rdquo;--the boss lunges into the player, and
+immediately, it first goes into its shell (mask) form, and waits until the timer goes to zero, then it performs a &ldquo;desperate attack&rdquo;--the boss lunges into the player, and
 when it crashes into a wall, it dies).<br><br>
 
-Now how do we represent this? Well <i>displaying</i> HP is just merely using graphics to show to the player. Therefore, we should go to its graphics routine, the area
+Now how do we display this? Well <i>displaying</i> HP is just merely using graphics to show to the player. Therefore, we should go to its graphics routine, the area
 that draws stuff on to the screen.</p>
 <h3>Graphics</h3>
 <p>Like most ASM files, they often use labels and comments making it easier for the programmer to understand how the code runs. This shouldn't be hard to find its graphics
@@ -83,9 +84,9 @@ X_Disp: dw .green,.fire,.rocks,.jumping,.walking
 .green
 ;[...] (a large table, but keep scrolling down and you'll get to the code)
 Graphics:
-    PHA
+    <font color="yellow">PHA
     ASL A
-    TAY
+    TAY</font>
     REP #$20
     LDA X_Disp,y
     STA $04
@@ -96,16 +97,16 @@ Graphics:
     LDA Properties,y
     STA $0A
     SEP #$20</pre></td></tr></table><br><br>
-This is where it sets up the graphics to draw into OAM. On this method, it stores a 16-bit address (<kbd>$**<u>XXXX</u></kbd>, using indirect-addressing, indexed,
-like <kbd>LDA ($XX),y</kbd>) onto $04-$05 for its X position displacement, $06-$07 for Y displacement, $08-$09 for tilemap, and properties for $0A-$0B, then later, stores it
-state in $03 (the image state showing if the koopa is walking or inside of its shell), then perform loops to write each tile information.<br><br>
+This is where it sets up the graphics to draw into OAM (this draws the sprite's body). On this method, it stores a 16-bit address (<kbd>$**<u>XXXX</u></kbd>, and uses indirect-addressing to access it, like
+<kbd>LDA ($XX),y</kbd>) onto $04-$05 for its X position displacement, $06-$07 for Y displacement, $08-$09 for tilemap, and properties for $0A-$0B, then later, stores its state in $03 (the image state
+showing if the koopa is walking or inside of its shell), then perform loops to write each tile into OAM.<br><br>
 
-Notice that the routine uses whatever was stored in A (accumulator) on the first 3 lines, which is later going to be used for indexing for indirect. So my solution is store it into $0F,
-since that is not used for anything else at the moment, then load that up later after calculating the graphical bar.<br><br>
+Notice that the routine uses whatever was stored in A (accumulator) on the first 3 lines (font colored yellow), which is later going to be used for indexing which stuff inside the tables.
+So my solution is store it into $0F, since that is not used (if it were reserved for something else, and I use it, it will break things) for anything else at the moment, then load that
+up later after calculating the graphical bar.<br><br>
 
-We want to include our code to display its HP bar, but we have to do so without interfering with its code. We could write our calculation
-routines before the very start of the routine (before $03-$0B becomes used for a specified purpose), and move several scratch RAM out of
-the way or position our code away from that if our routines uses those scratch RAM (this one is a hybrid supporting double-bar (rapid-flicker)):
+We want to include our code to display its HP bar, but we have to do so without interfering with the GMK's code. My method is simply make it so that the very first thing to do is calculate the HP
+bar <i>before</i> it does anything else on the graphics routine:<br>
 <table><tr><td><pre>Graphics:
 	;[GraphicalBar_For_HP]
 	;It's best to have this graphical bar code at the very start of "Graphics" so that branches would not skip
@@ -196,65 +197,104 @@ the way or position our code away from that if our routines uses those scratch R
 			JSL !ConvertBarFillAmountToTiles				;&gt;Convert tiles.
 			PLX								;&gt;Restore sprite slot index
 			;[...]</pre></td></tr></table><br>
-Now note: the calculation is before we call <kbd>%GetDrawInfo()</kbd>, an essential routine to get the OAM index. Most of the codes here are the same as the graphical bar code for the layer 3 status bar and overworld border,
-but with some key differences:
-<ul>
-	<li>Because its &ldquo;HP&rdquo; is a damage counter, we need to reverse it by doing <kbd>!HitPoints - !1543</kbd> (as in, <kbd>HP = NumberOfHitsToKill - HitsTaken</kbd>). We could use <kbd>InvertQuantity</kbd>,
-	however, its hit counter and kill check are all 8-bit value. After reversing the damage counter, we write it to <kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd>, and have <kbd>!Scratchram_GraphicalBar_FillByteTbl+1</kbd>
-	set to <kbd>$00</kbd>.</li><br>
-	
-	<li>This is using sprite tiles, not layer 3 graphics. So don't use any routines that pertains to layer 3.</li>
+Parts of this is very similar to the status bar-based code, but only the parts that <i>calculate</i> the tiles the use (not the actual writing the tile numbers as part of
+the final steps). We want to calculate this before calling <kbd>%GetDrawInfo()</kbd> as several subroutines it uses writes data into scratch RAM and also mangles the Y register, especially
+<kbd>CalculateGraphicalBarPercentage</kbd> ($00-$09 are all used). What we are concerned about is writing the tiles to OAM.
 </ul>
-To draw the bar on OAM, we must place our OAM writing code <i>after</i> <kbd>%GetDrawInfo()</kbd> (the OAM indexing and other info are needed). We can get our whatever-was-written-to-A by simply loading $0F:
-<table><tr><td><pre>    <font color="red">REP #$20
-    LDA X_Disp,y
-    STA $04
-    LDA Y_Disp,y
-    STA $06
-    LDA Tilemap,y
-    STA $08
-    LDA Properties,y
-    STA $0A
-    SEP #$20</font>
+To write to OAM, it has to be <i>after</i> <kbd>%GetDrawInfo()</kbd>, we must set up values for inputs for <a href="../GraphicalBar_ReadmeDocumentation.html#DrawSpriteGraphicalBarHorizVert"><kbd>DrawSpriteGraphicalBarHoriz</kbd>
+or <kbd>DrawSpriteGraphicalBarVert</kbd></a> prior calling it:
+<table><tr><td><pre>GraphicalBarXDisp:	;[GraphicalBar_For_HP]
+	;The origin of the sprites XY position isn't centered with the image of the sprite,
+	;so the bar's offset from the sprite's origin have to adjust to remain centered with the sprite.
+	db !Default_GiantMaskedKoopa_GraphicalBar_XPosOffset_StandFaceRight	;&gt;Facing right
+	db !Default_GiantMaskedKoopa_GraphicalBar_XPosOffset_StandFaceLeft	;&gt;Facing left
+		;[...]
+		%GetDrawInfo()		;&gt;We need: Y: OAM index, $00 and $01: Position. It does not mess with any other data in $02-$0F. Like I said, don't push, then call this without pulling in between pushing and calling GetDrawInfo.
+		;Like I said, what's first drawn in code-order is to be in front (top) of another sprite, due to after writing each tile, the OAM index gets INC by 4 (rather than DEC).
+		;Therefore of the GMK's body and the bar overlaps, the bar will be on top since that is processed first.
+		
+		LDX $15E9|!addr			;&gt;Sprite index
+		;[GraphicalBar_For_HP_Centering]
+		;Because the sprite's origin is not always centered with the sprite's body, especially when it changes its image state and have different alignments,
+		;which may have the minimum bounding box be shifted relative to its origin, we need to have a code that also shifts the bar to remain centered with
+		;the sprite's body.
+		;
+		;The good news is that the bottom of the sprite does not shift, so the Y position of the bar can be a fixed value relative to the sprite's origin position
+		;so we can place it under its feet. But the X centering position is what we need to condition the X-position offset based on its image states.
+		;
+		;There are 3 alignments to consider:
+		;-When the koopa is in its shell form: The very start of the phase waiting for the player to get close or chasing the player like a yellow disco shell.
+		;-When the koopa is standing upright, facing right
+		;-When the koopa is standing upright, facing left.
+		;For other sprites, there is a very high chance you'll have to trial-and-error the X and Y position offset so that it centers correctly with the sprite,
+		;mainly because the origin position of each sprites may be different in SMWC's sprite section and the fact that the shape of the sprite
+		;can differ.
+			LDA $0F			;&gt;We got our sprite image state previously stored in $0F, so using this can help detect how our HP bar is positioned correctly.
+			CMP #$04
+			BCS .StandUpright
+			
+			.InShell
+			LDA $00								;\X position
+			CLC								;|
+			ADC #!Default_GiantMaskedKoopa_GraphicalBar_XPosOffset_InShell	;|
+			STA $02								;/
+			BRA +
+			
+			.StandUpright
+			PHY
+			LDA !157C,x			;&gt;Sprite facing direction: $00 = right, $01 = left.
+			TAY
+			LDA $00
+			CLC
+			ADC GraphicalBarXDisp,y
+			STA $02
+			PLY
+		+
+		LDA $01							;\Y position
+		CLC							;|
+		ADC #!Default_GiantMaskedKoopa_GraphicalBar_YPosOffset	;|
+		STA $03							;/
+		
+		LDA #!Default_GiantMaskedKoopa_GraphicalBar_Flipped	;\Set direction
+		STA $06							;/
+		
+		LDA.b #!Default_GiantMaskedKoopa_GraphicalBar_Properties	;\Properties
+		STA $07								;/
+		PHX
+		if !Default_GiantMaskedKoopa_GraphicalBar_HorizOrVert == 0
+			JSL !DrawSpriteGraphicalBarHoriz
+		else
+			JSL !DrawSpriteGraphicalBarVert
+		endif
+		PLX
+		;[GraphicalBar_For_HP]
+		;Now I am done using $02-$08 after calling DrawSpriteGraphicalBarHoriz or DrawSpriteGraphicalBarVert. Therefore, those are now free to use for other things.
+		;Here, this is where $04-$0B is going to be used as an indirect addressing (get a value at an address that was stored in an address; &lt;opcode&gt; ($xx),y)
+		;First, it loads the 16-bit values representing the locations of each table (or "sub-table") into $04, $06, $08 and $0A.
+		;Then later, uses them (like ADC ($04),y).
+		<font color="red">LDA $0F			;\Save graphic state
+		PHA			;/
+		PHY			;&gt;Preserve OAM index
+		ASL A			;\Index the sprite's state.
+		TAY			;/
+		REP #$20		;\These sets up the table addresses for the following code below
+		LDA X_Disp,y		;|using indirect (you load a RAM that contains an address and load that)
+		STA $04			;|($xx),y
+		LDA Y_Disp,y		;|
+		STA $06			;|
+		LDA Tilemap,y		;|
+		STA $08			;|
+		LDA Properties,y	;|
+		STA $0A			;|
+		SEP #$20		;/
+		PLY			;&gt;Restore OAM index</font></pre></td></tr></table><br>
 
-    %GetDrawInfo()
+The comments should explain everything. Of course, there is no issue of having what's marked in red to be placed from before calling <kbd>%GetDrawInfo()</kbd> to after it (like I said, it only uses Y, $00, and $01, nothing else).<br><br>
 
-    LDA !sprite_smash_status,x
-    STA $03                     ; | $03 = index to frame start (0 or 4)
-
-    PLA
-    CMP #$04
-    BCS AlternateFrames
-    LDA #$03
-    STA $0F
-    LDA $14                     ;\ Frame counter ..
-    LSR #3                      ; | Add in frame animation rate; More LSRs for slower animation.
-    AND #$03                    ; | 01 means we animate between 2 frames (00 and 01).
-    ASL #2                      ; | ASL x2 (0-4) makes it switch between the first byte and fifth byte,
-    STA $03                     ;/ i.e. first animation and second animation. The result is stored into $03.</pre></td></tr></table><br>
-
-$03-0B is being used <i>before and after</i> <kbd>%GetDrawInfo()</kbd>. Therefore they shouldn't be modified by the routine in between, therefore it's okay to have this code marked in red placed after <kbd>%GetDrawInfo()</kbd>.<br><br>
-
-As a reminder, <kbd>%GetDrawInfo()</kbd> output these info:
-<table>
-<tr><th>Output</th><th>Number of Bytes</th><th>Description</th></tr>
-<tr><td>Y register</td><td align="center">1 (not stored)</td><td>Oam index</td></tr>
-<tr><td>$00</td><td align="center">1</td><td>X position, relative to screen border</td></tr>
-<tr><td>$01</td><td align="center">1</td><td>Y position, relative to screen border</td></tr>
-</table><br>
-After <kbd>%GetDrawInfo()</kbd>, we should set up all the values for the inputs for routines <kbd><a href="../GraphicalBar_ReadmeDocumentation.html#CountNumberOfTiles">!CountNumberOfTiles</a></kbd>, and <a href="../GraphicalBar_ReadmeDocumentation.html#DrawSpriteGraphicalBarHorizVert"><kbd>!DrawSpriteGraphicalBarHoriz</kbd> or <kbd>!DrawSpriteGraphicalBarVert</kbd></a>, and just
-restore some values for the sprite's code afterwards (such as loading $0F that we preserved).
 </p>
-<h3>Setup for the bar graphics</h3>
-<p>A lot can be explained by looking at the code in <kbd>SMW-Graphical-bar-display/Pixi_CustomSprite/GiantMaskedKoopa/giant_masked_koopa.asm</kbd> using a text editor (preferbly using notepad++ and using <kbd>syntax-highlighting</kbd> found in asar's
-<kbd>asar181/ext/notepad-plus-plus</kbd>), and CTRL+F &ldquo;<kbd>[GraphicalBar_For_HP]</kbd>&rdquo; (without quotes)</p>
-
-<p>For the XY positioning of the health bar to be center-aligned with the main body of the sprite, consider looking at the image of how I found out:<br>
-<img src="GraphicalBar_Offsetting_GMK.png"><br>
-Where &ldquo;<kbd>[GraphicalBar_For_HP_Centering]</kbd>&rdquo; (use CTRL+F) is the code that positions the HP bar so that it is aligned with the sprite.
-</p>
-<h3>8x8 and 16x16 tiles used together</h3>
-<p>Like I said, most sprites on SMWC is made up of 16x16, and the bar itself are 8x8s, so we need to manually set the size bit:
+<h3>The last bits of handling OAM</h3>
+<h4>8x8 and 16x16 tiles used together</h4>
+<p>Like I said, most sprites on SMWC is made up of 16x16, and the bar itself are 8x8s, so it is a sprite of a mixture of both, so we need to manually set the size bit:
 <table><tr><td><pre>    LDA ($08),y
     STA $0302|!Base2,x
     
@@ -263,23 +303,77 @@ Where &ldquo;<kbd>[GraphicalBar_For_HP_Centering]</kbd>&rdquo; (use CTRL+F) is t
 	;It is really not that hard, just preserve X or Y, depending on the sprite (GMK boss uses X, in this example),
 	;then take X or Y, whichever holds the OAM index (increments of 4) TXA or TYA, LSR #2, TAX or TAY to convert
 	;to slot numbering (increments of 1), and SET $0460, indexed by slot numbering's bit 1 (the 2nd last bit from the right) to 1.
-	PHX			;>Preserve OAM index
+	PHX			;&gt;Preserve OAM index
 	TXA			;\Convert OAM index numbering to slot numbering (increments of 1)
 	LSR #2			;|
 	TAX			;/
 	LDA $0460|!addr,x	;\Force the size bit of the OAM extra bit to be 16x16 instead of potentially be 8x8
 	ORA.b #%00000010	;|
 	STA $0460|!addr,x	;/
-	PLX			;>Restore OAM index</pre></td></tr></table><br>
+	PLX			;&gt;Restore OAM index</pre></td></tr></table><br>
 However, since XY are swapped due opcode limitations: <kbd>LDA ($xx),x</kbd> does not exist, we simply use the X register instead of Y.</p>
 
-<h3>Finish OAM write</h3>
-<p>Because we set the size bit, the FinishOAMWrite (either by calling <kbd>JSL $01B7B3|!BankB</kbd> or <kbd>%FinishOAMWrite()</kbd>), the Y input must be $FF, and for the number of tiles, thankfully, this isn't too hard,
-the number of tiles to write, minus 1, is stored in $0F already. It is easy to simply add by the number of tiles the bar uses:
-<table><tr><td><pre>		LDY #$FF                    ; Y ends with the tile size .. 02 means it's 16x16 (Edit: the bar is 8x8s, and the body of the sprite is 16x16, so a mixture was needed; Y=$FF means Manuel)
-		LDA $0F                     ; A -> number of tiles drawn - 1.
+<h4>Finish OAM write</h4>
+<p>Because we are using hybrid tile sizes, the FinishOAMWrite (either by calling <kbd>JSL $01B7B3|!BankB</kbd> or <kbd>%FinishOAMWrite()</kbd>), the Y input must be $FF (to indicate to the routine not to automatically write to $0460),
+and for the number of tiles, thankfully, this isn't too hard:
+<table><tr><td><pre>	;[GraphicalBar_For_HP] This is the last steps on working with OAM handling.
+	;Like I said, most sprites are composed of 16x16 tiles, and having a bar made of 8x8s means we are manually setting the tile sizes.
+	;When finishing OAM write, the inputs are:
+	; Y = size: $00 = 8x8s, $02 = 16x16s, $FF manuel
+	; A = Number of OAM slots used, minus 1.
+	;So have Y=$FF, unless in 0.01% chance you are having a PURE 8x8 sprite, then leave Y=$00.
+	;For A, we need the total number of tiles, which is the sprite's main body plus the bar itself, minus 1.
+	;It is very easy to know how many tiles the bar is, go check out the defines in GraphicalBarDefines/SpriteOAMSettings.asm
+	;and under "Giant Masked koopa tile count" contains a formula of counting the the number tiles for left end, middle, and right end.
+	;Since $0F contains the number of tiles, minus 1, we don't need to decrease it by 1 again (decrease by 1 again means we subtracted
+	;by 2 and that is the wrong amount). Therefore [(SpriteBodyTileCount + BarTileCount) - 1] is the same as [(SpriteBodyTileCount - 1) + BarTileCount].
+		LDY #$FF                    ; Y ends with the tile size .. 02 means it's 16x16 (Edit: the bar is 8x8s, and the body of the sprite is 16x16, so a mixture was needed; Y=$FF means Manuel)
+		LDA $0F                     ; A -&gt; number of tiles drawn - 1.
 		CLC
-		ADC.b #!GiantMaskedKoopa_GraphicalBar_TotalTiles
+		ADC.b #!GiantMaskedKoopa_GraphicalBar_TotalTiles ; Add by the number of tiles of the graphical bar (no need to subtract by 1, else we are doing it twice).
                                 ; I drew 2 tiles, so 2-1 = 1. A = 01.
     JSL $01B7B3|!BankB          ; Call the routine that draws the sprite (finish OAM write).
-    RTS</pre></td></tr></table></p>
+    RTS</pre></td></tr></table><br><br>
+again, the comments should explain everything. If you are wondering how does the program finds the total number of tiles, (which is <kbd>!GiantMaskedKoopa_GraphicalBar_TotalTiles</kbd>), it is calculated via this:
+<table><tr><td><pre> ;Giant Masked koopa tile count
+  ;Explanation: if these tiles don't exist (pieces set to 0, and/or middle length set to 0)
+  ;They're not written, so they are not counted. If they do exist (pieces set to any nonzero values),
+  ;that counts as a tile. After knowing if they exist or not we add all of them.
+  !GiantMaskedKoopa_GraphicalBar_LeftEndExist = 0
+  !GiantMaskedKoopa_GraphicalBar_MiddleExist = 0		;&gt;How many middle tiles
+  !GiantMaskedKoopa_GraphicalBar_RightEndExist = 0
+  if !Default_GiantMaskedKoopa_GraphicalBar_LeftEndPieces != 0
+   !GiantMaskedKoopa_GraphicalBar_LeftEndExist = 1
+  endif
+  if and(notequal(!Default_GiantMaskedKoopa_GraphicalBar_MiddlePieces, 0),notequal(!Default_GiantMaskedKoopa_GraphicalBar_MiddleLength, 0))	;&gt;Number of middle tiles AND number of middle pieces MUST be nonzero to include them
+   !GiantMaskedKoopa_GraphicalBar_MiddleExist = !Default_GiantMaskedKoopa_GraphicalBar_MiddleLength
+  endif
+  if !Default_PatchSprite_RightEndPieces != 0
+   !GiantMaskedKoopa_GraphicalBar_RightEndExist = 1
+  endif
+  !GiantMaskedKoopa_GraphicalBar_TotalTiles = !GiantMaskedKoopa_GraphicalBar_LeftEndExist+!GiantMaskedKoopa_GraphicalBar_MiddleExist+!GiantMaskedKoopa_GraphicalBar_RightEndExist</pre></td></tr></table><br>
+Which is found in <kbd>SMW-Graphical-bar-display/GraphicalBarDefines/SpriteOAMSettings.asm</kbd>.</p>
+<h3>Other information</h3>
+<ul>
+<li>If you are trying to figure out at what X and Y position to place the bar, chances are that you'll need to trial-and-error this. How I discover its center point was by setting the bar at ($00,$00), and the top-left of where the fill starts at
+is where that pink cross shown on the image below (which also shows how the offsets are correctly positioned):<br>
+<img src="GraphicalBar_Offsetting_GMK.png"><br>
+The pink dot on the top-left of the bar is just to show the bar's origin position.<br><br>
+
+An easier method of solving the X position of the bar where it should be is by using these formulas:
+<table>
+<tr>
+<td><pre>
+CenterPoint: A point where the midpoint of the bar should be at (where the bar centers around with)
+BarWidth: The width of the bar, in pixels. Note: it counts bar itself, not every 8x8 tile that its made out of.
+DistanceBetweenEdgeOfBarAndBarOrigin: The distance between the edge of the bar and the origin point of the bar.
+
+;Center Horizontally, left-to-right
+	BarXPosOffset = 0 - (floor(BarWidth / 2) + DistanceBetweenEdgeOfBarAndBarOrigin)
+</pre></td>
+<td>
+<img src="GraphicalBarOAM_CenterOffsetting.png"
+</td>
+</tr></table>
+</li>
+</ul>
