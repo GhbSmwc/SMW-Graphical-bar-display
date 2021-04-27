@@ -355,25 +355,45 @@ again, the comments should explain everything. If you are wondering how does the
 Which is found in <kbd>SMW-Graphical-bar-display/GraphicalBarDefines/SpriteOAMSettings.asm</kbd>.</p>
 <h3>Other information</h3>
 <ul>
-<li>If you are trying to figure out at what X and Y position to place the bar, chances are that you'll need to trial-and-error this. How I discover its center point was by setting the bar at ($00,$00), and the top-left of where the fill starts at
-is where that pink cross shown on the image below (which also shows how the offsets are correctly positioned):<br>
+<li>If you are trying to figure out at what X and Y position to place the bar, chances are that you'll need to trial-and-error this. How I discover its origin point (the XY position having a (0,0) offset from $E4/$14E0 $D8/$14D4) was by setting the position of the boss using uberasm tool code every frame:
+<table><tr><td><pre>;Note, it does this within a screen boundary, for the sake of simplicity!
+;Run this in main (every frame), not init!
+	LDX #!sprite_slots-1
+	-
+	LDA #$xx : STA !E4
+	LDA #$yy : STA !D8
+	DEX
+	BPL -
+	RTL
+;xx and yy are the level coordinates (low byte). Use LM's coordinate display at the bottom-left corner, multiply by $10 (or 16 in decimal) to convert from 16x16 blocks to pixel coordinates.</pre></td></tr></table><br>
+And arranged the blocks to mark its position. NOTE: while uberasm tool will lock its XY position, the sprite's movement (routine <kbd>$01802A</kbd>) code may displace it's position by a few pixels (such as gravity making
+the sprite 1 pixel lower).
+
+, and the top-left of where the fill starts at
+is where that purple cross shown on the image below (which also shows how the offsets are correctly positioned):<br>
 <img src="GraphicalBar_Offsetting_GMK.png"><br>
-The pink dot on the top-left of the bar is just to show the bar's origin position.<br><br>
+The purple dot on the top-left of the bar is just to show the bar's origin position.<br><br>
 
 An easier method of solving the X position of the bar where it should be is by using these formulas:
+<ul>
+<li><kbd>BarXPosOffset</kbd> is the offset (can be negative), from its center point (represented as an orange cross).</li>
+<li><kbd>floor(x)</kbd> means round a number that is between 2 closest integers to the highest integer less than or equal to x.</li>
+<li><kbd>BarWidth</kbd> means the width of the bar, in pixels. Note: we don't necessarily count the 8x8 bounding box, the bar itself:<br>
+<img src="BarWidth.png"><br>
+This does matter if you have left end and right end both nonzero and also not having the same number of pieces.</li>
+<li><kbd>EdgeOriginDistance</kbd> is the horizontal distance between the origin position of the bar (the purple dot/pixel) and the edge of the bar:<br>
+<img src="EdgeOriginDistance.png">
+</li>
+</ul>
 <table>
 <tr>
-<td><pre>
-CenterPoint: A point where the midpoint of the bar should be at (where the bar centers around with)
-BarWidth: The width of the bar, in pixels. Note: it counts bar itself, not every 8x8 tile that its made out of.
-DistanceBetweenEdgeOfBarAndBarOrigin: The distance between the edge of the bar and the origin point of the bar.
-
-;Center Horizontally, left-to-right
-	BarXPosOffset = 0 - (floor(BarWidth / 2) + DistanceBetweenEdgeOfBarAndBarOrigin)
-</pre></td>
-<td>
-<img src="GraphicalBarOAM_CenterOffsetting.png"
-</td>
-</tr></table>
+<td><pre>BarXPosOffset = 0 - (floor(BarWidth / 2)) - EdgeOriginDistance</pre></td>
+<td><img src="GraphicalBarOAM_CenterOffsetting.png"></td>
+</tr>
+<tr>
+<td><pre>BarXPosOffset = 0 + (floor(BarWidth / 2)) - EdgeOriginDistance</pre></td>
+<td><img src="GraphicalBarOAM_CenterOffsetting_Leftwards.png"></td>
+</tr>
+</table>
 </li>
 </ul>
