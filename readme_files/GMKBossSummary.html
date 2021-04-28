@@ -25,13 +25,20 @@
 <body>
 
 <h1><center>Giant Masked Koopa boss summary</center></h1>
+<h2>Quick Links</h2>
+<ul>
+<li><a href="#HealthDamageTrack" id="HealthDamageTrack_Back">Getting it to represent its HP</a></li>
+<li><a href="#Graphics" id="Graphics_Back">Graphics</a></li>
+<li><a href="#LastStuffOnOAM" id="LastStuffOnOAM_Back">Last bits of handling OAM</a></li>
+<li><a href="#Other" id="Other_Back">Other information</a></li>
+</ul>
 
 <p>This document is a summary of how I implement the non-static
 (placed on the body of the sprite rather than a fixed position on the screen) sprite-based HP bar for the giant masked koopa boss.</p>
 
 <h2>Getting it to represent its HP</h2>
 
-<h3>The value representing its damage/HP</h3>
+<h3><a href="#HealthDamageTrack_Back" id="HealthDamageTrack">^</a>The value representing its damage/HP</h3>
 <p>There has to be some sort of information stored of some value tracking its HP, else technically it would have infinite HP or just die in one hit:
 <ul>
 	<li>This value could start at 0, and increases (commonly by 1) on damage until it hits a certain value, and it dies-- also known as a damage counter.</li><br>
@@ -66,7 +73,7 @@ when it crashes into a wall, it dies).<br><br>
 
 Now how do we display this? Well <i>displaying</i> HP is just merely using graphics to show to the player. Therefore, we should go to its graphics routine, the area
 that draws stuff on to the screen.</p>
-<h3>Graphics</h3>
+<h3><a href="#Graphics_Back" id="Graphics">^</a>Graphics</h3>
 <p>Like most ASM files, they often use labels and comments making it easier for the programmer to understand how the code runs. This shouldn't be hard to find its graphics
 routine, we can CTRL+F &ldquo;<kbd>Graphics</kbd>&rdquo; and...
 <table><tr><td><pre>;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -292,7 +299,7 @@ or <kbd>DrawSpriteGraphicalBarVert</kbd></a> prior calling it:
 The comments should explain everything. Of course, there is no issue of having what's marked in red to be placed from before calling <kbd>%GetDrawInfo()</kbd> to after it (like I said, it only uses Y, $00, and $01, nothing else).<br><br>
 
 </p>
-<h3>The last bits of handling OAM</h3>
+<h3><a href="#LastStuffOnOAM_Back" id="LastStuffOnOAM">^</a>The last bits of handling OAM</h3>
 <h4>8x8 and 16x16 tiles used together</h4>
 <p>Like I said, most sprites on SMWC is made up of 16x16, and the bar itself are 8x8s, so it is a sprite of a mixture of both, so we need to manually set the size bit:
 <table><tr><td><pre>    LDA ($08),y
@@ -353,9 +360,11 @@ again, the comments should explain everything. If you are wondering how does the
   endif
   !GiantMaskedKoopa_GraphicalBar_TotalTiles = !GiantMaskedKoopa_GraphicalBar_LeftEndExist+!GiantMaskedKoopa_GraphicalBar_MiddleExist+!GiantMaskedKoopa_GraphicalBar_RightEndExist</pre></td></tr></table><br>
 Which is found in <kbd>SMW-Graphical-bar-display/GraphicalBarDefines/SpriteOAMSettings.asm</kbd>.</p>
-<h3>Other information</h3>
+<h3><a href="#Other_Back" id="Other">^</a>Other information</h3>
 <ul>
-<li>If you are trying to figure out at what X and Y position to place the bar, chances are that you'll need to trial-and-error this. How I discover its origin point (the XY position having a (0,0) offset from $E4/$14E0 $D8/$14D4) was by setting the position of the boss using uberasm tool code every frame:
+	<li>
+		If you are trying to figure out at what X and Y position to place the bar, chances are that you'll need to trial-and-error this. How I discover its origin point (the XY position having a (0,0) offset
+		from $E4/$14E0 $D8/$14D4) was by setting the position of the boss using uberasm tool code every frame:
 <table><tr><td><pre>;Note, it does this within a screen boundary, for the sake of simplicity!
 ;Run this in main (every frame), not init!
 	LDX #!sprite_slots-1
@@ -366,34 +375,55 @@ Which is found in <kbd>SMW-Graphical-bar-display/GraphicalBarDefines/SpriteOAMSe
 	BPL -
 	RTL
 ;xx and yy are the level coordinates (low byte). Use LM's coordinate display at the bottom-left corner, multiply by $10 (or 16 in decimal) to convert from 16x16 blocks to pixel coordinates.</pre></td></tr></table><br>
-And arranged the blocks to mark its position. NOTE: while uberasm tool will lock its XY position, the sprite's movement (routine <kbd>$01802A</kbd>) code may displace it's position by a few pixels (such as gravity making
-the sprite 1 pixel lower).
+		And arranged the blocks to mark its position.<br><br>
 
-, and the top-left of where the fill starts at
-is where that purple cross shown on the image below (which also shows how the offsets are correctly positioned):<br>
-<img src="GraphicalBar_Offsetting_GMK.png"><br>
-The purple dot on the top-left of the bar is just to show the bar's origin position.<br><br>
+		NOTE: despite uberasm tool will lock its XY position, the sprite's movement (routine <kbd>$01802A</kbd>) code may displace it's position by a few pixels (such as gravity making
+		the sprite 1 pixel lower). After discovering its XY origin position, I show off this image of where it is:
+		The purple cross represents its origin position, while the white box is just a reference with the common 16x16 tiles:<br>
+		<img src="GraphicalBar_Offsetting_GMK.png"><br>
+		The purple dot on the top-left of the bar is just to show the bar's origin position.<br><br>
 
-An easier method of solving the X position of the bar where it should be is by using these formulas:
-<ul>
-<li><kbd>BarXPosOffset</kbd> is the offset (can be negative), from its center point (represented as an orange cross).</li>
-<li><kbd>floor(x)</kbd> means round a number that is between 2 closest integers to the highest integer less than or equal to x.</li>
-<li><kbd>BarWidth</kbd> means the width of the bar, in pixels. Note: we don't necessarily count the 8x8 bounding box, the bar itself:<br>
-<img src="BarWidth.png"><br>
-This does matter if you have left end and right end both nonzero and also not having the same number of pieces.</li>
-<li><kbd>EdgeOriginDistance</kbd> is the horizontal distance between the origin position of the bar (the purple dot/pixel) and the edge of the bar:<br>
-<img src="EdgeOriginDistance.png">
-</li>
-</ul>
-<table>
-<tr>
-<td><pre>BarXPosOffset = 0 - (floor(BarWidth / 2)) - EdgeOriginDistance</pre></td>
-<td><img src="GraphicalBarOAM_CenterOffsetting.png"></td>
-</tr>
-<tr>
-<td><pre>BarXPosOffset = 0 + (floor(BarWidth / 2)) - EdgeOriginDistance</pre></td>
-<td><img src="GraphicalBarOAM_CenterOffsetting_Leftwards.png"></td>
-</tr>
-</table>
-</li>
+		An easier method of solving the X position of the bar to center a given point is by using this formula:<br><br>
+
+		<kbd>BarXPosition = GetToCenterOfSprite + BarXPosCenterOffset</kbd><br><br>
+		
+		Note: Signed means a variable can be negative, indicating a leftwards movement.<br><br>
+
+		Where:
+		<ul>
+				<li>
+					<kbd>GetToCenterOfSprite</kbd>: (signed) A displacement from the sprite's origin point to the actual center of the sprite's body:<br>
+					<img src="GetToCenterOfSprite.png">
+				</li>
+				<li><kbd>BarXPosCenterOffset</kbd>: (signed) an offset from its center point (represented as an orange cross) to the bar's origin point. This differs depending on the direction of the bar:
+				<table>
+					<tr>
+						<th>Direction</th>
+						<th>Formula</th>
+						<th>Example</th>
+					</tr>
+					<tr>
+						<th>Rightwards (left to right)</th>
+						<td><kbd>BarXPosCenterOffset = 0 - (floor(BarWidth / 2)) - EdgeOriginDistance</kbd></td>
+						<td><img src="GraphicalBarOAM_CenterOffsetting.png"></td>
+					</tr>
+					<tr>
+						<th>Leftwards (right to left)</th>
+						<td><kbd>BarXPosCenterOffset = 0 + (floor(BarWidth / 2)) - EdgeOriginDistance</kbd></td>
+						<td><img src="GraphicalBarOAM_CenterOffsetting_Leftwards.png"></td>
+					</tr>
+				</table>
+		Where:
+				<ul>
+					<li><kbd>floor(x)</kbd> is a function that rounds a number that is between 2 closest integers to the highest integer less than or equal to x.</li>
+					<li><kbd>BarWidth</kbd> means the width of the bar, in pixels. Note: we don't necessarily count the 8x8 bounding box, the bar itself:<br>
+					<img src="BarWidth.png"><br>
+					This does matter if you have left end and right end both nonzero and also not having the same number of pieces.</li>
+					<li><kbd>EdgeOriginDistance</kbd> is the horizontal distance between the origin position of the bar (the purple dot/pixel) and the edge of the bar:<br>
+						<img src="EdgeOriginDistance.png">
+					</li>
+				</ul>
+			</li>
+		</ul>
+	</li>
 </ul>
