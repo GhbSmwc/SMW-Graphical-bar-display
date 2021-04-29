@@ -46,6 +46,9 @@ length of the bar.<p>
 <li><a href="#Installation" id="InstallationBack">Installation (test run, uberasm tool)</a></li>
 <li><a href="#OwnGraphicalBar" id="OwnGraphicalBarBack">Displaying your own value as a graphical bar (Uberasm tool, Layer 3)</a></li>
 <li><a href="#CustomSprites" id="CustomSprites_Back">Drawing OAM (Normal sprites (SMW sprites or pixi), not cluster, extended, minor extended, etc.)</li>
+	<ul>
+		<li><a href="readme_files/GMKBossSummary.html" id="GMKBossSummary_TOCBack">Giant Masked Koopa boss editing example summary</li>
+	</ul>
 <li><a href="#DrawOamPatch" id="DrawOamPatch_Back">Drawing OAM (not using sprite slots, but patch using OAM).</a></li>
 <li><a href="#AsmDocumentation" id="AsmDocumentationBack">ASM Documentation</a></li>
 <ul>
@@ -112,15 +115,17 @@ length of the bar.<p>
 <p>Note many of these uses <kbd><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt">BigInt</a></kbd>, to avoid potential precision issues with double-precision. Make sure your browser
 supports it.</p>
 <ul>
-<li><a id="TopJSLink" href="readme_files/JS_GraphicalBarCalculator2.html">Calculate the graphical bar's memory usage</a></li>
-<li><a id="OAMNotes" href="readme_files/JS_OAM_Side_notes.html">OAM table and conversion sheet</a></li>
-<li>Tile property converters. Note they're not the same, rather similar, layer 3 has 2-bits (0-3) for page number and 1-bit (0-1) for priority, while sprites
+	<li><a id="TopJSLink" href="readme_files/JS_GraphicalBarCalculator2.html">Calculate the graphical bar's memory usage</a></li>
+	<li><a id="OAMNotes" href="readme_files/JS_OAM_Side_notes.html">OAM table and conversion sheet</a></li>
+	<li>Tile property converters. Note they're not the same, rather similar, layer 3 has 2-bits (0-3) for page number and 1-bit (0-1) for priority, while sprites
 have 1-bit for page number and 2-bits of priority:</li>
 <ul>
-<li><a id="Layer3Props" href="readme_files/JS_YXPCCCTT.html">Layer 3 properties (YXPCCCTT) converter</a></li>
-<li><a id="SpriteProps" href="readme_files/JS_YXPPCCCT.html">Sprite properties (YXPPCCCT) converter</a></li>
+	<li><a id="Layer3Props" href="readme_files/JS_YXPCCCTT.html">Layer 3 properties (YXPCCCTT) converter</a></li>
+	<li><a id="SpriteProps" href="readme_files/JS_YXPPCCCT.html">Sprite properties (YXPPCCCT) converter</a></li>
 </ul>
+	<li><a id="CenterBar" href="readme_files/JS_BarOAMCenterPos.html">Getting the sprite graphical bar to center with the sprite</a></li>
 </ul>
+
 <hr>
 <h2><a href="#InstallationBack" id="Installation">^</a>Installation (test run, uberasm tool)</h2>
 <ol>
