@@ -42,18 +42,28 @@
 <a href="../GraphicalBar_ReadmeDocumentation.html#CenterBar">Back to main readme</a><br>
 <a href="GMKBossSummary.html#From_JS_BarOAMCenterPos">Back to GMK summary</a>
 <ul>
-	<li><kbd>GetToCenterOfSprite</kbd>: <input type="number" id="GetToCenterOfSprite" onchange="CalculateBarCenteringPos()"></li>
+	<li><kbd>GetToCenterOfSprite</kbd> (signed): <input type="number" id="GetToCenterOfSprite" onchange="CalculateBarCenteringPos()"></li>
 	<li>
 		Direction:<br>
 		<input type="radio" name="BarDirection" id="BarDirectionL2R" checked onchange="CalculateBarCenteringPos()"><label for="BarDirectionL2R">Left to Right</label><br>
 		<input type="radio" name="BarDirection" id="BarDirectionR2L" onchange="CalculateBarCenteringPos()"><label for="BarDirectionR2L">Right to Left</label>
 	</li>
-	<li><kbd>BarWidth</kbd>: <input type="number" id="BarWidth" min="0" max="256" onchange="CalculateBarCenteringPos()"></li>
-	<li><kbd>EdgeOriginDistance</kbd>: <input type="number" id="EdgeOriginDistance" min="0" max="7" onchange="CalculateBarCenteringPos()"></li>
-</ul>
+	<li><kbd>BarWidth</kbd> (must be non-negative): <input type="number" id="BarWidth" min="0" max="256" onchange="CalculateBarCenteringPos()"></li>
+	<li><kbd>EdgeOriginDistance</kbd> (must be non-negative): <input type="number" id="EdgeOriginDistance" min="0" max="7" onchange="CalculateBarCenteringPos()"></li>
+</ul><br><br>
+
+<button onclick="Reset()">Reset</button>
 <hr>
 <span id="Output"></span>
 <script>
+	window.onload = Reset()
+	function Reset() {
+		document.getElementById("GetToCenterOfSprite").value = "0"
+		document.getElementById("BarDirectionL2R").checked = true
+		document.getElementById("BarWidth").value = "64"
+		document.getElementById("EdgeOriginDistance").value = "4"
+		CalculateBarCenteringPos()
+	}
 	function CalculateBarCenteringPos() {
 		var Output = ""
 		var GetToCenterOfSprite = CorrectSignedDecBigIntValue(document.getElementById("GetToCenterOfSprite").value)
@@ -69,9 +79,11 @@
 			//^Placeholder for result later.
 		
 		if (document.getElementById("BarDirectionL2R").checked == true) {
-			BarPosition = GetToCenterOfSprite + ( - (BarWidth / 2n) - EdgeOriginDistance)
+			//Left to right
+				BarPosition = GetToCenterOfSprite + ( - BigIntFloorDiv(BarWidth, 2n) - EdgeOriginDistance)
 		} else {
-			BarPosition = GetToCenterOfSprite + (BarWidth / 2n) - EdgeOriginDistance
+			//Right to left
+				BarPosition = GetToCenterOfSprite + BigIntFloorDiv(BarWidth, 2n) - EdgeOriginDistance
 		}
 		
 		Output += "Bar origin position realtive to sprite&apos;s center: "
@@ -106,7 +118,7 @@
 			if (BigIntNumber < 0n) {
 				BigIntNumber = "(" + BigIntNumber.toString(10) + ")"
 			} else {
-				BigIntNumber = BigIntNumber.toString(10)
+				BigIntNumber = "+" + BigIntNumber.toString(10)
 			}
 			return BigIntNumber
 		}
@@ -116,5 +128,19 @@
 			var s = num+"";
 			while (s.length < size) s = "0" + s;
 			return s;
+		}
+	//Floor division for bigint (avoids rounding upwards in negative, since bigint always truncates)
+		function BigIntFloorDiv(N, D) {
+			var Modulo = N % D
+			var Quotient = N / D
+			if ((((N > 0n)&&(D > 0n))||((N < 0n)&&(D < 0n))) == false) {
+				//Negative (N and D on different signs)
+				if (Modulo != 0n) {
+					//Modulo result not being zero means it landed in between two integers.
+						Quotient--
+				}
+			}
+			
+			return Quotient
 		}
 </script>

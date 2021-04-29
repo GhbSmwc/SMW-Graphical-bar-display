@@ -390,7 +390,8 @@ Which is found in <kbd>SMW-Graphical-bar-display/GraphicalBarDefines/SpriteOAMSe
 		
 		<a id="From_JS_BarOAMCenterPos" href="JS_BarOAMCenterPos.html">Simple JavaScript calculator provided</a><br><br>
 		
-		Note: Signed means a variable can be negative, indicating a leftwards movement.<br><br>
+		Note: Signed means a variable can be negative, indicating a leftwards movement. Another important information is that tile displacement from the sprite's origin ranges from -128 to 127 on both the X and Y axis,
+		due to <kbd>GetDrawInfo</kbd> only outputs the XY position in 8-bit signed value.<br><br>
 
 		Where:
 		<ul>
