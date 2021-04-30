@@ -364,7 +364,7 @@ Which is found in <kbd>SMW-Graphical-bar-display/GraphicalBarDefines/SpriteOAMSe
 <h3><a href="#Other_Back" id="Other">^</a>Other information</h3>
 <ul>
 	<li>
-		If you are trying to figure out at what X and Y position to place the bar, chances are that you'll need to trial-and-error this. How I discover its origin point (the XY position having a (0,0) offset
+		If you are trying to figure out at what X position to place the bar so that it is centered, chances are that you'll need to trial-and-error this. How I discover its origin point (the XY position having a (0,0) offset
 		from $E4/$14E0 $D8/$14D4) was by setting the position of the boss using uberasm tool code every frame:
 <table><tr><td><pre>;Note, it does this within a screen boundary, for the sake of simplicity!
 ;Run this in main (every frame), not init!
@@ -376,22 +376,24 @@ Which is found in <kbd>SMW-Graphical-bar-display/GraphicalBarDefines/SpriteOAMSe
 	BPL -
 	RTL
 ;xx and yy are the level coordinates (low byte). Use LM's coordinate display at the bottom-left corner, multiply by $10 (or 16 in decimal) to convert from 16x16 blocks to pixel coordinates.</pre></td></tr></table><br>
-		And arranged the blocks to mark its position.<br><br>
+		And arranged the blocks to mark its position. Most sprites and objects have their origin point on the top-left corner of their square or rectangle area.<br><br>
 
-		NOTE: despite uberasm tool will lock its XY position, the sprite's movement (routine <kbd>$01802A</kbd>) code may displace it's position by a few pixels (such as gravity making
-		the sprite 1 pixel lower). After discovering its XY origin position, I show off this image of where it is:
-		The purple cross represents its origin position, while the white box is just a reference with the common 16x16 tiles:<br>
+		NOTE: despite uberasm tool will lock its XY position, the sprite's movement (routine <kbd>$01802A</kbd>) code may displace it's position afterwards by a few pixels (such as gravity making
+		the sprite 1 pixel lower).<br><br>
+		
+		After discovering its XY origin position, I show off this image of where it is:
+		The purple cross represents the boss's origin position, while the white box is just a reference with the common 16x16 tiles:<br>
 		<img src="GraphicalBar_Offsetting_GMK.png"><br>
 		The purple dot on the top-left of the bar is just to show the bar's origin position.<br><br>
 
-		An easier method of solving the X position of the bar to center a given point is by using this formula:<br><br>
+		Another, easier method of solving the X position, without trial-and-error, is using math to locate a point of where the origin of the bar should be using this formula:<br><br>
 
 		<kbd>BarXPosition = GetToCenterOfSprite + BarXPosCenterOffset</kbd><br><br>
 		
 		<a id="From_JS_BarOAMCenterPos" href="JS_BarOAMCenterPos.html">Simple JavaScript calculator provided</a><br><br>
 		
-		Note: Signed means a variable can be negative, indicating a leftwards movement. Another important information is that tile displacement from the sprite's origin ranges from -128 to 127 on both the X and Y axis,
-		due to <kbd>GetDrawInfo</kbd> only outputs the XY position in 8-bit signed value.<br><br>
+		Note: Signed means a variable can be negative, indicating a leftwards displacement. Another important information is that tile displacement from the sprite's origin ranges from -128 to 127 on both the X and Y axis,
+		due to <kbd>GetDrawInfo</kbd> only outputs the XY position using an 8-bit signed value.<br><br>
 
 		Where:
 		<ul>

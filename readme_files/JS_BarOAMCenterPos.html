@@ -41,7 +41,8 @@
 	</head>
 <a href="../GraphicalBar_ReadmeDocumentation.html#CenterBar">Back to main readme</a><br>
 <a href="GMKBossSummary.html#From_JS_BarOAMCenterPos">Back to GMK summary</a>
-
+<center><h1>Centering bar calculator</h1></center>
+<p>This javascript HTML file is intended to calculate the X position (<abbr title="But why? Most video games that have HP bars are usually horizontal placed above or below the character.">it can work with vertical Y position as well</abbr>) of the bar so that it is centered with the sprite.</p>
 <p>Be sure to check out the Giant Masked Koopa summary linked above and view the images related to centering of what these variables mean.</p>
 <ul>
 	<li><abbr title="How many pixels, across the X axis, from the sprite&apos;s origin, to the center of the body. Negative goes to the left, positive goes to the right"><kbd>GetToCenterOfSprite</kbd></abbr> (signed): <input type="number" id="GetToCenterOfSprite" onchange="CalculateBarCenteringPos()"></li>
@@ -94,7 +95,7 @@
 		}
 		Output += "<kbd>" + ConvertNegativeDecimalNumberToParenthesisNotationString(BarPosition) + "</kbd>"
 		if (((BarPosition >= -128n)&&(BarPosition <= 127n)) == false) {
-			Output += "</font>"
+			Output += "</font> Offset too far! The offset can only represent ranges from (-128) to +127."
 		}
 		
 		if ((BarPosition >= -128n)&&(BarPosition <= 127n)) {

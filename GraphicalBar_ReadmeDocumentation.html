@@ -47,6 +47,7 @@ length of the bar.<p>
 <li><a href="#OwnGraphicalBar" id="OwnGraphicalBarBack">Displaying your own value as a graphical bar (Uberasm tool, Layer 3)</a></li>
 <li><a href="#CustomSprites" id="CustomSprites_Back">Drawing OAM (Normal sprites (SMW sprites or pixi), not cluster, extended, minor extended, etc.)</li>
 	<ul>
+		<li><a href="#ProgrammingOtherCustomSprites" id="ProgrammingOtherCustomSprites_back">Programming with other sprites.</a></li>
 		<li><a href="readme_files/GMKBossSummary.html" id="GMKBossSummary_TOCBack">Giant Masked Koopa boss editing example summary</li>
 	</ul>
 <li><a href="#DrawOamPatch" id="DrawOamPatch_Back">Drawing OAM (not using sprite slots, but patch using OAM).</a></li>
@@ -378,7 +379,7 @@ autoclean JML DrawSpriteGraphicalBarVert</pre></td></tr></table>
 	<li>And you are done. If you are planning to use this code within the custom sprite's code, continue doing the steps below.</li>
 </ol>
 <p>Feel free to view the code in <kbd>Pixi_CustomSprite/GraphicalBarSimpleTest/SpriteGraphicalBarTest.asm</kbd> with a text editor, it is intended to show a yoshi egg graphic representing the sprite origin and where would the bar would be placed relative to that.</p>
-<h3>Programming with existing custom sprites</h3>
+<h3><a href="#ProgrammingOtherCustomSprites_back" id="ProgrammingOtherCustomSprites">^</a>Programming with existing custom sprites</h3>
 <p>Note: You must have some mid-level of knowledge of ASM, as here you must learn how to:
 <ul>
 <li>Know which scratch RAM is currently used for other purpose during code execution, and be able to relocate them to another RAM should they conflict (2+ different data using the same address(es)) or use

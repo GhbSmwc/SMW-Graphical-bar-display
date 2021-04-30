@@ -15,16 +15,25 @@
   !Default_GiantMaskedKoopa_GraphicalBar_MiddlePieces = 8
   !Default_GiantMaskedKoopa_GraphicalBar_RightEndPieces = 3
   !Default_GiantMaskedKoopa_GraphicalBar_MiddleLength = 7		;>Number of middle tiles
- ;Graphical bar tile displacement (from the main body origin (where his feet is at)). Note: The
- ;XY origin of the bar is the end of the bar where the fill starts at when increasing.
-  !Default_GiantMaskedKoopa_GraphicalBar_XPosOffset_InShell = $E4
-  !Default_GiantMaskedKoopa_GraphicalBar_XPosOffset_StandFaceRight = $EC
-  !Default_GiantMaskedKoopa_GraphicalBar_XPosOffset_StandFaceLeft = $DC
-  !Default_GiantMaskedKoopa_GraphicalBar_YPosOffset = $10
- ;Other settings
+ ;Bar direction
   !Default_GiantMaskedKoopa_GraphicalBar_Flipped = $00
    ;^$00 = fill left-to-right/bottom-to-top
    ;^$01 = fill right-to-left/top-to-bottom (X or Y bits on YXPPCCCT are set)
+ ;Graphical bar tile displacement (from the main body origin (top-left of the 16x16 part where his feet is at)). Note: The
+ ;XY origin of the bar is the end of the bar where the fill starts at when increasing.
+  if !Default_GiantMaskedKoopa_GraphicalBar_Flipped == 0 ;Don't modify the if statements.
+   ;Left to right displacement
+    !Default_GiantMaskedKoopa_GraphicalBar_XPosOffset_InShell = $E4
+    !Default_GiantMaskedKoopa_GraphicalBar_XPosOffset_StandFaceLeft = $DC
+    !Default_GiantMaskedKoopa_GraphicalBar_XPosOffset_StandFaceRight = $EC
+  else
+   ;Right to left displacement
+    !Default_GiantMaskedKoopa_GraphicalBar_XPosOffset_InShell = $25
+    !Default_GiantMaskedKoopa_GraphicalBar_XPosOffset_StandFaceLeft = $1D
+    !Default_GiantMaskedKoopa_GraphicalBar_XPosOffset_StandFaceRight = $2D
+  endif
+  !Default_GiantMaskedKoopa_GraphicalBar_YPosOffset = $10
+ ;Other settings
   !Default_GiantMaskedKoopa_GraphicalBar_Properties = %00111001
    ;^Properties (YXPPCCCT).
   !Default_GiantMaskedKoopa_GraphicalBar_HorizOrVert = 0
