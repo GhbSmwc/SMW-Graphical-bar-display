@@ -44,9 +44,9 @@
 
 <p>Be sure to check out the Giant Masked Koopa summary linked above and view the images related to centering of what these variables mean.</p>
 <ul>
-	<li><abbr title="How many pixels, across the X axis, from the sprite&apos; origin, to the center of the body."><kbd>GetToCenterOfSprite</kbd></abbr> (signed): <input type="number" id="GetToCenterOfSprite" onchange="CalculateBarCenteringPos()"></li>
+	<li><abbr title="How many pixels, across the X axis, from the sprite&apos;s origin, to the center of the body. Negative goes to the left, positive goes to the right"><kbd>GetToCenterOfSprite</kbd></abbr> (signed): <input type="number" id="GetToCenterOfSprite" onchange="CalculateBarCenteringPos()"></li>
 	<li>
-		Direction:<br>
+		<abbr title="Fill direction.">Direction:</abbr><br>
 		<input type="radio" name="BarDirection" id="BarDirectionL2R" checked onchange="CalculateBarCenteringPos()"><label for="BarDirectionL2R">Left to Right</label><br>
 		<input type="radio" name="BarDirection" id="BarDirectionR2L" onchange="CalculateBarCenteringPos()"><label for="BarDirectionR2L">Right to Left</label>
 	</li>
