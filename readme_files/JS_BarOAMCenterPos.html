@@ -41,15 +41,17 @@
 	</head>
 <a href="../GraphicalBar_ReadmeDocumentation.html#CenterBar">Back to main readme</a><br>
 <a href="GMKBossSummary.html#From_JS_BarOAMCenterPos">Back to GMK summary</a>
+
+<p>Be sure to check out the Giant Masked Koopa summary linked above and view the images related to centering of what these variables mean.</p>
 <ul>
-	<li><kbd>GetToCenterOfSprite</kbd> (signed): <input type="number" id="GetToCenterOfSprite" onchange="CalculateBarCenteringPos()"></li>
+	<li><abbr title="How many pixels, across the X axis, from the sprite&apos; origin, to the center of the body."><kbd>GetToCenterOfSprite</kbd></abbr> (signed): <input type="number" id="GetToCenterOfSprite" onchange="CalculateBarCenteringPos()"></li>
 	<li>
 		Direction:<br>
 		<input type="radio" name="BarDirection" id="BarDirectionL2R" checked onchange="CalculateBarCenteringPos()"><label for="BarDirectionL2R">Left to Right</label><br>
 		<input type="radio" name="BarDirection" id="BarDirectionR2L" onchange="CalculateBarCenteringPos()"><label for="BarDirectionR2L">Right to Left</label>
 	</li>
-	<li><kbd>BarWidth</kbd> (must be non-negative): <input type="number" id="BarWidth" min="0" max="256" onchange="CalculateBarCenteringPos()"></li>
-	<li><kbd>EdgeOriginDistance</kbd> (must be non-negative): <input type="number" id="EdgeOriginDistance" min="0" max="7" onchange="CalculateBarCenteringPos()"></li>
+	<li><abbr title="Width of the bar itself (not the space of the remaining parts of the 8x8 tile), in pixels."><kbd>BarWidth</kbd></abbr> (must be non-negative): <input type="number" id="BarWidth" min="0" max="256" onchange="CalculateBarCenteringPos()"></li>
+	<li><abbr title="Distance between the nearest edge (left or right edge) of the bar to the origin position"><kbd>EdgeOriginDistance</kbd></abbr> (must be non-negative): <input type="number" id="EdgeOriginDistance" min="0" max="7" onchange="CalculateBarCenteringPos()"></li>
 </ul><br><br>
 
 <button onclick="Reset()">Reset</button>
