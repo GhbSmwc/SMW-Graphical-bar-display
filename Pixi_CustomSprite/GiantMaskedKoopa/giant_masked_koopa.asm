@@ -1177,11 +1177,14 @@ Graphics:
 					;In this state, when $1570 less than current HP percentage,
 					;do the filling animation by having $00 contain the value of $1558 every frame and the SFX.
 					INC !1570,x
+					LDA $0100|!addr			;\Prevent playing filling SFX during a black screen fade
+					CMP #$14			;|
+					BNE ..ShowPrev			;/
 					LDA $13
 					AND.b #%00000001
 					BNE ..ShowPrev
-					LDA #$23
-					STA $1DFC|!addr
+					LDA #$23			;\SFX of bar filling
+					STA $1DFC|!addr			;/
 					BRA ..ShowPrev
 				..Flicker
 					;In this state, every other frame displays previous HP
