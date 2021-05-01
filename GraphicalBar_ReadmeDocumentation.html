@@ -163,7 +163,7 @@ level:
 
 gamemode:
 ; Insert files here
-;0E		Gamemode0E_OWBorderTest.asm ;>Need OWB+ patch to function!</pre></td></tr></table><br>
+;0E		Gamemode0E_OWBorderTest.asm ;&gt;Need OWB+ patch to function!</pre></td></tr></table><br>
 </li>
 <li>Insert the graphics by:
 <ol>
@@ -229,11 +229,11 @@ main:		;&gt;You DO need this if using uberasm tool.
 	LDA.b <font color="green">#!Default_MiddleLength</font>				;\length (number of middle tiles)
 	STA !Scratchram_GraphicalBar_TempLength			;/
 .ConvertToBar
-	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
+	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;&gt;Get percentage
 	<font color="orange">JSL GraphicalBarELITE_RoundAwayEmptyFull</font>
-	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
-	STZ $00								;>Use Level-layer3 tileset
-	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
+	JSL GraphicalBarELITE_DrawGraphicalBar				;&gt;get bar values.
+	STZ $00								;&gt;Use Level-layer3 tileset
+	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;&gt;Convert tiles.
 	LDA.b <font color="yellow">#!Default_GraphicalBar_Pos_Tile</font>				;\Setup address to where to draw the bar.
 	STA $00								;|
 	LDA.b <font color="yellow">#!Default_GraphicalBar_Pos_Tile>>8</font>			;|
@@ -256,9 +256,9 @@ main:		;&gt;You DO need this if using uberasm tool.
 	endif
 	if !Default_LeftwardsBar == 0
 		if !StatusBarFormat = $01
-			JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;>Write to status bar
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;&gt;Write to status bar
 		else
-			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDFormat2		;>Write to status bar
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDFormat2		;&gt;Write to status bar
 		endif
 	else
 		if !StatusBarFormat = $01
@@ -1147,19 +1147,19 @@ For example, by making left end have 4 pieces instead of 3, you must have 5 valu
 
 			GraphicalBar_LeftEnd8x8s_Lvl_L3:
 			;Left end fill amount tile numbers:
-			db $36		;>Fill amount/index: $00
-			db $37		;>Fill amount/index: $01
-			db $38		;>Fill amount/index: $02
-			db $39		;>Fill amount/index: $03
+			db $36		;&gt;Fill amount/index: $00
+			db $37		;&gt;Fill amount/index: $01
+			db $38		;&gt;Fill amount/index: $02
+			db $39		;&gt;Fill amount/index: $03
 
 	;4 pieces, now values are 0-4:
 			GraphicalBar_LeftEnd8x8s_Lvl_L3:
 			;Left end fill amount tile numbers:
-			db $36		;>Fill amount/index: $00
-			db $37		;>Fill amount/index: $01
-			db $38		;>Fill amount/index: $02
-			db $39		;>Fill amount/index: $03
-			db <font color="red">$xx</font>		;>Fill amount/index: $04</pre></td></tr></table>
+			db $36		;&gt;Fill amount/index: $00
+			db $37		;&gt;Fill amount/index: $01
+			db $38		;&gt;Fill amount/index: $02
+			db $39		;&gt;Fill amount/index: $03
+			db <font color="red">$xx</font>		;&gt;Fill amount/index: $04</pre></td></tr></table>
 
 <br><br>
 
@@ -1723,15 +1723,15 @@ the tile converter does not recognize if the first and last tile are meant to be
 set the end tiles to be the same number of pieces for middle, and subtract the number of middle tiles by how many end tiles you are using (say 2) so that the end tiles don't use
 the same table graphic as middle and cause cutoff-ended bar.
 <table><tr><td><pre>	;[...]
-	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
+	JSL GraphicalBarELITE_DrawGraphicalBar				;&gt;get bar values.
 	LDA #$08							;\Middle tiles first and last replaced with end tiles.
 	STA !Scratchram_GraphicalBar_LeftEndPiece			;|
 	STA !Scratchram_GraphicalBar_RightEndPiece			;|
 	LDA !Scratchram_GraphicalBar_TempLength				;|
 	SEC								;|
-	SBC #$02							;|>Left end + Right end = 2 end tiles
+	SBC #$02							;|&gt;Left end + Right end = 2 end tiles
 	STA !Scratchram_GraphicalBar_TempLength				;/
-	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles (end tiles recognized).
+	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;&gt;Convert tiles (end tiles recognized).
 	;[...]</pre></td></tr></table><br><br>
 
 </p></li>
