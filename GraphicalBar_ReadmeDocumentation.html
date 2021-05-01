@@ -17,6 +17,14 @@
 			}
 			
 			abbr{cursor: help;}
+			img.img-hor {
+				-moz-transform: scaleX(-1);
+				-o-transform: scaleX(-1);
+				-webkit-transform: scaleX(-1);
+				transform: scaleX(-1);
+				filter: FlipH;
+				-ms-filter: "FlipH";
+			}
 		</style>
 	</head>
 <body>
@@ -1362,7 +1370,7 @@ Of course, because the <a href="https://www.smwcentral.net/?p=section&a=details&
 it will work on that as well (if <kbd>!StatusBarFormat</kbd> set to $02 and you make a different version of the routine <kbd>ConvertBarFillAmountToTiles</kbd> to use a different
 table to use OW layer 3 tiles).</li><br>
 
-<li><a href="#WriteBarToHUDLeftwards_Back" id="WriteBarToHUDLeftwards">^</a><kbd>WriteBarToHUDLeftwards</kbd>: Same as above, but writes an X-flipped version (<img width="96" src="readme_files/TransperentBackgroundXFlipped.png">). Note that it only
+<li><a href="#WriteBarToHUDLeftwards_Back" id="WriteBarToHUDLeftwards">^</a><kbd>WriteBarToHUDLeftwards</kbd>: Same as above, but writes an X-flipped version (<img width="96" class="img-hor" src="readme_files/TransperentBackground.png">). Note that it only
 works properly if you set bit 6 of YXPCCCTT properties byte (this routine itself does not automatically set bit 6, even with <kbd>!StatusBar_UsingCustomProperties</kbd> set to <kbd>1</kbd>), assuming
 the default graphic for the fill tiles are left-to-right. The tiles are arranged in reverse order so the leftmost tile (including the end tiles) is now the right most, the second leftmost is second
 rightmost, and so on. If you didn't X-flip the tiles via editing the tile properties (YXPCCCTT), each tile will starts filling left-to-right starting at the rightmost tile going towards the left.
