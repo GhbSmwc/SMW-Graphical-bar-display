@@ -422,7 +422,7 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
 3/11/2019-m/d/y
  -GraphicalBarConvertToTile have some of its codes use indent for convenience to see each code block.
  -Slanted graphical bar supported!
-11-24-2020 to 3-21-2021
+11-24-2020 to 3-21-2021 (v4.01)
  -Added an invert routine (inverts the quantity by taking MaxQuanity, subtract by Quantity, and the difference
   is the inverted quantity, no less than 0).
  -Table of contents are much more navigatable, linking to subsections
@@ -430,7 +430,7 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
  -Included a secondary version of doublebar, this time, it stores the second quantity as fill amount rather than
   have both be literal quantity amount, both as percentages. This enables things like if you want secondfill to
   increment/decrement at a constant rate.
-3/26/2021 to 5/1/2021 3.19, Sprite graphical bar. (took 36 days)
+3/26/2021 to 5/1/2021 5.00, Sprite graphical bar. (took 36 days)
  -The javascript html's hex input now reacts to up/down arrow keys, therefore behaving closer to how number inputs
   work (up increases the value, down decreases).
  -ConvertBarFillAmountToTiles and ConvertBarFillAmountToTilesEdgeOverMultipleTiles have been revamped to not check
