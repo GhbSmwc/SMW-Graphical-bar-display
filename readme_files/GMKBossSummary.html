@@ -364,8 +364,10 @@ Which is found in <kbd>SMW-Graphical-bar-display/GraphicalBarDefines/SpriteOAMSe
 <h3><a href="#Other_Back" id="Other">^</a>Other information</h3>
 <ul>
 	<li>
-		If you are trying to figure out at what X position to place the bar so that it is centered, chances are that you'll need to trial-and-error this. How I discover its origin point (the XY position having a (0,0) offset
-		from $E4/$14E0 $D8/$14D4) was by setting the position of the boss using uberasm tool code every frame:
+		There are methods of finding the XY origin position of the sprite to have the bar centered with the sprite:
+		<ul>
+			<li>Trial and error. If the bar is too far to the right, pick a smaller number, if too far to the left, pick a larger number.</li>
+			<li>Locking its XY position ($E4/$14E0 $D8/$14D4) at a specified value every frame using uberasm tool's <kbd>level main</kbd>:
 <table><tr><td><pre>;Note, it does this within a screen boundary, for the sake of simplicity!
 ;Run this in main (every frame), not init!
 	LDX #!sprite_slots-1
@@ -375,13 +377,19 @@ Which is found in <kbd>SMW-Graphical-bar-display/GraphicalBarDefines/SpriteOAMSe
 	DEX
 	BPL -
 	RTL
-;xx and yy are the level coordinates (low byte). Use LM's coordinate display at the bottom-left corner, multiply by $10 (or 16 in decimal) to convert from 16x16 blocks to pixel coordinates.</pre></td></tr></table><br>
-		And arranged the blocks to mark its position. Most sprites and objects have their origin point on the top-left corner of their square or rectangle area.<br><br>
+;xx and yy are the level coordinates (low byte). Use LM's coordinate display at the bottom-left corner, multiply by $10 (or 16 in decimal) to convert from 16x16 blocks to pixel coordinates.</pre></td></tr></table>
+			And arranged the blocks to mark its position.</li><br>
+			<li>Setting the bar's XY position to (0,0) (no displacement). The top-left pixel of the 8x8 tile that the fill starts at will point to where the origin point of the sprite.</li>
+		</ul>
+		
+		As a general note: most SMW sprites have their origin point on the top-left corner of their <a href="https://en.wikipedia.org/wiki/Minimum_bounding_box">minimum bounding box</a> or the 16x16 square that is meant to be the &ldquo;bottom half&rdquo; of
+		the 2-tile high sprite (that they interact with objects):<br>
+		<img src="SpritePositionPoints.png"><br>
 
 		NOTE: despite uberasm tool will lock its XY position, the sprite's movement (routine <kbd>$01802A</kbd>) code may displace it's position afterwards by a few pixels (such as gravity making
 		the sprite 1 pixel lower).<br><br>
 		
-		After discovering its XY origin position, I show off this image of where it is:
+		As an exmaple, after discovering its XY origin position of the GMK boss, I show off this image of where it is:
 		The purple cross represents the boss's origin position, while the white box is just a reference with the common 16x16 tiles:<br>
 		<img src="GraphicalBar_Offsetting_GMK.png"><br>
 		The purple dot on the top-left of the bar is just to show the bar's origin position.<br><br>
@@ -399,7 +407,27 @@ Which is found in <kbd>SMW-Graphical-bar-display/GraphicalBarDefines/SpriteOAMSe
 		<ul>
 				<li>
 					<kbd>GetToCenterOfSprite</kbd>: (signed) A displacement from the sprite's origin point to the actual center of the sprite's body:<br>
-					<img src="GetToCenterOfSprite.png">
+					<img src="GetToCenterOfSprite.png"><br>
+					To find the center point X position of the sprite:
+					<ol>
+						<li>Take a screenshot using the emulator and make sure the image is 1:1 scale with absolutely no resizing. The resolution of the screenshot MUST be 256x224.</li>
+						<li>Open the image that the emulator took the screenshot using an image editor of  your choice (such as paint or <a href="https://www.gimp.org/">gimp</a>),
+						(I recommend zooming in and enabling pixel grid display) and select the image of the boss itself, making sure you make the minimum bounding box with that selection:
+						<img src="GMK_MinimumBoundingBox.png"><br>
+						Now look at the info at the status bar of the program (usually at the bottom of the window). It should show the statistics, and we want to know the width. In this example,
+						the width of the sprite is 16 pixels. The good news is that since the majority of sprites are usually 8, 16, 32 or rarely 64 pixels wide, thus it is very easy by guessing.</li>
+						<li>Take the width of that bounding box, and divide by 2. This is the amount of pixels from either the left or right edge of the box, to get to the center. In this example,
+						it is <kbd>32 / 2 = 16</kbd>.</li>
+						<li>And now you have located the center X position of the sprite.</li>
+					</ol>
+					After this, perform this formula: <kbd>GetToCenterOfSprite = CenterXPosition - SpriteOriginXPos</kbd> using the coordinates of the said screenshot. The <kbd>CenterXPosition</kbd>
+					and <kbd>SpriteOriginXPos</kbd> may be at different position on the screenshot depending on where you have the sprite be at, but using the GMK boss, <kbd>GetToCenterOfSprite</kbd>
+					should be:
+					<ol>
+						<li>Facing left: 0</li>
+						<li>Facing right: 16</li>
+						<li>In its shell: 8</li>
+					</ol>
 				</li>
 				<li><kbd>BarXPosCenterOffset</kbd>: (signed) an offset from its center point (represented as an orange cross) to the bar's origin point. This differs depending on the direction of the bar:
 				<table>
