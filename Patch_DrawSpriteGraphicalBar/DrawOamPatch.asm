@@ -1,5 +1,7 @@
 ;This is the patch version that draws a OAM-based sprite graphical bar, without taking up any sprite slots.
 
+;Note: The tile table to use is the same as SimpleTest (SMW-Graphical-bar-display/ExGraphics/Sprite/SimpleTest/TileTable.asm)
+
 ;This patch is based on:
 ;-The mega man X HP bar by anonimzwx (https://www.smwcentral.net/?p=section&a=details&id=13994 )
 ;-The DKR status bar by Ladida, WhiteYoshiEgg, and lx5 (https://www.smwcentral.net/?p=section&a=details&id=24026 )
