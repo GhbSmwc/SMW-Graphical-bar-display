@@ -1176,10 +1176,10 @@ Graphics:
 				..Increase
 					;In this state, when $1570 less than current HP percentage,
 					;do the filling animation by having $00 contain the value of $1558 every frame and the SFX.
-					INC !1570,x
-					LDA $0100|!addr			;\Prevent playing filling SFX during a black screen fade
+					LDA $0100|!addr			;\Prevent playing filling SFX and filling during a black screen fade
 					CMP #$14			;|
 					BNE ..ShowPrev			;/
+					INC !1570,x			;>Filling up animation (1 piece per frame)
 					LDA $13
 					AND.b #%00000001
 					BNE ..ShowPrev
