@@ -209,7 +209,7 @@ bar <i>before</i> it does anything else on the graphics routine:<br>
 			JSL !ConvertBarFillAmountToTiles				;&gt;Convert tiles.
 			PLX								;&gt;Restore sprite slot index
 			;[...]</pre></td></tr></table><br>
-Parts of this is very similar to the status bar-based code, but only the parts that <i>calculate</i> the tiles the use (not the actual writing the tile numbers as part of
+Parts of this is very similar to the status bar-based code, but only the parts that <i>calculate</i> the tiles (not the actual writing the tile numbers as part of
 the final steps). We want to calculate this before calling <kbd>%GetDrawInfo()</kbd> as several subroutines it uses writes data into scratch RAM and also mangles the Y register, especially
 <kbd>CalculateGraphicalBarPercentage</kbd> ($00-$09 are all used). What we are concerned about is writing the tiles to OAM.
 </ul>
@@ -393,7 +393,7 @@ Which is found in <kbd>SMW-Graphical-bar-display/GraphicalBarDefines/SpriteOAMSe
 		NOTE: despite uberasm tool will lock its XY position, the sprite's movement (routine <kbd>$01802A</kbd>) code may displace it's position afterwards by a few pixels (such as gravity making
 		the sprite 1 pixel lower).<br><br>
 		
-		As an exmaple, after discovering its XY origin position of the GMK boss, I show off this image of where it is:
+		As an example, after discovering its XY origin position of the GMK boss, I show off this image of where it is:
 		The purple cross represents the boss's origin position, while the white box is just a reference with the common 16x16 tiles:<br>
 		<img src="GraphicalBar_Offsetting_GMK.png"><br>
 		The purple dot on the top-left of the bar is just to show the bar's origin position.<br><br>
