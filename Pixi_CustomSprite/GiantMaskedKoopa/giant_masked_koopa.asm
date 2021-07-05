@@ -1199,7 +1199,7 @@ Graphics:
 					LDA !1570,x		;\When filling upwards or on every odd frames, $00 will contain the value
 					STA $00			;/of $1570, showing a filling animation or previous HP percentage instead of current HP percentage.
 					
-					..ShowCurrent
+				..ShowCurrent
 			endif
 			JSL !DrawGraphicalBar						;>get bar values.
 			LDA #$01							;\Use Level-sprite tileset
