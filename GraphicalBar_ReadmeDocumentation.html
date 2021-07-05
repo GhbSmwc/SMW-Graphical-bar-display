@@ -678,7 +678,7 @@ See <a href="readme_files/DoubleBarInfo.html#SecondTable" target="_blank">this i
 <td>
 The amount of fill that was <kbd><span class="NoLineBreak"><b>$00</b></span></kbd> to <kbd><span class="NoLineBreak"><b>$01</b></span></kbd> was originally before calling this routine, the value is not
 capped, so inputting a number 63 when there are 62 pieces will have this RAM address storing the value 63. Can be used on such things like &ldquo;multi-bars&rdquo; that multiple bars are shown, and the
-fills advances to the next bar: <img src="readme_files/MultiBar.gif"
+fills advances to the next bar: <img src="readme_files/MultiBar.gif">
 </td>
 </tr>
 </table><br>
@@ -723,7 +723,7 @@ Here are the formulas on how each are calculated:<br><br>
 <li><kbd>MiddleFill = clamp((TotalFilled - LeftEndMax), 0, TotalMiddleMax)</kbd> (excluding the left end, how many pieces filled in the whole middle)</li>
 <li><kbd>NumberOfFullMiddleTiles = clamp(floor(MiddleFill/MiddleMaxEachTile), 0, MiddleLength)</kbd> (<a href="https://en.wikipedia.org/wiki/Euclidean_division">euclidean division</a>)</li>
 <li><kbd>MiddleFractionFill = MiddleFill MOD MiddleMaxEachTile</kbd> (euclidean division), placed just after the last full middle tile or
-on the first middle tile if there are no full middle tiles, if the entire middle tiles is full, fraction is not written at all)</li>
+on the first middle tile if there are no full middle tiles, if the entire middle tiles is full, fraction is not written at all.</li>
 </ul>
 <li>Right end:</li>
 <ul>
