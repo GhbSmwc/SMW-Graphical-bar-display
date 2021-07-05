@@ -258,7 +258,7 @@ main:		;&gt;You DO need this if using uberasm tool.
 		if !Default_LeftwardsBar == 0
 			LDA.b <font color="green">#!Default_StatusBar_TilePropertiesSetting</font>			;\Properties
 		else
-			LDA.b <font color="green">#(!Default_StatusBar_TilePropertiesSetting|(!Default_LeftwardsBar<<6))</font></<6))<>
+			LDA.b <font color="green">#(!Default_StatusBar_TilePropertiesSetting|(!Default_LeftwardsBar<<6))</font>
 		endif
 		STA $06								;/
 	endif
@@ -275,7 +275,8 @@ main:		;&gt;You DO need this if using uberasm tool.
 			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwardsFormat2
 		endif
 	endif
-	RTL</pre></td></tr></table><br>
+	RTL
+	</pre></td></tr></table><br>
 Font colored in <font color="red">red</font> is the things you change, while the <font color="green">green</font>, you edit values in the defines via opening up
 <kbd>GraphicalBarDefines/StatusBarSettings.asm</kbd> and changing those, and yes, you can safely redefine them when you have multiple bars for advanced use. <font color="yellow">Yellow</font>
 is the same as green, but it has to be a 3-byte (24-bit) address. <font color="orange">Orange</font> means you can remove the rounding away code if you want the bar to be able to round
@@ -1525,7 +1526,7 @@ routine before you call <kbd>CalculateGraphicalBarPercentage</kbd>.
 <table>
 <tr><th>Output</th><th>Number of bytes</th><th>Description</th><th>Where to write for <kbd>CalculateGraphicalBarPercentage</kbd></th></tr>
 <tr><td><kbd>$00</kbd> to <kbd>$01</kbd></td><td align="center" valign="center">2</td><td>The quantity, subtracted by minimum quantity. <kbd>ZeroBasedQuantity = max(Quantity - Minimum, 0)</kbd></td><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl+1</kbd></td></tr>
-<tr><td><kbd>$02</kbd> to <kbd>$03</kbd></td><td align="center" valign="center">2</td><td>The minimum quantity (stayed the same).</td><td>Not used (because this will always be zero -- subtracts by itself.</td></tr>
+<tr><td><kbd>$02</kbd> to <kbd>$03</kbd></td><td align="center" valign="center">2</td><td>The minimum quantity (stayed the same).</td><td>Not used (because this will always be zero by subtracting by itself, if it were used).</td></tr>
 <tr><td><kbd>$04</kbd> to <kbd>$05</kbd></td><td align="center" valign="center">2</td><td>The maximum quantity (subtracted by minimal quantity), this is also the size of the range. <kbd>ZeroBasedMaxQuaitity = MaxQuantity - MinQuantity</kbd></td><td><kbd>!Scratchram_GraphicalBar_FillByteTbl+2</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl+3</kbd></td></tr>
 </table><br>
 
