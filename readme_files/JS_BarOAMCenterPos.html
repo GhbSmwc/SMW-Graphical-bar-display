@@ -1,0 +1,149 @@
+<html>
+	<head>
+		<style>
+			html {
+			background-color: #000207;
+			color: white;
+			font-family: sans-serif;
+			}
+			
+			table, th, td {
+			border: 1px solid white;
+			border-collapse: collapse;
+			}
+			
+			div.SmallFont {
+				font-size: 11px;
+			}
+			
+			div.StatisticsTable {
+				max-width:900px;
+			}
+			input[type='text'] { font-family: monospace;}
+			input[type='number'] { font-family: monospace;}
+			
+			span.NoLineBreak {
+				white-space: nowrap;
+			}
+			
+			abbr{cursor: help;}
+			
+			
+			img.img-hor {
+				-moz-transform: scaleX(-1);
+				-o-transform: scaleX(-1);
+				-webkit-transform: scaleX(-1);
+				transform: scaleX(-1);
+				filter: FlipH;
+				-ms-filter: "FlipH";
+			}
+		</style>
+	</head>
+<a href="../GraphicalBar_ReadmeDocumentation.html#CenterBar">Back to main readme</a><br>
+<a href="GMKBossSummary.html#From_JS_BarOAMCenterPos">Back to GMK summary</a>
+<center><h1>Centering bar calculator</h1></center>
+<p>This javascript HTML file is intended to calculate the X position (<abbr title="But why? Most video games that have HP bars are usually horizontal placed above or below the character.">it can work with vertical Y position as well</abbr>) of the bar so that it is centered with the sprite.</p>
+<p>Be sure to check out the Giant Masked Koopa summary linked above and view the images related to centering of what these variables mean.</p>
+<ul>
+	<li><abbr title="How many pixels, across the X axis, from the sprite&apos;s origin, to the center of the body. Negative goes to the left, positive goes to the right"><kbd>GetToCenterOfSprite</kbd></abbr> (signed): <input type="number" id="GetToCenterOfSprite" onchange="CalculateBarCenteringPos()"></li>
+	<li>
+		<abbr title="Fill direction.">Direction:</abbr><br>
+		<input type="radio" name="BarDirection" id="BarDirectionL2R" checked onchange="CalculateBarCenteringPos()"><label for="BarDirectionL2R">Left to Right</label><br>
+		<input type="radio" name="BarDirection" id="BarDirectionR2L" onchange="CalculateBarCenteringPos()"><label for="BarDirectionR2L">Right to Left</label>
+	</li>
+	<li><abbr title="Width of the bar itself (not the space of the remaining parts of the 8x8 tile), in pixels."><kbd>BarWidth</kbd></abbr> (must be non-negative): <input type="number" id="BarWidth" min="0" max="256" onchange="CalculateBarCenteringPos()"></li>
+	<li><abbr title="Distance between the nearest edge (left or right edge) of the bar to its origin position, which is the top-left pixel of the 8x8 tile where the fill starts when increasing."><kbd>EdgeOriginDistance</kbd></abbr> (must be non-negative): <input type="number" id="EdgeOriginDistance" min="0" max="7" onchange="CalculateBarCenteringPos()"></li>
+</ul><br><br>
+
+<button onclick="Reset()">Reset</button>
+<hr>
+<span id="Output"></span>
+<script>
+	window.onload = Reset()
+	function Reset() {
+		document.getElementById("GetToCenterOfSprite").value = "0"
+		document.getElementById("BarDirectionL2R").checked = true
+		document.getElementById("BarWidth").value = "64"
+		document.getElementById("EdgeOriginDistance").value = "4"
+		CalculateBarCenteringPos()
+	}
+	function CalculateBarCenteringPos() {
+		var Output = ""
+		var GetToCenterOfSprite = CorrectSignedDecBigIntValue(document.getElementById("GetToCenterOfSprite").value)
+		document.getElementById("GetToCenterOfSprite").value = GetToCenterOfSprite.toString(10)
+		
+		var BarWidth = BigintClamp(CorrectSignedDecBigIntValue(document.getElementById("BarWidth").value), 0n, 256n)
+		document.getElementById("BarWidth").value = BarWidth.toString(10)
+		
+		var EdgeOriginDistance = BigintClamp(CorrectSignedDecBigIntValue(document.getElementById("EdgeOriginDistance").value), 0n, 7n)
+		document.getElementById("EdgeOriginDistance").value = EdgeOriginDistance.toString(10)
+		
+		var BarPosition = 0n
+			//^Placeholder for result later.
+		
+		if (document.getElementById("BarDirectionL2R").checked == true) {
+			//Left to right
+				BarPosition = GetToCenterOfSprite + ( - BigIntFloorDiv(BarWidth, 2n) - EdgeOriginDistance)
+		} else {
+			//Right to left
+				BarPosition = GetToCenterOfSprite + BigIntFloorDiv(BarWidth, 2n) - EdgeOriginDistance
+		}
+		
+		Output += "Bar origin position realtive to sprite&apos;s center: "
+		if (((BarPosition >= -128n)&&(BarPosition <= 127n)) == false) {
+			Output += "<font color='red'>"
+		}
+		Output += "<kbd>" + ConvertNegativeDecimalNumberToParenthesisNotationString(BarPosition) + "</kbd>"
+		if (((BarPosition >= -128n)&&(BarPosition <= 127n)) == false) {
+			Output += "</font> Offset too far! The offset can only represent ranges from (-128) to +127."
+		}
+		
+		if ((BarPosition >= -128n)&&(BarPosition <= 127n)) {
+			Output += " (Two&apos;s complement hex: <kbd>$" + pad((BigInt.asUintN(8, BarPosition)).toString(16).toUpperCase(), 2) + "</kbd>)"
+		}
+		document.getElementById("Output").innerHTML = Output
+	
+	}
+	//Clamp
+		function BigintClamp(num, min, max) {
+			//Restrict a number within a specified range, bigInt edition.
+			return num <= min ? min : num >= max ? max : num;
+		}
+	//Check if given string can be converted into bigInt value (including negatives)
+		function CorrectSignedDecBigIntValue(String) {
+			if ((/^-?\d+$/).test(String) == false) {
+				String = 0n
+			}
+			return CanConvertHexStringToBigInt = BigInt(String)
+		}
+	//Convert negative number to parenthesis notation string (example: -3 is now "(-3)")
+		function ConvertNegativeDecimalNumberToParenthesisNotationString(BigIntNumber) {
+			if (BigIntNumber < 0n) {
+				BigIntNumber = "(" + BigIntNumber.toString(10) + ")"
+			} else {
+				BigIntNumber = "+" + BigIntNumber.toString(10)
+			}
+			return BigIntNumber
+		}
+	//Pad zeroes if fewer digits
+		function pad(num, size) {
+			//This adds leading zeroes. [size] is the number of digits at minimum to show (less than that will fill this with 0s).
+			var s = num+"";
+			while (s.length < size) s = "0" + s;
+			return s;
+		}
+	//Floor division for bigint (avoids rounding upwards in negative, since bigint always truncates)
+		function BigIntFloorDiv(N, D) {
+			var Modulo = N % D
+			var Quotient = N / D
+			if ((((N > 0n)&&(D > 0n))||((N < 0n)&&(D < 0n))) == false) {
+				//Negative (N and D on different signs)
+				if (Modulo != 0n) {
+					//Modulo result not being zero means it landed in between two integers.
+						Quotient--
+				}
+			}
+			
+			return Quotient
+		}
+</script>

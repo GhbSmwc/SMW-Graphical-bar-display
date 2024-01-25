@@ -1,0 +1,63 @@
+<html>
+	<head>
+		<style>
+			html {
+			background-color: #000207;
+			color: white;
+			font-family: sans-serif;
+			}
+			
+			table, th, td {
+			border: 1px solid white;
+			border-collapse: collapse;
+			}
+			
+			span.NoLineBreak {
+				white-space: nowrap;
+			}
+			
+			abbr{cursor: help;}
+		</style>
+	</head>
+<body>
+Replace the current table (for &ldquo;DiagonalFillEdge&rdquo;) with this table,
+and then open <kbd>StatusBarSettings.asm</kbd>, and change <kbd>Default_RightPieces</kbd>
+to <kbd>$04</kbd>.
+<table><tr><td><pre>	;This is for level:
+		GraphicalBar_LeftEnd8x8sFillEdgeCross_Lvl_L3:
+		db $36		;&gt;Index: $00 (Filled amount: $00 out of $03)
+		db $37		;&gt;Index: $01 (Filled amount: $01 out of $03)
+		db $38		;&gt;Index: $02 (Filled amount: $02 out of $03)
+		db $39		;&gt;Index: $03 (Filled amount: $03 out of $03)
+		db $35		;&gt;Index: $04 ($03 + $01 = Index: $04)
+		db $35		;&gt;Index: $05 ($03 + $02 = Index: $05)
+		db $35		;&gt;Index: $06 ($03 + $03 = Index: $06)
+		db $35		;&gt;Index: $07 ($03 + $04 = Index: $07)
+		db $35		;&gt;Index: $08 ($03 + $05 = Index: $08)
+		db $35		;&gt;Index: $09 ($03 + $06 = Index: $09)
+		db $35		;&gt;Index: $0A ($03 + $07 = Index: $0A)
+		db $35		;&gt;Index: $0B ($03 + $08 = Index: $0B)
+		GraphicalBar_Middle8x8sFillEdgeCross_Lvl_L3:
+		db $55		;&gt;Index: $00 (Filled amount: $00 out of $08)
+		db $56		;&gt;Index: $01 (Filled amount: $01 out of $08)
+		db $57		;&gt;Index: $02 (Filled amount: $02 out of $08)
+		db $58		;&gt;Index: $03 (Filled amount: $03 out of $08)
+		db $59		;&gt;Index: $04 (Filled amount: $04 out of $08)
+		db $65		;&gt;Index: $05 (Filled amount: $05 out of $08)
+		db $66		;&gt;Index: $06 (Filled amount: $06 out of $08)
+		db $67		;&gt;Index: $07 (Filled amount: $07 out of $08)
+		db $68		;&gt;Index: $08 (Filled amount: $08 out of $08)
+		db $5A		;&gt;Index: $09 ($08 + $01 = Index: $09)
+		db $5A		;&gt;Index: $0A ($08 + $02 = Index: $0A)
+		db $5A		;&gt;Index: $0B ($08 + $03 = Index: $0B)
+		db $5A		;&gt;Index: $0C ($08 + $04 = Index: $0C)
+		db $5A		;&gt;Index: $0D ($08 + $05 = Index: $0D)
+		db $5A		;&gt;Index: $0E ($08 + $06 = Index: $0E)
+		db $5A		;&gt;Index: $0F ($08 + $07 = Index: $0F)
+		db $5A		;&gt;Index: $10 ($08 + $08 = Index: $10) Maximum value of next tile ($08 of next middle tile vs $03 of right end)
+		GraphicalBar_RightEnd8x8sFillEdgeCross_Lvl_L3:
+		db $50		;&gt;Index: $00 (Filled amount: $00 out of $04)
+		db $51		;&gt;Index: $01 (Filled amount: $01 out of $04)
+		db $52		;&gt;Index: $02 (Filled amount: $02 out of $04)
+		db $53		;&gt;Index: $03 (Filled amount: $03 out of $04)
+		db $54		;&gt;Index: $04 (Filled amount: $04 out of $04)</pre></td></tr></table>

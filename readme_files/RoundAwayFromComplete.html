@@ -1,0 +1,93 @@
+<html>
+	<head>
+		<style>
+			html {
+			background-color: #000207;
+			color: white;
+			font-family: sans-serif;
+			}
+			
+			table, th, td {
+			border: 1px solid white;
+			border-collapse: collapse;
+			}
+		</style>
+	</head>
+<body>
+
+<a href="../GraphicalBar_ReadmeDocumentation.html#RoundAwayFromComplete">Back to <kbd>CalculateGraphicalBarPercentage</kbd></a><br>
+<a href="../GraphicalBar_ReadmeDocumentation.html#TOCRoundAwayFromComplete">Back to <kbd>Round away from empty/full/both</kbd></a><br><br>
+<center><h1>Rounding towards &ldquo;Complete&rdquo; detection</h1></center>
+<center><table><tr><td><img src="RoundingAwayComparasions.png"><br>
+<div style="max-width:588px;">A comparison between not having &ldquo;rounding away&rdquo; and having rounding away when displaying values close to 0% and 100%
+on a 62-pieced bar (3 pieces for both ends, and 7 middle tiles with 8 pieces each: <nobr><kbd>3+(8*7)+3</kbd></nobr>). Note when round-away was applied, the bars' fill are 1-piece off from full and empty.</div></td></tr></table></center><br>
+
+The purpose of this rounding detection feature is to prevent the bar from misrepresenting the value of something when they get rounded down towards empty or
+upwards to full (I would use the term &ldquo;complete&rdquo; for both of these). Thus, before this was implemented, when used on such things such as a health
+bar, the meter can display &ldquo;empty&rdquo; when the character (player or enemy)'s actual HP isn't 0 (not defeated), due to the bar's fill value (number
+of pieces filled) was calculated to be a nonzero less than 0.5, and when used as a progress meter (say, the percentage completion), the bar could
+display 100% if the resulting number of pieces is at least <kbd>MaxFill-0.5</kbd> and less than <kbd>MaxFill</kbd>. This happens if the value of &ldquo;max quantity&rdquo;
+is greater than the number of pieces in the bar, resulting some of the quantity values to be assigned to the same number of pieces filled:
+<table><tr><td><pre>!Scratchram_GraphicalBar_LeftEndPiece:      $03
+!Scratchram_GraphicalBar_MiddlePiece:       $08
+!Scratchram_GraphicalBar_RightEndPiece:     $03
+!Scratchram_GraphicalBar_TempLength:        $07
+ 
+;TotalPieces: 3 + (8*7) + 3 = 62 pieces (the maximum) in the whole bar.
+;!Scratchram_GraphicalBar_FillByteTbl+2: Holds the 16-bit number $00C8 (200 in decimal).
+;Testing various values (16-bit) stored in !Scratchram_GraphicalBar_FillByteTbl results in these values:
+
+0*62/200 = 0.00 pieces filled &rightarrow; round to 0 (Y=$00) - A truly empty bar
+<span style="color: red">1*62/200 = 0.31 pieces filled &rightarrow; round to 0 (Y=$01)</span>
+2*62/200 = 0.62 pieces filled &rightarrow; round to 1 (Y=$00)
+3*62/200 = 0.93 pieces filled &rightarrow; round to 1 (Y=$00)
+4*62/200 = 1.24 pieces filled &rightarrow; round to 1 (Y=$00)
+;...
+195*62/200 = 60.45 pieces filled &rightarrow; round to 60 (Y=$00)
+196*62/200 = 60.76 pieces filled &rightarrow; round to 61 (Y=$00)
+197*62/200 = 61.07 pieces filled &rightarrow; round to 61 (Y=$00)
+198*62/200 = 61.38 pieces filled &rightarrow; round to 61 (Y=$00)
+<span style="color: red">199*62/200 = 61.69 pieces filled &rightarrow; round to 62 (Y=$02)</span>
+200*62/200 = 62.00 pieces filled &rightarrow; round to 62 (Y=$00) - A truly full bar
+201*62/200 = 62.31 pieces filled &rightarrow; round to 62 (Y=$00)
+202*62/200 = 62.62 pieces filled &rightarrow; round to 63 (Y=$00) - will still display 62/62 in the table (capped), but filled amount is still 63.</pre></td></tr></table><br>
+
+You may wondering why I rather have the information about the rounding towards empty or full (best to be called &ldquo;complete&rdquo;
+for both empty and full) to be as an output of <kbd>CalculateGraphicalBarPercentage</kbd> subroutine in Y than directly have $00 (amount of fill) set to #$0001 (the fill
+amount is 16-bit) or <kbd>AllPieces-1</kbd> be in the routine. This is in case if you want to have <i>certain</i> bar(s) with the rounding <i>away</i> from either full or empty (say a percent
+completion bar ALLOWS rounding down to 0%, but forbids rounding up to 100% when 99.99%, while the HP bar is the other way around). These subroutines will automatically perform the round-away for you:
+<table><tr><td><pre>JSL GraphicalBarELITE_RoundAwayEmpty			;>Rounds to 1 if attempts to round down to 0.
+JSL GraphicalBarELITE_RoundAwayFull			;>Rounds to MaxFill-1 if attempts to round up to MaxFill.
+JSL GraphicalBarELITE_RoundAwayEmptyFull		;>Rounds to 1 if attempts to round down to 0 AND rounds to MaxFill-1 if attempts to round up to MaxFill.</pre></td></tr></table>
+
+<script>
+//These makes all <pre>...</pre> have an effect that double-clicking will select all the text
+//in it, to make it easy to copy code and paste it in your ASM stuff.
+//
+//Credit:
+// https://keestalkstech.com/2014/04/click-to-select-all-on-the-pre-element/
+// https://www.sanwebe.com/2014/04/select-all-text-in-element-on-click
+document.addEventListener('dblclick', e => {
+  let pre = getClosest(e.target, "PRE");
+  if (pre && e.ctrlKey) {
+    let range = new Range();
+    range.selectNodeContents(pre);
+    document.getSelection().removeAllRanges();
+    document.getSelection().addRange(range);
+  }
+});
+
+function getClosest(el, tagName) {
+  tagName = tagName && tagName.toUpperCase();
+
+  if (!tagName || !el)
+    return null;
+
+  do
+    if (el.nodeName === tagName)
+      return el;
+  while (el = el.parentNode);
+
+  return null;
+}
+</script>

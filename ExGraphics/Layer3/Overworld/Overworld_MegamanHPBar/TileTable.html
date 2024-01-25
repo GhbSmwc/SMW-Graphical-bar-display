@@ -1,0 +1,43 @@
+<html>
+	<head>
+		<style>
+			html {
+			background-color: #000207;
+			color: white;
+			font-family: sans-serif;
+			}
+			
+			table, th, td {
+			border: 1px solid white;
+			border-collapse: collapse;
+			}
+			
+			span.NoLineBreak {
+				white-space: nowrap;
+			}
+			
+			abbr{cursor: help;}
+		</style>
+	</head>
+<body>
+Replace the table for <kbd>ConvertBarFillAmountToTiles</kbd>. Because of the alternating pixels in the bar, the number
+of units per tile is halved (each piece is 2 pixels wide in a period). NOTE: The bar will be odd pixels wide due to accommodate
+the spacing of each &ldquo;piece&rdquo;.
+<table><tr><td><pre>		GraphicalBar_LeftEnd8x8s_Ow_L3:
+		db $80		;&gt;Fill amount/index: $00 (0 out of 2)
+		db $81		;&gt;Fill amount/index: $01 (1 out of 2)
+		db $82		;&gt;Fill amount/index: $02 (2 out of 2)
+		GraphicalBar_Middle8x8s_Ow_L3:
+		db $84		;&gt;Fill amount/index: $00 (0 out of 4)
+		db $85		;&gt;Fill amount/index: $01 (1 out of 4)
+		db $86		;&gt;Fill amount/index: $02 (2 out of 4)
+		db $87		;&gt;Fill amount/index: $03 (3 out of 4)
+		db $88		;&gt;Fill amount/index: $04 (4 out of 4)
+		GraphicalBar_RightEnd8x8s_Ow_L3:
+		db $8D		;&gt;Fill amount/index: $00 (0 out of 2)
+		db $8E		;&gt;Fill amount/index: $01 (1 out of 2)
+		db $8F		;&gt;Fill amount/index: $02 (2 out of 2)</pre></td></tr></table><br>
+In <kbd>GraphicalBarDefines/StatusBarSettings.asm</kbd>:
+<table><tr><td><pre>	!Default_LeftPieces                  = 2             ;\These will by default, set the RAM for the pieces for each section
+	!Default_MiddlePieces                = 4             ;|
+	!Default_RightPieces                 = 2             ;/</pre></td></tr></table>

@@ -1,0 +1,49 @@
+<html>
+	<head>
+		<style>
+			html {
+			background-color: #000207;
+			color: white;
+			font-family: sans-serif;
+			}
+			
+			table, th, td {
+			border: 1px solid white;
+			border-collapse: collapse;
+			}
+			
+			span.NoLineBreak {
+				white-space: nowrap;
+			}
+			
+			abbr{cursor: help;}
+		</style>
+	</head>
+<body>
+For <kbd>Level_BlackBackground</kbd> and <kbd>Level_TransperentBackground</kbd> only. This is in case you replaced the table and wanted to revert back to this.
+to <kbd>$06</kbd>.
+<table><tr><td><pre>	;This is for level:
+		;Layer 3
+			GraphicalBar_LeftEnd8x8s_Lvl_L3:
+			;Left end fill amount tile numbers:
+			db $36		;&gt;Fill amount/index: $00
+			db $37		;&gt;Fill amount/index: $01
+			db $38		;&gt;Fill amount/index: $02
+			db $39		;&gt;Fill amount/index: $03
+			GraphicalBar_Middle8x8s_Lvl_L3:
+			;Middle fill amount tile numbers
+			db $55		;&gt;Fill amount/index: $00
+			db $56		;&gt;Fill amount/index: $01
+			db $57		;&gt;Fill amount/index: $02
+			db $58		;&gt;Fill amount/index: $03
+			db $59		;&gt;Fill amount/index: $04
+			db $65		;&gt;Fill amount/index: $05
+			db $66		;&gt;Fill amount/index: $06
+			db $67		;&gt;Fill amount/index: $07
+			db $68		;&gt;Fill amount/index: $08
+			GraphicalBar_RightEnd8x8s_Lvl_L3:
+			;Right end fill amount tile numbers:
+			db $50		;&gt;Fill amount/index: $00
+			db $51		;&gt;Fill amount/index: $01
+			db $52		;&gt;Fill amount/index: $02
+			db $53		;&gt;Fill amount/index: $03</pre></td></tr></table>

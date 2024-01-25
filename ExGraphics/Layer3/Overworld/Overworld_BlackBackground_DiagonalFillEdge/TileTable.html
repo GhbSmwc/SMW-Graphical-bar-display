@@ -1,0 +1,65 @@
+<html>
+	<head>
+		<style>
+			html {
+			background-color: #000207;
+			color: white;
+			font-family: sans-serif;
+			}
+			
+			table, th, td {
+			border: 1px solid white;
+			border-collapse: collapse;
+			}
+			
+			span.NoLineBreak {
+				white-space: nowrap;
+			}
+			
+			abbr{cursor: help;}
+		</style>
+	</head>
+<body>
+If you have replaced the table with the outlined fill edge, and you want the diagonal fill edge back,
+I've provided this backup table. Don't forget to open <kbd>StatusBarSettings.asm</kbd>, and change <kbd>Default_RightPieces</kbd>
+to <kbd>$06</kbd>.
+<table><tr><td><pre>	;These here are the same as above but intended for overworld border.
+		GraphicalBar_LeftEnd8x8sFillEdgeCross_Ow_L3:
+		db $80		;&gt;Index: $00 (Filled amount: $00 out of $03)
+		db $81		;&gt;Index: $01 (Filled amount: $01 out of $03)
+		db $82		;&gt;Index: $02 (Filled amount: $02 out of $03)
+		db $83		;&gt;Index: $03 (Filled amount: $03 out of $03)
+		db $84		;&gt;Index: $04 ($03 + $01 = Index: $04)
+		db $85		;&gt;Index: $05 ($03 + $02 = Index: $05)
+		db $86		;&gt;Index: $06 ($03 + $03 = Index: $06)
+		db $86		;&gt;Index: $07 ($03 + $04 = Index: $07)
+		db $86		;&gt;Index: $08 ($03 + $05 = Index: $08)
+		db $86		;&gt;Index: $09 ($03 + $06 = Index: $09)
+		db $86		;&gt;Index: $0A ($03 + $07 = Index: $0A)
+		db $86		;&gt;Index: $0B ($03 + $08 = Index: $0B)
+		GraphicalBar_Middle8x8sFillEdgeCross_Ow_L3:
+		db $87		;&gt;Index: $00 (Filled amount: $00 out of $08)
+		db $88		;&gt;Index: $01 (Filled amount: $01 out of $08)
+		db $89		;&gt;Index: $02 (Filled amount: $02 out of $08)
+		db $8A		;&gt;Index: $03 (Filled amount: $03 out of $08)
+		db $8B		;&gt;Index: $04 (Filled amount: $04 out of $08)
+		db $8C		;&gt;Index: $05 (Filled amount: $05 out of $08)
+		db $8D		;&gt;Index: $06 (Filled amount: $06 out of $08)
+		db $8E		;&gt;Index: $07 (Filled amount: $07 out of $08)
+		db $8F		;&gt;Index: $08 (Filled amount: $08 out of $08)
+		db $90		;&gt;Index: $09 ($08 + $01 = Index: $09)
+		db $92		;&gt;Index: $0A ($08 + $02 = Index: $0A)
+		db $93		;&gt;Index: $0B ($08 + $03 = Index: $0B)
+		db $93		;&gt;Index: $0C ($08 + $04 = Index: $0C)
+		db $93		;&gt;Index: $0D ($08 + $05 = Index: $0D)
+		db $93		;&gt;Index: $0E ($08 + $06 = Index: $0E)
+		db $93		;&gt;Index: $0F ($08 + $07 = Index: $0F)
+		db $93		;&gt;Index: $10 ($08 + $08 = Index: $10) Maximum value of next tile ($08 of next middle tile vs $03 of right end)
+		GraphicalBar_RightEnd8x8sFillEdgeCross_Ow_L3:
+		db $94		;&gt;Index: $00 (Filled amount: $00 out of $06)
+		db $95		;&gt;Index: $01 (Filled amount: $01 out of $06)
+		db $96		;&gt;Index: $02 (Filled amount: $02 out of $06)
+		db $97		;&gt;Index: $03 (Filled amount: $03 out of $06)
+		db $98		;&gt;Index: $04 (Filled amount: $04 out of $06)
+		db $99		;&gt;Index: $05 (Filled amount: $05 out of $06)
+		db $9A		;&gt;Index: $06 (Filled amount: $06 out of $06)</pre></td></tr></table>

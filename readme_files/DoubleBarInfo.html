@@ -1,0 +1,372 @@
+<html>
+	<head>
+		<style>
+			html {
+			background-color: #000207;
+			color: white;
+			font-family: sans-serif;
+			}
+			
+			table, th, td {
+			border: 1px solid white;
+			border-collapse: collapse;
+			}
+		</style>
+	</head>
+<body>
+
+<a href="../GraphicalBar_ReadmeDocumentation.html#DoubleBar">Back</a><br><br>
+<a href="../GraphicalBar_ReadmeDocumentation.html#ConvertBarFillAmountToTilesDoubleBar">Back to subroutine info about <kbd>ConvertBarFillAmountToTilesDoubleBar</kbd></a><br>
+
+<h1><center>How a Double Bar works</h1>
+You have probably seen this type of bar: <img src="GraphicalBarFillsAnimation.gif"> in most video games that display health. This is common in fighting games
+and some RPG games that when the fill drops, this loss is represented as a separate fill. This represents the damage taken to the character.<br><br>
+
+There are two ways to do this using this graphical bar code:
+<table>
+<tr>
+<th>Rapid-flicker</th>
+<th>Using separate graphics</th>
+</tr>
+<td>
+<center><img src="DoubleBarFills_Flicker.gif"></center><br>
+Flickers between two fill values rapidly (every other frame, frame 0 displays the current HP, for example, while frame 1 displays the previous before-damage HP)
+This gives a &ldquo;transparent&rdquo; appearance at 60 frames per second. The game, <i>Kirby Super Star Ultra</i> uses this mechanic. This does not use <kbd>ConvertBarFillAmountToTilesDoubleBar</kbd>
+and can be use with &ldquo;normal&rdquo; fill amount &rarr; tile number routines since we are recycling graphics.</td>
+<td>
+<center><img src="DoubleBarFills_AnotherColor.png">/<img src="DoubleBarFills_CheckerBoard.png"></center><br>
+Displays 2 different fills <b>at the same time</b>. This is very graphic-expensive, as <a href="DoubleBarVRAMGraphic.png" target="_blank">each tile have its own combination of display of the two fills individually</a> as layer
+background tiles on the same layer cannot overlap. Not recommended for use due to this. Do note that you are limited to 4 colors on a 2BPP (2 bits per pixel) graphic
+(palette 0 is transparent, and palettes 1-3 are the actual colors). This uses <kbd>ConvertBarFillAmountToTilesDoubleBar</kbd> instead of the &ldquo;normal&rdquo; fill amount &rarr; tile number routines.</td>
+</table><br>
+
+<h2>How this works</h2>
+These bars have two values stored in memory so that they are both represented as separate fills. It's essentially two bars merged into one. The code to do this is
+considerably different if you want the &ldquo;rapid-flicker&rdquo; or &ldquo;separate graphics&rdquo;. Note that these are bare-bones examples and are designed for testing
+only, advanced features like one fill amount increments/decrements towards another, separate graphics displaying an increase as well as a decrease, are included in <kbd>ExampleUsage</kbd> folder.
+<ul>
+<li><b>Rapid-flicker</b>:
+
+<table><tr><td><pre>incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
+incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
+;^These are needed so the defines relating to the graphical bars work.
+
+main:
+	LDA <span style="color: red">!Freeram_SecondQuantity</span>		;\If SecondQuantity is less than FirstQuantity, don't show secondfill.
+	CMP <span style="color: red">!Freeram_FirstQuantity</span>		;|over firstfill
+	BCC .Frame0				;/
+	
+	LDA $13					;\Frame counter [0-255] MOD 2
+	AND.b #%00000001			;/
+	BEQ .Frame0
+	
+	.Frame1
+		;Odd frame
+		;REP #$20
+		LDA <span style="color: red">!Freeram_SecondQuantity</span>
+		BRA .SetupQuantity
+	
+	.Frame0
+		;Even frame
+		;REP #$20
+		LDA <span style="color: red">!Freeram_FirstQuantity</span>
+	
+	.SetupQuantity
+		STA !Scratchram_GraphicalBar_FillByteTbl 		;>Quantity low
+		LDA <span style="color: red">#$00</span>						;\Quantity high (remove this two-line for 16-bit)
+		STA !Scratchram_GraphicalBar_FillByteTbl+1		;/
+		LDA <span style="color: red">#!DoubleBar_MaxQuantity</span>				;\Max Quantity low
+		STA !Scratchram_GraphicalBar_FillByteTbl+2		;/
+		LDA <span style="color: red">#$00</span>						;\Max quantity high (remove this two-line for 16-bit)
+		STA !Scratchram_GraphicalBar_FillByteTbl+3		;/
+		;SEP #$20
+	;GetBarData
+		LDA <span style="color: green">#!Default_LeftPieces</span>				;\Left end pieces
+		STA !Scratchram_GraphicalBar_LeftEndPiece		;/
+		LDA <span style="color: green">#!Default_MiddlePieces</span>				;\Middle pieces
+		STA !Scratchram_GraphicalBar_MiddlePiece		;/
+		LDA.b <span style="color: green">#!Default_MiddleLength</span>				;\Middle length
+		STA !Scratchram_GraphicalBar_TempLength			;/
+		LDA <span style="color: green">#!Default_RightPieces</span>				;\Right end pieces
+		STA !Scratchram_GraphicalBar_RightEndPiece		;/
+		JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
+		<span style="color: orange">JSL GraphicalBarELITE_RoundAwayEmptyFull</span>
+		JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
+		JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
+		LDA.b <span style="color: yellow">#!Default_GraphicalBar_Pos_Tile</span>				;\Setup address to where to draw the bar.
+		STA $00								;|
+		LDA.b <span style="color: yellow">#!Default_GraphicalBar_Pos_Tile>>8</span>			;|
+		STA $01								;|
+		LDA.b <span style="color: yellow">#!Default_GraphicalBar_Pos_Tile>>16</span>			;|
+		STA $02								;/
+		if !StatusBar_UsingCustomProperties != 0
+			LDA.b <span style="color: yellow">#!Default_GraphicalBar_Pos_Properties</span>				;\Same as above but properties
+			STA $03								;|
+			LDA.b <span style="color: yellow">#!Default_GraphicalBar_Pos_Properties>>8</span>			;|
+			STA $04								;|
+			LDA.b <span style="color: yellow">#!Default_GraphicalBar_Pos_Properties>>16</span>			;|
+			STA $05								;/
+			if !Default_LeftwardsBar == 0
+				LDA.b <span style="color: green">#!Default_StatusBar_TilePropertiesSetting</span>			;\Properties
+			else
+				LDA.b <span style="color: green">#(!Default_StatusBar_TilePropertiesSetting|(!Default_LeftwardsBar<<6))</span></<6))<>
+			endif
+			STA $06								;/
+		endif
+		if !Default_LeftwardsBar == 0
+			if !StatusBarFormat = $01
+				JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;>Write to status bar
+			else
+				JSL GraphicalBarWriteToStatusBar_WriteBarToHUDFormat2		;>Write to status bar
+			endif
+		else
+			if !StatusBarFormat = $01
+				JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards
+			else
+				JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwardsFormat2
+			endif
+		endif
+	RTL</pre></td></tr></table>
+Remove the semicolons in front of <nobr><kbd>REP #$20</kbd></nobr> and <nobr><kbd>SEP #$20</kbd></nobr> should your quantity amount is a 16-bit number (going over 255)
+The red font is the things you can replace. Note that this does not work with tiles that update other than each and every frame (for example, the Overworld
+Border Plus updates tile every other frame), in this case you left shift the <nobr><kbd>#%00000001</kbd></nobr> to <nobr><kbd>#%00000010</kbd></nobr> to obtain
+a slower flicker animation to accommodate this (however the flicker distinct frames become much more noticeable).
+</li><br>
+<li><b>Separate graphics</b>: You actually have to call the graphical bar routines (<kbd>DrawGraphicalBar</kbd> and maybe
+<kbd>CalculateGraphicalBarPercentage</kbd>) twice, with the first one's (<kbd>FirstQuantity</kbd>) table being moved to another location in memory.
+Oh, and because there are repeated codes, they are moved to subroutines to save space:
+<table><tr><td><pre>incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
+incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
+;^These are needed so the defines relating to the graphical bars work.
+
+main:
+.FirstQuantity
+	LDA <span style="color: red">!Freeram_FirstQuantity</span>				;\Amount of fill for first fill
+	STA !Scratchram_GraphicalBar_FillByteTbl		;/
+	LDA <span style="color: red">#$00</span>						;\High byte of above. Should your value here is 8-bit or only 1 byte long,
+	STA !Scratchram_GraphicalBar_FillByteTbl+1		;/use [LDA #$00 : STA !Scratchram_GraphicalBar_FillByteTbl+1].
+	JSR GetMaxQuantityPercentage				;>Set !Scratchram_GraphicalBar_FillByteTbl+2 and !Scratchram_GraphicalBar_FillByteTbl+3
+
+	LDA <span style="color: green">#!Default_LeftPieces</span>				;\Left end pieces
+	STA !Scratchram_GraphicalBar_LeftEndPiece		;/
+	LDA <span style="color: green">#!Default_MiddlePieces</span>				;\Middle pieces
+	STA !Scratchram_GraphicalBar_MiddlePiece		;/
+	LDA.b <span style="color: green">#!Default_MiddleLength</span>				;\Middle length
+	STA !Scratchram_GraphicalBar_TempLength			;/
+	LDA <span style="color: green">#!Default_RightPieces</span>				;\Right end pieces
+	STA !Scratchram_GraphicalBar_RightEndPiece		;/
+	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
+	<span style="color: orange">JSL GraphicalBarELITE_RoundAwayEmptyFull</span>
+	JSL GraphicalBarELITE_DrawGraphicalBar
+	
+	..TransferFirstFillBar ;>FirstFill will be located just after SecondFill in memory address: <SecondFill_Table><FirstFill_Table>
+		PHB
+		REP #$30
+		LDA.w #!Setting_GraphicalBar_SecondFillByteTableOffset-1					;>Number of bytes to transfer, -1 (because byte 0 is included)
+		LDX.w #!Scratchram_GraphicalBar_FillByteTbl							;>Source address
+		LDY.w #!Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset	;>Destination address
+		MVN (!Scratchram_GraphicalBar_FillByteTbl>>16), (!Scratchram_GraphicalBar_FillByteTbl>>16)	;>Move them
+		SEP #$30
+		PLB
+.SecondQuantity
+	;Thankfully the graphical bar routines does not mess up the scratch RAM inputs (other than !Scratchram_GraphicalBar_FillByteTbl), therefore
+	;you only need to set them once.
+	LDA <span style="color: red">!Freeram_SecondQuantity</span>				;\Amount of fill for second fill
+	STA !Scratchram_GraphicalBar_FillByteTbl		;/
+	LDA <span style="color: red">#$00</span>						;\High byte of above. Should your value here is 8-bit or only 1 byte long,
+	STA !Scratchram_GraphicalBar_FillByteTbl+1		;/use [LDA #$00 : STA !Scratchram_GraphicalBar_FillByteTbl+1].
+	JSR GetMaxQuantityPercentage				;>Set !Scratchram_GraphicalBar_FillByteTbl+2 and !Scratchram_GraphicalBar_FillByteTbl+3
+	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
+	<span style="color: orange">JSL GraphicalBarELITE_RoundAwayEmptyFull</span>
+	JSL GraphicalBarELITE_DrawGraphicalBar					;>get bar values.
+.PrepareTile
+	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTilesDoubleBar	;>Convert tiles.
+	LDA.b <span style="color: yellow">#!Default_GraphicalBar_Pos_Tile</span>					;\Setup address to where to draw the bar.
+	STA $00									;|
+	LDA.b <span style="color: yellow">#!Default_GraphicalBar_Pos_Tile>>8</span>				;|
+	STA $01									;|
+	LDA.b <span style="color: yellow">#!Default_GraphicalBar_Pos_Tile>>16</span>				;|
+	STA $02									;/
+	if !StatusBar_UsingCustomProperties != 0
+		LDA.b <span style="color: yellow">#!Default_GraphicalBar_Pos_Properties</span>				;\Same as above but properties
+		STA $03								;|
+		LDA.b <span style="color: yellow">#!Default_GraphicalBar_Pos_Properties>>8</span>			;|
+		STA $04								;|
+		LDA.b <span style="color: yellow">#!Default_GraphicalBar_Pos_Properties>>16</span>			;|
+		STA $05								;/
+		if !Default_LeftwardsBar == 0
+			LDA.b <span style="color: green">#!Default_StatusBar_TilePropertiesSetting</span>			;\Properties
+		else
+			LDA.b <span style="color: green">#(!Default_StatusBar_TilePropertiesSetting|(!Default_LeftwardsBar<<6))</span></<6))<>
+		endif
+		STA $06								;/
+	endif
+	if !Default_LeftwardsBar == 0
+		if !StatusBarFormat = $01
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;>Write to status bar
+		else
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDFormat2		;>Write to status bar
+		endif
+	else
+		if !StatusBarFormat = $01
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwards
+		else
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwardsFormat2
+		endif
+	endif
+	RTL
+	
+GetMaxQuantityPercentage:
+	LDA <span style="color: red">#!DoubleBar_MaxQuantity</span>				;\Max quantity (example: max HP). Can be a fixed value (#$) or adjustable RAM in-game.
+	STA !Scratchram_GraphicalBar_FillByteTbl+2		;/
+	LDA <span style="color: red">#$00</span>						;\High byte above, same format as you would do for quantity, so do the same
+	STA !Scratchram_GraphicalBar_FillByteTbl+3		;/as that if your value is 8-bit.
+	RTS</pre></td></tr></table><br>
+	
+	<a name="SecondTable">Thus, assuming you left <nobr><kbd>!Setting_GraphicalBar_SecondFillByteTableOffset</kbd></nobr> equal to <kbd>32</kbd>, both ends set to 3
+	pieces, middle set to 8 pieces, and middle span 7 tile bytes long, the table of values
+	are laid out like this:
+<table><tr><td><pre>!Scratchram_GraphicalBar_FillByteTbl+0:  (SecondFill left end)
+!Scratchram_GraphicalBar_FillByteTbl+1:  (SecondFill 1st middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+2:  (SecondFill 2nd middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+3:  (SecondFill 3rd middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+4:  (SecondFill 4th middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+5:  (SecondFill 5th middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+6:  (SecondFill 6th middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+7:  (SecondFill 7th and final middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+8:  (SecondFill right end)
+!Scratchram_GraphicalBar_FillByteTbl+9:  (unused garbage)
+!Scratchram_GraphicalBar_FillByteTbl+10: (unused garbage)
+!Scratchram_GraphicalBar_FillByteTbl+11: (unused garbage)
+;;;;;;;;;;;;;;;;;;;;;;;;
+;19 bytes later...
+;;;;;;;;;;;;;;;;;;;;;;;;
+!Scratchram_GraphicalBar_FillByteTbl+30: (unused garbage)
+!Scratchram_GraphicalBar_FillByteTbl+31: (unused garbage)
+!Scratchram_GraphicalBar_FillByteTbl+32: (FirstFill left end)
+!Scratchram_GraphicalBar_FillByteTbl+33: (FirstFill 1st middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+34: (FirstFill 2nd middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+35: (FirstFill 3rd middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+36: (FirstFill 4th middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+37: (FirstFill 5th middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+38: (FirstFill 6th middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+39: (FirstFill 7th and final middle tile)
+!Scratchram_GraphicalBar_FillByteTbl+40: (FirstFill right end)
+!Scratchram_GraphicalBar_FillByteTbl+41: (unused garbage)
+!Scratchram_GraphicalBar_FillByteTbl+42: (unused garbage)
+...</pre></td></tr></table>
+Now that both bar tiles are stored, the routine <nobr><kbd>ConvertBarFillAmountToTilesDoubleBar</kbd></nobr> in
+<nobr><kbd>GraphicalBarConvertToTile.asm</kbd></nobr> checks the two equivalent tiles (the two left ends, then the two first middle tile, second middles, and so on...) to determine
+what index to use in order to convert the pairs of fill values into tile numbers (this will write to <nobr><kbd>!Scratchram_GraphicalBar_FillByteTbl+0</kbd></nobr>, not the other table address).<br><br>
+
+You can set <nobr><kbd>!Setting_GraphicalBar_SecondFillByteTableOffset</kbd></nobr> to any number (beware of bank borders though), just be careful not to have your longest bar in your game to exceed this number
+(so if you have a bar that can go higher than 9 tile bytes long, and you set <nobr><kbd>!Setting_GraphicalBar_SecondFillByteTableOffset</kbd></nobr> to 9 or lower), else SecondFill will overwrite FirstFill
+and end up with glitched tiles. The <a href="JS_GraphicalBarCalculator2.html" id="DoubleBarSG">JavaScript calculator</a> also have a detection feature to alert you when you have such settings.<br><br>
+
+The table for the tiles to write to the status bar are formated <a href="DoubleBarFills.png" target="_blank">like this</a> (this is a two-dimensional array).</li></ul><br>
+
+Now note: in both cases, the two fill amounts are interpreted as if FirstFill is overlapping SecondFill, meaning both fill amounts are measured as &ldquo;lengths&rdquo; <b>from the
+<abbr title="left side of the bar, unless you use a &ldquo;leftwards&rdquo; bar, then it is the right side.">starting side<abbr> of the bar</b> rather than SecondFill measured starting
+from where FirstFill's edge is at. Here is an example:<br>
+<img src="SecondFillTreatedAsOverlap.png"><br><br>
+The perceived SecondFill would be: <kbd>SecondFill_Shown = max(SecondFill - FirstFill, 0)</kbd><br><br>
+If you want SecondFill to be mapped from where FirstFill is at, theoretically you can take pre-calculated SecondFill and add by FirstFill (both before calling DrawGraphicalBar), this result (written as the new SecondFill)
+will offset the fill to start at where FirstFill value is at:<br>
+<img src="SecondFillStartatFirstFill.png"><br>
+However there is a problem if you use <kbd>CalculateGraphicalBarPercentage</kbd>. That routine essentially converts quantity to fill amounts via multiplication and division, it may round up or down to an integer.
+While that alone may not be too much of a problem if you are not going to do arithmetic operations on that potentially inexact number, it is a problem that can be off by up to 2 units if you do perform arithmetic operations afterwards. So instead
+of offsetting from the fill amounts, we are offsetting from the quantity amounts, done by doing this instead:
+<ol>
+	<li>Take <kbd>FirstQuantity</kbd> and <kbd>MaxQuantity</kbd>, and use <kbd>CalculateGraphicalBarPercentage</kbd> to obtain <kbd>FirstFill</kbd></li>
+	<li>Take <kbd>SecondQuantity</kbd> and add by <kbd>FirstQuantity</kbd>, and then take the total as the quantity for calling <kbd>CalculateGraphicalBarPercentage</kbd> again (using the same <kbd>MaxQuantity</kbd>) but to obtain
+	<kbd>SecondFill</kbd>.</li>
+	
+	
+	<li><kbd>CalculateGraphicalBarPercentage</kbd> for <kbd>FirstFill = (FirstQuantity * BarMaximum) / MaximumQuantity</kbd></li>
+	<li>
+		<kbd>CalculateGraphicalBarPercentage</kbd> but you want to do this instead <kbd>SecondFillOffsetFromFirstFill = ((SecondQuantity + FirstQuantity) * BarMaximum) / MaximumQuantity</kbd> (we add using quantity amounts, not fill amounts),
+		done by adding the two quantities first, before calling <kbd>CalculateGraphicalBarPercentage</kbd>:
+<table><tr><td><pre>
+;Thankfully the graphical bar routines does not mess up the scratch RAM inputs (other than !Scratchram_GraphicalBar_FillByteTbl), therefore
+;you only need to set them once.
+
+;Note: If Quantity is 8-bit, make sure you zero out !Scratchram_GraphicalBar_FillByteTbl+1 and !Scratchram_GraphicalBar_FillByteTbl+3.
+
+;Set SecondQuantity
+	REP #$20
+	LDA &lt;SecondQuantity&gt;
+	CLC
+	ADC &lt;FirstQuantity&gt;
+	STA !Scratchram_GraphicalBar_FillByteTbl	;&gt;Offset quantity
+;MaxQuantity
+	LDA &lt;MaxQuantity&gt;
+	STA !Scratchram_GraphicalBar_FillByteTbl+2
+	SEP #$20
+;Calculate percentage the second time.
+	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
+</pre></td></tr></table>
+	</li>
+</ol>
+Because if you do this instead:
+<ol>
+	<li><kbd>CalculateGraphicalBarPercentage</kbd> for <kbd>FirstFill = (FirstQuantity * BarMaximum) / MaximumQuantity</kbd></li>
+	<li><kbd>CalculateGraphicalBarPercentage</kbd> for <kbd>SecondFill = (SecondQuantity * BarMaximum) / MaximumQuantity</kbd></li>
+	<li>
+		Add: <kbd>SecondFillOffsetFromFirstFill = SecondFill + FirstFill</kbd>. Code would look something like this:
+<table><tr><td><pre>;Made-up example because very likely you'll have to preserve scratch RAM in a different way, such as either using the stack (push and pull)
+;or store a copy of it in another scratch RAM. This one assumes you use the stack.
+
+;FirstFill result (Calculate percentage first time)
+	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
+	LDA $00							;\Push FirstFill value (rounded)
+	PHA							;/
+	;...							;&gt;Several lines of code later of setting up the inputs for subroutines
+;SecondFill result (Calculate percentage the second time)
+	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
+	PLA							;&gt;Pull out FirstFill value into A
+	CLC							;\Add by SecondFill (also rounded), right here the result have "drifted" and could potentially rounded off by 2 units.
+	ADC $00							;/
+</pre></td></tr></table>
+	</li>
+</ol>
+<kbd>SecondFill</kbd> could be rounded by 2 units off, as the third step is adding 2 rounded numbers, <kbd>FirstFill</kbd> and <kbd>SecondFill</kbd>.
+<br><br>
+
+If you want to display an increase (such as healing), you must swap the values so that SecondFill represents the current amount and FirstFill showing the previous amount, since the
+doublebar routine when using separate graphics have FirstFill overpowers SecondFill:<br>
+<img src="FirstFillSecondFill.png"><br>
+FirstFill is current HP and SecondFill represent previous HP.
+
+And thats it, be very careful as the quantity inputs data are loss when calling <kbd>GraphicalBarELITE_DrawGraphicalBar</kbd> due to the reused scratch RAM to save memory.
+
+<script>
+//These makes all <pre>...</pre> have an effect that double-clicking will select all the text
+//in it, to make it easy to copy code and paste it in your ASM stuff.
+//
+//Credit:
+// https://keestalkstech.com/2014/04/click-to-select-all-on-the-pre-element/
+// https://www.sanwebe.com/2014/04/select-all-text-in-element-on-click
+document.addEventListener('dblclick', e => {
+  let pre = getClosest(e.target, "PRE");
+  if (pre && e.ctrlKey) {
+    let range = new Range();
+    range.selectNodeContents(pre);
+    document.getSelection().removeAllRanges();
+    document.getSelection().addRange(range);
+  }
+});
+
+function getClosest(el, tagName) {
+  tagName = tagName && tagName.toUpperCase();
+
+  if (!tagName || !el)
+    return null;
+
+  do
+    if (el.nodeName === tagName)
+      return el;
+  while (el = el.parentNode);
+
+  return null;
+}
+</script>

@@ -1,0 +1,101 @@
+<html>
+	<head>
+		<style>
+			html {
+			background-color: #000207;
+			color: white;
+			font-family: sans-serif;
+			}
+			
+			table, th, td {
+			border: 1px solid white;
+			border-collapse: collapse;
+			}
+			
+			span.NoLineBreak {
+				white-space: nowrap;
+			}
+			
+			abbr{cursor: help;}
+		</style>
+	</head>
+<body>
+<a href="../GraphicalBar_ReadmeDocumentation.html#FillEdgeCrossingTileBorder">Back</a>
+
+<center><h1>Multi-tile-fill edge documentation</h1></center>
+
+<p>Note: This does not support double-bar's &ldquo;Using separate graphics&rdquo;, as having <i>even more</i> tiles would eat up a lot of tile space.<p>
+
+<p>To have this gimmick is very similar to the basic graphical bar code, but you use <kbd>ConvertBarFillAmountToTilesEdgeOverMultipleTiles</kbd> instead of <kbd>ConvertBarFillAmountToTiles</kbd>.
+Don't forget to insert the graphics accordingly, and to edit the table in <kbd>ConvertBarFillAmountToTilesEdgeOverMultipleTiles</kbd> (it is set to use the diagonal fill edge by default).</p>
+
+<p>I've provide tables in the exgraphics subfolders (the HTML files) so you don't have to manually enter the tile number for each fill amount.</p>
+
+<p>All of these uses the same subroutine (but different tile numbers and the number of values in the table) using <kbd>ConvertBarFillAmountToTilesEdgeOverMultipleTiles</kbd> (instead of using <kbd>ConvertBarFillAmountToTiles</kbd>). The way this
+works is by taking the fill amount of the current tile byte processed, add by the amount of the <abbr title="Fill_byte_table_index_you_are_on + 1">next</abbr> tile byte (if the current tile byte is the last tile, then don't add by anything), and
+then the total is now what tile index to use for that given tile byte:
+<table>
+<tr><th>Fill byte table (relative address/example)</th><th>Tile byte type</th><th>Fill amount</th><th>Fill amount maximum</th><th>Index to use</th></tr>
+<tr><td>+0/<kbd>$7F844A</kbd></td><td><span style="color: cyan">Left end</span></td><td style="background-color: orange"><kbd>$03</kbd></td><td><kbd>$03</kbd></td><td><kbd>$04</kbd> (This fill amount, plus 1 from next tile amount)</td></tr>
+<tr><td>+1/<kbd>$7F844B</kbd></td><td><span style="color: green">Middle 1</span></td><td style="background-color: yellow"><span style="color: black"><kbd>$01</kbd></span></td><td><kbd>$08</kbd></td><td><kbd>$01</kbd> (This fill amount, plus 0 of the next tile amount)</td></tr>
+<tr><td>+2/<kbd>$7F844C</kbd></td><td><span style="color: green">Middle 2</span></td><td style="background-color: grey"><kbd>$00</kbd></td><td><kbd>$08</kbd></td><td><kbd>$00</kbd> (This fill amount, plus 0 of the next tile amount)</td></tr>
+<tr><td>+3/<kbd>$7F844D</kbd></td><td><span style="color: green">Middle 3</span></td><td style="background-color: grey"><kbd>$00</kbd></td><td><kbd>$08</kbd></td><td><kbd>$00</kbd> (This fill amount, plus 0 of the next tile amount)</td></tr>
+<tr><td>+4/<kbd>$7F844E</kbd></td><td><span style="color: green">Middle 4</span></td><td style="background-color: grey"><kbd>$00</kbd></td><td><kbd>$08</kbd></td><td><kbd>$00</kbd> (This fill amount, plus 0 of the next tile amount)</td></tr>
+<tr><td>+5/<kbd>$7F844F</kbd></td><td><span style="color: green">Middle 5</span></td><td style="background-color: grey"><kbd>$00</kbd></td><td><kbd>$08</kbd></td><td><kbd>$00</kbd> (This fill amount, plus 0 of the next tile amount)</td></tr>
+<tr><td>+6/<kbd>$7F8450</kbd></td><td><span style="color: green">Middle 6</span></td><td style="background-color: grey"><kbd>$00</kbd></td><td><kbd>$08</kbd></td><td><kbd>$00</kbd> (This fill amount, plus 0 of the next tile amount)</td></tr>
+<tr><td>+7/<kbd>$7F8451</kbd></td><td><span style="color: green">Middle 7</span></td><td style="background-color: grey"><kbd>$00</kbd></td><td><kbd>$08</kbd></td><td><kbd>$00</kbd> (This fill amount, plus 0 of the next tile amount)</td></tr>
+<tr><td>+8/<kbd>$7F8452</kbd></td><td><span style="color: red">Right end</span></td><td style="background-color: grey"><kbd>$00</kbd></td><td><kbd>$06</kbd></td><td><kbd>$00</kbd> (use only this tile's fill amount for indexing, don't add by a value after here)</td></tr>
+</table>
+
+This also means that duplicate tile numbers in the table may be needed on the last n items in the tile table, because this covers all possible indexes from <kbd>$00</kbd> to <kbd>NumberOfPiecesOfGivenTile + <abbr title="Any number of pieces of whichever tile after this have the highest number of pieces, for example, working on the left end tile, if the next tile is a middle with 8 pieces or the next tile is a right end (no middle tiles) that have 6 pieces, you would take the 8 and not the 6 for indexing for the left end, it then becomes 3 + 8 = 11 ($0B) which is the highest index.">HighestNumberOFPiecesOfNextTile</kbd>.
+If you happen to have fewer number of values in the table than needed, garbage tiles will appear as soon as the next tile's fill amount is higher than a certain amount.</p>
+
+<h2>Quick jumps</h2>
+<ul>
+	<li><a href="#DiagonalEdge" id="TOC_DiagonalEdge">Diagonal edge</a></li>
+	<li><a href="#OutlineEdge" id="TOC_OutlineEdge">Outlined edge</a></li>
+	<li><a href="#RoundedEdge" id="TOC_RoundedEdge">RoundedEdge</a></li>
+</ul><br>
+The following images below illustrates how they work. The numbers on the leftmost margin is the index, ranging <kbd>$00</kbd> to <kbd>NumberOfPiecesOfGivenTile + HighestNumberOFPiecesOfNextTile</kbd> and the numbers to the right of each tile is the fill amount. Whenever the next tile byte starts filling, the current tile
+before it is always treated full (despite both current and next are graphically displaying partially filled), unless the current tile is the last tile, in which may have a higher maximum to graphically make it look full (example is for Diagonal edge, if the maximum is 3 and the graphics for the outline wasn't edited, it would use index 3, which ends up looking like the last tile is halfway full).
+<hr>
+<h1><a href="#TOC_DiagonalEdge" id="DiagonalEdge">^</a>Diagonal edge</h1>
+<img src="DiagonalFillEdge.png"><br>
+<hr>
+<h1><a href="#TOC_OutlineEdge" id="OutlineEdge">^</a>Outlined edge</h1>
+<img src="OutLineOnlyFillEdge.png"></p>
+<hr>
+<h1><a href="#TOC_RoundedEdge" id="RoundedEdge">^</a>Rounded edge</h1>
+<img src="RoundedFillEdge.png">
+
+<script>
+//These makes all <pre>...</pre> have an effect that double-clicking will select all the text
+//in it, to make it easy to copy code and paste it in your ASM stuff.
+//
+//Credit:
+// https://keestalkstech.com/2014/04/click-to-select-all-on-the-pre-element/
+// https://www.sanwebe.com/2014/04/select-all-text-in-element-on-click
+document.addEventListener('dblclick', e => {
+  let pre = getClosest(e.target, "PRE");
+  if (pre && e.ctrlKey) {
+    let range = new Range();
+    range.selectNodeContents(pre);
+    document.getSelection().removeAllRanges();
+    document.getSelection().addRange(range);
+  }
+});
+
+function getClosest(el, tagName) {
+  tagName = tagName && tagName.toUpperCase();
+
+  if (!tagName || !el)
+    return null;
+
+  do
+    if (el.nodeName === tagName)
+      return el;
+  while (el = el.parentNode);
+
+  return null;
+}
+</script>

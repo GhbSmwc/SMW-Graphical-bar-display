@@ -1,0 +1,68 @@
+<html>
+	<head>
+		<style>
+			html {
+			background-color: #000207;
+			color: white;
+			font-family: sans-serif;
+			}
+			
+			table, th, td {
+			border: 1px solid white;
+			border-collapse: collapse;
+			}
+			
+			span.NoLineBreak {
+				white-space: nowrap;
+			}
+			
+			abbr{cursor: help;}
+			img.img-hor {
+				-moz-transform: scaleX(-1);
+				-o-transform: scaleX(-1);
+				-webkit-transform: scaleX(-1);
+				transform: scaleX(-1);
+				filter: FlipH;
+				-ms-filter: "FlipH";
+			}
+		</style>
+	</head>
+<body>
+
+<p>Please note that all the labels:
+<ul>
+<li><kbd>GraphicalBar_LeftEnd8x8s_Lvl_Spr:</kbd></li>
+<li><kbd>GraphicalBar_Middle8x8s_Lvl_Spr:</kbd></li>
+<li><kbd>GraphicalBar_RightEnd8x8s_Lvl_Spr:</kbd></li>
+</ul>
+Must be prepended with a question mark (example: &ldquo;<kbd>?GraphicalBar_LeftEnd8x8s_Lvl_Spr:</kbd>&rdquo;)
+But for tools besides pixi (and possibly GPS, not sure if that is ever going to be used for graphical bar), they SHOULDN'T have the question mark.
+to avoid potential errors for pixi routines.</p>
+
+<p>Because of the boss's sprite body takes up a somewhat considerable amount of tile space, tile relocation is needed so I made
+another table for bar tiles to accommodate this (so you don't have to set the table yourself). Just open shared subroutine
+and the code you pasted earlier is "ConvertBarFillAmountToTiles" and look for "GraphicalBar_LeftEnd8x8s_Lvl_Spr" and
+replace the table with this:</p>
+<table><tr><td><pre>			?GraphicalBar_LeftEnd8x8s_Lvl_Spr:
+			;Left end fill amount tile numbers:
+			db $88		;&gt;Fill amount/index: $00
+			db $89		;&gt;Fill amount/index: $01
+			db $8A		;&gt;Fill amount/index: $02
+			db $8B		;&gt;Fill amount/index: $03
+			?GraphicalBar_Middle8x8s_Lvl_Spr:
+			;Middle fill amount tile numbers
+			db $8C		;&gt;Fill amount/index: $00
+			db $8D		;&gt;Fill amount/index: $01
+			db $8E		;&gt;Fill amount/index: $02
+			db $8F		;&gt;Fill amount/index: $03
+			db $98		;&gt;Fill amount/index: $04
+			db $99		;&gt;Fill amount/index: $05
+			db $9A		;&gt;Fill amount/index: $06
+			db $9B		;&gt;Fill amount/index: $07
+			db $9C		;&gt;Fill amount/index: $08
+			?GraphicalBar_RightEnd8x8s_Lvl_Spr:
+			;Right end fill amount tile numbers:
+			db $9D		;&gt;Fill amount/index: $00
+			db $9E		;&gt;Fill amount/index: $01
+			db $9F		;&gt;Fill amount/index: $02
+			db $A8		;&gt;Fill amount/index: $03</pre></td></tr></table>

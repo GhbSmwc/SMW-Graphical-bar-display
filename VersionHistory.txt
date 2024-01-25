@@ -1,0 +1,492 @@
+Note: should have 8 items (Excluding the Readme.md) in main directory or folder in
+case if any files missing.
+
+Note: Date sorted from oldest to newest (M/D/Y). Version number period symbol means
+a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 1.9,
+1.10... and not 1.8, 1.9 2.0...).
+
+7/4/2016:
+ -Updated the comments.
+ -Included a webpage (HTML file)
+ -Fix an error that if you set !MiddlePiece other than a power of 2 values
+  on a sa-1 rom. Since I forgot to add an if statement for sa-1 division
+  for that portion of code (pieces divide by pieces per 8x8s for the middle part).
+
+7/15/2016
+ -Fix some grammer issues like having a single sentence with an excess of commas
+  (",")
+ --the "should should" on where it mentions "coins".
+
+7/16/2016
+ -Added a general info about how the fraction tile edge cannot be on 2 8x8 tiles;
+  its not just the diagional edge, it is also having a 2-pixel thick outline
+  that each covers each of the two 8x8s.
+
+8/1/2016
+ -Fix an issue with the old SMW's status bar not looping for the fillable end tiles.
+ -[for non-SA-1]Fix a flaw on the rounding for the amount of pieces that uses 8-bit
+  values (after [Quantity*MaxPieces] is being divided by MaxQuanity), causing it to
+  round when it is not supposed to when using large values as max quanity (i.e 400).
+	;----code----;
+		.RoundHalfUp
+		REP #$20
+		LDX $00			;>No need to load quotient twice for each condition.
+		LDA $06			;>Transfer (copy) to max quantity to A since...
+		LSR			;>...LSR only works with A (divide by 2)
+		CMP $02			;>Compare with remainder
+		BCS ..NoRoundUp		;>if 1/2 of max bigger (or remainder smaller than 1/2), round down.
+		INX			;>round up
+	;----end_code----;
+  ^So the REP #$20 was added to round properly to the nearest whole number. To
+  test the rounding, simply use a calculator, like windows' (make sure it is
+  not programmer so it can show fraction decimals). Then use values that you
+  would use for the meter, for example: 3 as Quantity, 62 as MaxPieces (by
+  default), and finally 400 as MaxQuanity. Then use this formula:
+  (Quantity*MaxPieces)/MaxQuanity. Here is an example:
+
+  (3*62)/400 = 0.465 (R = 186) <-Should round down to 0 if the tenths place is 0~4.
+  (4*62)/400 = 0.62  (R = 248) <-Should round up to 1 if the tenths place is 5~9.
+
+  Then take a screenshot of the game (must be the exact screen dimensions:
+  256x224 to relate the pixels directly) and use the select dotted lines,
+  make sure that the select lines only surrounds the fill part of the bar
+  and not leave any open pixels, therefore all the borders of the select
+  touches the parameters of the fill. Then look at paint's status bar on
+  an icon showing info about the select, if the first number before the x
+  matches with your rounding test (the width of the box), it works
+  correctly. Make sure you test with other numbers just in case.
+
+8/28/2016
+ -Fix the image describing the pieces, it is saying 3/6 twice, it should
+  be 4/6 instead.
+ -Added info about using JSL.
+
+9/23/2016
+ -Thanks to a japanese user named "33953YoShI", that user have developed
+  a better multiplication/division routine:
+
+  --Unsigned 16*16 Multiplication
+  --Unsigned 32*32 Multiplication
+  --Unsigned 16/16 Division
+  --Unsigned 32/16 Division
+
+  This allows me to have more total pieces (including longer bar) and/or
+  higher quantity without overflowing and having to reduce the quantity over
+  max quantity ratio (2000/3000 -> 2/3 as an example)
+
+-Migrated the readme into an actual HTML file.
+
+ -All multiplication and division routines that involve finding the total amount
+  of pieces for the middle part and division to find the number of full middle 8x8
+  tile now have a check if you set !MiddlePiece to a value a power of 2, therefore,
+  allowing you to have even more compressed code (now uses ASL/LSR). 
+
+ -Created a "Super Graphical Bar" in which:
+  --DrawBar subrouine have the number of pieces filled 16-bit, allowing
+    "smaller piece size if you want a more compact meter. You also can have
+    a longer bar (like 16 8x8 tiles long (half a screen long))
+  --Like said above, you can have higher quantity.
+
+ -Fixes:
+ --The regular graphical bar has a bug where if you only have the left end tile
+   turned off, causes the right end to sometimes be full even if the real amount
+   of fill didn't reach there. This is due to a fact that I didn't properly
+   restore the total amount of fill for the middle part.
+ --Fix the STA !ScratchRam_Tiles,y issue when you also disable the left end.
+ --Fix a comment issue about the right end saying that it is stored into $04
+   when it should say $06.
+
+9/30/2016
+ -Fix a typo on the description of the subroutines on both the HTML and ASM files.
+
+10/3/2016
+ -Removed some unused routines, and made them consistent.
+ -32-bit*32-bit now can operate on SA-1.
+
+11/2/2016 (mini-update)
+ -Improved the CalculatePercentage routine where it finds the total pieces of
+  the whole bar to not do CLC : ADC twice on a fixed number for the end tile pieces.
+
+12/14/2016
+ -Fixed a small typo on ScratchRamTiles.png.
+
+12/15/2016
+ -Fixed another typo saying "in pixels" when it should say "pieces" in the
+ "CalculatePercentage" description comment on the ASM file.
+
+12/29/2016
+ -Updated the SA-1 detector to use the up to date version:
+ ;----code----;
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	;ROM type detector
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		!dp = $0000
+		!addr = $0000
+		!sa1 = 0
+		!gsu = 0
+
+	if read1($00FFD6) == $15
+		sfxrom
+		!dp = $6000
+		!addr = !dp
+		!gsu = 1
+	elseif read1($00FFD5) == $23
+		sa1rom
+		!dp = $3000
+		!addr = $6000
+		!sa1 = 1
+	endif
+ ;----end_code----;
+1/1/2017
+ -Due to changing labels, I forgot that they changed the !SA1 to a lowercased
+  version.
+6/18/2017 - 2.0
+ -Improved the information about overwritten scratch RAM (the "destroyed" values).
+ -Now learned that <pre>...</pre> means pre-formatted text, this means that ALL
+  possible characters are shown, even a tab character.
+6/18/2017 - 2.1
+ -Improved the scratch RAM usage for drawbar, making it destruct (labeled
+  overwritten) less scratch RAM rather than "skipping" addresses. If using
+  SA-1, it uses EVEN less.
+ -Fix a crash when using SA-1, forgot to remove the PHA for the calculate
+  percentage.
+8/13/2017 - 2.2
+ -Correct an error on !ScratchRam_Tiles that the minimum number of bytes used
+  is actually 4, not 2, since it uses !ScratchRam_Tiles and !ScratchRam_Tiles+2
+  on 16-bit values.
+8/16/2017 - 2.3
+ -Made a major change on most of the label names likely to cause conflicts with
+  future ASM codes (happens if both ASM are running at the same time by either
+  having both codes in one ASM, or [incsrc "<path>"] if the labels matches but
+  used for different purposes). Most of them are now appended "GraphiBar_" (but
+  goes after "!ScratchRam_" if exists). Others were not because it works with
+  other ASMs, for example: using the super status bar patch "!SSB_Size" as a
+  hybrid, or that its redefineable when having multiple bars.
+9/21/2017 - 2.4
+ -Small update: "WriteFullMiddle8x8s:" have a slightly optimized loop that since
+  the A register isn't updated throughout the loop, it doesn't need to reload
+  every time, therefore, placing it outside the loop speeds it a tiny bit faster.
+  Do note that this does not work with empty middle 8x8s, due to a check if it
+  tries to write an empty 8x8 past the last middle 8x8.
+10/16/2017 - ELITE 3.0
+ -Huge update:
+  -Number of pieces for left, each middle and right tiles are now RAM values,
+   allowing flexibility on the usage for different graphics.
+  -The RAM table now store the amount of fill rather than tiles numbers, again
+   allowing more flexibility for alternating graphics (reason for this is
+   because I'm tired of having to edit the routine code to check if the gamemode
+   is overworld for my player HP meter patch (plans to use an alternative table
+   outside the graphical bar routine), and also making it easier to use for sprite
+   programmers (future) to use this as well).
+10/20/2017 - 3.1
+ -Small update: Now includes credit to author(s) for resources used in the readme.
+10/23/2017 - 3.2 - minor changes
+ -Edited "GraphicalBarELITE.asm" to:
+  -Add a note about using wram banks ($7E/$7F) is not possible when running SA-1.
+  -A sa-1 detector in case if you were to include the code in a patch (there are
+   issues where uberasm tool code keeps moving around every time the codes are
+   inserted, even no changes to any asm files).
+  -Define "!Scratchram_GraphicalBar_FillByteTbl" now explains the amount of bytes
+   used when using it as a table for "DrawGraphicalBar" subroutine.
+  -Mentioned that "TotalMaxPieces" wasn't capped, but the routine "DrawGraphicalBar"
+   will avoid displaying fill over the maximum (in case if you want to use the
+   over-the-max value for something like filling up 2 seperate bars).
+10/24/2017 - 3.2 - not much of a change
+ -Fix the description about displaying over the maximum; it now mentions that
+  on "FilledPieces" than "TotalMaxPieces".
+10/25/2017 - found a small bug
+ -During calculate percentage's rounding error, due to using LSR, compare with
+  remainder, then BCS to avoid rounding it upwards, it is possible that when
+  dividing the quotient by 2 (for 1/2 point) have no remainder (even number prior),
+  but exactly equals with the remainder of MaxQuantity (example in decimal:
+  100 MaxQuantity / 2 compares with 50), will still round down (skips the INC $00),
+  as BCS will branch when values are equal OR higher. Tested using coins as quantity,
+  100 as max quantity (although 99 is the max and will loop when exceeded), and a
+  bar of 62 pieces.
+10/26/2017 - 3.2 - Some info added
+ -Added a reason in the readme of why "!Scratchram_GraphicalBar_FillByteTbl"
+  represent the amount of fill instead of directly using the tile numbers after
+  using "DrawGraphicalBar".
+ -Fix a typo about each middle 8x8 tile for the 8x8 tile table.
+10/29/2017 - 3.2 - typo in description
+ -Fix the discription saying that the half of max for rounding was rounded, down,
+  when in truth, was rounded 1/2 up.
+ -Added a description on "DrawGraphicalBar" that having the filled pieces greater
+  than the total pieces in the bar will display max rather than over-the-max.
+11/2/2017 - 3.3 - unreleased due to longtaking
+ -Added another example code that have the ability to display a "double" bar, as
+  in displaying 2 bars on top of each other in the similar style as the modern
+  street fighter games when the player takes damage, the "damaged" bar shows up
+  under the current.
+11/13/2017 - 3.3 - finally done.
+ -I've deleted my submission briefly due to new plans on adding more features
+  to it, this includes the finishing touches.
+ -Added a credit to the author of Bsnes plus.
+11/14/2017 - 3.3 - minor update
+ -"Write to status bar"'s leftwards routine now use a more consistent way of writing
+  tile properties rather than using ORA on some of the if conditions. They should now
+  write the entire byte rather than bitwise commands.
+ -Forgot to update the comments on simple.asm, now it is also consistent with other
+  code.
+ -Comments about having different lengths of the bar for double bar are now clear.
+11/15/2017 - 3.3 - typo
+ -!Scratchram_GraphicalBar_FillByteTbl description no longer have grammer issues.
+11/27/2017 - 3.4 - realized that it is possible for custom edge.
+ -Edited the instructions on that it is possible to have custom edge fills by checking
+  the fraction filled amount.
+12/5/2017 - 3.4
+ -Improved on the image representing that the routine does not outputs multiple
+  fraction-filled 8x8 byte.
+12/16/2017 - 3.4
+ -Fix a small typo that the quoted text saying "Convert fill to 8x8 tile" should not
+  include a period (".") in there, messing up the CTRL+F.
+12/17/2017 - 3.5
+ -Fix a typo on both example codes that I accidentally check the left end section
+  on the right end under label "..RightEndTranslate".
+ -Fix a wrong palette displayed on a YY-CHR screenshot for the "BarTilesGraphic.png".
+ -Added a notice that the ExampleUsage are meant to be used for uberasm tool, since
+  I left the "JSL GraphicalBarELITE_<routine within that file>" on the code.
+ -Fix a missing sentence portion of this update log on 11/27/2017.
+1/12/2018 - 3.5 - again
+ -Descriptions about having a double bar now have better explanations (more general
+  about types of diagonal fill, and potentially have tiles overwritten BEFORE the
+  fraction filled tile). This applies both the ASM and the readme.
+1/18/2018 - 3.5 - ASM comments
+ -Fixed many mispelling and typos in the ASM routine file, as well as making the
+  descriptions in there more clear.
+ -Also added comment info on what type uberasm tool code the ExampleUsage's ASM files
+  should run on.
+1/21/2018 - 3.6 - saved a byte, new graphics.
+ -Reworked the DrawGraphicalBar subroutine from scratch to make
+  !Scratchram_GraphicalBar_TempLength use a single byte rather than 2 bytes. This is
+  because the code HAD to increment it by 1 during handling the middle section, and
+  then revert it back. This time, the index for handling each byte now starts just
+  after the first byte.
+ -Included newer graphics that the bar now have an opaque background with white outline,
+  useful to avoid a potential camouflage with other things (such as layer 2, sprites, etc).
+1/21/2018 - 3.7
+ -Realized that starting the index at $00 on the first middle 8x8 is a bad idea:
+  if you disable leftend, bar tiles would begin at +1 from the start of the table's
+  address. This time, during the middle routine, uses Y as a countdown before hitting the
+  last middle byte/8x8.
+1/22/2018 - 3.8
+ -Made the 16-bit indexing for handling tiles table optional (8-bit indexing is now
+  possible), due to the fact that it is very unlikely for the user to even have 255
+  bytes/8x8s to be stored. The purpose of being optional rather than forced 8-bit is in
+  case if you have max length with any end tiles, which cannot be done in 8-bit
+  indexing (each byte/8x8 takes an index: 255 middles plus 1 or 2 ends).
+1/23/2018 - 3.9
+ -New feature: in "CalculateGraphicalBarPercentage", a new code was added to detect
+  if the number of pieces was rounded towards empty or full using the Y register,
+  thus, useful to avoid displaying completely empty or full (more than full is treated
+  as full) when the value is not really those numbers (best used for boss/enemy HP bars
+  with either a low number of pieces and/or large amount of HP; avoid displaying
+  0/<full bar value> pieces when the enemy has 1HP left).
+ -Fixed a missing code that was necessary for middle piece on converting to tiles:
+  checking if middle tiles exist, thus causing the routine to start writing 65,535
+  bytes (obviously a huge buffer overflow, and crashing the game) of middle tiles
+  when they don't set to exist for the test file "Simple.asm".
+ -Included 8-bit indexing for converting the tables to tile numbers (optional the same
+  way the main routine does it).
+1/24/2018 - 3.9
+ -Fixed a typo on "Description" on the readme.
+ -Readme images are reworked and have additional information on how it relates
+  to the amount of fill each byte to what tile.
+1/27/2018 - 3.9
+ -Now included an asm for the rounding handling for demonstration (coin meter).
+ -more typos are fixed.
+1/28/2018 - 3.9
+ -Added a note that if you are using graphics that would indicate the bar is rounded
+  towards empty or full (have !Default_RoundingIndicate set to 1), you must have
+  end tiles enabled.
+1/29/2018 - 3.10
+ -Realized that it WAS possible to have both ends disabled and have rounded near
+  "complete" graphics by simply having both round-empty and round-full tile numbers
+  stored after the middle fill 8x8 table.
+ -Improved on how to edit the table and have round away from "complete" graphics.
+1/30/2018 - 3.10
+ -Realized that I've forgot to remove the comment on "RoundAwayFromComplete.asm"
+  that it mentions that ends must be enabled.
+3/22/2018 - 3.10
+ -Reworded the description about "DrawGraphicalBar" subroutine when it mentions when
+  end tiles are disabled.
+
+3/26/2018 - 3.11
+ -Fix a calculation bug with Akaginite's (ID:8691) 32-bit/16-bit division routine that
+  caused an overflow due to the 16-bit handling's bitshift (ASL A) when the divisor is
+  close to #$FFFF (maximum unsigned 16-bit integer) where the 32-bit dividend were to
+  be doubled (left shift) past both the maximum unsigned integer and the divisor, which
+  causes the compare with the divisor to assume that the overflowed value is less than.
+  It was expected that the doubling value would land in between (inclusive) the divisor
+  and #$FFFF. Thank god ASL also uses the carry bit. This glitch can happen when using
+  subroutine "CalculateGraphicalBarPercentage" and set "max quantity" to a very large
+  16-bit number. Therefore with this fixed, your max quantity can now be $FFFF without
+  issues.
+ -Added a note about the routines included in the main ASM file that could be likely used
+  by non-graphical bar-related stuff.
+
+4/1/2018 - 3.12
+ -Added SA-1 support on the defines (why did I forget that?)
+ -And also fix the missing description for !Scratchram_GraphicalBar_TempLength in the
+  main ASM file.
+ -Mention about !Scratchram_GraphicalBar_TempLength being incremented by 1 was false info,
+  and therefore removed.
+ -Example asm files now have SA-1 hybrid RAM addressing (again, why did I forget?).
+
+4/20/2018 3.12 - description typo fix
+ -Fix a minor typo on the description saying that the tile properties is YXPPCCCT (sprite
+  tile properties) instead of YXPCCCTT (layer tile properties).
+
+4/21/2018 3.13 - example optimizations
+ -"Write to status bar" code now have the tile properties being merged with the loop that
+  handles transferring the tile numbers.
+
+4/28/2018 3.13 - double bar readme typo fixes
+ -"until fill" and typos of "amount" have been corrected.
+
+5/12/2018 3.13 - indention of descriptions of defines
+ -Fix a small error that I forgot to indent the defines that are not to be edited
+  (such as !GraphiBar_LeftTileExist and many exist flags)
+
+5/13/2018 3.14 - Middle tiles bugfix
+ -Fix a calculation bug that causes a gap of empty segment to appear in the middle of the
+  fill (with the right end being full). This happens when during the calculation that if the
+  total number of pieces in middle divided by number of pieces in each byte or 8x8 tile (which
+  is 8; divided by 8), and ends up with a value over 255 when the number of middle tiles is
+  expected not to exceed that number. Here is an example when a bar tries to represents 999/10:
+  
+   Number of pieces for both ends: 3
+   Number of pieces in each middle 8x8: 8
+   Length of middle: 7
+   Total pieces in whole bar: (8*7)+3+3 = 62
+   
+   Calculate percentage:
+   
+   999*62 = 61938
+   61938/10 ~ 6194
+   
+   Convert to fill/byte:
+   
+   Leftend will be full, when calculating the middle tiles, it does this to solve how many pieces
+   filled for middle: 6194-3 = 6191
+   
+   To find how many full middle tiles it divides 6191 by 8 (quotient rounded down, with a remainder of 7
+   as how many pieces for the fraction), the quotient is 773. Because the routine only have the number of
+   middle tiles being 8-bit, up to 255 full middle tiles will correctly be calculated. Thus you end up with
+   5 full middle tiles (because 773 mod 256) being filled instead of a full bar.
+
+5/29/2018 3.14 - note about the fraction byte/8x8 tile
+ -Added a note that the fraction byte includes the value 0 when there are only full bytes/8x8tiles exist.
+ 
+5/30/2018 3.14 - wording improvement
+ -Improved the description about when there is a value of 0 for fraction tiles. This applies both the
+  HTML and the ASM file of the graphical bar routine.
+
+8/31/2018 3.15 - Optimized multiplication and division usage.
+ -Improved the code that handles multiplication and division using unnecessary bit size.
+ -Added a "!Setting_SNESMath" define because it is possible to have either sa-1 processing or SNES
+  handling this routine, and that the user could only use the SNES processing for the graphical bar routine.
+ -Renamed "!Settings_GraphicalBar_IndexSize" to "!Setting_GraphicalBar_IndexSize" to have the word "!Setting"
+  as a define consistent with my other patches.
+ -Fixed a glitch with the right end overflowing back to zero when the fill amount value is #$XXYY where $XX
+  can be a non-zero value while $YY is a number close to FF. This is due to an oversight for not checking the high
+  byte of the difference with [RightEndAmount = TotalFill - ((MiddlePiecesPerTile*MiddleLength)+LeftEndPieces)], thus
+  modulo'ed the 16-bit difference by $0100 (256).
+9/1/2018 3.15 - Renamed a broad define.
+ -Renamed "!Setting_SNESMathOnly" to "!Setting_GraphicalBar_SNESMathOnly" and updated its description due
+  to potential other routine codes that do a similar thing with different way of calling under SA-1 or SNES.
+10/23/2018 3.16 - oversight fix
+ -Fix a glitch the routines that uses !Setting_GraphicalBar_SNESMathOnly have forgotten to use 8-bit mode
+  under the label "RoundingUpTowardsFullCheck".
+
+12/30/2018 3.17 - removal due to diffcult setup and missing information.
+ -See here: https://www.smwcentral.net/?p=viewthread&t=96028
+
+12/31/2018 3.17 - converter and status bar codes moved to subroutines.
+ -Seeing them as potential for being a subroutine, I moved them there.
+ -The "write to status bar" is more flexible now, as the number of tiles are now RAM based
+  instead of fixed numbers.
+3/13/2019 3.18 - Massive updates
+ -Readme now features a link to a HTML javascript that computes the memory range and layout for
+  [!Scratchram_GraphicalBar_FillByteTbl] and the status bar write range, as well as other statics
+  instead of having the user manually calculate to find out if too many bytes taken.
+ -Now features a code if you want a bar that is "Right-aligned" that can extend leftwards.
+ -Several parts of the main Readme was rewritten for better explanations like
+  [!Scratchram_GraphicalBar_FillByteTbl+X] means an address plus X which takes the relative location.
+ -Added explanations about the status bar and overworld border +'s tile data format.
+ -More example codes added such as OWB+ support.
+4/2/2019 - missing info about a required patch
+ -Added note that to write a meter on the overworld border, the overworld border plus patch is required
+  due to the difficulties surrounding editing tiles via vram without using RAM transferring like how the
+  Super Status Bar patch does it.
+3/11/2019-m/d/y
+ -GraphicalBarConvertToTile have some of its codes use indent for convenience to see each code block.
+ -Slanted graphical bar supported!
+11-24-2020 to 3-21-2021 (v4.01)
+ -Added an invert routine (inverts the quantity by taking MaxQuanity, subtract by Quantity, and the difference
+  is the inverted quantity, no less than 0).
+ -Table of contents are much more navigatable, linking to subsections
+ -Sentences reworded.
+ -Included a secondary version of doublebar, this time, it stores the second quantity as fill amount rather than
+  have both be literal quantity amount, both as percentages. This enables things like if you want secondfill to
+  increment/decrement at a constant rate.
+3/26/2021 to 5/1/2021 5.00, Sprite graphical bar. (took 36 days)
+ -The javascript html's hex input now reacts to up/down arrow keys, therefore behaving closer to how number inputs
+  work (up increases the value, down decreases).
+ -ConvertBarFillAmountToTiles and ConvertBarFillAmountToTilesEdgeOverMultipleTiles have been revamped to not check
+  $0100 (game mode), rather have $00 as an input to determine what sets of fill graphics to use, allowing multiple
+  sets of graphics in the same game mode (such as a layer 3 graphical bar and a sprite graphical bar).
+ -Added ConvertBarFillAmountToTilesIndirectAddressTable and ConvertBarFillAmountToTilesEdgeOverMultipleTilesIndirectAddressTable
+  which are a more-flexible versions (as in you don't need to edit the subroutine code to include another table set)
+  of ConvertBarFillAmountToTiles and ConvertBarFillAmountToTilesEdgeOverMultipleTiles, enabling the user to manually
+  use any table anywhere by inputting their 24-bit (3-byte) table addresses into $00, $03, and $06.
+ -Added sprite OAM support (as a custom sprite code, and as a "sprite status bar").
+ --Comes with a GMK boss sprite test.
+ -Various missing information such as inputs for many subroutines were fixed, either because I forgot them or
+  initially thought they are not needed.
+4/23/2022 v6.00
+ -Vertical bars now supported on layer 3 as both status bar and overworld border. Graphics and subroutines included.
+ -Stripe image fully supported (tested on layer 3). You can now have the bar anywhere on the screen on any direction.
+ -Megaman-styled HP bars added for both sprite and layer 3 and also both vertical and horizontal.
+ -Added a stripe image header converter JS HTML file. Good for debugging.
+ -Graphical bar calculator JS html file changes:
+ --Supports vertical bars.
+ --End tiles preview added.
+ --Preview image moved to the right side so the user can easily see the preview when editing values
+ --Fix the flickering issue when adjusting the fill amount - most-non-firefox browsers unload images when they don't
+   exist at all on the HTML content. By utilizing the "hidden" HTML attribute of the elementts designed to keep the
+   images loaded prevents the flicker and at the same time don't have random HTML content visible to the user.
+ --Each direction of the bar on the radio button selection now mentions the subrotuines associated with them.
+ --It has unity-styled mouse-drag-to-adjust-value. If you click and hold on the text to the left of the number inputs
+   (both decimal and hex), and move your mouse left and right, will increase and decrease it.
+8/19/2022 v6.1.1 Removal log
+ -Removed: https://www.smwcentral.net/?p=viewthread&t=122366&page=1&pid=1607684
+  I forgot to mention that GraphicalBarWriteToOam.asm shouldn't be used as uberasm tool code. My bad.
+ -Some grammar fixes of the mention of GraphicalBarWriteToOam.asm.
+8/29/2022-9/4/2022 v6.1.2 Rejected AGAIN - https://www.smwcentral.net/?p=viewthread&t=122466
+ -Quality of life improvements
+ --Realized that REQUIRING the shared subroutines for sprites was a terrible mistake for user-friendlyness,
+   so now they are:
+ ---Moved to subroutines via pixi
+ ---The sprite HUD patch now includes the subroutines via incsrc to this package' "Routines" folder.
+ ---Therefore this entire package no longer requires shared subroutine.
+ ---The tile table files in the ExGraphics folder are all converted to HTML files and are all named "TileTable.html"
+ --SA-1 default RAM have been relocated because MaxTile occupies $400180-$4001BF. It is now in a state that you can
+   insert these resources to a clean ROM (SA-1 or not) without glitches using only the default RAMs.
+ --Readme now includes a list of free/scratch RAM you can use with the address tracker's autoassign feature
+ --The included custom sprites can be inserted via copying the ASM, and JSON/cfg files rather than the folders themselves
+   (previously, the user HAVE to insert by copying the folders itself containing the sprites, and that wasn't mentioned
+   in the readme).
+ --Graphic files now named so that their ExGFX slots never conflict (as in, windows will ask you to replace them) -
+   this means you can insert all the GFXs here without renaming to use a different slot number when inserting into a clean ROM.
+ -Bug fixes:
+ --Fix a typo in GraphicalWriteToStatusBar.asm on WriteBarToHUDVertically and the format2 version having a table
+   label not using sublabels.
+ --Fixed the GMK boss hurt SFX being missing on SA-1.
+ --Fixed a missing code for "Level_RangeBased.asm" that sets the length of the bar.
+1/2/2023 v6.2.2
+ -Fixed an issue with the vertical graphical bars would still read/write tile properties even when disabled.
+ -Comment typos fixed in "Level_Simple_UsingStripe.asm"
+ -Improved the stripe write subroutine.
+ 1/6/2023 v6.3.2
+ -Further improvements to the stripe writer.

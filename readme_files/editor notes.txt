@@ -1,0 +1,8 @@
+The purpose of this text file is to inform other users working to update this
+content.
+
+-Font typed for non-monospaced font is Calibri for images, just in case if
+ you wanted consistency with the font type, and the fact that paint doesn't
+ let you reset the font type.
+
+-Monospaced code is Lucida Console also for images.
