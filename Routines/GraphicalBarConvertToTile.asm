@@ -272,12 +272,11 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;How this works in relation of using the table (regarding each 8x8 byte section):
 ;1) Amount of FirstFill multiply by the number of pieces +1 (example: LeftEndFirstFill*4).
 ;   The value you have now is currently the index number for each fill value for FirstFill
-;   while having SecondFill's index as "empty". Basically, this is the " leftmost column"
-;   of the table.
+;   which specifies the "row number".
 ;
 ;2) Load up the corresponding byte/tile (so if it's left end on the first bar, it must be
 ;   left end as well for the other bar.) of the second bar. You should have the value for
-;   SecondFill. Then add the value by the value you have in step 1 to get the "row number"
+;   SecondFill. Then add the value by the value you have in step 1 to get the "column number"
 ;   for getting SecondFill's index number. Remember that SecondBar is located before FirstBar
 ;   in memory address.
 ;
@@ -291,14 +290,15 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 ;These (below) are tables to convert whats in !Scratchram_GraphicalBar_FillByteTbl to tile numbers.
-;The format here is basically a combination represented as "(FirstFill;SecondFill)" where
+;The format here is basically a combination represented as "(FirstFill;SecondFill)[Index]" where
 ;"FirstFill" the amount of fill that overlaps "SecondFill". The amount of fill in SecondFill
 ;ALWAYS measures from the leftmost of the bar, NOT from where FirstFill ends at. So example:
 ;an 8x8 byte is "(2;5)", the 2 represent 2 pieces filled with FirstFill, while the 5 is the
 ;amount of fill for SecondFill. It should look like in-game as 3 pieces (5-2=3) of SecondFill.
 ;Should SecondFill be less than FirstFill (like (2;1)), it should reuse the same tile as if
 ;they're equal, this means that the table will have duplicated tile numbers, and increases by 1
-;each time FirstFill increases.
+;each time FirstFill increases. The index just represents the index number of what tile to use,
+;after calculating the FirstFill and SecondFill combinations.
 
 ;The table here are sorted with increasing SecondFill, and once it gets full, it will increase
 ;FirstFill by 1 and resets SecondFill, and repeats starting back at increasing SecondFill.
@@ -317,26 +317,27 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
 ;If you are editing the number of pieces in any bar parts here, the number of pieces must equal
 ;to (NumberOfPieces+1)^2 number of values in the table here.
+
 GraphicalBar_LeftEnd8x8sDoubleBar_Lvl_L3:
-db $29,$2A,$2B,$2C    ;>(0;0), (0;1), (0;2), (0;3). When FirstFill = 0, and SecondFill is any value
-db $2D,$2D,$2F,$35    ;>(1;0), (1;1), (1;2), (1;3). When FirstFill = 1, and SecondFill is any value
-db $36,$36,$36,$37    ;>(2;0), (2;1), (2;2), (2;3). When FirstFill = 2, and SecondFill is any value
-db $38,$38,$38,$38    ;>(3;0), (3;1), (3;2), (3;3). When FirstFill = 3, and SecondFill is any value
+db $29,$2A,$2B,$2C    ;>(0;0)[$00], (0;1)[$01], (0;2)[$02], (0;3)[$03]
+db $2D,$2D,$2F,$35    ;>(1;0)[$04], (1;1)[$05], (1;2)[$06], (1;3)[$07]
+db $36,$36,$36,$37    ;>(2;0)[$08], (2;1)[$09], (2;2)[$0A], (2;3)[$0B]
+db $38,$38,$38,$38    ;>(3;0)[$0B], (3;1)[$0D], (3;2)[$0E], (3;3)[$0F]
 GraphicalBar_Middle8x8sDoubleBar_Lvl_L3:
-db $39,$45,$46,$47,$48,$49,$4B,$4C,$4D ;>(0;0), (0;1), (0;2), (0;3), (0;4), (0;5), (0;6), (0;7), (0;8)
-db $4E,$4E,$4F,$50,$51,$52,$53,$54,$55 ;>(1;0), (1;1), (1;2), (1;3), (1;4), (1;5), (1;6), (1;7), (1;8)
-db $56,$56,$56,$57,$58,$59,$5A,$5B,$5C ;>(2;0), (2;1), (2;2), (2;3), (2;4), (2;5), (2;6), (2;7), (2;8)
-db $5D,$5D,$5D,$5D,$5E,$5F,$60,$61,$62 ;>(3;0), (3;1), (3;2), (3;3), (3;4), (3;5), (3;6), (3;7), (3;8)
-db $63,$63,$63,$63,$63,$65,$66,$67,$68 ;>(4;0), (4;1), (4;2), (4;3), (4;4), (4;5), (4;6), (4;7), (4;8)
-db $69,$69,$69,$69,$69,$69,$6A,$6B,$6C ;>(5;0), (5;1), (5;2), (5;3), (5;4), (5;5), (5;6), (5;7), (5;8)
-db $6D,$6D,$6D,$6D,$6D,$6D,$6D,$6E,$6F ;>(6;0), (6;1), (6;2), (6;3), (6;4), (6;5), (6;6), (6;7), (6;8)
-db $71,$71,$71,$71,$71,$71,$71,$71,$72 ;>(7;0), (7;1), (7;2), (7;3), (7;4), (7;5), (7;6), (7;7), (7;8)
-db $73,$73,$73,$73,$73,$73,$73,$73,$73 ;>(8;0), (8;1), (8;2), (8;3), (8;4), (8;5), (8;6), (8;7), (8;8)
+db $39,$45,$46,$47,$48,$49,$4B,$4C,$4D ;>(0;0)[$00], (0;1)[$01], (0;2)[$02], (0;3)[$03], (0;4)[$04], (0;5)[$05], (0;6)[$06], (0;7)[$07], (0;8)[$08]
+db $4E,$4E,$4F,$50,$51,$52,$53,$54,$55 ;>(1;0)[$09], (1;1)[$0A], (1;2)[$0B], (1;3)[$0C], (1;4)[$0D], (1;5)[$0E], (1;6)[$0F], (1;7)[$10], (1;8)[$11]
+db $56,$56,$56,$57,$58,$59,$5A,$5B,$5C ;>(2;0)[$12], (2;1)[$13], (2;2)[$14], (2;3)[$15], (2;4)[$16], (2;5)[$17], (2;6)[$18], (2;7)[$19], (2;8)[$1A]
+db $5D,$5D,$5D,$5D,$5E,$5F,$60,$61,$62 ;>(3;0)[$1B], (3;1)[$1C], (3;2)[$1D], (3;3)[$1E], (3;4)[$1F], (3;5)[$20], (3;6)[$21], (3;7)[$22], (3;8)[$23]
+db $63,$63,$63,$63,$63,$65,$66,$67,$68 ;>(4;0)[$24], (4;1)[$25], (4;2)[$26], (4;3)[$27], (4;4)[$28], (4;5)[$29], (4;6)[$2A], (4;7)[$2B], (4;8)[$2C]
+db $69,$69,$69,$69,$69,$69,$6A,$6B,$6C ;>(5;0)[$2D], (5;1)[$2E], (5;2)[$2F], (5;3)[$30], (5;4)[$31], (5;5)[$32], (5;6)[$33], (5;7)[$34], (5;8)[$35]
+db $6D,$6D,$6D,$6D,$6D,$6D,$6D,$6E,$6F ;>(6;0)[$36], (6;1)[$37], (6;2)[$38], (6;3)[$39], (6;4)[$3A], (6;5)[$3B], (6;6)[$3C], (6;7)[$3D], (6;8)[$3E]
+db $71,$71,$71,$71,$71,$71,$71,$71,$72 ;>(7;0)[$3F], (7;1)[$40], (7;2)[$41], (7;3)[$42], (7;4)[$43], (7;5)[$44], (7;6)[$45], (7;7)[$46], (7;8)[$47]
+db $73,$73,$73,$73,$73,$73,$73,$73,$73 ;>(8;0)[$48], (8;1)[$49], (8;2)[$4A], (8;3)[$4B], (8;4)[$4C], (8;5)[$4D], (8;6)[$4E], (8;7)[$4F], (8;8)[$50]
 GraphicalBar_RightEnd8x8sDoubleBar_Lvl_L3:
-db $74,$75,$79,$7A    ;>(0;0), (0;1), (0;2), (0;3)
-db $7B,$7B,$7C,$7D    ;>(1;0), (1;1), (1;2), (1;3)
-db $7E,$7E,$7E,$7F    ;>(2;0), (2;1), (2;2), (2;3)
-db $80,$80,$80,$80    ;>(3;0), (3;1), (3;2), (3;3)
+db $74,$75,$79,$7A    ;>(0;0)[$00], (0;1)[$01], (0;2)[$02], (0;3)[$03]
+db $7B,$7B,$7C,$7D    ;>(1;0)[$04], (1;1)[$05], (1;2)[$06], (1;3)[$07]
+db $7E,$7E,$7E,$7F    ;>(2;0)[$08], (2;1)[$09], (2;2)[$0A], (2;3)[$0B]
+db $80,$80,$80,$80    ;>(3;0)[$0B], (3;1)[$0D], (3;2)[$0E], (3;3)[$0F]
 
 ;^Just realized, this is called a "two-dimensional array".
 
