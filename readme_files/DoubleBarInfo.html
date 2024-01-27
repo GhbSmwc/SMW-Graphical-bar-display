@@ -332,10 +332,10 @@ Because if you do this instead:
 <kbd>SecondFill</kbd> could be rounded by 2 units off, as the third step is adding 2 rounded numbers, <kbd>FirstFill</kbd> and <kbd>SecondFill</kbd>.
 <br><br>
 
-If you want to display an increase (such as healing), you must swap the values so that SecondFill represents the current amount and FirstFill showing the previous amount, since the
+If you want to display an increase (such as healing) while using seperate graphics, you must swap the values so that SecondFill represents the current amount and FirstFill showing the previous amount, since the
 doublebar routine when using separate graphics have FirstFill overpowers SecondFill:<br>
 <img src="FirstFillSecondFill.png"><br>
-FirstFill is current HP and SecondFill represent previous HP.
+FirstFill is current HP and SecondFill represent previous HP. This is not the case for rapid-flicker since it shows both values within 2 frames regardless if one have a greater amount of fill or less.
 
 And thats it, be very careful as the quantity inputs data are loss when calling <kbd>GraphicalBarELITE_DrawGraphicalBar</kbd> due to the reused scratch RAM to save memory.
 
