@@ -27,6 +27,7 @@
 <a href="../GraphicalBar_ReadmeDocumentation.html#CalculatePercentageRoundBounds">Back</a><br>
 <a href="../GraphicalBar_ReadmeDocumentation.html#CalculateGraphicalBarPercentage_Discription">Back (to description)</a><br>
 <p>This HTML/Javascript file analyses the behavior of <kbd>CalculateGraphicalBarPercentage</kbd> and checking it's input and output value of any given quantity amount. This is useful to see how many values gets assigned or "distributed" to a specific amount of pieces filled</p>
+<p>The <kbd>Y</kbd> rounding to <kbd>0</kbd> or full are <kbd>$00</kbd> unless specified.</p>
 
 <table>
 	<tr>
@@ -59,25 +60,27 @@
 			{
 				RangeMin: 0n,
 				RangeMax: 0n,
-				PiecesFilled: 0n
+				PiecesFilled: 0n,
+				RoundTo0OrFull: 0
 			}
 		]
 		if (MaxQuantityValue != 0n && MaxPiecesValue != 0n) {
 			for (let QuantityAmount = 1n; QuantityAmount <= MaxQuantityValue; QuantityAmount++) {
-				let Output_PiecesFilled = DivideRoundHalfUpBigInt(QuantityAmount*MaxPiecesValue, MaxQuantityValue)
-				if (GraphicalBar_PiecesList.at(-1).PiecesFilled == Output_PiecesFilled) { //If resulted in the same number of pieces as the previous quantity amount, merge/update it.
+				let Output_CalculateGraphicalBarPercentage = DivideRoundHalfUpBigInt(QuantityAmount*MaxPiecesValue, MaxQuantityValue, MaxPiecesValue)
+				if (GraphicalBar_PiecesList.at(-1).PiecesFilled == Output_CalculateGraphicalBarPercentage.PiecesFilled && GraphicalBar_PiecesList.at(-1).RoundTo0OrFull == Output_CalculateGraphicalBarPercentage.RoundTo0OrFull) { //If resulted in the same number of pieces as the previous quantity amount, merge/update it.
 					GraphicalBar_PiecesList.at(-1).RangeMax = QuantityAmount //Update range max
 				} else { //Otherwise if it has more pieces filled than before, add a new object representing a new range
 					GraphicalBar_PiecesList.push({
 						RangeMin: QuantityAmount,
 						RangeMax: QuantityAmount,
-						PiecesFilled: Output_PiecesFilled
+						PiecesFilled: Output_CalculateGraphicalBarPercentage.PiecesFilled,
+						RoundTo0OrFull: Output_CalculateGraphicalBarPercentage.RoundTo0OrFull
 					})
 				}
 			}
 			let OutputTable = ""
 			OutputTable += "<table>"
-			OutputTable += "<tr><th>Quantity amount</th><th>How many in range</th><th>Resulting Number of Pieces Filled</th></tr>"
+			OutputTable += "<tr><th>Quantity amount</th><th>How many in range</th><th>Result</th></tr>"
 			
 			GraphicalBar_PiecesList.forEach((BarPieceFilledValue) => {
 				OutputTable += "<tr>"
@@ -87,7 +90,15 @@
 					OutputTable += "<td><kbd>" + BarPieceFilledValue.RangeMin.toString(10) + "-" + BarPieceFilledValue.RangeMax.toString(10) + " ($" + pad(BarPieceFilledValue.RangeMin.toString(16).toUpperCase(), 4) + "-$" +pad(BarPieceFilledValue.RangeMax.toString(16).toUpperCase(), 4) + ")</kbd></td>"
 				}
 				OutputTable += "<td><kbd>" + (BarPieceFilledValue.RangeMax-BarPieceFilledValue.RangeMin+1n).toString(10) + "</kbd></td>"
-				OutputTable += "<td><kbd>" + BarPieceFilledValue.PiecesFilled.toString(10) + " ($" + pad(BarPieceFilledValue.PiecesFilled.toString(16).toUpperCase(), 4) + ")</kbd></td>"
+				//Handle number of pieces and rounding flag
+					OutputTable += "<td>"
+					OutputTable += "<kbd>"
+					OutputTable += BarPieceFilledValue.PiecesFilled.toString(10) + " ($" + pad(BarPieceFilledValue.PiecesFilled.toString(16).toUpperCase(), 4) + ")"
+					if (BarPieceFilledValue.RoundTo0OrFull != 0) {
+						OutputTable += ", Y=$" + pad(BarPieceFilledValue.RoundTo0OrFull.toString(16).toUpperCase(), 2)
+					}
+					OutputTable += "</kbd>"
+					OutputTable += "</td>"
 				OutputTable += "</tr>"
 			});
 			
@@ -104,19 +115,30 @@
 			return num <= min ? min : num >= max ? max : num;
 	}
 	
-	function DivideRoundHalfUpBigInt(dividend, divisor) {
+	function DivideRoundHalfUpBigInt(dividend, divisor, MaxPiecesValue) {
 		if (divisor != 0n) {
+			let RoundTo0OrFull = 0
 			let Quotient = dividend / divisor
 			let Remainder = dividend % divisor
 			let HalfwayPoint = divisor / 2n
 			
-			if (divisor % 2n != 0) {
+			if (divisor % 2n != 0) { //Round halfwaypoint upwards
 				HalfwayPoint++
 			}
-			if (Remainder >= HalfwayPoint) {
+			if (Remainder >= HalfwayPoint) { //If remainder is more than halfway, round up the division result
 				Quotient++
+				if (Quotient == MaxPiecesValue) { //If rounds up to full, set flag
+					RoundTo0OrFull = 2
+				}
+			} else {
+				if (Quotient == 0n && Remainder != 0n) {
+					RoundTo0OrFull = 1
+				}
 			}
-			return Quotient
+			return {
+				PiecesFilled: Quotient,
+				RoundTo0OrFull: RoundTo0OrFull
+			}
 		} else {
 			return -1n
 		}
