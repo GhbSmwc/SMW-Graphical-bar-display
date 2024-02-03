@@ -143,6 +143,7 @@ GraphicalBar	!Scratchram_WhatRange	2	-	-</pre></td></tr></table>
 supports it.</p>
 <ul>
 	<li><a id="TopJSLink" href="readme_files/JS_GraphicalBarCalculator2.html">Calculate the graphical bar's memory usage</a></li>
+	<li><a id="CalculatePercentageRoundBounds" href="readme_files/Js_GraphicalBar_PercentageRoundBounds.html">CalculateGraphicalBarPercentage's range of inputs to amount of pieces filled</li>
 	<li><a id="OAMNotes" href="readme_files/JS_OAM_Side_notes.html">OAM table and conversion sheet</a></li>
 	<li>Tile property converters. Note they're not the same, rather similar, layer 3 has 2-bits (0-3) for page number and 1-bit (0-1) for priority, while sprites
 have 1-bit for page number and 2-bits of priority:</li>
@@ -570,6 +571,8 @@ Result:
 <td style="text-align: center; vertical-align: middle;">2</td>
 <td>The amount of fill as a &ldquo;percentage&rdquo; (known as &ldquo;<kbd>FillAmount</kbd>&rdquo;). Calculated by <kbd>FillAmount = <abbr title="During division, if the remainder is less than half the divisor, would round down to nearest integer, otherwise if greater than or equal to, rounds up to nearest integer.">RoundHalfUp</abbr>(Quantity * TotalNumberOfPiecesInBar / MaxQuantity)</kbd>
 If max quantity is 0, a division by zero occurs, and outputs <kbd>$FFFF</kbd>. If you are familiar with what that is, that is <a href="https://en.wikipedia.org/wiki/Cross-multiplication">cross-multiplying</a> to convert fractions.<br><br>
+
+Because we are dealing with integer values and rounding after division, if you have more MaxQuantity than MaxFill, then several quantity values may result in the same number of pieces filled. See <a href="readme_files/Js_GraphicalBar_PercentageRoundBounds.html" id="CalculateGraphicalBarPercentage_Discription">this</a> to view the distribution of values to each fill amount<br><br>
 
 Note that this is not capped at total pieces in the bar, meaning that if <kbd>Quantity</kbd> is greater than <kbd>MaxQuantity</kbd>, this routine will output the number of pieces in the bar greater than its maximum, although <kbd>DrawGraphicalBar</kbd> and
 <kbd>DrawGraphicalBarSubtractionLoopEdition</kbd> will treat it as capped.<br><br>

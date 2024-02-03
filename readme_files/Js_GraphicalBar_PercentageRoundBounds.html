@@ -1,0 +1,239 @@
+<html>
+	<head>
+		<style>
+			html {
+			background-color: #000207;
+			color: white;
+			font-family: sans-serif;
+			}
+			
+			table, th, td {
+			border: 1px solid white;
+			border-collapse: collapse;
+			}
+			
+			div.SmallFont {
+				font-size: 11px;
+			}
+			
+			div.StatisticsTable {
+				max-width:900px;
+			}
+			input[type='text'] { font-family: monospace;}
+			input[type='number'] { font-family: monospace;}
+		</style>
+	</head>
+	
+<a href="../GraphicalBar_ReadmeDocumentation.html#CalculatePercentageRoundBounds">Back</a><br>
+<a href="../GraphicalBar_ReadmeDocumentation.html#CalculateGraphicalBarPercentage_Discription">Back (to description)</a><br>
+<p>This HTML/Javascript file analyses the behavior of <kbd>CalculateGraphicalBarPercentage</kbd> and checking it's input and output value of any given quantity amount. This is useful to see how many values gets assigned or "distributed" to a specific amount of pieces filled</p>
+
+<table>
+	<tr>
+		<td>Max quantity:</td>
+		<td><input type="number" value="100" min="0" max="65535" id="GraphicalBar_MaxQuantity" data-input_number_radix="10" onchange="MultiRadixInputs(); MainCode()" data-list_of_input_radixes_ids_to_update="GraphicalBar_MaxQuantity_Hex"> ($<input type="text" value="64" class="AnyRadixNumberInput" data-input_number_radix="16" data-list_of_input_radixes_ids_to_update="GraphicalBar_MaxQuantity" onchange="MultiRadixInputs(); MainCode()" id="GraphicalBar_MaxQuantity_Hex">)</td>
+	</tr>
+	<tr>
+		<td>Number of pieces in bar:</td>
+		<td><input type="number" value="62" min="0" max="65535" id="GraphicalBar_MaxPieces" data-input_number_radix="10" onchange="MultiRadixInputs(); MainCode()" data-list_of_input_radixes_ids_to_update="GraphicalBar_MaxPieces_Hex"> ($<input type="text" value="3E" class="AnyRadixNumberInput" data-input_number_radix="16" data-list_of_input_radixes_ids_to_update="GraphicalBar_MaxPieces" onchange="MultiRadixInputs(); MainCode()" id="GraphicalBar_MaxPieces_Hex">)</td>
+	</tr>
+</table>
+<hr>
+<span id="Output"></span>
+
+
+<script>
+//Input codes
+	function MainCode() {
+		let MaxQuantityValue = BigintClamp(ParseBigIntValue(document.getElementById("GraphicalBar_MaxQuantity").value), 0n, 65535n)
+		document.getElementById("GraphicalBar_MaxQuantity").value = MaxQuantityValue.toString(10)
+		document.getElementById("GraphicalBar_MaxQuantity_Hex").value = MaxQuantityValue.toString(16).toUpperCase()
+		
+		let MaxPiecesValue = BigintClamp(ParseBigIntValue(document.getElementById("GraphicalBar_MaxPieces").value), 0n, 65535n)
+		document.getElementById("GraphicalBar_MaxPieces").value = MaxPiecesValue.toString(10)
+		document.getElementById("GraphicalBar_MaxPieces_Hex").value = MaxPiecesValue.toString(16).toUpperCase()
+		
+		let GraphicalBar_PiecesList = [
+			//RangeMin = min value that any value lower causes the graphical bar to show less pieces filled
+			//RangeMax = max value that any value higher causes the graphical bar to show more pieces filled
+			{
+				RangeMin: 0n,
+				RangeMax: 0n,
+				PiecesFilled: 0n
+			}
+		]
+		if (MaxQuantityValue != 0n && MaxPiecesValue != 0n) {
+			for (let QuantityAmount = 1n; QuantityAmount <= MaxQuantityValue; QuantityAmount++) {
+				let Output_PiecesFilled = DivideRoundHalfUpBigInt(QuantityAmount*MaxPiecesValue, MaxQuantityValue)
+				if (GraphicalBar_PiecesList.at(-1).PiecesFilled == Output_PiecesFilled) { //If resulted in the same number of pieces as the previous quantity amount, merge/update it.
+					GraphicalBar_PiecesList.at(-1).RangeMax = QuantityAmount //Update range max
+				} else { //Otherwise if it has more pieces filled than before, add a new object representing a new range
+					GraphicalBar_PiecesList.push({
+						RangeMin: QuantityAmount,
+						RangeMax: QuantityAmount,
+						PiecesFilled: Output_PiecesFilled
+					})
+				}
+			}
+			let OutputTable = ""
+			OutputTable += "<table>"
+			OutputTable += "<tr><th>Quantity amount</th><th>How many in range</th><th>Resulting Number of Pieces Filled</th></tr>"
+			
+			GraphicalBar_PiecesList.forEach((BarPieceFilledValue) => {
+				OutputTable += "<tr>"
+				if (BarPieceFilledValue.RangeMin == BarPieceFilledValue.RangeMax) {
+					OutputTable += "<td><kbd>" + BarPieceFilledValue.RangeMin.toString(10) + " ($" + pad(BarPieceFilledValue.RangeMin.toString(16).toUpperCase(), 4) + ")</kbd></td>"
+				} else {
+					OutputTable += "<td><kbd>" + BarPieceFilledValue.RangeMin.toString(10) + "-" + BarPieceFilledValue.RangeMax.toString(10) + " ($" + pad(BarPieceFilledValue.RangeMin.toString(16).toUpperCase(), 4) + "-$" +pad(BarPieceFilledValue.RangeMax.toString(16).toUpperCase(), 4) + ")</kbd></td>"
+				}
+				OutputTable += "<td><kbd>" + (BarPieceFilledValue.RangeMax-BarPieceFilledValue.RangeMin+1n).toString(10) + "</kbd></td>"
+				OutputTable += "<td><kbd>" + BarPieceFilledValue.PiecesFilled.toString(10) + " ($" + pad(BarPieceFilledValue.PiecesFilled.toString(16).toUpperCase(), 4) + ")</kbd></td>"
+				OutputTable += "</tr>"
+			});
+			
+			OutputTable += "</table>"
+			
+			document.getElementById("Output").innerHTML = OutputTable
+		} else {
+			document.getElementById("Output").innerHTML = "Error, there are no values!"
+		}
+	}
+//various functions
+	function BigintClamp(num, min, max) {
+		//Restrict a number within a specified range, bigInt edition.
+			return num <= min ? min : num >= max ? max : num;
+	}
+	
+	function DivideRoundHalfUpBigInt(dividend, divisor) {
+		if (divisor != 0n) {
+			let Quotient = dividend / divisor
+			let Remainder = dividend % divisor
+			let HalfwayPoint = divisor / 2n
+			
+			if (divisor % 2n != 0) {
+				HalfwayPoint++
+			}
+			if (Remainder >= HalfwayPoint) {
+				Quotient++
+			}
+			return Quotient
+		} else {
+			return -1n
+		}
+	}
+	function pad(num, size) {
+		//This adds leading zeroes. [size] is the number of digits at minimum to show (less than that will fill this with 0s).
+			let s = num+"";
+			while (s.length < size) s = "0" + s;
+			return s;
+	}
+//Radix input functions
+	 window.onload = function(){ //Upon loading, apply the function to execute when the up/down arrow keys are pressed.
+	  UpDownArrowKeysIncrement()
+	  MainCode()
+	 }
+	//These makes input text act like a number input, pressing UP/DOWN on the arrow keys to increment/decrement it, but with any radixes.
+	//In order for this to apply, have these on the number input:
+	//- Make sure the class contains "AnyRadixNumberInput"
+	//- Specify what radix it is, have the custom attribute [data-input_number_radix="x"] where x
+	//  is a radix number that can be any number 2-36. Examples include: 2 = binary, 10 = decimal (default), 16 = hexadecimal.
+	//To get this to apply, use this:
+	// window.onload = function(){ //Upon loading, apply the function to execute when the up/down arrow keys are pressed.
+	//  UpDownArrowKeysIncrement()
+	// }
+	// This function requires these functions:
+	// - ParseBigIntValue
+		function UpDownArrowKeysIncrement() {
+			let FocusedElement = document.activeElement;
+			if(FocusedElement.addEventListener ) {
+				FocusedElement.addEventListener('keydown',this.keyHandler,false);
+			} else if(FocusedElement.attachEvent ) {
+				FocusedElement.attachEvent('onkeydown',this.keyHandler);
+			}
+		}
+	
+		function keyHandler(e) {
+			if (((e.code == "ArrowUp")||e.code == "ArrowDown")&&((/(^|\s.*?)AnyRadixNumberInput($|\s.*?)/).test(document.activeElement.className))) {
+				let target;
+				//Handle radix.
+					let Radix = 10
+					if ((/^\d+$/).test(document.activeElement.dataset.input_number_radix)) {
+						Radix = parseInt(document.activeElement.dataset.input_number_radix)
+					}
+				let InputNumber = ParseBigIntValue(document.activeElement.value, Radix) //This gets the number
+				if (!e) var e = window.event;
+				if (e.target) target = e.target;
+				else if (e.srcElement) target = e.srcElement;
+				
+				if(e.code == "ArrowUp") {
+					InputNumber++
+					e.preventDefault()	//Prevents the caret (blinking text cursor) from being placed at the beginning of the line.
+				} else if(e.code == "ArrowDown") {
+					InputNumber--
+				}
+				document.activeElement.value = InputNumber.toString(Radix).toUpperCase()
+				document.activeElement.setSelectionRange(document.activeElement.value.length, document.activeElement.value.length)
+				document.activeElement.onchange()
+			}
+		}
+	function ParseBigIntValue(string, radix) {
+		//Acts more closely to parseInt, unlike other methods (other functions, like CorrectBinBigIntValue)
+		//this works with bigInt.
+		let Output = 0n
+		let NegativeNumber = 1n
+		if ((/^-/).test(string)) {
+			NegativeNumber = -1n
+		}
+		let DigitPart = string.substring((string.search(/[0-9a-zA-Z]/)))
+		switch (radix) {
+			//decimal
+				default:
+				if ((/^-?\d+$/).test(string)) {
+					Output = BigInt(string)
+				}
+				break
+			//Hexadecimal
+				case 16:
+				case "0x":
+				case "0X":
+				if ((/^-?[0-9A-Fa-f]+$/).test(string)) {
+					Output = BigInt("0x" + DigitPart) * NegativeNumber
+				}
+				break
+			//Binary
+				case 2:
+				case "0b":
+				case "0B":
+				if ((/^-?[01]+$/).test(string)) {
+					Output = BigInt("0b" + DigitPart) * NegativeNumber
+				}
+		
+		}
+		return Output
+	}
+	function MultiRadixInputs() {
+		//This function is for having multiple inputs each having the same number with different radixes that are linked together if one of them changes.
+		//For this to apply:
+		// - Recommended to use the onchange event to include the effect
+		// - Each linked input shall have an unique id
+		// - Make sure they have [data-input_number_radix="x"] to specify the radix, else it defaults to 10
+		// - Make sure they have [data-list_of_input_radixes_ids_to_update="x"] where X is a space-separated list containing a list of element ids
+		//   to update them to show the same number (but with different radix). Make sure that list does not include the ID of itself element, only others.
+		// This function requires these functions:
+		// - ParseBigIntValue
+		let DefaultRadixEventTarget = 10
+		if (/^\d+$/.test(event.target.dataset.input_number_radix)) {
+			DefaultRadixEventTarget = parseInt(event.target.dataset.input_number_radix)
+		}
+		event.target.value = ParseBigIntValue(event.target.value, DefaultRadixEventTarget).toString(DefaultRadixEventTarget).toUpperCase() //this makes it so that it corrects the input of itself the user entered.
+		let ListOfIds = event.target.dataset.list_of_input_radixes_ids_to_update.match(/[A-Za-z0-9_]+/g)
+		for (let Index = 0; Index < ListOfIds.length; Index++) {
+			let DefaultRadixListOfIds = 10
+			if (/^\d+$/.test(document.getElementById(ListOfIds[Index]).dataset.input_number_radix)) {
+				DefaultRadixListOfIds = parseInt(document.getElementById(ListOfIds[Index]).dataset.input_number_radix)
+			}
+			document.getElementById(ListOfIds[Index]).value = ParseBigIntValue(event.target.value, DefaultRadixEventTarget).toString(DefaultRadixListOfIds).toUpperCase()
+		}
+	}
+
+</script>
