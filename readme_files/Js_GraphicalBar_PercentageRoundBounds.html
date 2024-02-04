@@ -27,7 +27,7 @@
 <a href="../GraphicalBar_ReadmeDocumentation.html#CalculatePercentageRoundBounds">Back</a><br>
 <a href="../GraphicalBar_ReadmeDocumentation.html#CalculateGraphicalBarPercentage_Discription">Back (to description)</a><br>
 <p>This HTML/Javascript file analyses the behavior of <kbd>CalculateGraphicalBarPercentage</kbd> and checking it's input and output value of any given quantity amount. This is useful to see how many values gets assigned or "distributed" to a specific amount of pieces filled</p>
-<p>The <kbd>Y</kbd> rounding to <kbd>0</kbd> or full are <kbd>$00</kbd> unless specified.</p>
+<p>The <kbd>Y</kbd> value indicating a rounding to <kbd>0</kbd> or full are <kbd>$00</kbd> unless specified.</p>
 
 <table>
 	<tr>
@@ -80,7 +80,7 @@
 			}
 			let OutputTable = ""
 			OutputTable += "<table>"
-			OutputTable += "<tr><th>Quantity amount</th><th>How many in range</th><th>Result</th></tr>"
+			OutputTable += "<tr><th>Quantity amount</th><th>How many in range</th><th>Result (pieces filled and round 0 or full)</th></tr>"
 			
 			GraphicalBar_PiecesList.forEach((BarPieceFilledValue) => {
 				OutputTable += "<tr>"
