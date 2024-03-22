@@ -4,7 +4,7 @@
 ;will also display as if FirstFill changes should the maximum changes.
 
 ;This only supports SecondFill following FirstFill, as to test the rate in which one bar follows another.
-;Also, the dealy MUST be  a nonzero value since having huge MaxQuantity makes the bar representing current value
+;Also, the dealy MUST be a nonzero value since having huge MaxQuantity makes the bar representing current value
 ;move so slow that the previous value display ("following" bar) catch up easily, making it impossible to see
 ;the second bar.
 
