@@ -625,9 +625,9 @@ in this order: N (can be zero) bytes being at their set maximums, 0 or 1 fractio
 the order of their maximums (3, 8, 8, 8, 8...), stored in a RAM defined <kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd>:<br>
 <img src="readme_files/FillAmountDividedUnevenlyToTileBytes.png"><br>
 
-As an analogy, you fill the cup with water until it's full, then fill the next cup until it's full, until you got all the cups full or run out of water. The reason for this being
-treated as segmented parts is because the SNES' graphics are all tile-based, (most modern games rely on texture-based rendering often drawing polygons that get the width of the fill region)
-so we have to deal with them tile-by-tile. <br><br>
+As an analogy, there are N cups, arranged in a row, and starting at the first cup, you fill that cup with water until it's full, or you run out of water, and you repeat the process on the next
+cup finishing once you reached the last one. The reason for this being treated as segmented parts is because the SNES' graphics are all tile-based, (most modern games rely on texture-based rendering
+often drawing polygons that get the width of the fill region, or simply have one number representing a fill for the entire bar) so we have to deal with them tile-by-tile. <br><br>
 
 <table>
 <tr>
