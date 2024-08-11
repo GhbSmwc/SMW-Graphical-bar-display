@@ -145,16 +145,16 @@ Notes:<br>
 
 <script>
 	//Initalize some variables for mouse dragging
-		var MouseDragOriginX = 0
-		var MouseDragOriginY = 0
-		var WhichElementIDClicked = ""
-		var MouseState = ""
-		var CurrentNumberInputValueSelected = 0 //may be a double or a bigint
-		var MouseCoordinateArray = [,]
+		let MouseDragOriginX = 0
+		let MouseDragOriginY = 0
+		let WhichElementIDClicked = ""
+		let MouseState = ""
+		let CurrentNumberInputValueSelected = 0 //may be a double or a bigint
+		let MouseCoordinateArray = [,]
 	
 		window.onload = function(){
 			//Add up/down arrow keys to increase or decrease the hex number inputs
-				var FocusedElement = document.activeElement;
+				let FocusedElement = document.activeElement;
 				if(FocusedElement.addEventListener ) {
 					FocusedElement.addEventListener('keydown',this.UpDownArrowKeysIncreaseDecreaseHexInput,false);
 				} else if(FocusedElement.attachEvent ) {
@@ -186,9 +186,9 @@ Notes:<br>
 		function UpDownArrowKeysIncreaseDecreaseHexInput(e) {
 			//Arrowkeys for hex number inputs
 				if (((e.code == "ArrowUp")||e.code == "ArrowDown")&&((/(^|\s.*?)HexNumberInput($|\s.*?)/).test(document.activeElement.className))) {
-					var target;
-					var InputNumber = ParseBigIntValue(document.activeElement.value, 16)
-					if (!e) var e = window.event;
+					let target;
+					let InputNumber = ParseBigIntValue(document.activeElement.value, 16)
+					if (!e) e = window.event;
 					if (e.target) target = e.target;
 					else if (e.srcElement) target = e.srcElement;
 					
@@ -203,7 +203,7 @@ Notes:<br>
 					document.activeElement.value = InputNumber.toString(16).toUpperCase()
 					document.activeElement.setSelectionRange(document.activeElement.value.length, document.activeElement.value.length)
 					//Execute the functions that were in the element's onchange.
-						var ActiveElementInputID = document.activeElement.id
+						let ActiveElementInputID = document.activeElement.id
 						if (ActiveElementInputID == "FillAmountHex") {
 							BigintClamp(BigInt("0x" + document.getElementById(ActiveElementInputID).value), 0n, 65535n)
 							CorrectUserInputHexStringBigInt('FillAmountHex', 4)
@@ -452,7 +452,7 @@ Notes:<br>
 	}
 	function pad(num, size) {
 		//This adds leading zeroes. [size] is the number of digits at minimum to show (less than that will fill this with 0s).
-		var s = num+"";
+		let s = num+"";
 		while (s.length < size) s = "0" + s;
 		return s;
 	}
@@ -466,7 +466,7 @@ Notes:<br>
 	}
 	function CheckIfNumInRange(Num, RangeMin, RangeMax) {
 		//Returns true if Num is in between (inclusive) RangeMin and RangeMax
-		var ReturnValue = false
+		let ReturnValue = false
 		if ((Num >= RangeMin) && (Num <=  RangeMax)) {
 			ReturnValue = true
 		}
@@ -477,21 +477,21 @@ Notes:<br>
 		//A: 1-5, B: 6-10: false
 		//A: 1-5, B: 5-9: true
 		//A: 1-5, B: 1-5: true
-		var ReturnValue = false
+		let ReturnValue = false
 		if ((RangeAMax >= RangeBMin) && (RangeAMin <= RangeBMax)) {
 			ReturnValue = true
 		}
 		return ReturnValue
 	}
 	function BigIntMin(A, B) {
-		var ReturnValue = A
+		let ReturnValue = A
 		if (B < A) {
 			ReturnValue = B
 		}
 		return ReturnValue
 	}
 	function BigIntMax(A, B) {
-		var ReturnValue = A
+		let ReturnValue = A
 		if (B > A) {
 			ReturnValue = B
 		}
@@ -796,7 +796,7 @@ Notes:<br>
 					//Left panel
 						OutputString += "<table><tr><td><br>"
 						OutputString += "<kbd>DrawGraphicalBarSubtractionLoopEdition&apos;s output $00-$01 value: " + RunningFillAmount.toString(10) + " ($" + pad(RunningFillAmount.toString(16).toUpperCase(), 4) + ")</kbd><br><br>"
-						var FractionTileProcessed = 0n //>This determines should it say the tile is full (= 0), fraction (0 to max-1) (= 1), or empty (= 2).
+						let FractionTileProcessed = 0n //>This determines should it say the tile is full (= 0), fraction (0 to max-1) (= 1), or empty (= 2).
 						OutputString += "<table>"
 						OutputString += "<tr><th><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> addresses</th><th><abbr title='When using &ldquo;seperate graphics&rdquo; of displaying 2 fills at the same time, where FirstFill will be stored in.'>Second table</abbr></th><th><abbr title='The values stored in $" + pad(FillByteTable.toString(16).toUpperCase(), 6) + " table.'>Fill amount</th><th>Max fill amount</th><th>Tile byte type</th><th>Tile address</th></tr>"
 						//LeftEnd
