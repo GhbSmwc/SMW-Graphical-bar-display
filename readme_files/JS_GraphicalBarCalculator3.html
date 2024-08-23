@@ -150,13 +150,6 @@ Notes:<br>
 		<td>Using <kbd>BarExtendLeft</kbd>? (Only applies to horizontal bars and not using stripe)</td>
 		<td><label><input type="checkbox" onchange="MainCode()" id="BarExtendLeft"></label></td>
 	</tr>
-	<tr>
-		<td>Using static end tiles?</td>
-		<td>
-			<div><label><input type="checkbox"> (&ldquo;left side&rdquo; for horizontal bars, whatever top or bottom the fill starts at for vertical)</label></div>
-			<div><label><input type="checkbox">  (&ldquo;right side&rdquo; for horizontal bars, whatever top or bottom the fill ends at for vertical)</label></div>
-		</td>
-	</tr>
 </table>
 <hr>
 <div id="OutputInfo">
@@ -167,11 +160,15 @@ Notes:<br>
 		</tr>
 		<tr>
 			<td style="font-family: monospace">Total bytes used for fill table for double bar</td>
-			<td style="font-family: monospace" id="Output_TileTableSizeAndRangeDoubleBar"></td>
+			<td style="font-family: monospace" ><span id="Output_TileTableSizeAndRangeDoubleBar"></span> <span id="Output_SecondBarOverlap" style="color: red"></span></td>
 		</tr>
 		<tr>
 			<td style="font-family: monospace">Total bar pieces</td>
 			<td style="font-family: monospace" id="Output_TotalBarPieces"></td>
+		</tr>
+		<tr>
+			<td style="font-family: monospace"><kbd>DrawGraphicalBarSubtractionLoopEdition</kbd> remaining fill</td>
+			<td style="font-family: monospace" id="Output_RemainingFill"></td>
 		</tr>
 	</table><br>
 	<div>
@@ -305,15 +302,19 @@ Notes:<br>
 		if (document.getElementById("StatusBarFormat_2").selected) {
 			StatusBarByteFormat = 2n
 		}
+		let IsTwoBarsConflicting = false
 		
-		let Input_FillAmount =   ParseBigIntValue(document.getElementById("Input_FillAmount").value)
-		let Input_LeftPiece =    ParseBigIntValue(document.getElementById("Input_LeftPiece").value)
-		let Input_MiddlePiece =  ParseBigIntValue(document.getElementById("Input_MiddlePiece").value)
-		let Input_RightPiece =   ParseBigIntValue(document.getElementById("Input_RightPiece").value)
-		let Input_MiddleLength = ParseBigIntValue(document.getElementById("Input_MiddleLength").value)
-		let Input_DoubleBarAddressOffset = ParseBigIntValue(document.getElementById("Input_DoubleBarAddressOffset").value)
-		let Input_TileByteTableAddress = ParseBigIntValue(document.getElementById("GraphicalBar_TileAddressLocation").value, 16)
+		let Input_FillAmount =              ParseBigIntValue(document.getElementById("Input_FillAmount").value)
+		let Input_LeftPiece =               ParseBigIntValue(document.getElementById("Input_LeftPiece").value)
+		let Input_MiddlePiece =             ParseBigIntValue(document.getElementById("Input_MiddlePiece").value)
+		let Input_RightPiece =              ParseBigIntValue(document.getElementById("Input_RightPiece").value)
+		let Input_MiddleLength =            ParseBigIntValue(document.getElementById("Input_MiddleLength").value)
+		let Input_DoubleBarAddressOffset =  ParseBigIntValue(document.getElementById("Input_DoubleBarAddressOffset").value)
+		let Input_TileByteTableAddress =    ParseBigIntValue(document.getElementById("GraphicalBar_TileAddressLocation").value, 16)
 		let Input_StatusbarAddressToWrite = ParseBigIntValue(document.getElementById("StatusBarAddressToWrite").value, 16)
+		
+		let DoubleBar_TileByteTableAddress = Input_TileByteTableAddress+Input_DoubleBarAddressOffset
+		let DoubleBar_TileByteTableAddress_Ending = DoubleBar_TileByteTableAddress+TotalGraphicalBarTableLength-1n
 		
 		let NumberOf_LeftByte = 0n
 		if (Input_LeftPiece != 0n) {
@@ -333,16 +334,19 @@ Notes:<br>
 			document.getElementById("OutputError").hidden = false
 			return
 		}
+		
 		document.getElementById("OutputInfo").hidden = false
 		document.getElementById("OutputError").hidden = true
 		let BarMaxTotalPieces = Input_LeftPiece + (Input_MiddleLength * Input_MiddlePiece) + Input_RightPiece
 		
-		document.getElementById("Output_TileTableSizeAndRange").textContent = TotalGraphicalBarTableLength.toString(10) + " (" + BigIntToStringSignedHex(Input_TileByteTableAddress) + " ~ " + BigIntToStringSignedHex(Input_TileByteTableAddress+TotalGraphicalBarTableLength-1n) + ")"
+		let Input_TileByteTableAddress_Ending = Input_TileByteTableAddress+TotalGraphicalBarTableLength-1n
+		
+		document.getElementById("Output_TileTableSizeAndRange").textContent = TotalGraphicalBarTableLength.toString(10) + " (" + BigIntToStringSignedHex(Input_TileByteTableAddress) + " ~ " + BigIntToStringSignedHex(Input_TileByteTableAddress_Ending) + ")"
 		document.getElementById("Output_TileTableSizeAndRangeDoubleBar").textContent = "N/A"
 		if (IsDoubleBarEnabled) {
-			document.getElementById("Output_TileTableSizeAndRangeDoubleBar").textContent = TotalGraphicalBarTableLength.toString(10) + " (" + BigIntToStringSignedHex(Input_TileByteTableAddress+Input_DoubleBarAddressOffset) + " ~ " + BigIntToStringSignedHex(Input_TileByteTableAddress+TotalGraphicalBarTableLength-1n+Input_DoubleBarAddressOffset) + ")"
+			document.getElementById("Output_TileTableSizeAndRangeDoubleBar").textContent = TotalGraphicalBarTableLength.toString(10) + " (" + BigIntToStringSignedHex(DoubleBar_TileByteTableAddress) + " ~ " + BigIntToStringSignedHex(DoubleBar_TileByteTableAddress_Ending) + ")"
 		}
-		document.getElementById("Output_TotalBarPieces").textContent = BarMaxTotalPieces.toString(10) + " (" + BigIntToStringSignedHex(BarMaxTotalPieces) + ")"
+		document.getElementById("Output_TotalBarPieces").textContent = BarMaxTotalPieces.toString(10) + " ($" + BarMaxTotalPieces.toString(16).toUpperCase().padStart(4, "0") + ")"
 		
 		document.getElementById("BarExtendLeft").disabled = false
 		if (document.getElementById("FillDirection_Up").selected||document.getElementById("FillDirection_Down").selected) {
@@ -409,13 +413,27 @@ Notes:<br>
 					
 					let TableRow_ByteInfo_GraphicalBarByte = document.createElement("td")
 					TableRow_ByteInfo_GraphicalBarByte.style.fontFamily = "monospace"
-					TableRow_ByteInfo_GraphicalBarByte.appendChild(document.createTextNode(BigIntToStringSignedHex(Input_TileByteTableAddress+GraphicalBarBytes_Index)))
+					let Text_Address = BigIntToStringSignedHex(Input_TileByteTableAddress+GraphicalBarBytes_Index)
+					let CurrentFillByte = Input_TileByteTableAddress+GraphicalBarBytes_Index
+					if ((CurrentFillByte >= DoubleBar_TileByteTableAddress && CurrentFillByte <= DoubleBar_TileByteTableAddress_Ending)&&document.getElementById("ToggleDoubleBar").checked) {
+						Text_Address += " Overlaps with second bar!"
+						TableRow_ByteInfo_GraphicalBarByte.style.color = "red"
+						IsTwoBarsConflicting = true
+					}
+					TableRow_ByteInfo_GraphicalBarByte.appendChild(document.createTextNode(Text_Address))
 					TableRow_ByteInfoRow.appendChild(TableRow_ByteInfo_GraphicalBarByte)
 					
 					if (document.getElementById("ToggleDoubleBar").checked) {
 						let TableRow_ByteInfo_GraphicalBarByte_SecondBar = document.createElement("td")
 						TableRow_ByteInfo_GraphicalBarByte_SecondBar.style.fontFamily = "monospace"
-						TableRow_ByteInfo_GraphicalBarByte_SecondBar.appendChild(document.createTextNode(BigIntToStringSignedHex(Input_TileByteTableAddress+Input_DoubleBarAddressOffset+GraphicalBarBytes_Index)))
+						let SecondBarCurrentFillByte = Input_TileByteTableAddress+Input_DoubleBarAddressOffset+GraphicalBarBytes_Index
+						let Text_Address_SecondBar = BigIntToStringSignedHex(SecondBarCurrentFillByte)
+						if (SecondBarCurrentFillByte >= Input_TileByteTableAddress && SecondBarCurrentFillByte <= Input_TileByteTableAddress_Ending) {
+							Text_Address_SecondBar += " Overlaps with first bar!"
+							TableRow_ByteInfo_GraphicalBarByte_SecondBar.style.color = "red"
+						}
+						
+						TableRow_ByteInfo_GraphicalBarByte_SecondBar.appendChild(document.createTextNode(Text_Address_SecondBar))
 						TableRow_ByteInfoRow.appendChild(TableRow_ByteInfo_GraphicalBarByte_SecondBar)
 					}
 					
@@ -507,8 +525,19 @@ Notes:<br>
 				GenerateTableRow(Input_RightPiece, "Right")
 			}
 		//Remaining fill left
-		let a = 0
-		
+			document.getElementById("Output_RemainingFill").textContent = Input_FillAmount.toString(10) + " ($" + Input_FillAmount.toString(16).toUpperCase().padStart(4, "0") + ")"
+		//Get Overlapping range
+			if (IsTwoBarsConflicting) {
+				let LowestOverlappingByte = Input_TileByteTableAddress;
+				if (LowestOverlappingByte < DoubleBar_TileByteTableAddress) {
+					LowestOverlappingByte = DoubleBar_TileByteTableAddress
+				}
+				let HighestOverlappingByte = Input_TileByteTableAddress_Ending
+				if (HighestOverlappingByte > DoubleBar_TileByteTableAddress_Ending) {
+					HighestOverlappingByte = DoubleBar_TileByteTableAddress_Ending
+				}
+				document.getElementById("Output_SecondBarOverlap").textContent = "Overlap occurs at " + BigIntToStringSignedHex(LowestOverlappingByte) + " ~ " + BigIntToStringSignedHex(HighestOverlappingByte)
+			}
 	}
 	//Helper
 		function UpdateOtherInputs(ele) {
@@ -620,5 +649,18 @@ Notes:<br>
 					setTimeout(DeleteCopyMessage.bind(null, CopiedMessage), 1500)
 				}).bind(null, EventElement)
 			);
+		}
+	//Check if two ranges overlap.
+	//Given 2 ranges:
+	//Range_A: A_Start and A_End
+	//Range_B: B_Start and B_End
+	//If B_End is touching A_Start, then Range_B is at the lowest position (or Range_A at the highest position) that would count as an overlap
+	//If B_Start is touching A_End, then Range_B is at the highest position (or Range_A is at the lowest position) that would count as an overlap
+		function CheckOverlap(A_Start, A_End, B_Start, B_End) {
+			if (B_End >= A_Start&&B_Start <= A_End) {
+				return true
+			} else {
+				return false
+			}
 		}
 </script>
