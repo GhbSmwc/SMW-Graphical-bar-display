@@ -148,7 +148,7 @@ Notes:<br>
 	</tr>
 	<tr>
 		<td>Using <kbd>BarExtendLeft</kbd>? (Only applies to horizontal bars and not using stripe)</td>
-		<td><label><input type="checkbox" onchange="MainCode()"></label></td>
+		<td><label><input type="checkbox" onchange="MainCode()" id="BarExtendLeft"></label></td>
 	</tr>
 	<tr>
 		<td>Using static end tiles?</td>
@@ -344,6 +344,11 @@ Notes:<br>
 		}
 		document.getElementById("Output_TotalBarPieces").textContent = BarMaxTotalPieces.toString(10) + " (" + BigIntToStringSignedHex(BarMaxTotalPieces) + ")"
 		
+		document.getElementById("BarExtendLeft").disabled = false
+		if (document.getElementById("FillDirection_Up").selected||document.getElementById("FillDirection_Down").selected) {
+			document.getElementById("BarExtendLeft").disabled = true
+		}
+		
 		//Clear table
 			let OutputByteTable = document.getElementById("Output_ByteLayout")
 			while (OutputByteTable.lastElementChild) {
@@ -390,7 +395,9 @@ Notes:<br>
 			if (document.getElementById("FillDirection_Left").selected) {
 				CurrentStatusBarAddress += (TotalGraphicalBarTableLength-1n)*StatusBarByteFormat
 			}
-			
+			if (document.getElementById("BarExtendLeft").checked && (document.getElementById("FillDirection_Left").selected||document.getElementById("FillDirection_Right").selected)) {
+				CurrentStatusBarAddress += -(TotalGraphicalBarTableLength-1n)*StatusBarByteFormat
+			}
 			//Declare function
 				function GenerateTableRow(Maximum, ByteType, MiddleLeft) {
 					let NamesToColors = {
@@ -451,11 +458,16 @@ Notes:<br>
 					TableRow_ByteInfo_StatusBarWrite.appendChild(document.createTextNode(BigIntToStringSignedHex(CurrentStatusBarAddress)))
 					TableRow_ByteInfoRow.appendChild(TableRow_ByteInfo_StatusBarWrite)
 					
-					let NextTileDirection = 1n
+					let NextTileDirection = 1n //Forwards or backwards
 					if (document.getElementById("FillDirection_Left").selected||document.getElementById("FillDirection_Up").selected) {
 						NextTileDirection = -1n
 					}
-					CurrentStatusBarAddress += 1n*StatusBarByteFormat*NextTileDirection
+					let NextRowDirection = 1n
+					if (document.getElementById("FillDirection_Up").selected||document.getElementById("FillDirection_Down").selected) {
+						NextRowDirection = 32n
+					}
+					
+					CurrentStatusBarAddress += NextRowDirection*StatusBarByteFormat*NextTileDirection
 					
 					OutputByteTable.appendChild(TableRow_ByteInfoRow)
 				}
