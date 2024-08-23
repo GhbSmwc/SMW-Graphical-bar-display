@@ -172,7 +172,12 @@ Notes:<br>
 		<td style="font-family: monospace">Total bar pieces</td>
 		<td style="font-family: monospace" id="Output_TotalBarPieces"></td>
 	</tr>
-</table>
+</table><br>
+<textarea id="Output_AddressInfo_Text" readonly cols="75" rows="7" style="white-space: pre; overflow-wrap: normal; overflow-x: scroll; background-color: #000000; color: white"></textarea><br>
+	<div>
+		<button onclick="setClipboard(document.getElementById('Output_AddressInfo_Text').value);">Copy to clipboard</button>
+		<span></span>
+	</div><br>
 
 
 <script>
@@ -256,6 +261,14 @@ Notes:<br>
 			document.getElementById("Output_TileTableSizeAndRangeDoubleBar").textContent = TotalGraphicalBarTableLength.toString(10) + " (" + BigIntToStringSignedHex(Input_TileByteTableAddress+Input_DoubleBarAddressOffset) + " ~ " + BigIntToStringSignedHex(Input_TileByteTableAddress+TotalGraphicalBarTableLength-1n+Input_DoubleBarAddressOffset) + ")"
 		}
 		document.getElementById("Output_TotalBarPieces").textContent = BarMaxTotalPieces.toString(10) + " (" + BigIntToStringSignedHex(BarMaxTotalPieces) + ")"
+		
+		let FreeramAutoAssignerText = ""
+		FreeramAutoAssignerText += "Graphical Bar\t!Scratchram_GraphicalBar_LeftEndPiece\t1\t-\t-\n"
+		FreeramAutoAssignerText += "Graphical Bar\t!Scratchram_GraphicalBar_MiddlePiece\t1\t-\t-\n"
+		FreeramAutoAssignerText += "Graphical Bar\t!Scratchram_GraphicalBar_RightEndPiece\t1\t-\t-\n"
+		FreeramAutoAssignerText += "Graphical Bar\t!Scratchram_GraphicalBar_TempLength\t1\t-\t-\n"
+		FreeramAutoAssignerText += "Graphical Bar\t!Scratchram_GraphicalBar_FillByteTbl\t" + TotalGraphicalBarTableLength + "\t-\t-\n"
+		document.getElementById("Output_AddressInfo_Text").value = FreeramAutoAssignerText
 	}
 	//Helper
 		function UpdateOtherInputs(ele) {
@@ -334,5 +347,33 @@ Notes:<br>
 				StringOutput = "-$" + (BigIntVal*-1n).toString(16).toUpperCase()
 			}
 			return StringOutput
+		}
+		function DeleteCopyMessage(HTMLElement) {
+			HTMLElement.textContent = ""
+		}
+		
+		function setClipboard(String) {
+			//Credit goes to Mozilla: https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/write
+			const type = "text/plain";
+			const blob = new Blob([String], { type });
+			const data = [new ClipboardItem({ [type]: blob })];
+			
+			let EventElement = event.target
+			let CopiedMessage = EventElement.parentNode.querySelector("span")
+		
+			navigator.clipboard.write(data).then(
+				((EventElement) => {
+				/* success */
+					CopiedMessage.textContent = "Copied!"
+					CopiedMessage.style.color = "#00FF00"
+					setTimeout(DeleteCopyMessage.bind(null, CopiedMessage), 1500)
+				}).bind(null, EventElement),
+				((EventElement) => {
+				/* failure */
+					CopiedMessage.textContent = "Failed!"
+					CopiedMessage.style.color = "#FF0000"
+					setTimeout(DeleteCopyMessage.bind(null, CopiedMessage), 1500)
+				}).bind(null, EventElement)
+			);
 		}
 </script>
