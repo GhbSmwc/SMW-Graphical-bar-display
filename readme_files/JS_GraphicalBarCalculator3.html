@@ -75,23 +75,23 @@ Notes:<br>
 <table>
 	<tr>
 		<td>Fill amount</td>
-		<td><input type="number" data-radix="10" min="0" max="65535" value="0"> $<input type="text" data-radix="16" data-min="0" data-max="65535" value="0"></td>
+		<td><input type="number" data-radix="10" min="0" max="65535" data-min="0" data-max="65535" value="0" id="Input_FillAmount"> $<input type="text" data-radix="16" data-min="0" data-max="65535" value="0"><button>Click & hold to adjust</button></td>
 	</tr>
 	<tr>
 		<td>Number of pieces for left end</td>
-		<td><input type="number" data-radix="10" min="0" max="255" value="3" id="Input_LeftPiece"> $<input type="text" data-radix="16" data-min="0" data-max="255" value="3"></td>
+		<td><input type="number" data-radix="10" min="0" max="255" data-min="0" data-max="255" value="3" id="Input_LeftPiece"> $<input type="text" data-radix="16" data-min="0" data-max="255" value="3"><button>Click & hold to adjust</button></td>
 	</tr>
 	<tr>
 		<td>Number of pieces for each middle</td>
-		<td><input type="number" data-radix="10" min="0" max="255" value="8" id="Input_MiddlePiece"> $<input type="text" data-radix="16" data-min="0" data-max="255" value="8"></td>
+		<td><input type="number" data-radix="10" min="0" max="255" data-min="0" data-max="255" value="8" id="Input_MiddlePiece"> $<input type="text" data-radix="16" data-min="0" data-max="255" value="8"><button>Click & hold to adjust</button></td>
 	</tr>
 	<tr>
 		<td>Number of pieces for right end</td>
-		<td><input type="number" data-radix="10" min="0" max="255" value="3" id="Input_RightPiece"> $<input type="text" data-radix="16" data-min="0" data-max="255" value="3"></td>
+		<td><input type="number" data-radix="10" min="0" max="255" data-min="0" data-max="255" value="3" id="Input_RightPiece"> $<input type="text" data-radix="16" data-min="0" data-max="255" value="3"><button>Click & hold to adjust</button></td>
 	</tr>
 	<tr>
 		<td>Number of middle tiles</td>
-		<td><input type="number" data-radix="10" min="0" max="255" value="7" id="Input_MiddleLength"> $<input type="text" data-radix="16" data-min="0" data-max="255" value="7"></td>
+		<td><input type="number" data-radix="10" min="0" max="255" data-min="0" data-max="255" value="7" id="Input_MiddleLength"> $<input type="text" data-radix="16" data-min="0" data-max="255" value="7"><button>Click & hold to adjust</button></td>
 	</tr>
 	<tr>
 		<td>Using double bar?</td>
@@ -99,7 +99,7 @@ Notes:<br>
 	</tr>
 	<tr>
 		<td><kbd>!Setting_GraphicalBar_SecondFillByteTableOffset</kbd></td>
-		<td><input type="number" data-radix="10" min="0" max="257" value="32" id="Input_DoubleBarAddressOffset" class="DoubleBarRelated"> $<input type="text" data-radix="16" data-min="0" data-max="257" value="20" class="DoubleBarRelated"></td>
+		<td><input type="number" data-radix="10" min="0" max="257"  data-min="0" data-max="257" value="32" id="Input_DoubleBarAddressOffset" class="DoubleBarRelated"> $<input type="text" data-radix="16" data-min="0" data-max="257" value="20" class="DoubleBarRelated"><button class="DoubleBarRelated">Click & hold to adjust</button></td>
 	</tr>
 	<tr>
 		<td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> location</td>
@@ -109,6 +109,7 @@ Notes:<br>
 				<option value="7F844A">Default LoROM</option>
 				<option value="400198">SA-1</option>
 			</datalist>
+			<button>Click & hold to adjust</button>
 		</td>
 	</tr>
 	<tr>
@@ -124,6 +125,7 @@ Notes:<br>
 				<option value="7FEC00">Overworld border plus</option>
 				<option value="41EC00">Overworld border plus (SA-1)</option>
 			</datalist>
+			<button>Click & hold to adjust</button>
 		</td>
 	</tr>
 	<tr>
@@ -183,17 +185,71 @@ Notes:<br>
 
 <script>
 	let TotalGraphicalBarTableLength = 0n
+	let MouseDownClickPos = {
+		x: 0,
+		y: 0,
+		moveByX: 0,
+		moveByY: 0,
+		PlacedState: false,
+		OriginalNumber: 0n
+	}
+	let ElementToAdjust = null
 	window.addEventListener(
 		"load",
 		function () {
-			[...document.querySelectorAll("input")].forEach(ele => {
+			[...document.querySelectorAll("input")].forEach(ele => { //Add up/down triggers
 				if (ele.type == "text"||ele.type == "number") {
 					AddInputNumberTriggers(ele)
 				}
 				if (ele.type == "text") {
 					UpDownArrowTriggers(ele)
 				}
+			});
+			[...document.querySelectorAll("button")].filter(btn => { //move mouse to adjust
+				return btn.textContent == "Click & hold to adjust"
+			}).forEach(ele => {
+				ele.addEventListener(
+					"mousedown",
+					function (e) {
+						e.preventDefault()
+						if (e.button != 0) {
+							return
+						}
+						MouseDownClickPos.x = e.pageX
+						MouseDownClickPos.y = e.pageY
+						MouseDownClickPos.moveByX = e.pageX - MouseDownClickPos.x
+						MouseDownClickPos.moveByY = e.pageY - MouseDownClickPos.y
+						MouseDownClickPos.PlacedState = true
+						
+						try {
+							ElementToAdjust = e.target.parentNode.querySelector("input")
+							OriginalNumber = ParseBigIntValue(ElementToAdjust.value, parseInt(ElementToAdjust.dataset.radix))
+						} catch {
+							ElementToAdjust = null
+						}
+					}
+				)
 			})
+			document.addEventListener(
+				"mouseup",
+				function (e) {
+					MouseDownClickPos.PlacedState = false
+				}
+			)
+			document.addEventListener(
+				"mousemove",
+				function (e) {
+					if (MouseDownClickPos.PlacedState) {
+						MouseDownClickPos.moveByX = e.pageX - MouseDownClickPos.x
+						MouseDownClickPos.moveByY = e.pageY - MouseDownClickPos.y
+						if (ElementToAdjust != null) {
+							ElementToAdjust.value = (OriginalNumber + BigInt(Math.round(MouseDownClickPos.moveByX/8))).toString(ElementToAdjust.dataset.radix)
+							UpdateOtherInputs(ElementToAdjust)
+						}
+					}
+				}
+			
+			)
 			MainCode()
 		}
 	)
@@ -235,6 +291,14 @@ Notes:<br>
 		FreeramAutoAssignerText += "Graphical Bar\t!Scratchram_GraphicalBar_FillByteTbl\t" + TotalGraphicalBarTableLength + "\t-\t-\n"
 		setClipboard(FreeramAutoAssignerText)
 	}
+	function HandleMouseMovementToNumberInput(e) {
+		let ElementToAdjust = MouseDrag.ElementClicked.parentNode.querySelector("input")
+		let NumberValue = ParseBigIntValue(ElementToAdjust.value, ElementToAdjust.dataset.radix)
+		NumberValue += BigInt(Math.floor(MouseDrag.DraggedByX/8))
+		ElementToAdjust.value = NumberValue.toString(ElementToAdjust.dataset.radix)
+		UpdateOtherInputs(e.parentNode.querySelector("input"))
+	}
+	
 	function MainCode() {
 		let IsDoubleBarEnabled = document.getElementById("ToggleDoubleBar").checked;
 		[...document.querySelectorAll("*.DoubleBarRelated")].forEach(ele => ele.disabled = !IsDoubleBarEnabled);
@@ -277,9 +341,8 @@ Notes:<br>
 	}
 	//Helper
 		function UpdateOtherInputs(ele) {
-			let ElementBeingUsed = event.target
-			let EnteredValue = ElementBeingUsed.value
-			let EnteredNumber = ParseBigIntValue(EnteredValue, parseInt(ElementBeingUsed.dataset.radix))
+			let EnteredValue = ele.value
+			let EnteredNumber = ParseBigIntValue(EnteredValue, parseInt(ele.dataset.radix))
 			let EnteredMin = -Infinity
 			if (typeof ele.dataset.min != "undefined") {
 				EnteredMin = ParseBigIntValue(ele.dataset.min)
@@ -290,7 +353,7 @@ Notes:<br>
 			}
 			EnteredNumber = BigintClamp(EnteredNumber, EnteredMin, EnteredMax)
 			
-			let InputsToUpdate = [...ElementBeingUsed.parentNode.querySelectorAll("input")]
+			let InputsToUpdate = [...ele.parentNode.querySelectorAll("input")]
 			.filter(ele2 => (/(?:text|number)/).test(ele2.type))
 			//Corrects and will update other adjacent inputs
 			InputsToUpdate.forEach(ele2 => {
@@ -309,37 +372,39 @@ Notes:<br>
 		function ParseBigIntValue(string, radix) {
 			//Acts more closely to parseInt, unlike other methods (other functions, like CorrectBinBigIntValue)
 			//this works with bigInt.
-			let Output = 0n
-			let NegativeNumber = 1n
-			if ((/^-/).test(string)) {
-				NegativeNumber = -1n
-			}
-			let DigitPart = string.substring((string.search(/[0-9a-zA-Z]/)))
-			switch (radix) {
-				//decimal
-					default:
-					if ((/^-?\d+$/).test(string)) {
-						Output = BigInt(string)
-					}
-					break
-				//Hexadecimal
-					case 16:
-					case "0x":
-					case "0X":
-					if ((/^-?[0-9A-Fa-f]+$/).test(string)) {
-						Output = BigInt("0x" + DigitPart) * NegativeNumber
-					}
-					break
-				//Binary
-					case 2:
-					case "0b":
-					case "0B":
-					if ((/^-?[01]+$/).test(string)) {
-						Output = BigInt("0b" + DigitPart) * NegativeNumber
-					}
-			
-			}
-			return Output
+			try {
+				let Output = 0n
+				let NegativeNumber = 1n
+				if ((/^-/).test(string)) {
+					NegativeNumber = -1n
+				}
+				let DigitPart = string.substring((string.search(/[0-9a-zA-Z]/)))
+				switch (radix) {
+					//decimal
+						default:
+						if ((/^-?\d+$/).test(string)) {
+							Output = BigInt(string)
+						}
+						break
+					//Hexadecimal
+						case 16:
+						case "0x":
+						case "0X":
+						if ((/^-?[0-9A-Fa-f]+$/).test(string)) {
+							Output = BigInt("0x" + DigitPart) * NegativeNumber
+						}
+						break
+					//Binary
+						case 2:
+						case "0b":
+						case "0B":
+						if ((/^-?[01]+$/).test(string)) {
+							Output = BigInt("0b" + DigitPart) * NegativeNumber
+						}
+				
+				}
+				return Output
+			} catch {}
 		}
 		function BigIntToStringSignedHex(BigIntVal) {
 			//Converts a bigint value into a signed ASM-styled hex number:
