@@ -75,23 +75,23 @@ Notes:<br>
 <table>
 	<tr>
 		<td>Fill amount</td>
-		<td><input type="number" data-radix="10" min="0" max="65535" data-min="0" data-max="65535" value="0" id="Input_FillAmount"> $<input type="text" data-radix="16" data-min="0" data-max="65535" value="0"><button>Click & hold to adjust</button></td>
+		<td><input type="number" data-radix="10" min="0" max="65535" data-min="0" data-max="65535" value="0" id="Input_FillAmount"> $<input type="text" data-radix="16" data-padlength="4" data-min="0" data-max="65535" value="0000"><button>Click & hold to adjust</button></td>
 	</tr>
 	<tr>
 		<td>Number of pieces for left end</td>
-		<td><input type="number" data-radix="10" min="0" max="255" data-min="0" data-max="255" value="3" id="Input_LeftPiece"> $<input type="text" data-radix="16" data-min="0" data-max="255" value="3"><button>Click & hold to adjust</button></td>
+		<td><input type="number" data-radix="10" min="0" max="255" data-min="0" data-max="255" value="3" id="Input_LeftPiece"> $<input type="text" data-radix="16" data-padlength="2" data-min="0" data-max="255" value="03"><button>Click & hold to adjust</button></td>
 	</tr>
 	<tr>
 		<td>Number of pieces for each middle</td>
-		<td><input type="number" data-radix="10" min="0" max="255" data-min="0" data-max="255" value="8" id="Input_MiddlePiece"> $<input type="text" data-radix="16" data-min="0" data-max="255" value="8"><button>Click & hold to adjust</button></td>
+		<td><input type="number" data-radix="10" min="0" max="255" data-min="0" data-max="255" value="8" id="Input_MiddlePiece"> $<input type="text" data-radix="16" data-padlength="2" data-min="0" data-max="255" value="08"><button>Click & hold to adjust</button></td>
 	</tr>
 	<tr>
 		<td>Number of pieces for right end</td>
-		<td><input type="number" data-radix="10" min="0" max="255" data-min="0" data-max="255" value="3" id="Input_RightPiece"> $<input type="text" data-radix="16" data-min="0" data-max="255" value="3"><button>Click & hold to adjust</button></td>
+		<td><input type="number" data-radix="10" min="0" max="255" data-min="0" data-max="255" value="3" id="Input_RightPiece"> $<input type="text" data-radix="16" data-padlength="2" data-min="0" data-max="255" value="03"><button>Click & hold to adjust</button></td>
 	</tr>
 	<tr>
 		<td>Number of middle tiles</td>
-		<td><input type="number" data-radix="10" min="0" max="255" data-min="0" data-max="255" value="7" id="Input_MiddleLength"> $<input type="text" data-radix="16" data-min="0" data-max="255" value="7"><button>Click & hold to adjust</button></td>
+		<td><input type="number" data-radix="10" min="0" max="255" data-min="0" data-max="255" value="7" id="Input_MiddleLength"> $<input type="text" data-radix="16" data-padlength="2" data-min="0" data-max="255" value="07"><button>Click & hold to adjust</button></td>
 	</tr>
 	<tr>
 		<td>Using double bar?</td>
@@ -99,22 +99,22 @@ Notes:<br>
 	</tr>
 	<tr>
 		<td><kbd>!Setting_GraphicalBar_SecondFillByteTableOffset</kbd></td>
-		<td><input type="number" data-radix="10" min="0" max="257"  data-min="0" data-max="257" value="32" id="Input_DoubleBarAddressOffset" class="DoubleBarRelated"> $<input type="text" data-radix="16" data-min="0" data-max="257" value="20" class="DoubleBarRelated"><button class="DoubleBarRelated">Click & hold to adjust</button></td>
+		<td><input type="number" data-radix="10" min="0" max="257"  data-min="0" data-max="257" value="32" id="Input_DoubleBarAddressOffset" class="DoubleBarRelated"> $<input type="text" data-radix="16" data-padlength="2" data-min="0" data-max="257" value="20" class="DoubleBarRelated"><button class="DoubleBarRelated">Click & hold to adjust</button></td>
 	</tr>
 	<tr>
 		<td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> location</td>
 		<td>
-			$<input type="text" data-radix="16" value="7F844A" id="GraphicalBar_TileAddressLocation" list="BarTileTableRAMList">
+			$<input type="text" data-radix="16" value="7F844A" id="GraphicalBar_TileAddressLocation" list="BarTileTableRAMList"><button>Click & hold to adjust</button>
 			<datalist id="BarTileTableRAMList">
 				<option value="7F844A">Default LoROM</option>
 				<option value="400198">SA-1</option>
-			</datalist><button>Click & hold to adjust</button>
+			</datalist>
 		</td>
 	</tr>
 	<tr>
 		<td>Write your tiles at:</td>
 		<td>
-			$<input type="text" data-radix="16" value="7FA000" list="StatusBarRAMTileList">
+			$<input type="text" data-radix="16" value="7FA000" list="StatusBarRAMTileList"><button>Click & hold to adjust</button>
 			<datalist id="StatusBarRAMTileList">
 				<option value="7E0F09">SMW's status bar (Writes over “TIME”)</option>
 				<option value="7FA000">Super status bar </option>
@@ -123,7 +123,7 @@ Notes:<br>
 				<option value="40403E">Super status bar (SA-1, top right corner)</option>
 				<option value="7FEC00">Overworld border plus</option>
 				<option value="41EC00">Overworld border plus (SA-1)</option>
-			</datalist><button>Click & hold to adjust</button>
+			</datalist>
 		</td>
 	</tr>
 	<tr>
@@ -567,7 +567,11 @@ Notes:<br>
 			.filter(ele2 => (/(?:text|number)/).test(ele2.type))
 			//Corrects and will update other adjacent inputs
 			InputsToUpdate.forEach(ele2 => {
-				ele2.value = EnteredNumber.toString(parseInt(ele2.dataset.radix)).toUpperCase()
+				let StringToDisplay = EnteredNumber.toString(parseInt(ele2.dataset.radix)).toUpperCase()
+				try {
+					StringToDisplay = StringToDisplay.padStart(parseInt(ele2.dataset.padlength), "0")
+				} catch {}
+				ele2.value = StringToDisplay
 			})
 			MainCode()
 		}
