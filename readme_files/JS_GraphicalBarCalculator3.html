@@ -108,8 +108,7 @@ Notes:<br>
 			<datalist id="BarTileTableRAMList">
 				<option value="7F844A">Default LoROM</option>
 				<option value="400198">SA-1</option>
-			</datalist>
-			<button>Click & hold to adjust</button>
+			</datalist><button>Click & hold to adjust</button>
 		</td>
 	</tr>
 	<tr>
@@ -124,8 +123,7 @@ Notes:<br>
 				<option value="40403E">Super status bar (SA-1, top right corner)</option>
 				<option value="7FEC00">Overworld border plus</option>
 				<option value="41EC00">Overworld border plus (SA-1)</option>
-			</datalist>
-			<button>Click & hold to adjust</button>
+			</datalist><button>Click & hold to adjust</button>
 		</td>
 	</tr>
 	<tr>
@@ -180,6 +178,7 @@ Notes:<br>
 		<button title="For Address tracker&apos; auto-assigner" onclick="CopyRAMUsage()">Get autoassigner data</button>
 		<span></span>
 	</div><br>
+	<table id="Output_ByteLayout"></table>
 </div>
 <div id="OutputError" hidden><span style="font-family: monospace; color: #ff0000">Error! Not a single byte used.</span></div>
 
@@ -302,7 +301,8 @@ Notes:<br>
 	function MainCode() {
 		let IsDoubleBarEnabled = document.getElementById("ToggleDoubleBar").checked;
 		[...document.querySelectorAll("*.DoubleBarRelated")].forEach(ele => ele.disabled = !IsDoubleBarEnabled);
-	
+		
+		let Input_FillAmount =   ParseBigIntValue(document.getElementById("Input_FillAmount").value)
 		let Input_LeftPiece =    ParseBigIntValue(document.getElementById("Input_LeftPiece").value)
 		let Input_MiddlePiece =  ParseBigIntValue(document.getElementById("Input_MiddlePiece").value)
 		let Input_RightPiece =   ParseBigIntValue(document.getElementById("Input_RightPiece").value)
@@ -338,6 +338,216 @@ Notes:<br>
 			document.getElementById("Output_TileTableSizeAndRangeDoubleBar").textContent = TotalGraphicalBarTableLength.toString(10) + " (" + BigIntToStringSignedHex(Input_TileByteTableAddress+Input_DoubleBarAddressOffset) + " ~ " + BigIntToStringSignedHex(Input_TileByteTableAddress+TotalGraphicalBarTableLength-1n+Input_DoubleBarAddressOffset) + ")"
 		}
 		document.getElementById("Output_TotalBarPieces").textContent = BarMaxTotalPieces.toString(10) + " (" + BigIntToStringSignedHex(BarMaxTotalPieces) + ")"
+		
+		//Clear table
+			let OutputByteTable = document.getElementById("Output_ByteLayout")
+			while (OutputByteTable.lastElementChild) {
+				OutputByteTable.removeChild(OutputByteTable.lastElementChild)
+			}
+		//Table header
+			let OutputByteTable_HeaderRow = document.createElement("tr")
+			
+			let OutputByteTable_TableHeader_FillByteTable = document.createElement("th")
+			OutputByteTable_TableHeader_FillByteTable.style.fontFamily = "monospace"
+			OutputByteTable_TableHeader_FillByteTable.appendChild(document.createTextNode("!Scratchram_GraphicalBar_FillByteTbl"))
+			OutputByteTable_HeaderRow.appendChild(OutputByteTable_TableHeader_FillByteTable)
+			
+			if (document.getElementById("ToggleDoubleBar").checked) {
+				let OutputByteTable_TableHeader_SecondFillByteTable = document.createElement("th")
+				OutputByteTable_TableHeader_SecondFillByteTable.appendChild(document.createTextNode("Second bar location"))
+				OutputByteTable_HeaderRow.appendChild(OutputByteTable_TableHeader_SecondFillByteTable)
+			}
+			
+			let OutputByteTable_TableHeader_FillAmount = document.createElement("th")
+			OutputByteTable_TableHeader_FillAmount.appendChild(document.createTextNode("Fill amount"))
+			OutputByteTable_HeaderRow.appendChild(OutputByteTable_TableHeader_FillAmount)
+			
+			let OutputByteTable_TableHeader_FillMax = document.createElement("th")
+			OutputByteTable_TableHeader_FillMax.appendChild(document.createTextNode("Maximum fill"))
+			OutputByteTable_HeaderRow.appendChild(OutputByteTable_TableHeader_FillMax)
+			
+			let OutputByteTable_TableHeader_ByteType = document.createElement("th")
+			OutputByteTable_TableHeader_ByteType.appendChild(document.createTextNode("Byte type"))
+			OutputByteTable_HeaderRow.appendChild(OutputByteTable_TableHeader_ByteType)
+			
+			let OutputByteTable_TableHeader_StatusBarWriteLocation = document.createElement("th")
+			OutputByteTable_TableHeader_StatusBarWriteLocation.appendChild(document.createTextNode("Written to"))
+			OutputByteTable_HeaderRow.appendChild(OutputByteTable_TableHeader_StatusBarWriteLocation)
+			
+			OutputByteTable.appendChild(OutputByteTable_HeaderRow)
+		//Graphical bar bytes
+			let GraphicalBarBytes = []
+			GraphicalBarBytes.length = 257
+			GraphicalBarBytes.fill(0n)
+			let GraphicalBarBytes_Index = 0n
+			let IsEmptyNonFraction = false
+			
+			if (Input_LeftPiece != 0n) {
+				if (Input_FillAmount >= Input_LeftPiece) {
+					GraphicalBarBytes[GraphicalBarBytes_Index] = Input_LeftPiece
+					Input_FillAmount -= Input_LeftPiece
+				} else {
+					GraphicalBarBytes[GraphicalBarBytes_Index] = Input_FillAmount
+					Input_FillAmount = 0n
+				}
+				
+				//Output as a table
+					let TableRow_ByteInfoRow = document.createElement("tr")
+					
+					let TableRow_ByteInfo_GraphicalBarByte = document.createElement("td")
+					TableRow_ByteInfo_GraphicalBarByte.style.fontFamily = "monospace"
+					TableRow_ByteInfo_GraphicalBarByte.appendChild(document.createTextNode(BigIntToStringSignedHex(Input_TileByteTableAddress+GraphicalBarBytes_Index)))
+					TableRow_ByteInfoRow.appendChild(TableRow_ByteInfo_GraphicalBarByte)
+					
+					if (document.getElementById("ToggleDoubleBar").checked) {
+						let TableRow_ByteInfo_GraphicalBarByte_SecondBar = document.createElement("td")
+						TableRow_ByteInfo_GraphicalBarByte_SecondBar.style.fontFamily = "monospace"
+						TableRow_ByteInfo_GraphicalBarByte_SecondBar.appendChild(document.createTextNode(BigIntToStringSignedHex(Input_TileByteTableAddress+Input_DoubleBarAddressOffset+GraphicalBarBytes_Index)))
+						TableRow_ByteInfoRow.appendChild(TableRow_ByteInfo_GraphicalBarByte_SecondBar)
+					}
+					
+					let TableRow_ByteInfo_FillAmount = document.createElement("td")
+					TableRow_ByteInfo_FillAmount.style.fontFamily = "monospace"
+					TableRow_ByteInfo_FillAmount.appendChild(document.createTextNode(GraphicalBarBytes[GraphicalBarBytes_Index].toString(10) + " ($" + GraphicalBarBytes[GraphicalBarBytes_Index].toString(16).toUpperCase().padStart(2, "0") + ")"))
+					TableRow_ByteInfoRow.appendChild(TableRow_ByteInfo_FillAmount)
+					if (GraphicalBarBytes[GraphicalBarBytes_Index] == Input_LeftPiece) {
+						TableRow_ByteInfo_FillAmount.style.backgroundColor = "Orange"
+					} else {
+						if (!IsEmptyNonFraction) {
+							TableRow_ByteInfo_FillAmount.style.backgroundColor = "yellow"
+							TableRow_ByteInfo_FillAmount.style.color = "black"
+							IsEmptyNonFraction = true
+						} else { //A fraction
+							TableRow_ByteInfo_FillAmount.style.backgroundColor = "grey"
+						}
+					}
+					
+					let TableRow_ByteInfo_FillAmountMax = document.createElement("td")
+					TableRow_ByteInfo_FillAmountMax.style.fontFamily = "monospace"
+					TableRow_ByteInfo_FillAmountMax.appendChild(document.createTextNode(Input_LeftPiece.toString(10) + " ($" + Input_LeftPiece.toString(16).toUpperCase().padStart(2, "0") + ")"))
+					TableRow_ByteInfoRow.appendChild(TableRow_ByteInfo_FillAmountMax)
+					
+					
+					let TableRow_ByteInfo_Type = document.createElement("td")
+					TableRow_ByteInfo_Type.style.fontFamily = "monospace"
+					TableRow_ByteInfo_Type.style.color = "cyan"
+					TableRow_ByteInfo_Type.appendChild(document.createTextNode("Left end"))
+					TableRow_ByteInfoRow.appendChild(TableRow_ByteInfo_Type)
+					
+					OutputByteTable.appendChild(TableRow_ByteInfoRow)
+				
+				GraphicalBarBytes_Index++
+			}
+			for (let MiddleLeft = NumberOf_MiddleByte; MiddleLeft > 0n; MiddleLeft--, GraphicalBarBytes_Index++) {
+				if (Input_FillAmount >= Input_MiddlePiece) {
+					GraphicalBarBytes[GraphicalBarBytes_Index] = Input_MiddlePiece
+					Input_FillAmount -= Input_MiddlePiece
+				} else {
+					GraphicalBarBytes[GraphicalBarBytes_Index] = Input_FillAmount
+					Input_FillAmount = 0n
+				}
+				//Output as a table
+					let TableRow_ByteInfoRow = document.createElement("tr")
+					
+					let TableRow_ByteInfo_GraphicalBarByte = document.createElement("td")
+					TableRow_ByteInfo_GraphicalBarByte.style.fontFamily = "monospace"
+					TableRow_ByteInfo_GraphicalBarByte.appendChild(document.createTextNode(BigIntToStringSignedHex(Input_TileByteTableAddress+GraphicalBarBytes_Index)))
+					TableRow_ByteInfoRow.appendChild(TableRow_ByteInfo_GraphicalBarByte)
+					
+					if (document.getElementById("ToggleDoubleBar").checked) {
+						let TableRow_ByteInfo_GraphicalBarByte_SecondBar = document.createElement("td")
+						TableRow_ByteInfo_GraphicalBarByte_SecondBar.style.fontFamily = "monospace"
+						TableRow_ByteInfo_GraphicalBarByte_SecondBar.appendChild(document.createTextNode(BigIntToStringSignedHex(Input_TileByteTableAddress+Input_DoubleBarAddressOffset+GraphicalBarBytes_Index)))
+						TableRow_ByteInfoRow.appendChild(TableRow_ByteInfo_GraphicalBarByte_SecondBar)
+					}
+					
+					let TableRow_ByteInfo_FillAmount = document.createElement("td")
+					TableRow_ByteInfo_FillAmount.style.fontFamily = "monospace"
+					TableRow_ByteInfo_FillAmount.appendChild(document.createTextNode(GraphicalBarBytes[GraphicalBarBytes_Index].toString(10) + " ($" + GraphicalBarBytes[GraphicalBarBytes_Index].toString(16).toUpperCase().padStart(2, "0") + ")"))
+					TableRow_ByteInfoRow.appendChild(TableRow_ByteInfo_FillAmount)
+					if (GraphicalBarBytes[GraphicalBarBytes_Index] == Input_MiddlePiece) {
+						TableRow_ByteInfo_FillAmount.style.backgroundColor = "Orange"
+					} else {
+						if (!IsEmptyNonFraction) {
+							TableRow_ByteInfo_FillAmount.style.backgroundColor = "yellow"
+							TableRow_ByteInfo_FillAmount.style.color = "black"
+							IsEmptyNonFraction = true
+						} else { //A fraction
+							TableRow_ByteInfo_FillAmount.style.backgroundColor = "grey"
+						}
+					}
+					
+					let TableRow_ByteInfo_FillAmountMax = document.createElement("td")
+					TableRow_ByteInfo_FillAmountMax.style.fontFamily = "monospace"
+					TableRow_ByteInfo_FillAmountMax.appendChild(document.createTextNode(Input_MiddlePiece.toString(10) + " ($" + Input_MiddlePiece.toString(16).toUpperCase().padStart(2, "0") + ")"))
+					TableRow_ByteInfoRow.appendChild(TableRow_ByteInfo_FillAmountMax)
+					
+					
+					let TableRow_ByteInfo_Type = document.createElement("td")
+					TableRow_ByteInfo_Type.style.fontFamily = "monospace"
+					TableRow_ByteInfo_Type.style.color = "green"
+					TableRow_ByteInfo_Type.appendChild(document.createTextNode("Middle"))
+					TableRow_ByteInfoRow.appendChild(TableRow_ByteInfo_Type)
+					
+					OutputByteTable.appendChild(TableRow_ByteInfoRow)
+				
+			}
+			if (Input_RightPiece != 0n) {
+				if (Input_FillAmount >= Input_RightPiece) {
+					GraphicalBarBytes[GraphicalBarBytes_Index] = Input_RightPiece
+					Input_FillAmount -= Input_RightPiece
+				} else {
+					GraphicalBarBytes[GraphicalBarBytes_Index] = Input_FillAmount
+					Input_FillAmount = 0n
+				}
+				//Output as a table
+					let TableRow_ByteInfoRow = document.createElement("tr")
+					
+					let TableRow_ByteInfo_GraphicalBarByte = document.createElement("td")
+					TableRow_ByteInfo_GraphicalBarByte.style.fontFamily = "monospace"
+					TableRow_ByteInfo_GraphicalBarByte.appendChild(document.createTextNode(BigIntToStringSignedHex(Input_TileByteTableAddress+GraphicalBarBytes_Index)))
+					TableRow_ByteInfoRow.appendChild(TableRow_ByteInfo_GraphicalBarByte)
+					
+					if (document.getElementById("ToggleDoubleBar").checked) {
+						let TableRow_ByteInfo_GraphicalBarByte_SecondBar = document.createElement("td")
+						TableRow_ByteInfo_GraphicalBarByte_SecondBar.style.fontFamily = "monospace"
+						TableRow_ByteInfo_GraphicalBarByte_SecondBar.appendChild(document.createTextNode(BigIntToStringSignedHex(Input_TileByteTableAddress+Input_DoubleBarAddressOffset+GraphicalBarBytes_Index)))
+						TableRow_ByteInfoRow.appendChild(TableRow_ByteInfo_GraphicalBarByte_SecondBar)
+					}
+					
+					let TableRow_ByteInfo_FillAmount = document.createElement("td")
+					TableRow_ByteInfo_FillAmount.style.fontFamily = "monospace"
+					TableRow_ByteInfo_FillAmount.appendChild(document.createTextNode(GraphicalBarBytes[GraphicalBarBytes_Index].toString(10) + " ($" + GraphicalBarBytes[GraphicalBarBytes_Index].toString(16).toUpperCase().padStart(2, "0") + ")"))
+					TableRow_ByteInfoRow.appendChild(TableRow_ByteInfo_FillAmount)
+					if (GraphicalBarBytes[GraphicalBarBytes_Index] == Input_RightPiece) {
+						TableRow_ByteInfo_FillAmount.style.backgroundColor = "Orange"
+					} else {
+						if (!IsEmptyNonFraction) {
+							TableRow_ByteInfo_FillAmount.style.backgroundColor = "yellow"
+							TableRow_ByteInfo_FillAmount.style.color = "black"
+							IsEmptyNonFraction = true
+						} else { //A fraction
+							TableRow_ByteInfo_FillAmount.style.backgroundColor = "grey"
+						}
+					}
+					
+					let TableRow_ByteInfo_FillAmountMax = document.createElement("td")
+					TableRow_ByteInfo_FillAmountMax.style.fontFamily = "monospace"
+					TableRow_ByteInfo_FillAmountMax.appendChild(document.createTextNode(Input_RightPiece.toString(10) + " ($" + Input_RightPiece.toString(16).toUpperCase().padStart(2, "0") + ")"))
+					TableRow_ByteInfoRow.appendChild(TableRow_ByteInfo_FillAmountMax)
+					
+					
+					let TableRow_ByteInfo_Type = document.createElement("td")
+					TableRow_ByteInfo_Type.style.fontFamily = "monospace"
+					TableRow_ByteInfo_Type.style.color = "red"
+					TableRow_ByteInfo_Type.appendChild(document.createTextNode("Right end"))
+					TableRow_ByteInfoRow.appendChild(TableRow_ByteInfo_Type)
+					
+					OutputByteTable.appendChild(TableRow_ByteInfoRow)
+			}
+		//Remaining fill left
+		let a = 0
+		
 	}
 	//Helper
 		function UpdateOtherInputs(ele) {
