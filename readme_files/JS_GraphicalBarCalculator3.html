@@ -1,0 +1,338 @@
+<html>
+	<head>
+		<style>
+			html {
+			background-color: #000207;
+			color: white;
+			font-family: sans-serif;
+			}
+			
+			table, th, td {
+			border: 1px solid white;
+			border-collapse: collapse;
+			}
+			
+			div.SmallFont {
+				font-size: 11px;
+			}
+			
+			div.StatisticsTable {
+				max-width:900px;
+			}
+			input[type='text'] { font-family: monospace;}
+			input[type='number'] { font-family: monospace;}
+			
+			span.NoLineBreak {
+				white-space: nowrap;
+			}
+			
+			abbr{cursor: help;}
+			
+			
+			img.img-hor {
+				-moz-transform: scaleX(-1);
+				-o-transform: scaleX(-1);
+				-webkit-transform: scaleX(-1);
+				transform: scaleX(-1);
+				filter: FlipH;
+				-ms-filter: "FlipH";
+			}
+			img.img-rot {
+				/* upwards bar */
+				transform: rotate(-90deg)
+			}
+			img.img-downwardsbar {
+				/* it performs the transforms right-to-left*/
+				transform: scaleY(-1) rotate(-90deg);
+			}
+			label { display: block; }
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+.ClickHoldChangeNumber {
+	cursor: ew-resize
+}
+	input[type='text'] { font-family: monospace;}
+	input[type='number'] { font-family: monospace;}
+		</style>
+	</head>
+<a href="../GraphicalBar_ReadmeDocumentation.html#TopJSLink">Back to top</a><br>
+<a href="../GraphicalBar_ReadmeDocumentation.html#ComputeGraphicalBarData">Back to info table</a><br>
+<a href="DoubleBarInfo.html#DoubleBarSG">Back to Double bar information</a><br><br>
+<p>This javascript HTML file simulates the subroutine <kbd>DrawGraphicalBar</kbd> and <kbd>DrawGraphicalBarSubtractionLoopEdition</kbd>.</p>
+Notes:<br>
+<ul>
+<li>The screen is 256 by 224 pixels, therefore when dealing with 8x8 tiles, the number of 8x8s to fill the entire width or height would be 32 tiles wide 28 tiles tall.</li>
+<li>The tile display is only available using default number of pieces or zero for left end, middle, and right end, this is because there are way too many different configurations for me to draw every tile.</li>
+<li>When using a vertical bar on a stripe image, the tile data write is the same way as horizontal bar using the <kbd>[TTTTTTTT, YXPCCCTT]</kbd> format, ignoring the header and the terminating byte.</li>
+</ul>
+<table>
+	<tr>
+		<td>Fill amount</td>
+		<td><input type="number" data-radix="10" min="0" max="65535" value="0"> $<input type="text" data-radix="16" data-min="0" data-max="65535" value="0"></td>
+	</tr>
+	<tr>
+		<td>Number of pieces for left end</td>
+		<td><input type="number" data-radix="10" min="0" max="255" value="3" id="Input_LeftPiece"> $<input type="text" data-radix="16" data-min="0" data-max="255" value="3"></td>
+	</tr>
+	<tr>
+		<td>Number of pieces for each middle</td>
+		<td><input type="number" data-radix="10" min="0" max="255" value="8" id="Input_MiddlePiece"> $<input type="text" data-radix="16" data-min="0" data-max="255" value="8"></td>
+	</tr>
+	<tr>
+		<td>Number of pieces for right end</td>
+		<td><input type="number" data-radix="10" min="0" max="255" value="3" id="Input_RightPiece"> $<input type="text" data-radix="16" data-min="0" data-max="255" value="3"></td>
+	</tr>
+	<tr>
+		<td>Number of middle tiles</td>
+		<td><input type="number" data-radix="10" min="0" max="255" value="7" id="Input_MiddleLength"> $<input type="text" data-radix="16" data-min="0" data-max="255" value="7"></td>
+	</tr>
+	<tr>
+		<td>Using double bar?</td>
+		<td><label><input type="checkbox" id="ToggleDoubleBar" onchange="MainCode()"></label></td>
+	</tr>
+	<tr>
+		<td><kbd>!Setting_GraphicalBar_SecondFillByteTableOffset</kbd></td>
+		<td><input type="number" data-radix="10" min="0" max="257" value="32" id="Input_DoubleBarAddressOffset" class="DoubleBarRelated"> $<input type="text" data-radix="16" data-min="0" data-max="257" value="20" class="DoubleBarRelated"></td>
+	</tr>
+	<tr>
+		<td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> location</td>
+		<td>
+			$<input type="text" data-radix="16" value="7F844A" id="GraphicalBar_TileAddressLocation" list="BarTileTableRAMList">
+			<datalist id="BarTileTableRAMList">
+				<option value="7F844A">Default LoROM</option>
+				<option value="400198">SA-1</option>
+			</datalist>
+		</td>
+	</tr>
+	<tr>
+		<td>Write your tiles at:</td>
+		<td>
+			$<input type="text" data-radix="16" value="7FA000" list="StatusBarRAMTileList">
+			<datalist id="StatusBarRAMTileList">
+				<option value="7E0F09">SMW's status bar (Writes over “TIME”)</option>
+				<option value="7FA000">Super status bar </option>
+				<option value="404000">Super status bar (SA-1)</option>
+				<option value="7FA03E">Super status bar (Top right corner)</option>
+				<option value="40403E">Super status bar (SA-1, top right corner)</option>
+				<option value="7FEC00">Overworld border plus</option>
+				<option value="41EC00">Overworld border plus (SA-1)</option>
+			</datalist>
+		</td>
+	</tr>
+	<tr>
+		<td>Status bar tile format</td>
+		<td>
+			<select onchange="MainCode()">
+				<option selected>Interleaved [TT, PP, TT, PP,...]</option>
+				<option>2 Seperate tables [TT, TT, TT,...][PP, PP, PP,...]</option>
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td>Direction</td>
+		<td>
+			<select onchange="MainCode()">
+				<option selected>Right</option>
+				<option>Left</option>
+				<option>Up</option>
+				<option>Down</option>
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td>Using <kbd>BarExtendLeft</kbd>?</td>
+		<td><label><input type="checkbox" onchange="MainCode()"></label></td>
+	</tr>
+	<tr>
+		<td>Using static end tiles?</td>
+		<td>
+			<div><label><input type="checkbox"> (&ldquo;left side&rdquo; for horizontal bars, whatever top or bottom the fill starts at for vertical)</label></div>
+			<div><label><input type="checkbox">  (&ldquo;right side&rdquo; for horizontal bars, whatever top or bottom the fill ends at for vertical)</label></div>
+		</td>
+	</tr>
+</table>
+<hr>
+<table>
+	<tr>
+		<td style="font-family: monospace">Total bytes used for fill table</td>
+		<td style="font-family: monospace" id="Output_TileTableSizeAndRange"></td>
+	</tr>
+	<tr>
+		<td style="font-family: monospace">Total bytes used for fill table for double bar</td>
+		<td style="font-family: monospace" id="Output_TileTableSizeAndRangeDoubleBar"></td>
+	</tr>
+	<tr>
+		<td style="font-family: monospace">Total bar pieces</td>
+		<td style="font-family: monospace" id="Output_TotalBarPieces"></td>
+	</tr>
+</table>
+
+
+<script>
+	window.addEventListener(
+		"load",
+		function () {
+			[...document.querySelectorAll("input")].forEach(ele => {
+				if (ele.type == "text"||ele.type == "number") {
+					AddInputNumberTriggers(ele)
+				}
+				if (ele.type == "text") {
+					UpDownArrowTriggers(ele)
+				}
+			})
+			MainCode()
+		}
+	)
+	function AddInputNumberTriggers(ele) {
+		ele.addEventListener(
+			"change",
+			function () {
+				UpdateOtherInputs(ele)
+			}.bind(null, ele)
+		)
+	}
+	function UpDownArrowTriggers(ele) {
+		ele.addEventListener(
+			"keydown",
+			function (e) {
+				let KeyName = e.key
+				if (/(ArrowDown|ArrowUp)/.test(KeyName)) {
+					e.preventDefault()
+					let IncrementDecrement = 1n
+					if (KeyName == "ArrowDown") {
+						IncrementDecrement *= -1n
+					}
+					let EnteredNumber = ParseBigIntValue(e.target.value, parseInt(e.target.dataset.radix)) + IncrementDecrement
+					event.target.value = (EnteredNumber.toString(parseInt(e.target.dataset.radix))).toUpperCase()
+					
+					let a = 0
+					UpdateOtherInputs(e.target)
+					
+				}
+			}
+		)
+	}
+	function MainCode() {
+		let IsDoubleBarEnabled = document.getElementById("ToggleDoubleBar").checked;
+		[...document.querySelectorAll("*.DoubleBarRelated")].forEach(ele => ele.disabled = !IsDoubleBarEnabled);
+	
+		let Input_LeftPiece =    ParseBigIntValue(document.getElementById("Input_LeftPiece").value)
+		let Input_MiddlePiece =  ParseBigIntValue(document.getElementById("Input_MiddlePiece").value)
+		let Input_RightPiece =   ParseBigIntValue(document.getElementById("Input_RightPiece").value)
+		let Input_MiddleLength = ParseBigIntValue(document.getElementById("Input_MiddleLength").value)
+		let Input_DoubleBarAddressOffset = ParseBigIntValue(document.getElementById("Input_DoubleBarAddressOffset").value)
+		let Input_TileByteTableAddress = ParseBigIntValue(document.getElementById("GraphicalBar_TileAddressLocation").value, 16)
+		
+		let NumberOf_LeftByte = 0n
+		if (Input_LeftPiece != 0n) {
+			NumberOf_LeftByte = 1n
+		}
+		let NumberOf_MiddleByte = 0n
+		if (Input_MiddleLength * Input_MiddlePiece != 0n) {
+			NumberOf_MiddleByte = Input_MiddleLength
+		}
+		let NumberOf_RightByte = 0n
+		if (Input_RightPiece != 0n) {
+			NumberOf_RightByte = 1n
+		}
+		let TotalGraphicalBarTableLength = NumberOf_LeftByte+NumberOf_MiddleByte+NumberOf_RightByte
+		if (TotalGraphicalBarTableLength == 0n) {
+			document.getElementById("Output_TileTableSizeAndRange").textContent = ""
+			document.getElementById("Output_TotalBarPieces").textContent = ""
+			return
+		}
+		let BarMaxTotalPieces = Input_LeftPiece + (Input_MiddleLength * Input_MiddlePiece) + Input_RightPiece
+		
+		document.getElementById("Output_TileTableSizeAndRange").textContent = TotalGraphicalBarTableLength.toString(10) + " (" + BigIntToStringSignedHex(Input_TileByteTableAddress) + " ~ " + BigIntToStringSignedHex(Input_TileByteTableAddress+TotalGraphicalBarTableLength-1n) + ")"
+		document.getElementById("Output_TileTableSizeAndRangeDoubleBar").textContent = "N/A"
+		if (IsDoubleBarEnabled) {
+			document.getElementById("Output_TileTableSizeAndRangeDoubleBar").textContent = TotalGraphicalBarTableLength.toString(10) + " (" + BigIntToStringSignedHex(Input_TileByteTableAddress+Input_DoubleBarAddressOffset) + " ~ " + BigIntToStringSignedHex(Input_TileByteTableAddress+TotalGraphicalBarTableLength-1n+Input_DoubleBarAddressOffset) + ")"
+		}
+		document.getElementById("Output_TotalBarPieces").textContent = BarMaxTotalPieces.toString(10) + " (" + BigIntToStringSignedHex(BarMaxTotalPieces) + ")"
+	}
+	//Helper
+		function UpdateOtherInputs(ele) {
+			let ElementBeingUsed = event.target
+			let EnteredValue = ElementBeingUsed.value
+			let EnteredNumber = ParseBigIntValue(EnteredValue, parseInt(ElementBeingUsed.dataset.radix))
+			let EnteredMin = -Infinity
+			if (typeof ele.dataset.min != "undefined") {
+				EnteredMin = ParseBigIntValue(ele.dataset.min)
+			}
+			let EnteredMax = Infinity
+			if (typeof ele.dataset.max != "undefined") {
+				EnteredMax = ParseBigIntValue(ele.dataset.max)
+			}
+			EnteredNumber = BigintClamp(EnteredNumber, EnteredMin, EnteredMax)
+			
+			let InputsToUpdate = [...ElementBeingUsed.parentNode.querySelectorAll("input")]
+			.filter(ele2 => (/(?:text|number)/).test(ele2.type))
+			//Corrects and will update other adjacent inputs
+			InputsToUpdate.forEach(ele2 => {
+				ele2.value = EnteredNumber.toString(parseInt(ele2.dataset.radix)).toUpperCase()
+			})
+			MainCode()
+		}
+		
+		function BigintClamp(num, min, max) {
+			//Restrict a number within a specified range, bigInt edition.
+				return num <= min ? min : num >= max ? max : num;
+		}
+		function createSVGElement(tag) { //https://stackoverflow.com/questions/57894500/why-is-it-necessary-to-use-document-createelementns-when-adding-svg-tags-to
+			return document.createElementNS('http://www.w3.org/2000/svg', tag)
+		}
+		function ParseBigIntValue(string, radix) {
+			//Acts more closely to parseInt, unlike other methods (other functions, like CorrectBinBigIntValue)
+			//this works with bigInt.
+			let Output = 0n
+			let NegativeNumber = 1n
+			if ((/^-/).test(string)) {
+				NegativeNumber = -1n
+			}
+			let DigitPart = string.substring((string.search(/[0-9a-zA-Z]/)))
+			switch (radix) {
+				//decimal
+					default:
+					if ((/^-?\d+$/).test(string)) {
+						Output = BigInt(string)
+					}
+					break
+				//Hexadecimal
+					case 16:
+					case "0x":
+					case "0X":
+					if ((/^-?[0-9A-Fa-f]+$/).test(string)) {
+						Output = BigInt("0x" + DigitPart) * NegativeNumber
+					}
+					break
+				//Binary
+					case 2:
+					case "0b":
+					case "0B":
+					if ((/^-?[01]+$/).test(string)) {
+						Output = BigInt("0b" + DigitPart) * NegativeNumber
+					}
+			
+			}
+			return Output
+		}
+		function BigIntToStringSignedHex(BigIntVal) {
+			//Converts a bigint value into a signed ASM-styled hex number:
+			//16n -> "$10"
+			//-16n -> "-$10"
+			let StringOutput = ""
+			if (BigIntVal >= 0n) {
+				StringOutput = "$" + BigIntVal.toString(16).toUpperCase()
+			} else {
+				StringOutput = "-$" + (BigIntVal*-1n).toString(16).toUpperCase()
+			}
+			return StringOutput
+		}
+</script>
