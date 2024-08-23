@@ -159,28 +159,30 @@ Notes:<br>
 	</tr>
 </table>
 <hr>
-<table>
-	<tr>
-		<td style="font-family: monospace">Total bytes used for fill table</td>
-		<td style="font-family: monospace" id="Output_TileTableSizeAndRange"></td>
-	</tr>
-	<tr>
-		<td style="font-family: monospace">Total bytes used for fill table for double bar</td>
-		<td style="font-family: monospace" id="Output_TileTableSizeAndRangeDoubleBar"></td>
-	</tr>
-	<tr>
-		<td style="font-family: monospace">Total bar pieces</td>
-		<td style="font-family: monospace" id="Output_TotalBarPieces"></td>
-	</tr>
-</table><br>
-<textarea id="Output_AddressInfo_Text" readonly cols="75" rows="7" style="white-space: pre; overflow-wrap: normal; overflow-x: scroll; background-color: #000000; color: white"></textarea><br>
+<div id="OutputInfo">
+	<table>
+		<tr>
+			<td style="font-family: monospace">Total bytes used for fill table</td>
+			<td style="font-family: monospace" id="Output_TileTableSizeAndRange"></td>
+		</tr>
+		<tr>
+			<td style="font-family: monospace">Total bytes used for fill table for double bar</td>
+			<td style="font-family: monospace" id="Output_TileTableSizeAndRangeDoubleBar"></td>
+		</tr>
+		<tr>
+			<td style="font-family: monospace">Total bar pieces</td>
+			<td style="font-family: monospace" id="Output_TotalBarPieces"></td>
+		</tr>
+	</table><br>
 	<div>
-		<button onclick="setClipboard(document.getElementById('Output_AddressInfo_Text').value);">Copy to clipboard</button>
+		<button title="For Address tracker&apos; auto-assigner" onclick="CopyRAMUsage()">Get autoassigner data</button>
 		<span></span>
 	</div><br>
-
+</div>
+<div id="OutputError" hidden><span style="font-family: monospace; color: #ff0000">Error! Not a single byte used.</span></div>
 
 <script>
+	let TotalGraphicalBarTableLength = 0n
 	window.addEventListener(
 		"load",
 		function () {
@@ -224,6 +226,15 @@ Notes:<br>
 			}
 		)
 	}
+	function CopyRAMUsage() {
+		let FreeramAutoAssignerText = ""
+		FreeramAutoAssignerText += "Graphical Bar\t!Scratchram_GraphicalBar_LeftEndPiece\t1\t-\t-\n"
+		FreeramAutoAssignerText += "Graphical Bar\t!Scratchram_GraphicalBar_MiddlePiece\t1\t-\t-\n"
+		FreeramAutoAssignerText += "Graphical Bar\t!Scratchram_GraphicalBar_RightEndPiece\t1\t-\t-\n"
+		FreeramAutoAssignerText += "Graphical Bar\t!Scratchram_GraphicalBar_TempLength\t1\t-\t-\n"
+		FreeramAutoAssignerText += "Graphical Bar\t!Scratchram_GraphicalBar_FillByteTbl\t" + TotalGraphicalBarTableLength + "\t-\t-\n"
+		setClipboard(FreeramAutoAssignerText)
+	}
 	function MainCode() {
 		let IsDoubleBarEnabled = document.getElementById("ToggleDoubleBar").checked;
 		[...document.querySelectorAll("*.DoubleBarRelated")].forEach(ele => ele.disabled = !IsDoubleBarEnabled);
@@ -247,12 +258,14 @@ Notes:<br>
 		if (Input_RightPiece != 0n) {
 			NumberOf_RightByte = 1n
 		}
-		let TotalGraphicalBarTableLength = NumberOf_LeftByte+NumberOf_MiddleByte+NumberOf_RightByte
+		TotalGraphicalBarTableLength = NumberOf_LeftByte+NumberOf_MiddleByte+NumberOf_RightByte
 		if (TotalGraphicalBarTableLength == 0n) {
-			document.getElementById("Output_TileTableSizeAndRange").textContent = ""
-			document.getElementById("Output_TotalBarPieces").textContent = ""
+			document.getElementById("OutputInfo").hidden = true
+			document.getElementById("OutputError").hidden = false
 			return
 		}
+		document.getElementById("OutputInfo").hidden = false
+		document.getElementById("OutputError").hidden = true
 		let BarMaxTotalPieces = Input_LeftPiece + (Input_MiddleLength * Input_MiddlePiece) + Input_RightPiece
 		
 		document.getElementById("Output_TileTableSizeAndRange").textContent = TotalGraphicalBarTableLength.toString(10) + " (" + BigIntToStringSignedHex(Input_TileByteTableAddress) + " ~ " + BigIntToStringSignedHex(Input_TileByteTableAddress+TotalGraphicalBarTableLength-1n) + ")"
@@ -261,14 +274,6 @@ Notes:<br>
 			document.getElementById("Output_TileTableSizeAndRangeDoubleBar").textContent = TotalGraphicalBarTableLength.toString(10) + " (" + BigIntToStringSignedHex(Input_TileByteTableAddress+Input_DoubleBarAddressOffset) + " ~ " + BigIntToStringSignedHex(Input_TileByteTableAddress+TotalGraphicalBarTableLength-1n+Input_DoubleBarAddressOffset) + ")"
 		}
 		document.getElementById("Output_TotalBarPieces").textContent = BarMaxTotalPieces.toString(10) + " (" + BigIntToStringSignedHex(BarMaxTotalPieces) + ")"
-		
-		let FreeramAutoAssignerText = ""
-		FreeramAutoAssignerText += "Graphical Bar\t!Scratchram_GraphicalBar_LeftEndPiece\t1\t-\t-\n"
-		FreeramAutoAssignerText += "Graphical Bar\t!Scratchram_GraphicalBar_MiddlePiece\t1\t-\t-\n"
-		FreeramAutoAssignerText += "Graphical Bar\t!Scratchram_GraphicalBar_RightEndPiece\t1\t-\t-\n"
-		FreeramAutoAssignerText += "Graphical Bar\t!Scratchram_GraphicalBar_TempLength\t1\t-\t-\n"
-		FreeramAutoAssignerText += "Graphical Bar\t!Scratchram_GraphicalBar_FillByteTbl\t" + TotalGraphicalBarTableLength + "\t-\t-\n"
-		document.getElementById("Output_AddressInfo_Text").value = FreeramAutoAssignerText
 	}
 	//Helper
 		function UpdateOtherInputs(ele) {
