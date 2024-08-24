@@ -214,7 +214,7 @@
 						Radix = parseInt(document.activeElement.dataset.input_number_radix)
 					}
 				let InputNumber = ParseBigIntValue(document.activeElement.value, Radix) //This gets the number
-				if (!e) var e = window.event;
+				if (!e) e = window.event;
 				if (e.target) target = e.target;
 				else if (e.srcElement) target = e.srcElement;
 				
