@@ -40,7 +40,7 @@
 	</tr>
 </table>
 <hr>
-<span id="Output"></span>
+<table id="Output"></table>
 
 
 <script>
@@ -64,6 +64,11 @@
 				RoundTo0OrFull: 0
 			}
 		]
+		//Clear first
+			let OutputTable = document.getElementById("Output")
+			while (OutputTable.lastElementChild) {
+				OutputTable.removeChild(OutputTable.lastElementChild)
+			}
 		if (MaxQuantityValue != 0n && MaxPiecesValue != 0n) {
 			for (let QuantityAmount = 1n; QuantityAmount <= MaxQuantityValue; QuantityAmount++) {
 				let Output_CalculateGraphicalBarPercentage = DivideRoundHalfUpBigInt(QuantityAmount*MaxPiecesValue, MaxQuantityValue, MaxPiecesValue)
@@ -78,35 +83,61 @@
 					})
 				}
 			}
-			let OutputTable = ""
-			OutputTable += "<table>"
-			OutputTable += "<tr><th>Quantity amount</th><th>How many in range</th><th>Result (pieces filled and round 0 or full)</th></tr>"
 			
-			GraphicalBar_PiecesList.forEach((BarPieceFilledValue) => {
-				OutputTable += "<tr>"
+			let OutputTableHeaderRow = document.createElement("tr")
+			
+			let OutputTableHeader_QuantityAmount = document.createElement("th")
+			OutputTableHeader_QuantityAmount.appendChild(document.createTextNode("Quantity amount"))
+			OutputTableHeaderRow.appendChild(OutputTableHeader_QuantityAmount)
+			
+			let OutputTableHeader_HowManyInRange = document.createElement("th")
+			OutputTableHeader_HowManyInRange.appendChild(document.createTextNode("How many in range"))
+			OutputTableHeaderRow.appendChild(OutputTableHeader_HowManyInRange)
+			
+			let OutputTableHeader_Result = document.createElement("th")
+			OutputTableHeader_Result.appendChild(document.createTextNode("Result"))
+			OutputTableHeaderRow.appendChild(OutputTableHeader_Result)
+			
+			OutputTable.appendChild(OutputTableHeaderRow)
+			
+			GraphicalBar_PiecesList.forEach(BarPieceFilledValue => {
+				let Row_Output = document.createElement("tr")
+				
+				let Cell_QuantityAmount = document.createElement("td")
+				Cell_QuantityAmount.style.fontFamily = "monospace"
+				
+				let RangeText = ""
 				if (BarPieceFilledValue.RangeMin == BarPieceFilledValue.RangeMax) {
-					OutputTable += "<td><kbd>" + BarPieceFilledValue.RangeMin.toString(10) + " ($" + pad(BarPieceFilledValue.RangeMin.toString(16).toUpperCase(), 4) + ")</kbd></td>"
+					RangeText += BarPieceFilledValue.RangeMin.toString(10) + " ($" + BarPieceFilledValue.RangeMin.toString(16).toUpperCase().padStart(4, "0") + ")"
 				} else {
-					OutputTable += "<td><kbd>" + BarPieceFilledValue.RangeMin.toString(10) + "-" + BarPieceFilledValue.RangeMax.toString(10) + " ($" + pad(BarPieceFilledValue.RangeMin.toString(16).toUpperCase(), 4) + "-$" +pad(BarPieceFilledValue.RangeMax.toString(16).toUpperCase(), 4) + ")</kbd></td>"
+					RangeText += BarPieceFilledValue.RangeMin.toString(10) + "-" + BarPieceFilledValue.RangeMax.toString(10) + " ($" + BarPieceFilledValue.RangeMin.toString(16).toUpperCase().padStart(4, "0") + "-$" + BarPieceFilledValue.RangeMax.toString(16).toUpperCase().padStart(4, "0") + ")"
 				}
-				OutputTable += "<td><kbd>" + (BarPieceFilledValue.RangeMax-BarPieceFilledValue.RangeMin+1n).toString(10) + "</kbd></td>"
-				//Handle number of pieces and rounding flag
-					OutputTable += "<td>"
-					OutputTable += "<kbd>"
-					OutputTable += BarPieceFilledValue.PiecesFilled.toString(10) + " ($" + pad(BarPieceFilledValue.PiecesFilled.toString(16).toUpperCase(), 4) + ")"
-					if (BarPieceFilledValue.RoundTo0OrFull != 0) {
-						OutputTable += ", Y=$" + pad(BarPieceFilledValue.RoundTo0OrFull.toString(16).toUpperCase(), 2)
-					}
-					OutputTable += "</kbd>"
-					OutputTable += "</td>"
-				OutputTable += "</tr>"
-			});
-			
-			OutputTable += "</table>"
-			
-			document.getElementById("Output").innerHTML = OutputTable
+				Cell_QuantityAmount.appendChild(document.createTextNode(RangeText))
+				Row_Output.appendChild(Cell_QuantityAmount)
+				
+				let Cell_RangeSize = document.createElement("td")
+				Cell_RangeSize.style.fontFamily = "monospace"
+				let RangeSizeText = (BarPieceFilledValue.RangeMax-BarPieceFilledValue.RangeMin+1n).toString(10)
+				Cell_RangeSize.appendChild(document.createTextNode(RangeSizeText))
+				Row_Output.appendChild(Cell_RangeSize)
+				
+				let Cell_OutputPiecesFilled = document.createElement("td")
+				Cell_OutputPiecesFilled.style.fontFamily = "monospace"
+				let PiecesFilledText = BarPieceFilledValue.PiecesFilled.toString(10) + " ($" + BarPieceFilledValue.PiecesFilled.toString(16).toUpperCase().padStart(4, "0") + ")"
+				if (BarPieceFilledValue.RoundTo0OrFull != 0) {
+					PiecesFilledText += ", Y=$" + BarPieceFilledValue.RoundTo0OrFull.toString(16).toUpperCase().padStart(2, "0")
+				}
+				Cell_OutputPiecesFilled.appendChild(document.createTextNode(PiecesFilledText))
+				Row_Output.appendChild(Cell_OutputPiecesFilled)
+				
+				OutputTable.appendChild(Row_Output)
+			})
 		} else {
-			document.getElementById("Output").innerHTML = "Error, there are no values!"
+			let TableRow_ErrorMessage = document.createElement("tr")
+			let TableCell_ErrorMessage = document.createElement("td")
+			TableCell_ErrorMessage.appendChild(document.createTextNode("Error, there are no values!"))
+			TableRow_ErrorMessage.appendChild(TableCell_ErrorMessage)
+			OutputTable.appendChild(TableRow_ErrorMessage)
 		}
 	}
 //various functions
