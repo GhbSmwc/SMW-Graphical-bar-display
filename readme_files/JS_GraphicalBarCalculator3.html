@@ -46,20 +46,21 @@
 				transform: scaleY(-1) rotate(-90deg);
 			}
 			label { display: block; }
-.noselect {
-  -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-     -khtml-user-select: none; /* Konqueror HTML */
-       -moz-user-select: none; /* Old versions of Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome, Edge, Opera and Firefox */
-}
-.ClickHoldChangeNumber {
-	cursor: ew-resize
-}
-	input[type='text'] { font-family: monospace;}
-	input[type='number'] { font-family: monospace;}
+			.noselect {
+			-webkit-touch-callout: none; /* iOS Safari */
+			-webkit-user-select: none; /* Safari */
+			-khtml-user-select: none; /* Konqueror HTML */
+			-moz-user-select: none; /* Old versions of Firefox */
+				-ms-user-select: none; /* Internet Explorer/Edge */
+				user-select: none; /* Non-prefixed version, currently
+							supported by Chrome, Edge, Opera and Firefox */
+			}
+			.ClickHoldChangeNumber {
+				cursor: ew-resize
+			}
+				input[type='text'] { font-family: monospace;}
+				input[type='number'] { font-family: monospace;}
+				
 		</style>
 	</head>
 <a href="../GraphicalBar_ReadmeDocumentation.html#TopJSLink">Back to top</a><br>
@@ -198,7 +199,7 @@ Notes:<br>
 				</div>
 			</td>
 			<td>
-				<div style="width: 800px; height: 300px; overflow: auto; border: 1px solid white;" id="ImgPreview">
+				<div style="width: 800px; height: 300px; overflow: auto; border: 1px solid white; white-space: nowrap; text-align: center; align-content: center;" id="ImgPreview">
 				
 				</div>
 			</td>
@@ -207,7 +208,25 @@ Notes:<br>
 
 </div>
 <div id="OutputError" hidden><span style="font-family: monospace; color: #ff0000">Error! Not a single byte used.</span></div>
-
+<span hidden data-comment="This is here so to prevent the browser from unloading and reloading bar image tiles and causing flickers in the preview when updating the inputs">
+<img src="GraphicalBarFills/LeftEnd_0_of_3.png">
+<img src="GraphicalBarFills/LeftEnd_1_of_3.png">
+<img src="GraphicalBarFills/LeftEnd_2_of_3.png">
+<img src="GraphicalBarFills/LeftEnd_3_of_3.png">
+<img src="GraphicalBarFills/Middle_0_of_8.png">
+<img src="GraphicalBarFills/Middle_1_of_8.png">
+<img src="GraphicalBarFills/Middle_2_of_8.png">
+<img src="GraphicalBarFills/Middle_3_of_8.png">
+<img src="GraphicalBarFills/Middle_4_of_8.png">
+<img src="GraphicalBarFills/Middle_5_of_8.png">
+<img src="GraphicalBarFills/Middle_6_of_8.png">
+<img src="GraphicalBarFills/Middle_7_of_8.png">
+<img src="GraphicalBarFills/Middle_8_of_8.png">
+<img src="GraphicalBarFills/RightEnd_0_of_3.png">
+<img src="GraphicalBarFills/RightEnd_1_of_3.png">
+<img src="GraphicalBarFills/RightEnd_2_of_3.png">
+<img src="GraphicalBarFills/RightEnd_3_of_3.png">
+</span>
 <script>
 	let TotalGraphicalBarTableLength = 0n
 	let MouseDownClickPos = {
@@ -452,7 +471,11 @@ Notes:<br>
 				}
 				return true
 			})();
-			
+			if (!PreviewAvailable) {
+				let PreviewNotAvailableMsg = document.createElement("span")
+				PreviewNotAvailableMsg.appendChild(document.createTextNode("Preview unavailable."))
+				ImagePreview.appendChild(PreviewNotAvailableMsg)
+			}
 			//Declare functions
 				function GenerateTableRow(Maximum, ByteType, MiddleLeft) {
 					let NamesToColors = {
