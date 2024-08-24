@@ -453,6 +453,7 @@ Notes:<br>
 			let GraphicalBarBytes_Index = 0n
 			let IsEmptyNonFraction = false
 			let CurrentStatusBarAddress = Input_StatusbarAddressToWrite
+			let LastWrittenImgGraphicalBarPart = null //Needed for leftwards/upwards bar
 			if (document.getElementById("FillDirection_Left").selected) {
 				CurrentStatusBarAddress += (TotalGraphicalBarTableLength-1n)*StatusBarByteFormat
 			}
@@ -569,7 +570,70 @@ Notes:<br>
 					}
 					let IMG_GraphicalBar = document.createElement("img")
 					IMG_GraphicalBar.src = "GraphicalBarFills/" + Type + "_" + GraphicalBarBytes[GraphicalBarBytes_Index].toString(10) + "_of_" + Max.toString(10) + ".png"
-					ImagePreview.appendChild(IMG_GraphicalBar)
+					IMG_GraphicalBar.style.border = "1px solid white"
+					//Static left end
+						if (GraphicalBarBytes_Index == 0n) { //Before the first tile
+							if (document.getElementById("UsingStatic_LeftSide").checked) {
+								IMG_GraphicalBar_StaticLeft = document.createElement("img")
+								IMG_GraphicalBar_StaticLeft.src = "GraphicalBarFills/StaticLeftEnd.png"
+								IMG_GraphicalBar_StaticLeft.style.border = "1px solid white"
+								if (document.getElementById("FillDirection_Up").selected) { //Insert
+									ImagePreview.insertBefore(IMG_GraphicalBar_StaticLeft, LastWrittenImgGraphicalBarPart)
+									IMG_GraphicalBar_StaticLeft.className += "img-rot"
+									LastWrittenImgGraphicalBarPart = IMG_GraphicalBar_StaticLeft
+								} else {
+									if (document.getElementById("FillDirection_Down").selected) {
+										IMG_GraphicalBar_StaticLeft.className += "img-downwardsbar"
+									}
+									ImagePreview.appendChild(IMG_GraphicalBar_StaticLeft)
+								}
+							}
+						}
+					
+					if (document.getElementById("FillDirection_Right").selected) {
+						ImagePreview.appendChild(IMG_GraphicalBar)
+					} else if (document.getElementById("FillDirection_Left").selected) {
+						IMG_GraphicalBar.className += "img-hor"
+						if (LastWrittenImgGraphicalBarPart != null) {
+							ImagePreview.insertBefore(IMG_GraphicalBar, LastWrittenImgGraphicalBarPart)
+						} else {
+							ImagePreview.appendChild(IMG_GraphicalBar)
+						}
+						LastWrittenImgGraphicalBarPart = IMG_GraphicalBar
+					} else if (document.getElementById("FillDirection_Up").selected) {
+						IMG_GraphicalBar.className += "img-rot"
+						let BrElement = document.createElement("br")
+						ImagePreview.insertBefore(BrElement, LastWrittenImgGraphicalBarPart)
+						LastWrittenImgGraphicalBarPart = BrElement
+						ImagePreview.insertBefore(IMG_GraphicalBar, LastWrittenImgGraphicalBarPart)
+						LastWrittenImgGraphicalBarPart = IMG_GraphicalBar // white-space: nowrap;
+					} else { //Downwards
+						IMG_GraphicalBar.className += "img-downwardsbar"
+						ImagePreview.appendChild(document.createElement("br"))
+						ImagePreview.appendChild(IMG_GraphicalBar)
+					}
+					//Static right end
+						if (GraphicalBarBytes_Index >= TotalGraphicalBarTableLength-1n) {
+							if (document.getElementById("UsingStatic_RightSide").checked) {
+								let ReusedLeftEndNowRightEnd = document.createElement("img") //Had to re-create element so that the left end doesn't get moved to here.
+								ReusedLeftEndNowRightEnd.style.border = "1px solid white"
+								ReusedLeftEndNowRightEnd.src = "GraphicalBarFills/StaticLeftEnd.png"
+								if (document.getElementById("FillDirection_Left").selected||document.getElementById("FillDirection_Right").selected) { //Left or right, always the right side
+									ReusedLeftEndNowRightEnd.className += "img-hor"
+									ImagePreview.appendChild(ReusedLeftEndNowRightEnd)
+								} else if (document.getElementById("FillDirection_Up").selected) {
+									ReusedLeftEndNowRightEnd.className += "img-downwardsbar"
+									let BrElement = document.createElement("br")
+									ImagePreview.insertBefore(BrElement, LastWrittenImgGraphicalBarPart)
+									LastWrittenImgGraphicalBarPart = BrElement
+									ImagePreview.insertBefore(ReusedLeftEndNowRightEnd, LastWrittenImgGraphicalBarPart)
+								} else { //Downwards
+									ReusedLeftEndNowRightEnd.className += "img-rot"
+									ImagePreview.appendChild(document.createElement("br"))
+									ImagePreview.appendChild(ReusedLeftEndNowRightEnd)
+								}
+							}
+						}
 				}
 			
 			if (Input_LeftPiece != 0n) {
