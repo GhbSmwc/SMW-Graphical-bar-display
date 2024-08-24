@@ -563,6 +563,8 @@ Notes:<br>
 					HighestOverlappingByte = DoubleBar_TileByteTableAddress_Ending
 				}
 				document.getElementById("Output_SecondBarOverlap").textContent = "Overlap occurs at " + BigIntToStringSignedHex(LowestOverlappingByte) + " ~ " + BigIntToStringSignedHex(HighestOverlappingByte)
+			} else {
+				document.getElementById("Output_SecondBarOverlap").textContent = ""
 			}
 		//Static end tiles
 			if (document.getElementById("UsingStatic_LeftSide").checked) {
