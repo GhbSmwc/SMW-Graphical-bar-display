@@ -198,6 +198,9 @@ Notes:<br>
 				</div>
 			</td>
 			<td>
+				<div style="width: 800px; height: 300px; overflow: auto; border: 1px solid white;" id="ImgPreview">
+				
+				</div>
 			</td>
 		</tr>
 	</table>
@@ -305,12 +308,17 @@ Notes:<br>
 		)
 	}
 	function CopyRAMUsage() {
+		let IsUsingDoubleBar = 1n
+		if (document.getElementById("ToggleDoubleBar").checked) {
+			IsUsingDoubleBar = 2n
+		}
+	
 		let FreeramAutoAssignerText = ""
 		FreeramAutoAssignerText += "Graphical Bar\t!Scratchram_GraphicalBar_LeftEndPiece\t1\t-\t-\n"
 		FreeramAutoAssignerText += "Graphical Bar\t!Scratchram_GraphicalBar_MiddlePiece\t1\t-\t-\n"
 		FreeramAutoAssignerText += "Graphical Bar\t!Scratchram_GraphicalBar_RightEndPiece\t1\t-\t-\n"
 		FreeramAutoAssignerText += "Graphical Bar\t!Scratchram_GraphicalBar_TempLength\t1\t-\t-\n"
-		FreeramAutoAssignerText += "Graphical Bar\t!Scratchram_GraphicalBar_FillByteTbl\t" + TotalGraphicalBarTableLength + "\t-\t-"
+		FreeramAutoAssignerText += "Graphical Bar\t!Scratchram_GraphicalBar_FillByteTbl\t" + (TotalGraphicalBarTableLength*IsUsingDoubleBar) + "\t-\t-"
 		setClipboard(FreeramAutoAssignerText)
 	}
 	function HandleMouseMovementToNumberInput(e) {
@@ -384,6 +392,10 @@ Notes:<br>
 			while (OutputByteTable.lastElementChild) {
 				OutputByteTable.removeChild(OutputByteTable.lastElementChild)
 			}
+			let ImagePreview = document.getElementById("ImgPreview")
+			while (ImagePreview.lastElementChild) {
+				ImagePreview.removeChild(ImagePreview.lastElementChild)
+			}
 		//Table header
 			let OutputByteTable_HeaderRow = document.createElement("tr")
 			
@@ -428,7 +440,20 @@ Notes:<br>
 			if (document.getElementById("BarExtendLeft").checked && (document.getElementById("FillDirection_Left").selected||document.getElementById("FillDirection_Right").selected)) {
 				CurrentStatusBarAddress += -(TotalGraphicalBarTableLength-1n)*StatusBarByteFormat
 			}
-			//Declare function
+			let PreviewAvailable = (() => {
+				if (!(Input_LeftPiece == 0n||Input_LeftPiece == 3n)) {
+					return false
+				}
+				if (!(Input_MiddlePiece == 0n||Input_MiddlePiece == 8n)) {
+					return false
+				}
+				if (!(Input_RightPiece == 0n||Input_RightPiece == 3n)) {
+					return false
+				}
+				return true
+			})();
+			
+			//Declare functions
 				function GenerateTableRow(Maximum, ByteType, MiddleLeft) {
 					let NamesToColors = {
 						"Left": "Cyan",
@@ -515,6 +540,14 @@ Notes:<br>
 					
 					OutputByteTable.appendChild(TableRow_ByteInfoRow)
 				}
+				function ImageRender(Max, Type) {
+					if (!PreviewAvailable) {
+						return
+					}
+					let IMG_GraphicalBar = document.createElement("img")
+					IMG_GraphicalBar.src = "GraphicalBarFills/" + Type + "_" + GraphicalBarBytes[GraphicalBarBytes_Index].toString(10) + "_of_" + Max.toString(10) + ".png"
+					ImagePreview.appendChild(IMG_GraphicalBar)
+				}
 			
 			if (Input_LeftPiece != 0n) {
 				if (Input_FillAmount >= Input_LeftPiece) {
@@ -526,6 +559,7 @@ Notes:<br>
 				}
 				
 				GenerateTableRow(Input_LeftPiece, "Left")
+				ImageRender(Input_LeftPiece, "LeftEnd")
 				
 				GraphicalBarBytes_Index++
 			}
@@ -538,7 +572,7 @@ Notes:<br>
 					Input_FillAmount = 0n
 				}
 				GenerateTableRow(Input_MiddlePiece, "Middle", MiddleLeft)
-				
+				ImageRender(Input_MiddlePiece, "Middle")
 			}
 			if (Input_RightPiece != 0n) {
 				if (Input_FillAmount >= Input_RightPiece) {
@@ -549,6 +583,7 @@ Notes:<br>
 					Input_FillAmount = 0n
 				}
 				GenerateTableRow(Input_RightPiece, "Right")
+				ImageRender(Input_RightPiece, "RightEnd")
 			}
 		//Remaining fill left
 			document.getElementById("Output_RemainingFill").textContent = Input_FillAmount.toString(10) + " ($" + Input_FillAmount.toString(16).toUpperCase().padStart(4, "0") + ")"
