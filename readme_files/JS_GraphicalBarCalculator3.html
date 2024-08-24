@@ -589,6 +589,12 @@ Notes:<br>
 						Offset = 1n
 					}
 					document.getElementById("Output_StaticRightAddr").textContent = BigIntToStringSignedHex(Input_StatusbarAddressToWrite+(Offset*StatusBarByteFormat))
+				} else {
+					let Offset = TotalGraphicalBarTableLength
+					if (document.getElementById("FillDirection_Up").selected) {
+						Offset *= -1n
+					}
+					document.getElementById("Output_StaticRightAddr").textContent = BigIntToStringSignedHex(Input_StatusbarAddressToWrite+(32n*StatusBarByteFormat*Offset))
 				}
 			} else {
 				document.getElementById("Output_StaticRightAddr").textContent = "N/A"
