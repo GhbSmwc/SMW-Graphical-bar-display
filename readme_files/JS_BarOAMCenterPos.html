@@ -57,7 +57,7 @@
 
 <button onclick="Reset()">Reset</button>
 <hr>
-<span id="Output"></span>
+<span id="Output" style="font-family: monospace"></span>
 <script>
 	window.onload = Reset()
 	function Reset() {
@@ -68,17 +68,17 @@
 		CalculateBarCenteringPos()
 	}
 	function CalculateBarCenteringPos() {
-		var Output = ""
-		var GetToCenterOfSprite = CorrectSignedDecBigIntValue(document.getElementById("GetToCenterOfSprite").value)
+		let Output = ""
+		let GetToCenterOfSprite = CorrectSignedDecBigIntValue(document.getElementById("GetToCenterOfSprite").value)
 		document.getElementById("GetToCenterOfSprite").value = GetToCenterOfSprite.toString(10)
 		
-		var BarWidth = BigintClamp(CorrectSignedDecBigIntValue(document.getElementById("BarWidth").value), 0n, 256n)
+		let BarWidth = BigintClamp(CorrectSignedDecBigIntValue(document.getElementById("BarWidth").value), 0n, 256n)
 		document.getElementById("BarWidth").value = BarWidth.toString(10)
 		
-		var EdgeOriginDistance = BigintClamp(CorrectSignedDecBigIntValue(document.getElementById("EdgeOriginDistance").value), 0n, 7n)
+		let EdgeOriginDistance = BigintClamp(CorrectSignedDecBigIntValue(document.getElementById("EdgeOriginDistance").value), 0n, 7n)
 		document.getElementById("EdgeOriginDistance").value = EdgeOriginDistance.toString(10)
 		
-		var BarPosition = 0n
+		let BarPosition = 0n
 			//^Placeholder for result later.
 		
 		if (document.getElementById("BarDirectionL2R").checked == true) {
@@ -89,19 +89,21 @@
 				BarPosition = GetToCenterOfSprite + BigIntFloorDiv(BarWidth, 2n) - EdgeOriginDistance
 		}
 		
-		Output += "Bar origin position realtive to sprite&apos;s center: "
+		Output += "Bar origin position realtive to sprite\'s center: "
 		if (((BarPosition >= -128n)&&(BarPosition <= 127n)) == false) {
-			Output += "<font color='red'>"
+			document.getElementById("Output").style.color = "red"
+		} else {
+			document.getElementById("Output").style.color = "white"
 		}
-		Output += "<kbd>" + ConvertNegativeDecimalNumberToParenthesisNotationString(BarPosition) + "</kbd>"
-		if (((BarPosition >= -128n)&&(BarPosition <= 127n)) == false) {
-			Output += "</font> Offset too far! The offset can only represent ranges from (-128) to +127."
+		Output += ConvertNegativeDecimalNumberToParenthesisNotationString(BarPosition)
+		if (!((BarPosition >= -128n)&&(BarPosition <= 127n))) {
+			Output += ". Offset too far! The offset can only represent ranges from (-128) to +127."
 		}
 		
 		if ((BarPosition >= -128n)&&(BarPosition <= 127n)) {
-			Output += " (Two&apos;s complement hex: <kbd>$" + pad((BigInt.asUintN(8, BarPosition)).toString(16).toUpperCase(), 2) + "</kbd>)"
+			Output += " $" + pad((BigInt.asUintN(8, BarPosition)).toString(16).toUpperCase(), 2) + ")"
 		}
-		document.getElementById("Output").innerHTML = Output
+		document.getElementById("Output").textContent = Output
 	
 	}
 	//Clamp
@@ -128,14 +130,14 @@
 	//Pad zeroes if fewer digits
 		function pad(num, size) {
 			//This adds leading zeroes. [size] is the number of digits at minimum to show (less than that will fill this with 0s).
-			var s = num+"";
+			let s = num+"";
 			while (s.length < size) s = "0" + s;
 			return s;
 		}
 	//Floor division for bigint (avoids rounding upwards in negative, since bigint always truncates)
 		function BigIntFloorDiv(N, D) {
-			var Modulo = N % D
-			var Quotient = N / D
+			let Modulo = N % D
+			let Quotient = N / D
 			if ((((N > 0n)&&(D > 0n))||((N < 0n)&&(D < 0n))) == false) {
 				//Negative (N and D on different signs)
 				if (Modulo != 0n) {
