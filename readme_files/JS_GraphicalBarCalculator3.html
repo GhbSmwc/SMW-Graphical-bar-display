@@ -150,6 +150,13 @@ Notes:<br>
 		<td>Using <kbd>BarExtendLeft</kbd>? (Only applies to horizontal bars and not using stripe)</td>
 		<td><label><input type="checkbox" onchange="MainCode()" id="BarExtendLeft"></label></td>
 	</tr>
+	<tr>
+		<td>Using static end tiles?</td>
+		<td>
+			<div><label><input type="checkbox" onchange="MainCode();" id="UsingStatic_LeftSide"> (&ldquo;left side&rdquo; for horizontal bars, whatever top or bottom the fill starts at for vertical)</label></div>
+			<div><label><input type="checkbox" onchange="MainCode();" id="UsingStatic_RightSide">  (&ldquo;right side&rdquo; for horizontal bars, whatever top or bottom the fill ends at for vertical)</label></div>
+		</td>
+	</tr>
 </table>
 <hr>
 <div id="OutputInfo">
@@ -170,12 +177,31 @@ Notes:<br>
 			<td style="font-family: monospace"><kbd>DrawGraphicalBarSubtractionLoopEdition</kbd> remaining fill</td>
 			<td style="font-family: monospace" id="Output_RemainingFill"></td>
 		</tr>
+		<tr>
+			<td style="font-family: monospace">Static left end address:</td>
+			<td style="font-family: monospace" id="Output_StaticLeftAddr"></td>
+		</tr>
+		<tr>
+			<td style="font-family: monospace">Static right end address:</td>
+			<td style="font-family: monospace" id="Output_StaticRightAddr"></td>
+		</tr>
 	</table><br>
 	<div>
 		<button title="For Address tracker&apos; auto-assigner" onclick="CopyRAMUsage()">Get autoassigner data</button>
 		<span></span>
 	</div><br>
-	<table id="Output_ByteLayout"></table>
+	<table>
+		<tr>
+			<td>
+				<div style="width: 800px; height: 300px; overflow: auto; border: 1px solid white;">
+					<table id="Output_ByteLayout"></table>
+				</div>
+			</td>
+			<td>
+			</td>
+		</tr>
+	</table>
+
 </div>
 <div id="OutputError" hidden><span style="font-family: monospace; color: #ff0000">Error! Not a single byte used.</span></div>
 
@@ -538,10 +564,39 @@ Notes:<br>
 				}
 				document.getElementById("Output_SecondBarOverlap").textContent = "Overlap occurs at " + BigIntToStringSignedHex(LowestOverlappingByte) + " ~ " + BigIntToStringSignedHex(HighestOverlappingByte)
 			}
+		//Static end tiles
+			if (document.getElementById("UsingStatic_LeftSide").checked) {
+				if (document.getElementById("FillDirection_Right").selected||document.getElementById("FillDirection_Left").selected) { //Horizontal mode
+					let BackOffset = 1n
+					if (document.getElementById("BarExtendLeft").checked) {
+						BackOffset = TotalGraphicalBarTableLength
+					}
+					document.getElementById("Output_StaticLeftAddr").textContent = BigIntToStringSignedHex(Input_StatusbarAddressToWrite-(BackOffset*1n*StatusBarByteFormat))
+				} else { //Vertical mode (not using stripe)
+					let Direction = -1n
+					if (document.getElementById("FillDirection_Up").selected) {
+						Direction = 1n
+					}
+					document.getElementById("Output_StaticLeftAddr").textContent = BigIntToStringSignedHex(Input_StatusbarAddressToWrite+(32n*StatusBarByteFormat*Direction))
+				}
+			} else {
+				document.getElementById("Output_StaticLeftAddr").textContent = "N/A"
+			}
+			if (document.getElementById("UsingStatic_RightSide").checked) {
+				if (document.getElementById("FillDirection_Right").selected||document.getElementById("FillDirection_Left").selected) { //Horizontal mode
+					let Offset = TotalGraphicalBarTableLength
+					if (document.getElementById("BarExtendLeft").checked) {
+						Offset = 1n
+					}
+					document.getElementById("Output_StaticRightAddr").textContent = BigIntToStringSignedHex(Input_StatusbarAddressToWrite+(Offset*StatusBarByteFormat))
+				}
+			} else {
+				document.getElementById("Output_StaticRightAddr").textContent = "N/A"
+			}
 	}
 	//Helper
 		function UpdateOtherInputs(ele) {
-			let EnteredValue = ele.value
+			let EnteredValue = ele.value.replaceAll(/\s/g, "")
 			let EnteredNumber = ParseBigIntValue(EnteredValue, parseInt(ele.dataset.radix))
 			let EnteredMin = -Infinity
 			if (typeof ele.dataset.min != "undefined") {
