@@ -493,3 +493,5 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
 8/24/2024 v6.3.3
  -Mere javascript update. No longer uses innerHTML and var, instead uses createElement and let. Reason is slow
   and potential security risk.
+8/24/2024 v6.3.4
+ -Last minute update: removed older versions of the graphical bar calculator.
