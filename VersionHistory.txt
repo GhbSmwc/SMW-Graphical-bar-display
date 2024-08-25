@@ -454,7 +454,7 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
  --End tiles preview added.
  --Preview image moved to the right side so the user can easily see the preview when editing values
  --Fix the flickering issue when adjusting the fill amount - most-non-firefox browsers unload images when they don't
-   exist at all on the HTML content. By utilizing the "hidden" HTML attribute of the elementts designed to keep the
+   exist at all on the HTML content. By utilizing the "hidden" HTML attribute of the elements designed to keep the
    images loaded prevents the flicker and at the same time don't have random HTML content visible to the user.
  --Each direction of the bar on the radio button selection now mentions the subrotuines associated with them.
  --It has unity-styled mouse-drag-to-adjust-value. If you click and hold on the text to the left of the number inputs
@@ -493,5 +493,7 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
 8/24/2024 v6.3.3
  -Mere javascript update. No longer uses innerHTML and var, instead uses createElement and let. Reason is slow
   and potential security risk.
-8/24/2024 v6.3.4
+8/24/2024 v6.3.4-6.3.5
  -Last minute update: removed older versions of the graphical bar calculator.
+ -Graphical bar calculator update - fixed an issue where click-hold-drag is being let go on any disabled elements causes
+  "mouseup" event to not fire, resulting in remaining in "drag mode" despite the left mouse button being released.
