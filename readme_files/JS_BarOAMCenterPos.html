@@ -101,7 +101,7 @@
 		}
 		
 		if ((BarPosition >= -128n)&&(BarPosition <= 127n)) {
-			Output += " $" + pad((BigInt.asUintN(8, BarPosition)).toString(16).toUpperCase(), 2) + ")"
+			Output += " ($" + pad((BigInt.asUintN(8, BarPosition)).toString(16).toUpperCase(), 2) + ")"
 		}
 		document.getElementById("Output").textContent = Output
 	
