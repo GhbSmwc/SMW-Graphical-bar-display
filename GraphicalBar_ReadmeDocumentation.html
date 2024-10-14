@@ -1626,11 +1626,39 @@ I've made a test file <kbd>Level_RangeBased.asm</kbd> (located in <kbd>UberasmTo
 </li><br><br>
 
 <li><a href="#InvertQuantity_Back" id="InvertQuantity">^</a><kbd>InvertQuantity</kbd>: Inverts the quantity (example: 12/100 &rightarrow; 88/100). This is useful
-for in case you wanted something that increments (in memory), but the bar decreases from 100% (for example, chargin chucks, all koopalings besides wendy and lemmy uses an &ldquo;inverted health&rdquo; system: A damage
-counter that increases every damage they take, and dies when it hits 3, 5, or 12 (side note: this value ALWAYS increases by 1 regardless of attack, and the last hit checks these values based on which attack, which leads to inconsistent
-amounts of damage)). This is calculated simply by taking the maximum amount subtracting by the current amount, in this case, <kbd>100 - 12 = 88</kbd>. If quantity is exceeding maximum prior calling this routine,
-will output zero. NOTE: It is better to use this subroutine
-to handle the literal quantity amounts prior calling <kbd>CalculateGraphicalBarPercentage</kbd> to avoid potential accumulating rounding errors.
+for in case you wanted something that increments (in memory), but the bar decreases from 100%. This is calculated simply by taking the maximum amount subtracting by the current amount, in this case, <kbd>100 - 12 = 88</kbd>. If quantity is exceeding maximum prior calling this routine,
+will output zero. NOTE: It is better to use this subroutine to handle the literal quantity amounts prior calling <kbd>CalculateGraphicalBarPercentage</kbd> rather than to invert the fill amount to avoid potential accumulating rounding errors.<br><br>
+
+<ul>
+	<li>In Vanilla SMW, chargin chucks, all koopalings besides wendy and lemmy uses an &ldquo;inverted health&rdquo; system: A damage
+	counter that increases every damage they take, and dies when it hits 3 (stomps for all HP based sprites), 5 (fireballs, for chucks), or 12 (for Ludwig). But there's a quirk:  regardless of which way to damage these characters, will always deal the same 1 point of damage. The number of hits
+	to defeat is based on the last hit reaching or exceeding a value in which that value depends on the aforementioned damage type. This means you can quickly defeat SMW enemies/bosses effectively bypassing their invulnerability timer by shooting 2 fireballs, followed by stomping them, as they only
+	gain their invulnerability timer from stomp attack, that the fireballs are worth the same as stomping, and that it was programmed that having 3 points of damage after a stomp defeats the sprite.</li><br>
+	<li>A simple way to fix this anomaly is to have the kill threshold is not to have multiple values depending on the attack, but have a single value regardless of an attack, and make damages they take be at different values. To get the desired hits to defeat, do <kbd>Damage = <abbr title="Always round up to an integer; get lowest integer greater than or equal to X.">Ceiling</abbr>(TotalDamageToKill / NumberOfHits)</kbd>, Therefore:
+	<table>
+		<tr>
+			<th>Enemy</th>
+			<th>Max health/damage to defeat</th>
+			<th>Stomp damage</th>
+			<th>Fireball damage</th>
+		</tr>
+		<tr>
+			<td>Chargin chuck</td>
+			<td>15</td>
+			<td>5</td>
+			<td>3</td>
+		</tr>
+		<tr>
+			<td>Ludwig</td>
+			<td>12</td>
+			<td>4</td>
+			<td>1</td>
+		</tr>
+	</table>
+	This <a href="https://www.smwcentral.net/?p=section&a=details&id=18148">Patch</a> along with displaying HP, comes with a fix with the janky SMW HP system.
+</li><br>
+
+</ul>
 <table>
 <tr><th>Input</th><th>Number of bytes</th><th>Description</th></tr>
 <tr><td><kbd>$00</kbd> to <kbd>$01</kbd></td><td style="text-align: center; vertical-align: middle;">2</td><td>The quantity</td></tr>
