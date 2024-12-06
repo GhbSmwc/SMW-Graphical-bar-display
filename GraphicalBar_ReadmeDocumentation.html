@@ -476,7 +476,7 @@ in your game that have different tile layouts that you want them to display a ba
 <hr>
 <h2><a href="#DrawOamPatch_Back" id="DrawOamPatch">^</a>Drawing OAM (not using sprite slots, but patch using OAM).</h2>
 <p>This is similar to the sprite version, but written using a patch. Using a hijack at <kbd>$00A2E6</kbd> and running the patch's OAM handler AFTER processing all sprites (including after $028AB1), gives
-the benefit of tile priority so that no other sprite will overlap the bar (OAM is handled so that the lower indexes have higher priority and is rendered in front of the high-indexed OAM slots).</p>
+the benefit of tile priority so that no other sprite will overlap the bar (OAM is handled so that the lower indexes have higher priority and is rendered in front of the higher-indexed OAM slots).</p>
 What you need is Asar, a patching tool.
 To install:
 <ol>
@@ -496,7 +496,9 @@ To install:
 	<li>And you are done. Feel free to take a look at the contents of <kbd>DrawOamPatch.asm</kbd> to learn how it works. Most of the codes are the same as the layer 3 version, but writes to OAM instead.</li>
 </ol><br>
 
-You can uninstall it by simply opening <kbd>GraphicalBarDefines/SpriteOAMSettings.asm</kbd>, and set <kbd>!PatchSprite_Uninstall</kbd> to <kbd>1</kbd>, and then re-apply the patch.
+You can uninstall it by simply opening <kbd>GraphicalBarDefines/SpriteOAMSettings.asm</kbd>, and set <kbd>!PatchSprite_Uninstall</kbd> to <kbd>1</kbd>, and then re-apply the patch.<br><br>
+
+As a side note, this ASM resource was made before UberASM Tool v2.0 (released on SMWC on 2024-08-02). That means you no longer need the patch by moving the code to UberASM tool's <kbd>level</kbd>'s <kbd>end:</kbd> label (and excluding the hijacks).
 <hr>
 <h2><a href="#AsmDocumentationBack" id="AsmDocumentation">^</a>ASM Documentation</h2>
 Note: All values here are unsigned. Routine information follows:
