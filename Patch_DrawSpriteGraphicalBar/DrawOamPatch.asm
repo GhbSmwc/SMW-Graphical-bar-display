@@ -1,4 +1,5 @@
-;This is the patch version that draws a OAM-based sprite graphical bar, without taking up any sprite slots.
+;This is the patch version that draws a OAM-based sprite graphical bar, without taking up any sprite slots. Note: This is being made
+;before UberASM tool 2.0's level "end:" feature was introduced (released on SMWC on 2024-08-02).
 
 ;To get this inserted in your game, make needed changes in the defines, inserted the appropriate graphics and insert via LM,
 ;and then run this patch via asar.
@@ -58,7 +59,7 @@
 		endif
 ;Patch stuff
 if !PatchSprite_Uninstall == 0
-	org $00A2E6				;>$00A2E6 is the code that runs at the end of the frame, after ALL sprite tiles are written.
+	org $00A2E6				;>$00A2E6 is the code that runs at the end of the frame, after ALL sprite tiles are written. Not executed if game is paused, along with the OAM clear routine.
 	autoclean JML GraphicalBarTest
 else
 	if read4($00A2E6) != $028AB122			;22 B1 8A 02 -> JSL.L CODE_028AB1
