@@ -67,7 +67,7 @@ length of the bar.</p>
 	<li><a href="#GraphicalBarELITE" id="GraphicalBarELITEBack"><kbd>GraphicalBarELITE.asm</kbd></a></li>
 	<ul>
 		<li><a href="#CalculateGraphicalBarPercentage" id="CalculateGraphicalBarPercentage_Back"><kbd>CalculateGraphicalBarPercentage</kbd></a></li>
-		<li><a href="#DrawGraphicalBar" id="DrawGraphicalBar_Back"><kbd>DrawGraphicalBar</kbd></a></li>
+		<li><a href="#DrawGraphicalBar" id="DrawGraphicalBar_Back"><s><kbd>DrawGraphicalBar</kbd></s></a> (depreciated, please use <kbd>DrawGraphicalBarSubtractionLoopEdition</kbd> instead)</li>
 		<li><a href="#DrawGraphicalBarSubtractionLoopEdition" id="DrawGraphicalBarSubtractionLoopEdition_Back"><kbd>DrawGraphicalBarSubtractionLoopEdition</kbd></a></li>
 		<li><a href="#TOCRoundAwayFromComplete" id="TOCRoundAwayFromComplete_Back"><kbd>Round away from empty/full/both</kbd></a></li>
 	</ul>
@@ -267,7 +267,7 @@ main:		;&gt;You DO need this if using uberasm tool.
 .ConvertToBar
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;&gt;Get percentage
 	<span style="color: orange">JSL GraphicalBarELITE_RoundAwayEmptyFull</span>
-	JSL GraphicalBarELITE_DrawGraphicalBar				;&gt;get bar values.
+	JSL GraphicalBarELITE_DrawGraphicalBarSubtractionLoopEdition				;&gt;get bar values.
 	STZ $00								;&gt;Use Level-layer3 tileset
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;&gt;Convert tiles.
 	LDA.b <span style="color: yellow">#!Default_GraphicalBar_Pos_Tile</span>				;\Setup address to where to draw the bar.
@@ -622,7 +622,8 @@ Destroyed:
 </tr>
 </table>
 
-<li><a href="#DrawGraphicalBar_Back" id="DrawGraphicalBar">^</a><kbd>DrawGraphicalBar</kbd>: it takes a value representing how much fill in the entire bar, and divides them into a byte-array of numbers that are addends of the fill amount,
+<li><a href="#DrawGraphicalBar_Back" id="DrawGraphicalBar">^</a><kbd>DrawGraphicalBar</kbd> (depreciated, recommended to use <kbd><a href="#DrawGraphicalBarSubtractionLoopEdition">DrawGraphicalBarSubtractionLoopEdition</a></kbd> instead):
+it takes a value representing how much fill in the entire bar, and divides them into a byte-array of numbers that are addends of the fill amount,
 in this order: N (can be zero) bytes being at their set maximums, 0 or 1 fraction byte (no fraction if bar is full), and then N bytes (can be zero) empty, while keeping
 the order of their maximums (3, 8, 8, 8, 8...), stored in a RAM defined <kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd>:<br>
 <img src="readme_files/FillAmountDividedUnevenlyToTileBytes.png"><br>
@@ -1860,7 +1861,7 @@ the tile converter does not recognize if the first and last tile are meant to be
 set the end tiles to be the same number of pieces for middle, and subtract the number of middle tiles by how many end tiles you are using (say 2) so that the end tiles don't use
 the same table graphic as middle and cause cutoff-ended bar.
 <table><tr><td><pre>	;[...]
-	JSL GraphicalBarELITE_DrawGraphicalBar				;&gt;get bar values.
+	JSL GraphicalBarELITE_DrawGraphicalBarSubtractionLoopEdition	;&gt;get bar values.
 	LDA #$08							;\Middle tiles first and last replaced with end tiles.
 	STA !Scratchram_GraphicalBar_LeftEndPiece			;|
 	STA !Scratchram_GraphicalBar_RightEndPiece			;|

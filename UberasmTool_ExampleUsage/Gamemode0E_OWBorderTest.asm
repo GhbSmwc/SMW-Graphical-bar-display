@@ -36,7 +36,7 @@ main:
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
 	JSL GraphicalBarELITE_RoundAwayEmptyFull			;>Avoid rounding towards 0 or MaxPieces when they are not those numbers.
 	
-	JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
+	JSL GraphicalBarELITE_DrawGraphicalBarSubtractionLoopEdition	;>get bar values.
 	LDA #$02							;\Use Level-layer3 tileset
 	STA $00								;/
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.

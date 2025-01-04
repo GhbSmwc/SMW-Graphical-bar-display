@@ -6,11 +6,11 @@
 ;such as street fighter, when a character takes damage, the "secondary" amount of fill
 ;represents the amount of HP loss (damage indicator).
 
-;How this works: DrawGraphicalBar is executed twice, with the first one having its byte
-;table moved into another location to have both being stored and not overwritten. Then,
-;when trying to convert the fill values into tile numbers, it check BOTH corresponding
-;numbers (corresponding 8x8 bytes) to determine what tile number number (that can show
-;2 fills) to use.
+;How this works: DrawGraphicalBarSubtractionLoopEdition is executed twice, with the
+;first one having its byte table moved into another location to have both being stored
+;and not overwritten. Then, when trying to convert the fill values into tile numbers,
+;it check BOTH corresponding numbers (corresponding 8x8 bytes) to determine what tile
+;number number (that can show 2 fills) to use.
 ;
 ;For easy testing, up and down on the D-pad adjust FirstFill, left and right adjusts
 ;SecondFill.
@@ -262,7 +262,7 @@ main:
 			STA !FirstFillPercentHexValDisplayPos+(1*!StatusBarFormat)	;/
 		endif
 	;Call subroutine
-		JSL GraphicalBarELITE_DrawGraphicalBar
+		JSL GraphicalBarELITE_DrawGraphicalBarSubtractionLoopEdition
 ;;;;;;;;;;;;
 ;SecondFill
 ;;;;;;;;;;;;
@@ -315,7 +315,7 @@ main:
 				AND #$0F							;|
 				STA !SecondFillPercentHexValDisplayPos+(1*!StatusBarFormat)	;/
 			endif
-		JSL GraphicalBarELITE_DrawGraphicalBar					;>Get amount of fill.
+		JSL GraphicalBarELITE_DrawGraphicalBarSubtractionLoopEdition			;>Get amount of fill.
 		JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTilesDoubleBar
 	endif
 ;;;;;;;;;;;;;;;;;;;;;;;;

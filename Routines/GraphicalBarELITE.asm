@@ -298,6 +298,9 @@ CalculateGraphicalBarPercentage:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Convert amount of fill to each fill per byte.
 ;
+;Note: I recommend using DrawGraphicalBarSubtractionLoopEdition instead,
+;realizing this routine is much less optimized than the aforementioned.
+;
 ;This basically divides the amount of fill in the whole bar into each
 ;addends of the amount of fill stored in each byte in the table, in
 ;this order: N bytes (including zero) being maxed out, 0 or 1 fraction byte,

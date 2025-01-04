@@ -38,7 +38,7 @@ main:
 .ConvertToBar
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage	;>Get ratio/percentage [Here, I assume you are using uberasmTool]
 	JSL GraphicalBarELITE_RoundAwayEmptyFull		;>Avoid rounding towards 0 or MaxPieces when they are not those numbers.
-	JSL GraphicalBarELITE_DrawGraphicalBar
+	JSL GraphicalBarELITE_DrawGraphicalBarSubtractionLoopEdition
 	STZ $00								;>Use Level-layer3 tileset
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
 	LDA.b #!Default_GraphicalBar_Pos_Tile

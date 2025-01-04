@@ -72,7 +72,7 @@ main:
 		LDA <span style="color: red">!Freeram_FirstQuantity</span>
 	
 	.SetupQuantity
-		STA !Scratchram_GraphicalBar_FillByteTbl 		;>Quantity low
+		STA !Scratchram_GraphicalBar_FillByteTbl 		;&gt;Quantity low
 		LDA <span style="color: red">#$00</span>						;\Quantity high (remove this two-line for 16-bit)
 		STA !Scratchram_GraphicalBar_FillByteTbl+1		;/
 		LDA <span style="color: red">#!DoubleBar_MaxQuantity</span>				;\Max Quantity low
@@ -89,10 +89,10 @@ main:
 		STA !Scratchram_GraphicalBar_TempLength			;/
 		LDA <span style="color: green">#!Default_RightPieces</span>				;\Right end pieces
 		STA !Scratchram_GraphicalBar_RightEndPiece		;/
-		JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
+		JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;&gt;Get percentage
 		<span style="color: orange">JSL GraphicalBarELITE_RoundAwayEmptyFull</span>
-		JSL GraphicalBarELITE_DrawGraphicalBar				;>get bar values.
-		JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
+		JSL GraphicalBarELITE_DrawGraphicalBarSubtractionLoopEdition	;&gt;get bar values.
+		JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;&gt;Convert tiles.
 		LDA.b <span style="color: yellow">#!Default_GraphicalBar_Pos_Tile</span>				;\Setup address to where to draw the bar.
 		STA $00								;|
 		LDA.b <span style="color: yellow">#!Default_GraphicalBar_Pos_Tile>>8</span>			;|
@@ -115,9 +115,9 @@ main:
 		endif
 		if !Default_LeftwardsBar == 0
 			if !StatusBarFormat = $01
-				JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;>Write to status bar
+				JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;&gt;Write to status bar
 			else
-				JSL GraphicalBarWriteToStatusBar_WriteBarToHUDFormat2		;>Write to status bar
+				JSL GraphicalBarWriteToStatusBar_WriteBarToHUDFormat2		;&gt;Write to status bar
 			endif
 		else
 			if !StatusBarFormat = $01
@@ -132,7 +132,7 @@ The red font is the things you can replace. Note that this does not work with ti
 Border Plus updates tile every other frame), in this case you left shift the <nobr><kbd>#%00000001</kbd></nobr> to <nobr><kbd>#%00000010</kbd></nobr> to obtain
 a slower flicker animation to accommodate this (however the flicker distinct frames become much more noticeable).
 </li><br>
-<li><b>Separate graphics</b>: You actually have to call the graphical bar routines (<kbd>DrawGraphicalBar</kbd> and maybe
+<li><b>Separate graphics</b>: You actually have to call the graphical bar routines (<kbd>DrawGraphicalBarSubtractionLoopEdition</kbd> and maybe
 <kbd>CalculateGraphicalBarPercentage</kbd>) twice, with the first one's (<kbd>FirstQuantity</kbd>) table being moved to another location in memory.
 Oh, and because there are repeated codes, they are moved to subroutines to save space:
 <table><tr><td><pre>incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
@@ -145,7 +145,7 @@ main:
 	STA !Scratchram_GraphicalBar_FillByteTbl		;/
 	LDA <span style="color: red">#$00</span>						;\High byte of above. Should your value here is 8-bit or only 1 byte long,
 	STA !Scratchram_GraphicalBar_FillByteTbl+1		;/use [LDA #$00 : STA !Scratchram_GraphicalBar_FillByteTbl+1].
-	JSR GetMaxQuantityPercentage				;>Set !Scratchram_GraphicalBar_FillByteTbl+2 and !Scratchram_GraphicalBar_FillByteTbl+3
+	JSR GetMaxQuantityPercentage				;&gt;Set !Scratchram_GraphicalBar_FillByteTbl+2 and !Scratchram_GraphicalBar_FillByteTbl+3
 
 	LDA <span style="color: green">#!Default_LeftPieces</span>				;\Left end pieces
 	STA !Scratchram_GraphicalBar_LeftEndPiece		;/
@@ -157,15 +157,15 @@ main:
 	STA !Scratchram_GraphicalBar_RightEndPiece		;/
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
 	<span style="color: orange">JSL GraphicalBarELITE_RoundAwayEmptyFull</span>
-	JSL GraphicalBarELITE_DrawGraphicalBar
+	JSL GraphicalBarELITE_DrawGraphicalBarSubtractionLoopEdition
 	
-	..TransferFirstFillBar ;>FirstFill will be located just after SecondFill in memory address: <SecondFill_Table><FirstFill_Table>
+	..TransferFirstFillBar ;&gt;FirstFill will be located just after SecondFill in memory address: <SecondFill_Table><FirstFill_Table>
 		PHB
 		REP #$30
-		LDA.w #!Setting_GraphicalBar_SecondFillByteTableOffset-1					;>Number of bytes to transfer, -1 (because byte 0 is included)
-		LDX.w #!Scratchram_GraphicalBar_FillByteTbl							;>Source address
-		LDY.w #!Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset	;>Destination address
-		MVN (!Scratchram_GraphicalBar_FillByteTbl>>16), (!Scratchram_GraphicalBar_FillByteTbl>>16)	;>Move them
+		LDA.w #!Setting_GraphicalBar_SecondFillByteTableOffset-1					;&gt;Number of bytes to transfer, -1 (because byte 0 is included)
+		LDX.w #!Scratchram_GraphicalBar_FillByteTbl							;&gt;Source address
+		LDY.w #!Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset	;&gt;Destination address
+		MVN (!Scratchram_GraphicalBar_FillByteTbl>>16), (!Scratchram_GraphicalBar_FillByteTbl>>16)	;&gt;Move them
 		SEP #$30
 		PLB
 .SecondQuantity
@@ -175,12 +175,12 @@ main:
 	STA !Scratchram_GraphicalBar_FillByteTbl		;/
 	LDA <span style="color: red">#$00</span>						;\High byte of above. Should your value here is 8-bit or only 1 byte long,
 	STA !Scratchram_GraphicalBar_FillByteTbl+1		;/use [LDA #$00 : STA !Scratchram_GraphicalBar_FillByteTbl+1].
-	JSR GetMaxQuantityPercentage				;>Set !Scratchram_GraphicalBar_FillByteTbl+2 and !Scratchram_GraphicalBar_FillByteTbl+3
+	JSR GetMaxQuantityPercentage				;&gt;Set !Scratchram_GraphicalBar_FillByteTbl+2 and !Scratchram_GraphicalBar_FillByteTbl+3
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
 	<span style="color: orange">JSL GraphicalBarELITE_RoundAwayEmptyFull</span>
-	JSL GraphicalBarELITE_DrawGraphicalBar					;>get bar values.
+	JSL GraphicalBarELITE_DrawGraphicalBarSubtractionLoopEdition		;&gt;get bar values.
 .PrepareTile
-	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTilesDoubleBar	;>Convert tiles.
+	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTilesDoubleBar	;&gt;Convert tiles.
 	LDA.b <span style="color: yellow">#!Default_GraphicalBar_Pos_Tile</span>					;\Setup address to where to draw the bar.
 	STA $00									;|
 	LDA.b <span style="color: yellow">#!Default_GraphicalBar_Pos_Tile>>8</span>				;|
@@ -203,9 +203,9 @@ main:
 	endif
 	if !Default_LeftwardsBar == 0
 		if !StatusBarFormat = $01
-			JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;>Write to status bar
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUD			;&gt;Write to status bar
 		else
-			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDFormat2		;>Write to status bar
+			JSL GraphicalBarWriteToStatusBar_WriteBarToHUDFormat2		;&gt;Write to status bar
 		endif
 	else
 		if !StatusBarFormat = $01
@@ -270,7 +270,7 @@ Now note: in both cases, the two fill amounts are interpreted as if FirstFill is
 from where FirstFill's edge is at. Here is an example:<br>
 <img src="SecondFillTreatedAsOverlap.png"><br><br>
 The perceived SecondFill would be: <kbd>SecondFill_Shown = max(SecondFill - FirstFill, 0)</kbd><br><br>
-If you want SecondFill to be mapped from where FirstFill is at, theoretically you can take pre-calculated SecondFill and add by FirstFill (both before calling DrawGraphicalBar), this result (written as the new SecondFill)
+If you want SecondFill to be mapped from where FirstFill is at, theoretically you can take pre-calculated SecondFill and add by FirstFill (both before calling DrawGraphicalBarSubtractionLoopEdition), this result (written as the new SecondFill)
 will offset the fill to start at where FirstFill value is at:<br>
 <img src="SecondFillStartatFirstFill.png"><br>
 However there is a problem if you use <kbd>CalculateGraphicalBarPercentage</kbd>. That routine essentially converts quantity to fill amounts via multiplication and division, it may round up or down to an integer.
@@ -337,7 +337,7 @@ doublebar routine when using separate graphics have FirstFill overpowers SecondF
 <img src="FirstFillSecondFill.png"><br>
 FirstFill is current HP and SecondFill represent previous HP. This is not the case for rapid-flicker since it shows both values within 2 frames regardless if one have a greater amount of fill or less.
 
-And thats it, be very careful as the quantity inputs data are loss when calling <kbd>GraphicalBarELITE_DrawGraphicalBar</kbd> due to the reused scratch RAM to save memory.
+And thats it, be very careful as the quantity inputs data are loss when calling <kbd>GraphicalBarELITE_DrawGraphicalBarSubtractionLoopEdition</kbd> due to the reused scratch RAM to save memory.
 
 <script>
 //These makes all <pre>...</pre> have an effect that double-clicking will select all the text
