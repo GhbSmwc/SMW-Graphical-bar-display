@@ -626,11 +626,10 @@ Destroyed:
 it takes a value representing how much fill in the entire bar, and divides them into a byte-array of numbers that are addends of the fill amount,
 in this order: N (can be zero) bytes being at their set maximums, 0 or 1 fraction byte (no fraction if bar is full), and then N bytes (can be zero) empty, while keeping
 the order of their maximums (3, 8, 8, 8, 8...), stored in a RAM defined <kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd>:<br>
-<img src="readme_files/FillAmountDividedUnevenlyToTileBytes.png"><br>
+<img src="readme_files/FillAmountDividedUnevenlyToTileBytes.png"><br><br>
 
-As an analogy, there are N cups, arranged in a row, and starting at the first cup, you fill that cup with water until it's full, or you run out of water, and you repeat the process on the next
-cup finishing once you reached the last one. The reason for this being treated as segmented parts is because the SNES' graphics are all tile-based, (most modern games rely on texture-based rendering
-often drawing polygons that get the width of the fill region, or simply have one number representing a fill for the entire bar) so we have to deal with them tile-by-tile. <br><br>
+The reason for this being treated as segmented parts is because the SNES' graphics are all tile-based, (most modern games rely on texture-based rendering
+often drawing polygons that get the width of the fill region, or simply have one number representing a fill for the entire bar) so we have to deal with them tile-by-tile.<br><br>
 
 <table>
 <tr>
@@ -946,10 +945,12 @@ without the need of manually calculating the values.</li><br>
 it does the same thing, but slightly different. Instead of using any form of division, it simply uses repeated subtraction, and in fact, does not use any other subroutines (this is a standalone). Almost all the inputs and outputs the
 same, except that the output <kbd>$00-$01</kbd> acts as the remaining fill when the bar is full or higher and 0 otherwise (<kbd>RemainingFill = <abbr title="Picks what number in the parameter is the highest value. If the fill amount is less than 0, it results things like max(-5, 0) which returns 0 and not -5">max</abbr>((InputFillAmount - BarMaximumFull), 0)</kbd>), while <kbd>$02-$09</kbd> aren't destroyed.<br>
 
-
-<p>It works like this: subtract the input fill amount by the tile byte maximum starting at the first byte going towards the last byte, if the subtraction was successful (having enough filled pieces; subtracted without going in the negatives), would write
+<p>It works like this: subtract the input fill amount by the tile byte maximum starting at the first byte going towards the last byte, if the subtraction was successful (having enough filled pieces; subtracted without going in the negatives), then write
 the maximum amount to the byte in the table and writes the difference back to the remaining fill amount, otherwise (if it fails, not having enough filled pieces) it would write that remaining fill amount into byte in the table and
-set the remaining fill amount to 0 (takes all the rest if less). After this, this then repeats (the remaining fill amount gets subtracted towards 0) until all tile bytes are finished.<br>
+set the remaining fill amount to 0 (takes all the rest if less). After this, this then repeats (the remaining fill amount gets subtracted towards 0) until all tile bytes are finished.<br><br>
+
+As an analogy, there are N empty cups, arranged in a row, and starting at the first cup, you fill that cup with water until it's full, or you run out of water, and you repeat the process on the next
+cup finishing once you reached the last one.<br><br>
 
 <ul><li>For example: using the same attributes as examples above, [14 - 3 = 11]. Subtraction successful, write 3 (maximum)
 for the left end, and then write 11 back to the remaining fill amount. Then [11 - 8 = 3], subtraction successful, so the first middle tile byte is 8 (maximum). Finally, [3 - 8 = (-5)]. Subtraction failed, write the remaining amount
