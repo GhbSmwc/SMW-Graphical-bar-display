@@ -743,27 +743,7 @@ on the first middle tile if there are no full middle tiles, if the entire middle
 <li><kbd>floor(x)</kbd> returns the highest integer that is &le; x. Essentially this round down an integer (7/8 = 0.875 &rarr; 0, 9/8 = 1.125 &rarr; 1).</li>
 </ul>
 </ul><br>
-<p>Another way is by taking the given fill amount, subtract by the tile byte maximum starting at the first byte going towards the last byte, if the subtraction was successful (subtracted without going in the negatives), would write
-the maximum amount to the byte in the table and writes the difference back to the remaining fill amount, otherwise (if it fails) it would write the remaining fill amount (the last difference before going negative) into byte in the table and
-set the remaining fill amount to 0. After this, this then repeats until all tile bytes are finished.<br><br>
-
-<ul><li>For example: using the same attributes as examples above, [14 - 3 = 11]. Subtraction successful, write 3 (maximum)
-for the left end, and then write 11 back to the remaining fill amount. Then [11 - 8 = 3], subtraction successful, so the first middle tile byte is 8 (maximum). Finally, [3 - 8 = (-5)]. Subtraction failed, write the remaining amount
-(3) on the second middle tile byte. Set the remaining fill amount to 0, and repeat until all tile bytes processed (which results in [0 - MaxAmount], and repeatedly sets the following bytes to 0):
-<table>
-<tr><th><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> addresses</th><th>Tile byte type</th><th>Fill amount</th><th>Fill maximum</th><th>Calculation</th><th>Remaining fill amount changes</th></tr>
-<tr><td><kbd>$7F844A</kbd> (<kbd>Address+0</kbd>)</td><td><span style="color: cyan">Left end</span></td><td style="background-color: orange"><kbd>3</kbd> (<kbd>$03</kbd>)</td><td style="text-align: center;"><kbd>3</kbd></td><td><kbd>14 - 3 = 11</kbd> subtraction successful!</td><td>14 &rightarrow; 11</td></tr>
-<tr><td><kbd>$7F844B</kbd> (<kbd>Address+1</kbd>)</td><td><span style="color: #00FF00">Middle 1</span></td><td style="background-color: orange"><kbd>8</kbd> (<kbd>$08</kbd>)</td><td style="text-align: center;"><kbd>8</kbd></td><td><kbd>11 - 8 = 3</kbd> subtraction successful!</td><td>11 &rightarrow; 3</td></tr>
-<tr><td><kbd>$7F844C</kbd> (<kbd>Address+2</kbd>)</td><td><span style="color: #00FF00">Middle 2</span></td><td style="background-color: yellow"><span style="color: black"><kbd>3</kbd> (<kbd>$03</kbd>)</span></td><td style="text-align: center;"><kbd>8</kbd></td><td><kbd>3 - 8 = (-5)</kbd> subtraction failed!</td><td>3 &rightarrow; 0</td></tr>
-<tr><td><kbd>$7F844D</kbd> (<kbd>Address+3</kbd>)</td><td><span style="color: #00FF00">Middle 3</span></td><td style="background-color: grey"><kbd>0</kbd> (<kbd>$00</kbd>)</td><td style="text-align: center;"><kbd>8</kbd></td><td><kbd>0 - 8 = (-8)</kbd> subtraction failed!</td><td>0 &rightarrow; 0</td></tr>
-<tr><td><kbd>$7F844E</kbd> (<kbd>Address+4</kbd>)</td><td><span style="color: #00FF00">Middle 4</span></td><td style="background-color: grey"><kbd>0</kbd> (<kbd>$00</kbd>)</td><td style="text-align: center;"><kbd>8</kbd></td><td><kbd>0 - 8 = (-8)</kbd> subtraction failed!</td><td>0 &rightarrow; 0</td></tr>
-<tr><td colspan="6"style="text-align: center;">...</td></tr>
-<tr><td><kbd>Address+(NumberOfBytes-1)</kbd></td><td><span style="color: red">Right end</span></td><td style="background-color: grey"><kbd>0</kbd> (<kbd>$00</kbd>)</td><td style="text-align: center;"><kbd>3</kbd></td><td><kbd>0 - 3 = (-3)</kbd> subtraction failed!</td><td>0 &rightarrow; 0</td></tr>
-</table></li></ul><br>
-<img src="readme_files/RepeatedSubtraction.png">
-<br><br>
-This is known as repeated subtraction, it keeps subtracting until no more is left. Another version of <kbd>DrawGraphicalBar</kbd>, <a href="#DrawGraphicalBarSubtractionLoopEdition"><kbd>DrawGraphicalBarSubtractionLoopEdition</kbd></a> does this exact procedure.</p>
-
+Another version of <kbd>DrawGraphicalBar</kbd>, <a href="#DrawGraphicalBarSubtractionLoopEdition"><kbd>DrawGraphicalBarSubtractionLoopEdition</kbd></a> does the same thing, but is more optimized and functions slightly differently.</p>
 
 The inputs are similar to the previously mentioned routine (such as requiring the attributes), but you don't write to <span class="NoLineBreak"><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd></span> to
 <span class="NoLineBreak"><kbd>!Scratchram_GraphicalBar_FillByteTbl+3</kbd></span>, as it is no longer needed. Just to keep in mind, the attributes are kept after running this routine, so you don't have to rewrite them again.
@@ -963,8 +943,31 @@ Of course, I made a <a id="ComputeGraphicalBarData" href="readme_files/JS_Graphi
 without the need of manually calculating the values.</li><br>
 
 <li><a href="#DrawGraphicalBarSubtractionLoopEdition_Back" id="DrawGraphicalBarSubtractionLoopEdition">^</a><kbd>DrawGraphicalBarSubtractionLoopEdition</kbd> An alternative routine to <kbd>DrawGraphicalBar</kbd>,
-it does the same thing, but the method is different. Instead of using any form of division, it simply uses repeated subtraction, and in fact, does not use any other subroutines (this is a standalone). Almost all the inputs and outputs the
-same, except that the output <kbd>$00-$01</kbd> acts as the remaining fill when the bar is full or higher and 0 otherwise (<kbd>RemainingFill = <abbr title="Picks what number in the parameter is the highest value. If the fill amount is less than 0, it results things like max(-5, 0) which returns 0 and not -5">max</abbr>((InputFillAmount - BarMaximumFull), 0)</kbd>), while <kbd>$02-$09</kbd> aren't destroyed.<br><br>
+it does the same thing, but slightly different. Instead of using any form of division, it simply uses repeated subtraction, and in fact, does not use any other subroutines (this is a standalone). Almost all the inputs and outputs the
+same, except that the output <kbd>$00-$01</kbd> acts as the remaining fill when the bar is full or higher and 0 otherwise (<kbd>RemainingFill = <abbr title="Picks what number in the parameter is the highest value. If the fill amount is less than 0, it results things like max(-5, 0) which returns 0 and not -5">max</abbr>((InputFillAmount - BarMaximumFull), 0)</kbd>), while <kbd>$02-$09</kbd> aren't destroyed.<br>
+
+
+<p>It works like this: subtract the input fill amount by the tile byte maximum starting at the first byte going towards the last byte, if the subtraction was successful (having enough filled pieces; subtracted without going in the negatives), would write
+the maximum amount to the byte in the table and writes the difference back to the remaining fill amount, otherwise (if it fails, not having enough filled pieces) it would write that remaining fill amount into byte in the table and
+set the remaining fill amount to 0 (takes all the rest if less). After this, this then repeats (the remaining fill amount gets subtracted towards 0) until all tile bytes are finished.<br>
+
+<ul><li>For example: using the same attributes as examples above, [14 - 3 = 11]. Subtraction successful, write 3 (maximum)
+for the left end, and then write 11 back to the remaining fill amount. Then [11 - 8 = 3], subtraction successful, so the first middle tile byte is 8 (maximum). Finally, [3 - 8 = (-5)]. Subtraction failed, write the remaining amount
+(3) on the second middle tile byte. Set the remaining fill amount to 0, and repeat until all tile bytes processed (which results in [0 - MaxAmount], and repeatedly sets the following bytes to 0):
+<table>
+<tr><th><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> addresses</th><th>Tile byte type</th><th>Fill amount</th><th>Fill maximum</th><th>Calculation</th><th>Remaining fill amount changes</th></tr>
+<tr><td><kbd>$7F844A</kbd> (<kbd>Address+0</kbd>)</td><td><span style="color: cyan">Left end</span></td><td style="background-color: orange"><kbd>3</kbd> (<kbd>$03</kbd>)</td><td style="text-align: center;"><kbd>3</kbd></td><td><kbd>14 - 3 = 11</kbd> subtraction successful!</td><td>14 &rightarrow; 11</td></tr>
+<tr><td><kbd>$7F844B</kbd> (<kbd>Address+1</kbd>)</td><td><span style="color: #00FF00">Middle 1</span></td><td style="background-color: orange"><kbd>8</kbd> (<kbd>$08</kbd>)</td><td style="text-align: center;"><kbd>8</kbd></td><td><kbd>11 - 8 = 3</kbd> subtraction successful!</td><td>11 &rightarrow; 3</td></tr>
+<tr><td><kbd>$7F844C</kbd> (<kbd>Address+2</kbd>)</td><td><span style="color: #00FF00">Middle 2</span></td><td style="background-color: yellow"><span style="color: black"><kbd>3</kbd> (<kbd>$03</kbd>)</span></td><td style="text-align: center;"><kbd>8</kbd></td><td><kbd>3 - 8 = (-5)</kbd> subtraction failed!</td><td>3 &rightarrow; 0</td></tr>
+<tr><td><kbd>$7F844D</kbd> (<kbd>Address+3</kbd>)</td><td><span style="color: #00FF00">Middle 3</span></td><td style="background-color: grey"><kbd>0</kbd> (<kbd>$00</kbd>)</td><td style="text-align: center;"><kbd>8</kbd></td><td><kbd>0 - 8 = (-8)</kbd> subtraction failed!</td><td>0 &rightarrow; 0</td></tr>
+<tr><td><kbd>$7F844E</kbd> (<kbd>Address+4</kbd>)</td><td><span style="color: #00FF00">Middle 4</span></td><td style="background-color: grey"><kbd>0</kbd> (<kbd>$00</kbd>)</td><td style="text-align: center;"><kbd>8</kbd></td><td><kbd>0 - 8 = (-8)</kbd> subtraction failed!</td><td>0 &rightarrow; 0</td></tr>
+<tr><td colspan="6"style="text-align: center;">...</td></tr>
+<tr><td><kbd>Address+(NumberOfBytes-1)</kbd></td><td><span style="color: red">Right end</span></td><td style="background-color: grey"><kbd>0</kbd> (<kbd>$00</kbd>)</td><td style="text-align: center;"><kbd>3</kbd></td><td><kbd>0 - 3 = (-3)</kbd> subtraction failed!</td><td>0 &rightarrow; 0</td></tr>
+</table><br>
+<img src="readme_files/RepeatedSubtraction.png">
+</li></ul><br>
+<br><br>
+
 
 <table>
 <tr><th>Input</th><td>Number of bytes</td><th>Description</th></tr>
@@ -983,13 +986,13 @@ same, except that the output <kbd>$00-$01</kbd> acts as the remaining fill when 
 <abbr title="Equals to !Scratchram_GraphicalBar_TempLength if middle pieces is nonzero, 0 otherwise">MiddleLength</abbr> + <abbr title="0 if no right end, 1 if set to any nonzero number of pieces">RightEnd</abbr>) - 1)</span></span></kbd>
 </td>
 <td style="text-align: center; vertical-align: middle;"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td>
-<td>The table array containing each tile byte fill amount, same as <kbd>CalculateGraphicalBarPercentage</kbd>.</td>
+<td>The table array containing each tile byte fill amount, same as <kbd>DrawGraphicalBar</kbd>.</td>
 <tr><td><kbd>$00</kbd> to <kbd>$01</kbd></td><td style="text-align: center; vertical-align: middle;">2</td><td>The leftover remaining amount of fill, if the fill amount is greater than the maximum/total, 0 otherwise (calculated via <kbd>RemainingFill = max((InputFillAmount - BarMaximumFull), 0)</kbd>)</td></tr>
 </tr>
 
 </table>
 </li>
-
+<br>
 
 <li><a href="#TOCRoundAwayFromComplete_Back" id="TOCRoundAwayFromComplete">^</a><kbd>RoundAwayEmpty</kbd>, <kbd>RoundAwayFull</kbd>, and <kbd>RoundAwayEmptyFull</kbd>: After getting the Y register value from <kbd>CalculateGraphicalBarPercentage</kbd>, this increments or
 decrements the fill amount <kbd>$00-$01</kbd> by 1 so it will display 1 and/or <kbd>MaxFill-1</kbd> instead of showing 0 and/or <kbd>MaxFill</kbd> when the value is rounded towards them. The names
