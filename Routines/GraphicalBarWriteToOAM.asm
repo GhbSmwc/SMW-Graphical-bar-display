@@ -295,9 +295,9 @@
 			;Output: Carry = Set if not enough slots found, Clear if enough slots found
 			PHY
 			LDY.w #$0000					;>Open slot counter
-			LDX.w #!GraphicalBar_OAMSlot*4			;>skip the first four slots
+			LDX.w #!GraphicalBar_OAMSlot*4			;>skip the first four slots (Index_Increment4 = Slot*4)
 			.loop:						;>to avoid message box conflicts
-				CPX #$0200				;\If all slots searched, there is not enough
+				CPX.w #(128*4)				;\If all slots searched, there is not enough (There are 128 slots, that means 128*4 = 512 Index_Increment4)
 				BEQ .notEnoughFound			;/open slots being found
 		
 				LDA $0201|!addr,x			;\If slot used, that isn't empty
