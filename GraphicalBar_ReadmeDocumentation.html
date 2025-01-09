@@ -267,7 +267,7 @@ main:		;&gt;You DO need this if using uberasm tool.
 .ConvertToBar
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;&gt;Get percentage
 	<span style="color: orange">JSL GraphicalBarELITE_RoundAwayEmptyFull</span>
-	JSL GraphicalBarELITE_DrawGraphicalBarSubtractionLoopEdition				;&gt;get bar values.
+	JSL GraphicalBarELITE_DrawGraphicalBarSubtractionLoopEdition	;&gt;get bar values.
 	STZ $00								;&gt;Use Level-layer3 tileset
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;&gt;Convert tiles.
 	LDA.b <span style="color: yellow">#!Default_GraphicalBar_Pos_Tile</span>				;\Setup address to where to draw the bar.
