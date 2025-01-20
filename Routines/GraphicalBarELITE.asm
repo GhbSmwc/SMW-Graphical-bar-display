@@ -8,7 +8,7 @@
 ;
 ;Main routines to use:
 ;-CalculateGraphicalBarPercentage
-;-DrawGraphicalBar
+;-DrawGraphicalBar (depreciated, please use the one blow instead)
 ;-DrawGraphicalBarSubtractionLoopEdition
 ;-RoundAwayEmpty
 ;-RoundAwayFull
@@ -84,10 +84,10 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;*MaxQuantity = the maximum amount of something, say max HP.
 ;*FilledPieces = the number of pieces filled in the whole bar (rounded 1/2 up).
 ; *Note that this value isn't capped (mainly Quantity > MaxQuantity), the
-;  "DrawGraphicalBar" subroutine will detect and will not display over max,
-;  just in case if you somehow want to use the over-the-max-value on advance
-;  use (such as filling 2 separate bars, filling up the 2nd one after the 1st
-;  is full).
+;  "DrawGraphicalBar" (and "DrawGraphicalBarSubtractionLoopEdition") subroutine will
+;  detect and will not display over max, just in case if you somehow want to use the
+;  over-the-max-value on advance use (such as filling 2 separate bars, filling up
+;  the 2nd one after the 1st is full).
 ;*TotalMaxPieces = the number of pieces of the whole bar when full.
 ;
 ;Input:
@@ -387,255 +387,255 @@ CalculateGraphicalBarPercentage:
 ; --$02 to $07: needed to move values to another address due to subroutines,
 ;   as well as outputs of the subroutines.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-DrawGraphicalBar:
-	if !Setting_GraphicalBar_IndexSize == 0
-		LDX #$00					;>Index to write all our bytes/8x8s after the first tile.
-		REP #$20					;>16-bit A
-		LDA $00						;\make a backup on the amount of fill because $00 is used by math routines,
-		STA $08						;/and in case if any of the 3 parts gets disabled.
-	else
-		REP #$30					;>16-bit AXY
-		LDX #$0000					;>Index to write all our bytes/8x8s after the first tile.
-		LDA $00						;\make a backup on the amount of fill because $00 is used by math routines,
-		STA $08						;/and in case if any of the 3 parts gets disabled.
-	endif
-	.LeftEnd
-		;LeftendFill = Clamp(InputFill, 0, LeftMax)
-		LDA !Scratchram_GraphicalBar_LeftEndPiece	;\check if the left end was present
-		AND #$00FF					;|
-		BEQ .Middle					;/
-		
-		CMP $00						;>Number of pieces on left end (max pieces) compares with number of pieces filled
-		BCC ..Full					;>If max pieces is < pieces filled (pieces filled > max), cap it to full
-		
-		..NotFull
-		LDA $00						;>Load the valid non-full value
-		
-		..Full
-		SEP #$20					;\Write only on the first byte of the table.
-		STA !Scratchram_GraphicalBar_FillByteTbl	;/
-		INX
-	.Middle
-		;MiddleFill = InputFill - LeftMax
-		;NumberOfFullMiddles = clamp(floor(MiddleFill/InputMiddlePiecesEachMax), 0, InputMiddleLength)
-		;MiddleFractionLocation = NumberOfFullMiddles + 1 (indexes the fraction tile after the last full middle), if all middles are full,
-		; it is not written.
-		;MiddleFractionAmount = MiddleFill % InputMiddlePiecesEachMax (% is the modulo operator).
-		;NumberOfMiddleEmpties = clamp(InputMiddleLength - (NumberOfFullMiddles + 1), 0, InputMiddleLength)
-		; ^Note: This writes $00 to all the remaining middles when there are 2+ less full tiles than InputMiddleLength
-		;  (A fraction tile can also be $00, thus the first number that is not maxed in the table is always a fraction,
-		;  i.e: [$03,$08,$08,$00,$00] <- the first $00 after the $08 is reguarded as a fraction.)
-		LDA !Scratchram_GraphicalBar_MiddlePiece	;\Both of these have to be nonzero to include middle.
-		BNE +						;|
-		JMP .RightEnd					;|
-		+						;|
-		LDA !Scratchram_GraphicalBar_TempLength		;|
-		BNE +						;|
-		JMP .RightEnd					;/
-		+
-		REP #$20
-		LDA !Scratchram_GraphicalBar_LeftEndPiece	;>Left end maximum
-		AND #$00FF					;
-		CMP $00						;>compares with amount filled
-		SEP #$20					;
-		BCC ..ReachesMiddle				;>If maximum < filled (filled >= maximum)
-		;The gimmick here is that the Y acts as a counter of how many middle tiles to process.
-		;Each time you write a tile (full, fraction, or empty), it subtracts Y by 1 after, and once
-		;that is zero, tells it to stop writing any additional tiles. So no worries that it
-		;would write additional bytes beyond the expected right end if the fill amount is
-		;bigger than the bar's maximum value (or total pieces).
-		..EmptyMiddle
-			if !Setting_GraphicalBar_IndexSize == 0
-				LDA !Scratchram_GraphicalBar_TempLength
-				TAY
-			else
-				REP #$20
-				LDA !Scratchram_GraphicalBar_TempLength
-				AND #$00FF
-				TAY
-				SEP #$20
-			endif
-			...Loop
-				LDA #$00					;\Write empty for the middle section
-				STA !Scratchram_GraphicalBar_FillByteTbl,x	;/
-		
-				....Next
-				INX						;>next byte/8x8
-				DEY
-				if !Setting_GraphicalBar_IndexSize == 0
-					CPY #$00
-				else
-					CPY #$0000
-				endif
-				BNE ...Loop
-				JMP .RightEnd
-
-		..ReachesMiddle
-			if !Setting_GraphicalBar_IndexSize == 0
-				LDA !Scratchram_GraphicalBar_TempLength		;\number of middles to write in Y (used as how many middles, either full, partially or empty left to write)
-				TAY						;/
-			else
-				REP #$20					;\number of middles to write in Y
-				LDA !Scratchram_GraphicalBar_TempLength		;|
-				AND #$00FF					;|
-				TAY						;|
-				SEP #$20					;/
-			endif
-			LDA !Scratchram_GraphicalBar_LeftEndPiece	;\Akaginite's (ID:8691) 16-bit subtract by 8-bit [MiddleFillOnly = TotalFilled - LeftEnd]
-			REP #$21					;|>A = 16bit and carry set
-			AND #$00FF					;|>Remove high byte
-			EOR #$FFFF					;|\Invert the now 16-bit number.
-			INC A						;|/>INC does not affect the carry.
-			ADC $00						;/>And negative LeftEnd plus filled to get MiddleFillOnly [MiddleFillOnly = (-LeftEnd) + TotalFilled]
-
-		..NumberOfFullMiddles
-			STA $08						;>middle fill (amount of fill in middle only)
-			STA $00						;>store the middlefill in $00 for dividend
-			LDA !Scratchram_GraphicalBar_MiddlePiece	;\middlepiece as divisor [NumberOfFull8x8s = MiddleFill/PiecesPer8x8, with NumberOfFull8x8s rounded down.]
-			AND #$00FF					;|
-			STA $02						;/
-			PHY						;>protect number of middle tiles left
-			SEP #$30					;>8-bit AXY
-			JSL MathDiv					;>$00: number of full bytes/8x8s, $02: fraction byte/8x8 [FractionAmount = MiddleFill MOD PiecesPer8x8]
-			LDA $01						;\check if the number of full bytes/8x8s is bigger than 255
-			BEQ ...ValidNumbFullMiddles			;/
-			
-			...InvalidNumbFullMiddles
-				LDA #$FF					;\cap the number of full middle 8x8s to max 8-bit number
-				STA $00						;/(if for some reason if you want such a length, but shouldn't hurt if you put less)
-			
-			...ValidNumbFullMiddles
-				if !Setting_GraphicalBar_IndexSize == 0
-					REP #$20					;>16-bit A
-				else
-					REP #$30					;>16-bit AXY
-				endif
-				PLY						;>restore number of middle tiles left
-				LDA $00						;>number of full tiles to write
-				SEP #$20					;>8-bit A
-				BEQ ..FractionAfterFullMiddles			;>skip to fraction because there is no full middle byte/8x8
-
-
-			...Loop
-				LDA !Scratchram_GraphicalBar_MiddlePiece	;\write full tiles
-				STA !Scratchram_GraphicalBar_FillByteTbl,x	;/
-		
-				....Next
-					INX						;>next byte/8x8
-					DEY						;>subtract number of middles left by 1
-					if !Setting_GraphicalBar_IndexSize == 0
-						CPY #$00
-					else
-						CPY #$0000					;\end the loop should the entire middle section be full or higher
-					endif
-					BEQ ..MiddleDone				;/(avoids adding an extra middle tile, which should be avoided at all cost)
-					DEC $00						;\end the loop should all full middles are written.
-					BNE ...Loop					;/
-		
-		..FractionAfterFullMiddles
-			LDA $02						;\(remainder) Fraction tiles after all the full middles
-			STA !Scratchram_GraphicalBar_FillByteTbl,x	;/
-		
-		..EmptyAfterFraction
-			INX						;>After fraction
-			DEY						;>number of bytes/8x8s before the last middle
-			if !Setting_GraphicalBar_IndexSize == 0
-				CPY #$00					;>countdown before the final middle
-			else
-				CPY #$0000					;>countdown before the final middle
-			endif
-			BEQ ..MiddleDone				;>avoid writing the very first empty past the last middle
-		
-			...Loop
-				LDA #$00					;\write empty
-				STA !Scratchram_GraphicalBar_FillByteTbl,x	;/
-			
-				....Next
-					INX						;\loop until all middle tiles done.
-					DEY
-					if !Setting_GraphicalBar_IndexSize == 0
-						CPY #$00
-					else
-						CPY #$0000
-					endif
-					BNE ...Loop					;/won't add another empty tile.
-		
-		..MiddleDone
-			REP #$20
-			LDA !Scratchram_GraphicalBar_LeftEndPiece	;\8-bit left end
-			AND #$00FF					;/
-			CLC						;\re-include left end, now back to having total amount of filled
-			ADC $08						;|pieces
-			STA $08						;/
-			SEP #$20
-	.RightEnd
-		;RightEndFill = clamp((InputFill - (LeftMax + (InputMiddlePiecesEachMax * InputMiddleLength))), 0, RightMax)
-		LDA !Scratchram_GraphicalBar_RightEndPiece	;\check if right end exist
-		BEQ .Done					;/
-		
-		if !Setting_GraphicalBar_SNESMathOnly == 0
-			LDA !Scratchram_GraphicalBar_MiddlePiece	;\MiddlePieceTotal = MiddlePiecePer8x8 * Length
-			STA $00						;|
-			STZ $01						;|
-			LDA !Scratchram_GraphicalBar_TempLength		;|
-			STA $02						;|
-			STZ $03						;/
-			if !Setting_GraphicalBar_IndexSize == 0
-				JSL MathMul16_16
-				REP #$20					;>16-bit A
-			else
-				PHX						;>Preserve X due to destroyed high byte from the following SEP.
-				SEP #$30					;>8-bit AXY
-				JSL MathMul16_16				;>$04 to $07: 32 bit product (the total amount in middle)
-				REP #$30					;>16-bit AXY
-				PLX						;>restore X
-			endif
-		else
-			LDA !Scratchram_GraphicalBar_MiddlePiece	;\MiddlePieceTotal = MiddlePiecePer8x8 * Length
-			STA $4202					;|
-			LDA !Scratchram_GraphicalBar_TempLength		;|
-			STA $4203					;/
-			XBA						;\Wait 8 cycles (XBA takes 3, NOP takes 2) for calculation
-			XBA						;|
-			NOP						;/
-			LDA $4216					;\Product in $04-$05
-			STA $04						;|
-			LDA $4217					;|
-			STA $05						;/
-			REP #$20					;>16-bit A
-		endif
-
-		LDA !Scratchram_GraphicalBar_LeftEndPiece	;\Add by left end piece [TotalLeftEndAndMiddle = MiddlePieceTotal + LeftEnd]
-		AND #$00FF					;|
-		CLC						;|
-		ADC $04						;|This should mark the boundary between middle and right end
-		STA $04						;/
-		LDA $08						;\RightEndFillOnly = TotalFilled - (MiddlePieceTotal+LeftEnd)
-		SEC						;|this result should be less than or equal to 255
-		SBC $04						;/>SBC clears the carry should an unsigned underflow occurs ($00 -> $FF) from borrowing (small - bigger). Value should be < 255
-		BCC ..EmptyRightEnd				;>carry clear means that the total filled is less than the amount needed to reach the right end.
-		STA $00						;>Store right end fill to $00-$01 (still 16-bit to prevent right end from randomly overflowing)
-		LDA !Scratchram_GraphicalBar_RightEndPiece	;\RightEnd's maximum (8-bit)
-		AND #$00FF					;/
-		CMP $00						;>compare with amount of fill only right end (that potentially be over 255)
-		BCC ..FullRightEnd				;>If maximum < fill pieces (or right end's filled pieces >= maximum), cap the fill value
-		SEP #$20
-		LDA $00						;>amount of fill, assuming it's 0 to max.
-		BRA ..SetRightEndFill
-		
-		..EmptyRightEnd
-			SEP #$20
-			LDA #$00
-		
-		..FullRightEnd
-			SEP #$20
-		
-		..SetRightEndFill
-			STA !Scratchram_GraphicalBar_FillByteTbl,x
-		
-	.Done
-		SEP #$30					;>8-bit AXY
-		RTL
+;DrawGraphicalBar:
+;	if !Setting_GraphicalBar_IndexSize == 0
+;		LDX #$00					;>Index to write all our bytes/8x8s after the first tile.
+;		REP #$20					;>16-bit A
+;		LDA $00						;\make a backup on the amount of fill because $00 is used by math routines,
+;		STA $08						;/and in case if any of the 3 parts gets disabled.
+;	else
+;		REP #$30					;>16-bit AXY
+;		LDX #$0000					;>Index to write all our bytes/8x8s after the first tile.
+;		LDA $00						;\make a backup on the amount of fill because $00 is used by math routines,
+;		STA $08						;/and in case if any of the 3 parts gets disabled.
+;	endif
+;	.LeftEnd
+;		;LeftendFill = Clamp(InputFill, 0, LeftMax)
+;		LDA !Scratchram_GraphicalBar_LeftEndPiece	;\check if the left end was present
+;		AND #$00FF					;|
+;		BEQ .Middle					;/
+;		
+;		CMP $00						;>Number of pieces on left end (max pieces) compares with number of pieces filled
+;		BCC ..Full					;>If max pieces is < pieces filled (pieces filled > max), cap it to full
+;		
+;		..NotFull
+;		LDA $00						;>Load the valid non-full value
+;		
+;		..Full
+;		SEP #$20					;\Write only on the first byte of the table.
+;		STA !Scratchram_GraphicalBar_FillByteTbl	;/
+;		INX
+;	.Middle
+;		;MiddleFill = InputFill - LeftMax
+;		;NumberOfFullMiddles = clamp(floor(MiddleFill/InputMiddlePiecesEachMax), 0, InputMiddleLength)
+;		;MiddleFractionLocation = NumberOfFullMiddles + 1 (indexes the fraction tile after the last full middle), if all middles are full,
+;		; it is not written.
+;		;MiddleFractionAmount = MiddleFill % InputMiddlePiecesEachMax (% is the modulo operator).
+;		;NumberOfMiddleEmpties = clamp(InputMiddleLength - (NumberOfFullMiddles + 1), 0, InputMiddleLength)
+;		; ^Note: This writes $00 to all the remaining middles when there are 2+ less full tiles than InputMiddleLength
+;		;  (A fraction tile can also be $00, thus the first number that is not maxed in the table is always a fraction,
+;		;  i.e: [$03,$08,$08,$00,$00] <- the first $00 after the $08 is reguarded as a fraction.)
+;		LDA !Scratchram_GraphicalBar_MiddlePiece	;\Both of these have to be nonzero to include middle.
+;		BNE +						;|
+;		JMP .RightEnd					;|
+;		+						;|
+;		LDA !Scratchram_GraphicalBar_TempLength		;|
+;		BNE +						;|
+;		JMP .RightEnd					;/
+;		+
+;		REP #$20
+;		LDA !Scratchram_GraphicalBar_LeftEndPiece	;>Left end maximum
+;		AND #$00FF					;
+;		CMP $00						;>compares with amount filled
+;		SEP #$20					;
+;		BCC ..ReachesMiddle				;>If maximum < filled (filled >= maximum)
+;		;The gimmick here is that the Y acts as a counter of how many middle tiles to process.
+;		;Each time you write a tile (full, fraction, or empty), it subtracts Y by 1 after, and once
+;		;that is zero, tells it to stop writing any additional tiles. So no worries that it
+;		;would write additional bytes beyond the expected right end if the fill amount is
+;		;bigger than the bar's maximum value (or total pieces).
+;		..EmptyMiddle
+;			if !Setting_GraphicalBar_IndexSize == 0
+;				LDA !Scratchram_GraphicalBar_TempLength
+;				TAY
+;			else
+;				REP #$20
+;				LDA !Scratchram_GraphicalBar_TempLength
+;				AND #$00FF
+;				TAY
+;				SEP #$20
+;			endif
+;			...Loop
+;				LDA #$00					;\Write empty for the middle section
+;				STA !Scratchram_GraphicalBar_FillByteTbl,x	;/
+;		
+;				....Next
+;				INX						;>next byte/8x8
+;				DEY
+;				if !Setting_GraphicalBar_IndexSize == 0
+;					CPY #$00
+;				else
+;					CPY #$0000
+;				endif
+;				BNE ...Loop
+;				JMP .RightEnd
+;
+;		..ReachesMiddle
+;			if !Setting_GraphicalBar_IndexSize == 0
+;				LDA !Scratchram_GraphicalBar_TempLength		;\number of middles to write in Y (used as how many middles, either full, partially or empty left to write)
+;				TAY						;/
+;			else
+;				REP #$20					;\number of middles to write in Y
+;				LDA !Scratchram_GraphicalBar_TempLength		;|
+;				AND #$00FF					;|
+;				TAY						;|
+;				SEP #$20					;/
+;			endif
+;			LDA !Scratchram_GraphicalBar_LeftEndPiece	;\Akaginite's (ID:8691) 16-bit subtract by 8-bit [MiddleFillOnly = TotalFilled - LeftEnd]
+;			REP #$21					;|>A = 16bit and carry set
+;			AND #$00FF					;|>Remove high byte
+;			EOR #$FFFF					;|\Invert the now 16-bit number.
+;			INC A						;|/>INC does not affect the carry.
+;			ADC $00						;/>And negative LeftEnd plus filled to get MiddleFillOnly [MiddleFillOnly = (-LeftEnd) + TotalFilled]
+;
+;		..NumberOfFullMiddles
+;			STA $08						;>middle fill (amount of fill in middle only)
+;			STA $00						;>store the middlefill in $00 for dividend
+;			LDA !Scratchram_GraphicalBar_MiddlePiece	;\middlepiece as divisor [NumberOfFull8x8s = MiddleFill/PiecesPer8x8, with NumberOfFull8x8s rounded down.]
+;			AND #$00FF					;|
+;			STA $02						;/
+;			PHY						;>protect number of middle tiles left
+;			SEP #$30					;>8-bit AXY
+;			JSL MathDiv					;>$00: number of full bytes/8x8s, $02: fraction byte/8x8 [FractionAmount = MiddleFill MOD PiecesPer8x8]
+;			LDA $01						;\check if the number of full bytes/8x8s is bigger than 255
+;			BEQ ...ValidNumbFullMiddles			;/
+;			
+;			...InvalidNumbFullMiddles
+;				LDA #$FF					;\cap the number of full middle 8x8s to max 8-bit number
+;				STA $00						;/(if for some reason if you want such a length, but shouldn't hurt if you put less)
+;			
+;			...ValidNumbFullMiddles
+;				if !Setting_GraphicalBar_IndexSize == 0
+;					REP #$20					;>16-bit A
+;				else
+;					REP #$30					;>16-bit AXY
+;				endif
+;				PLY						;>restore number of middle tiles left
+;				LDA $00						;>number of full tiles to write
+;				SEP #$20					;>8-bit A
+;				BEQ ..FractionAfterFullMiddles			;>skip to fraction because there is no full middle byte/8x8
+;
+;
+;			...Loop
+;				LDA !Scratchram_GraphicalBar_MiddlePiece	;\write full tiles
+;				STA !Scratchram_GraphicalBar_FillByteTbl,x	;/
+;		
+;				....Next
+;					INX						;>next byte/8x8
+;					DEY						;>subtract number of middles left by 1
+;					if !Setting_GraphicalBar_IndexSize == 0
+;						CPY #$00
+;					else
+;						CPY #$0000					;\end the loop should the entire middle section be full or higher
+;					endif
+;					BEQ ..MiddleDone				;/(avoids adding an extra middle tile, which should be avoided at all cost)
+;					DEC $00						;\end the loop should all full middles are written.
+;					BNE ...Loop					;/
+;		
+;		..FractionAfterFullMiddles
+;			LDA $02						;\(remainder) Fraction tiles after all the full middles
+;			STA !Scratchram_GraphicalBar_FillByteTbl,x	;/
+;		
+;		..EmptyAfterFraction
+;			INX						;>After fraction
+;			DEY						;>number of bytes/8x8s before the last middle
+;			if !Setting_GraphicalBar_IndexSize == 0
+;				CPY #$00					;>countdown before the final middle
+;			else
+;				CPY #$0000					;>countdown before the final middle
+;			endif
+;			BEQ ..MiddleDone				;>avoid writing the very first empty past the last middle
+;		
+;			...Loop
+;				LDA #$00					;\write empty
+;				STA !Scratchram_GraphicalBar_FillByteTbl,x	;/
+;			
+;				....Next
+;					INX						;\loop until all middle tiles done.
+;					DEY
+;					if !Setting_GraphicalBar_IndexSize == 0
+;						CPY #$00
+;					else
+;						CPY #$0000
+;					endif
+;					BNE ...Loop					;/won't add another empty tile.
+;		
+;		..MiddleDone
+;			REP #$20
+;			LDA !Scratchram_GraphicalBar_LeftEndPiece	;\8-bit left end
+;			AND #$00FF					;/
+;			CLC						;\re-include left end, now back to having total amount of filled
+;			ADC $08						;|pieces
+;			STA $08						;/
+;			SEP #$20
+;	.RightEnd
+;		;RightEndFill = clamp((InputFill - (LeftMax + (InputMiddlePiecesEachMax * InputMiddleLength))), 0, RightMax)
+;		LDA !Scratchram_GraphicalBar_RightEndPiece	;\check if right end exist
+;		BEQ .Done					;/
+;		
+;		if !Setting_GraphicalBar_SNESMathOnly == 0
+;			LDA !Scratchram_GraphicalBar_MiddlePiece	;\MiddlePieceTotal = MiddlePiecePer8x8 * Length
+;			STA $00						;|
+;			STZ $01						;|
+;			LDA !Scratchram_GraphicalBar_TempLength		;|
+;			STA $02						;|
+;			STZ $03						;/
+;			if !Setting_GraphicalBar_IndexSize == 0
+;				JSL MathMul16_16
+;				REP #$20					;>16-bit A
+;			else
+;				PHX						;>Preserve X due to destroyed high byte from the following SEP.
+;				SEP #$30					;>8-bit AXY
+;				JSL MathMul16_16				;>$04 to $07: 32 bit product (the total amount in middle)
+;				REP #$30					;>16-bit AXY
+;				PLX						;>restore X
+;			endif
+;		else
+;			LDA !Scratchram_GraphicalBar_MiddlePiece	;\MiddlePieceTotal = MiddlePiecePer8x8 * Length
+;			STA $4202					;|
+;			LDA !Scratchram_GraphicalBar_TempLength		;|
+;			STA $4203					;/
+;			XBA						;\Wait 8 cycles (XBA takes 3, NOP takes 2) for calculation
+;			XBA						;|
+;			NOP						;/
+;			LDA $4216					;\Product in $04-$05
+;			STA $04						;|
+;			LDA $4217					;|
+;			STA $05						;/
+;			REP #$20					;>16-bit A
+;		endif
+;
+;		LDA !Scratchram_GraphicalBar_LeftEndPiece	;\Add by left end piece [TotalLeftEndAndMiddle = MiddlePieceTotal + LeftEnd]
+;		AND #$00FF					;|
+;		CLC						;|
+;		ADC $04						;|This should mark the boundary between middle and right end
+;		STA $04						;/
+;		LDA $08						;\RightEndFillOnly = TotalFilled - (MiddlePieceTotal+LeftEnd)
+;		SEC						;|this result should be less than or equal to 255
+;		SBC $04						;/>SBC clears the carry should an unsigned underflow occurs ($00 -> $FF) from borrowing (small - bigger). Value should be < 255
+;		BCC ..EmptyRightEnd				;>carry clear means that the total filled is less than the amount needed to reach the right end.
+;		STA $00						;>Store right end fill to $00-$01 (still 16-bit to prevent right end from randomly overflowing)
+;		LDA !Scratchram_GraphicalBar_RightEndPiece	;\RightEnd's maximum (8-bit)
+;		AND #$00FF					;/
+;		CMP $00						;>compare with amount of fill only right end (that potentially be over 255)
+;		BCC ..FullRightEnd				;>If maximum < fill pieces (or right end's filled pieces >= maximum), cap the fill value
+;		SEP #$20
+;		LDA $00						;>amount of fill, assuming it's 0 to max.
+;		BRA ..SetRightEndFill
+;		
+;		..EmptyRightEnd
+;			SEP #$20
+;			LDA #$00
+;		
+;		..FullRightEnd
+;			SEP #$20
+;		
+;		..SetRightEndFill
+;			STA !Scratchram_GraphicalBar_FillByteTbl,x
+;		
+;	.Done
+;		SEP #$30					;>8-bit AXY
+;		RTL
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Convert amount of fill to each fill per byte, repeated subtraction edition.
 ;
