@@ -270,7 +270,7 @@ Now note: in both cases, the two fill amounts are interpreted as if FirstFill is
 from where FirstFill's edge is at. Here is an example:<br>
 <img src="SecondFillTreatedAsOverlap.png"><br><br>
 The perceived SecondFill would be: <kbd>SecondFill_Shown = max(SecondFill - FirstFill, 0)</kbd><br><br>
-If you want SecondFill to be mapped from where FirstFill is at, theoretically you can take pre-calculated SecondFill and add by FirstFill (both before calling DrawGraphicalBarSubtractionLoopEdition), this result (written as the new SecondFill)
+If you want SecondFill to be mapped from where FirstFill is at, theoretically you can take pre-calculated SecondFill and add by FirstFill (both before calling <kbd>DrawGraphicalBarSubtractionLoopEdition</kbd>), this result (written as the new SecondFill)
 will offset the fill to start at where FirstFill value is at:<br>
 <img src="SecondFillStartatFirstFill.png"><br>
 However there is a problem if you use <kbd>CalculateGraphicalBarPercentage</kbd>. That routine essentially converts quantity to fill amounts via multiplication and division, it may round up or down to an integer.
