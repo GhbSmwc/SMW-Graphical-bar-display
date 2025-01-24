@@ -950,7 +950,7 @@ the maximum amount to the byte in the table and writes the difference back to th
 set the remaining fill amount to 0 (takes all the rest if less). After this, this then repeats (the remaining fill amount gets subtracted towards 0) until all tile bytes are finished.<br><br>
 
 As an analogy, there are N empty cups, arranged in a row, and starting at the first cup, you fill that cup with water until it's full, or you run out of water, and you repeat the process on the next
-cup finishing once you reached the last one.<br><br>
+cup finishing once you reached the last one. The only difference is that the bytes' value are <i>not</i> added by the fill amount, rather <i>set</i> to as it would be unoptimized to repeatedly do <kbd>0 + FillTaken</kbd>.<br><br>
 
 <ul><li>For example: using the same attributes as examples above, [14 - 3 = 11]. Subtraction successful, write 3 (maximum)
 for the left end, and then write 11 back to the remaining fill amount. Then [11 - 8 = 3], subtraction successful, so the first middle tile byte is 8 (maximum). Finally, [3 - 8 = (-5)]. Subtraction failed, write the remaining amount
