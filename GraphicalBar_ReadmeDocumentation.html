@@ -945,8 +945,8 @@ without the need of manually calculating the values.</li><br>
 it does the same thing, but slightly different. Instead of using any form of division, it simply uses repeated subtraction, and in fact, does not use any other subroutines (this is a standalone). Almost all the inputs and outputs the
 same, except that the output <kbd>$00-$01</kbd> acts as the remaining fill when the bar is full or higher and 0 otherwise (<kbd>RemainingFill = <abbr title="Picks what number in the parameter is the highest value. If the fill amount is less than 0, it results things like max(-5, 0) which returns 0 and not -5">max</abbr>((InputFillAmount - BarMaximumFull), 0)</kbd>), while <kbd>$02-$09</kbd> aren't destroyed.<br>
 
-<p>It works like this: subtract the input fill amount by the tile byte maximum starting at the first byte going towards the last byte, if the subtraction was successful (having enough filled pieces; subtracted without going in the negatives), then write
-the maximum amount to the byte in the table and writes the difference back to the remaining fill amount, otherwise (if it fails, not having enough filled pieces) it would write that remaining fill amount into the byte in the table and
+<p>It works like this: subtract the input fill amount by the tile byte maximum starting at the first byte going towards the last byte, if the subtraction was successful (having enough filled pieces to be full; subtracted without going in the negatives), then write
+the maximum amount to the byte in the table and writes the difference back to the remaining fill amount, otherwise (if it fails, having less than maximum) it would write that remaining fill amount into the byte in the table and
 set the remaining fill amount to 0 (takes all the rest if less). After this, this then repeats (the remaining fill amount gets subtracted towards 0) until all tile bytes are finished.<br><br>
 
 As an analogy, there are N empty cups, arranged in a row, and starting at the first cup, you fill that cup with water until it's full, or you run out of water, and you repeat the process on the next
