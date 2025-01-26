@@ -1,0 +1,162 @@
+<svg width="1000" height="1000" style="background-color: #707070" id="SVG_RepeatedSubtractionExplained">
+</svg>
+
+<script>
+	DrawRepeatedSubtractionSVG()
+	
+	
+	function DrawRepeatedSubtractionSVG() {
+		let SVGGraphToDisplay = document.getElementById("SVG_RepeatedSubtractionExplained")
+		
+		//Amount Settings
+			let GraphicalBarLeftEndPiece = 3n
+			let GraphicalBarMiddlePiece = 8n
+			let GraphicalBarRightEndPiece = 3n
+			let GraphicalBarMiddleLength = 4n
+			
+			let InputAmountFilled = 14n
+		//Display positioning settings
+			let FilledAmountLeftMargin = 10n
+			let TileProcessYPositionRow_Spacing = 90n
+			let FilledPieceXPosition = FilledAmountLeftMargin + 10n
+		//Don't touch
+		{
+			//Starting fill amount
+			let OutputProcessYPositionStart = 100n
+			
+			let StartingFillAmountText = createSVGElement("text")
+			StartingFillAmountText.setAttribute("x", FilledAmountLeftMargin.toString(10))
+			StartingFillAmountText.setAttribute("y", "30")
+			StartingFillAmountText.appendChild(document.createTextNode("$00-$01 fill amount:"))
+			SVGGraphToDisplay.appendChild(StartingFillAmountText)
+			
+			for (let Countdown = InputAmountFilled; Countdown > 0n; Countdown--) {
+				let Xpositioning = FilledPieceXPosition + ((InputAmountFilled - Countdown) * 10n)
+				
+				let Piece = createSVGElement("rect")
+				Piece.setAttribute("x", Xpositioning.toString(10))
+				Piece.setAttribute("y", "50")
+				Piece.setAttribute("width", "10")
+				Piece.setAttribute("height", "30")
+				Piece.setAttribute("stroke-width", "1")
+				Piece.setAttribute("stroke", "#000000")
+				Piece.setAttribute("fill", "#00C000")
+				SVGGraphToDisplay.appendChild(Piece)
+			}
+			
+			let FillAmountNumberTextDisplay = createSVGElement("text")
+			FillAmountNumberTextDisplay.setAttribute("x", (FilledAmountLeftMargin + (InputAmountFilled * 10n) + 15n).toString(10))
+			FillAmountNumberTextDisplay.setAttribute("y", "70")
+			FillAmountNumberTextDisplay.appendChild(document.createTextNode(InputAmountFilled.toString(10)))
+			SVGGraphToDisplay.appendChild(FillAmountNumberTextDisplay)
+			
+			let VerticalLineXPos = FilledPieceXPosition + (InputAmountFilled * 10n) + 30n
+			let VerticalLine = createSVGElement("line")
+			VerticalLine.setAttribute("x1", VerticalLineXPos.toString(10))
+			VerticalLine.setAttribute("y1", "0")
+			VerticalLine.setAttribute("x2", VerticalLineXPos.toString(10))
+			VerticalLine.setAttribute("y2", "1000")
+			VerticalLine.setAttribute("stroke", "black")
+			SVGGraphToDisplay.appendChild(VerticalLine)
+		}
+		{
+			//Each row representing each tile byte getting filled.
+			let RemainingFill = InputAmountFilled
+			let TileProcessYPositionRow = 100n
+
+			//Show subtraction from the remaining fill amount
+			//Declare functions
+				function RepeatedSubtractionDisplay({Max = 0n}) {
+					let HorizontalLine = createSVGElement("line")
+					HorizontalLine.setAttribute("x1", "0")
+					HorizontalLine.setAttribute("y1", TileProcessYPositionRow.toString(10))
+					HorizontalLine.setAttribute("x2", "1000")
+					HorizontalLine.setAttribute("y2", TileProcessYPositionRow.toString(10))
+					HorizontalLine.setAttribute("stroke", "black")
+					SVGGraphToDisplay.appendChild(HorizontalLine)
+					
+					let SubtractionText = createSVGElement("text")
+					SubtractionText.setAttribute("x", FilledAmountLeftMargin.toString(10))
+					SubtractionText.setAttribute("y", (TileProcessYPositionRow + 20n).toString(10))
+					
+					let Text = ""
+					let PostSubtractionAmount = RemainingFill-Max
+					if (PostSubtractionAmount < 0n) {
+						SubtractionText.setAttribute("stroke", "#800000")
+						SubtractionText.setAttribute("fill", "#800000")
+						Text += RemainingFill.toString(10) + " - " + Max.toString(10) + " = (" + PostSubtractionAmount + ") -> 0"
+						RemainingFill = 0n
+					} else {
+						//SubtractionText.setAttribute("stroke", "black")
+						Text += RemainingFill.toString(10) + " - " + Max.toString(10) + " = " + PostSubtractionAmount
+						RemainingFill = PostSubtractionAmount
+					}
+					SubtractionText.appendChild(document.createTextNode(Text))
+					
+					SVGGraphToDisplay.appendChild(SubtractionText)
+					
+					//Graphical fill changes
+					if (PostSubtractionAmount < 0) { //Below max
+						for (let Countdown = Max, FillLeft = PostSubtractionAmount+Max; Countdown > 0n; Countdown--, FillLeft--) {
+							let Xpositioning = FilledPieceXPosition + ((RemainingFill+Max - Countdown) * 10n)
+							
+							let Piece = createSVGElement("rect")
+							Piece.setAttribute("x", Xpositioning.toString(10))
+							Piece.setAttribute("width", "10")
+							Piece.setAttribute("height", "30")
+							Piece.setAttribute("stroke-width", "1")
+							
+							if (FillLeft <= 0n)  { //Below by...
+								Piece.setAttribute("stroke-dasharray", "4")
+								Piece.setAttribute("fill", "rgb(0,0,0,0)")
+								Piece.setAttribute("y", (TileProcessYPositionRow+50n).toString(10))
+							} else { //Remaining fill
+								Piece.setAttribute("stroke", "#000000")
+								Piece.setAttribute("fill", "#B5E61D")
+								Piece.setAttribute("y", (TileProcessYPositionRow+40n).toString(10))
+							}
+							
+							Piece.setAttribute("stroke", "#000000")
+							SVGGraphToDisplay.appendChild(Piece)
+						}
+						
+					} else {
+						for (let Countdown = RemainingFill+Max, Subtracted = RemainingFill; Countdown > 0n; Countdown--, Subtracted--) {
+							let Xpositioning = FilledPieceXPosition + ((RemainingFill+Max - Countdown) * 10n)
+							
+							let FillColor = "#00C000"
+							let Shifted = 0n
+							if (Subtracted <= 0n) {//Boxes that are removed.
+								FillColor = "#B5E61D"
+								Shifted = -10n
+							}
+							
+							let Piece = createSVGElement("rect")
+							Piece.setAttribute("x", Xpositioning.toString(10))
+							Piece.setAttribute("y", (TileProcessYPositionRow+50n+Shifted).toString(10))
+							Piece.setAttribute("width", "10")
+							Piece.setAttribute("height", "30")
+							Piece.setAttribute("stroke-width", "1")
+							Piece.setAttribute("stroke", "#000000")
+							
+							Piece.setAttribute("fill", FillColor)
+							SVGGraphToDisplay.appendChild(Piece)
+						}
+					}
+					TileProcessYPositionRow += TileProcessYPositionRow_Spacing
+				}
+			if (GraphicalBarLeftEndPiece > 0n) { //Left end
+				RepeatedSubtractionDisplay({Max: GraphicalBarLeftEndPiece})
+			}
+			for (let MiddleLeft = GraphicalBarMiddleLength; MiddleLeft > 0n; MiddleLeft--) {
+				RepeatedSubtractionDisplay({Max: GraphicalBarMiddlePiece})
+			}
+			if (GraphicalBarRightEndPiece > 0n) {
+				RepeatedSubtractionDisplay({Max: GraphicalBarRightEndPiece})
+			}
+		}
+	}
+	function createSVGElement(tag) { //https://stackoverflow.com/questions/57894500/why-is-it-necessary-to-use-document-createelementns-when-adding-svg-tags-to
+		return document.createElementNS('http://www.w3.org/2000/svg', tag)
+	}
+</script>
