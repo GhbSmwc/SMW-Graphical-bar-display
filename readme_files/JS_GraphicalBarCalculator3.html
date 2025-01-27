@@ -491,7 +491,7 @@ Notes:<br>
 					
 					let TableRow_ByteInfo_GraphicalBarByte = document.createElement("td")
 					TableRow_ByteInfo_GraphicalBarByte.style.fontFamily = "monospace"
-					let Text_Address = BigIntToStringSignedHex(Input_TileByteTableAddress+GraphicalBarBytes_Index)
+					let Text_Address = BigIntToStringSignedHex(Input_TileByteTableAddress+GraphicalBarBytes_Index) + " (Address+" + GraphicalBarBytes_Index.toString(10) + ")"
 					let CurrentFillByte = Input_TileByteTableAddress+GraphicalBarBytes_Index
 					if ((CurrentFillByte >= DoubleBar_TileByteTableAddress && CurrentFillByte <= DoubleBar_TileByteTableAddress_Ending)&&document.getElementById("ToggleDoubleBar").checked) {
 						Text_Address += " Overlaps with second bar!"
@@ -505,7 +505,7 @@ Notes:<br>
 						let TableRow_ByteInfo_GraphicalBarByte_SecondBar = document.createElement("td")
 						TableRow_ByteInfo_GraphicalBarByte_SecondBar.style.fontFamily = "monospace"
 						let SecondBarCurrentFillByte = Input_TileByteTableAddress+Input_DoubleBarAddressOffset+GraphicalBarBytes_Index
-						let Text_Address_SecondBar = BigIntToStringSignedHex(SecondBarCurrentFillByte)
+						let Text_Address_SecondBar = BigIntToStringSignedHex(SecondBarCurrentFillByte) + " (Address+" + (Input_DoubleBarAddressOffset+GraphicalBarBytes_Index).toString(10) + ")"
 						if (SecondBarCurrentFillByte >= Input_TileByteTableAddress && SecondBarCurrentFillByte <= Input_TileByteTableAddress_Ending) {
 							Text_Address_SecondBar += " Overlaps with first bar!"
 							TableRow_ByteInfo_GraphicalBarByte_SecondBar.style.color = "red"
