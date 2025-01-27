@@ -622,10 +622,10 @@ Destroyed:
 </tr>
 </table>
 
-<li><a href="#DrawGraphicalBar_Back" id="DrawGraphicalBar">^</a><kbd>DrawGraphicalBar</kbd> (depreciated, recommended to use <kbd><a href="#DrawGraphicalBarSubtractionLoopEdition">DrawGraphicalBarSubtractionLoopEdition</a></kbd> instead):
-it takes a value representing how much fill in the entire bar, and divides them into a byte-array of numbers that are addends of the fill amount,
-in this order: N (can be zero) bytes being at their set maximums, 0 or 1 fraction byte (no fraction if bar is full), and then N bytes (can be zero) empty, while keeping
-the order of their maximums (3, 8, 8, 8, 8...), stored in a RAM defined <kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd>:<br>
+<li><a href="#DrawGraphicalBar_Back" id="DrawGraphicalBar">^</a><kbd>DrawGraphicalBar</kbd> (depreciated and commented out, recommended to use
+<kbd><a href="#DrawGraphicalBarSubtractionLoopEdition">DrawGraphicalBarSubtractionLoopEdition</a></kbd> instead): it takes a value representing how much fill in the entire bar,
+and divides them into a byte-array of numbers that are addends of the fill amount, in this order: N (can be zero) bytes being at their set maximums, 0 or 1 fraction byte (no
+fraction if bar is full), and then N bytes (can be zero) empty, while keeping the order of their maximums (3, 8, 8, 8, 8...), stored in a RAM defined <kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd>:<br>
 <img src="readme_files/FillAmountDividedUnevenlyToTileBytes.png"><br><br>
 
 The reason for this being treated as segmented parts is because the SNES' graphics are all tile-based, (most modern games rely on texture-based rendering
@@ -952,7 +952,7 @@ set the remaining fill amount to 0 (takes all the rest if less). After this, thi
 As an analogy, there are N empty cups, arranged in a row, and starting at the first cup, you fill that cup with water until it's full, or until you run out of water, and then you repeat the process on the next
 cup finishing once you reached the last one. The only difference is that the bytes' value are <i>not</i> added by the fill amount, rather <i>set</i> to as it would be unoptimized to repeatedly do <kbd>0 + FillTaken</kbd>.<br><br>
 
-<ul><li>For example: using the same attributes as examples above, [14 - 3 = 11]. Subtraction successful, write 3 (maximum)
+<ul><li>For example: using the same attributes as examples above (with 4 middle tiles), [14 - 3 = 11]. Subtraction successful, write 3 (maximum)
 for the left end, and then write 11 back to the remaining fill amount. Then [11 - 8 = 3], subtraction successful, so the first middle tile byte is 8 (maximum). Finally, [3 - 8 = (-5)]. Subtraction failed, write the remaining amount
 (3) on the second middle tile byte. Set the remaining fill amount to 0, and repeat until all tile bytes processed (which results in [0 - MaxAmount], and repeatedly sets the following bytes to 0):
 <table>
@@ -2031,7 +2031,7 @@ function getClosest(el, tagName) {
 					let Text = ""
 					if (RemainingFillSubtracted < 0n) {
 						SubtractionText.setAttribute("fill", "#900000")
-						Text += RemainingFill.toString(10) + " - " + Max.toString(10) + " = (" + RemainingFillSubtracted + ") -> 0"
+						Text += RemainingFill.toString(10) + " - " + Max.toString(10) + " = (" + RemainingFillSubtracted + ") → 0"
 					} else {
 						Text += RemainingFill.toString(10) + " - " + Max.toString(10) + " = " + RemainingFillSubtracted
 					}
@@ -2051,7 +2051,7 @@ function getClosest(el, tagName) {
 							Piece.setAttribute("stroke-width", "1")
 							
 							if (FillLeft <= 0n)  { //Below by...
-								Piece.setAttribute("stroke-dasharray", "4")
+								Piece.setAttribute("stroke-dasharray", "2")
 								Piece.setAttribute("fill", "rgb(0,0,0,0)")
 								Piece.setAttribute("y", (TileProcessYPositionRow+50n).toString(10))
 							} else { //Remaining fill
@@ -2118,33 +2118,41 @@ function getClosest(el, tagName) {
 					}
 					function DisplayCurrentlyProcessedTileByte(NumberOfPieces) {
 						if (CurrentFillByteIndex == FillByteTableIndex_RecentlyFilled) {
+							let WidthOfBox = (NumberOfPieces*10n)+10n
+							let BoxXPos = Xpositioning-5n
+							let MidPointXPos = BoxXPos + (WidthOfBox/2n)
+							
+							let ProcessingText = createSVGElement("text")
+							ProcessingText.setAttribute("x", MidPointXPos.toString(10))
+							ProcessingText.setAttribute("y", (TileProcessYPositionRow+20n).toString(10))
+							ProcessingText.setAttribute("fill", "#FFFF00")
+							ProcessingText.setAttribute("text-anchor", "middle")
+							ProcessingText.appendChild(document.createTextNode("Processing"))
+							ProcessingText.setAttribute("font-family", "monospace")
+							SVGGraphToDisplay.appendChild(ProcessingText)
+							
 							let HighlightedBox = createSVGElement("rect")
-							HighlightedBox.setAttribute("x", (Xpositioning-5n).toString(10))
-							HighlightedBox.setAttribute("y", (TileProcessYPositionRow+30n-5n).toString(10))
-							HighlightedBox.setAttribute("width", ((NumberOfPieces*10n)+10n).toString(10))
+							HighlightedBox.setAttribute("x", BoxXPos.toString(10))
+							HighlightedBox.setAttribute("y", (TileProcessYPositionRow+25n).toString(10))
+							HighlightedBox.setAttribute("width", WidthOfBox.toString(10))
 							HighlightedBox.setAttribute("height", "40")
 							HighlightedBox.setAttribute("fill", "rgb(0,0,0,0)")
-							HighlightedBox.setAttribute("stroke-width", "1")
+							HighlightedBox.setAttribute("stroke-width", "2")
 							HighlightedBox.setAttribute("stroke", "#FFFF00")
 							SVGGraphToDisplay.appendChild(HighlightedBox)
 						}
 					}
 					function ByteTypeLabeling({ByteType = "", MiddleCount = 0n}) {
 						let NameColor = {
-							"Left End": "cyan",
+							"Left end": "cyan",
 							"Middle": "#00FF00",
-							"Right End": "red"
+							"Right end": "red"
 						}
 						let ByteTypeText = createSVGElement("text")
-						//ByteTypeText.setAttribute("x", Xpositioning.toString(10))
-						//ByteTypeText.setAttribute("y", TileProcessYPositionRow+80n)
 						ByteTypeText.setAttribute("transform", "translate(" + (Xpositioning+5n).toString(10) + ", " + (TileProcessYPositionRow+70n).toString(10) + ")rotate(45)")
 						
 						ByteTypeText.setAttribute("fill", NameColor[ByteType])
 						ByteTypeText.setAttribute("font-family", "monospace")
-						if (ByteType == "Left End" || ByteType == "Right End") {
-							ByteTypeText.setAttribute("asdf", "asdf")
-						}
 						let Text = ByteType
 						if (ByteType == "Middle") {
 							Text += " " + MiddleCount.toString(10)
@@ -2153,8 +2161,8 @@ function getClosest(el, tagName) {
 						SVGGraphToDisplay.appendChild(ByteTypeText)
 					}
 					if (GraphicalBarLeftEndPiece > 0n) {
+						ByteTypeLabeling({ByteType: "Left end"})
 						DisplayCurrentlyProcessedTileByte(GraphicalBarLeftEndPiece)
-						ByteTypeLabeling({ByteType: "Left End"})
 						for (let Countdown = GraphicalBarLeftEndPiece; Countdown > 0n; Countdown--) {
 							GeneratePieces()
 						}
@@ -2162,8 +2170,8 @@ function getClosest(el, tagName) {
 						CurrentFillByteIndex++
 					}
 					for (let MiddleCountDown = GraphicalBarMiddleLength; MiddleCountDown > 0n; MiddleCountDown--) {
-						DisplayCurrentlyProcessedTileByte(GraphicalBarMiddlePiece)
 						ByteTypeLabeling({ByteType: "Middle", MiddleCount: GraphicalBarMiddleLength - MiddleCountDown + 1n})
+						DisplayCurrentlyProcessedTileByte(GraphicalBarMiddlePiece)
 						for (let FillCountDownPerTile = GraphicalBarMiddlePiece; FillCountDownPerTile > 0n; FillCountDownPerTile--) {
 							GeneratePieces()
 						}
@@ -2171,8 +2179,8 @@ function getClosest(el, tagName) {
 						CurrentFillByteIndex++
 					}
 					if (GraphicalBarRightEndPiece > 0n) {
+						ByteTypeLabeling({ByteType: "Right end"})
 						DisplayCurrentlyProcessedTileByte(GraphicalBarRightEndPiece)
-						ByteTypeLabeling({ByteType: "Right End"})
 						for (let Countdown = GraphicalBarRightEndPiece; Countdown > 0n; Countdown--) {
 							GeneratePieces()
 						}
