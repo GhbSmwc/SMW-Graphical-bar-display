@@ -17,7 +17,7 @@
 			let InputAmountFilled = 14n
 		//Display positioning settings
 			let FilledAmountLeftMargin = 10n
-			let TileProcessYPositionRow_Spacing = 150n
+			let TileProcessYPositionRow_Spacing = 130n
 			let FilledPieceXPosition = FilledAmountLeftMargin + 10n
 			let VerticalLineXPos = FilledPieceXPosition + (InputAmountFilled * 10n) + 30n
 		//Don't touch
@@ -195,7 +195,7 @@
 						let ByteTypeText = createSVGElement("text")
 						//ByteTypeText.setAttribute("x", Xpositioning.toString(10))
 						//ByteTypeText.setAttribute("y", TileProcessYPositionRow+80n)
-						ByteTypeText.setAttribute("transform", "translate(" + (Xpositioning+5n).toString(10) + ", " + (TileProcessYPositionRow+70n).toString(10) + ")rotate(90)")
+						ByteTypeText.setAttribute("transform", "translate(" + (Xpositioning+5n).toString(10) + ", " + (TileProcessYPositionRow+70n).toString(10) + ")rotate(45)")
 						
 						ByteTypeText.setAttribute("fill", NameColor[ByteType])
 						ByteTypeText.setAttribute("font-family", "monospace")
