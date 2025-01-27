@@ -953,7 +953,7 @@ set the remaining fill amount to 0 (takes all the rest if less). After this, thi
 As an analogy, there are N empty cups, arranged in a row, and starting at the first cup, you fill that cup with water until it's full, or until you run out of water, and then you repeat the process on the next
 cup finishing once you reached the last one. The only difference is that the bytes' value are <i>not</i> added by the fill amount, rather <i>set</i> to as it would be unoptimized to repeatedly do <kbd>0 + FillTaken</kbd>.<br><br>
 
-<ul><li>For example: using the same attributes as examples above (with 4 middle tiles), [14 - 3 = 11]. Subtraction successful, write 3 (maximum)
+<ul><li>For example: using the same attributes as examples above (but with 4 middle tiles), [14 - 3 = 11]. Subtraction successful, write 3 (maximum)
 for the left end, and then write 11 back to the remaining fill amount. Then [11 - 8 = 3], subtraction successful, so the first middle tile byte is 8 (maximum). Finally, [3 - 8 = (-5)]. Subtraction failed, write the remaining amount
 (3) on the second middle tile byte. Set the remaining fill amount to 0, and repeat until all tile bytes processed (which results in [0 - MaxAmount], and repeatedly sets the following bytes to 0):
 <table>
