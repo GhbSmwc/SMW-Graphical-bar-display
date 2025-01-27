@@ -2220,6 +2220,8 @@ function getClosest(el, tagName) {
 	}
 
 	function createSVGElement(tag) { //https://stackoverflow.com/questions/57894500/why-is-it-necessary-to-use-document-createelementns-when-adding-svg-tags-to
-		return document.createElementNS('http://www.w3.org/2000/svg', tag)
+		let SVGEle = document.createElementNS('http://www.w3.org/2000/svg', tag)
+		SVGEle.setAttribute("shape-rendering", "crispEdges")
+		return SVGEle
 	}
 </script>
