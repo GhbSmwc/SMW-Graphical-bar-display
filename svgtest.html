@@ -186,8 +186,27 @@
 							SVGGraphToDisplay.appendChild(HighlightedBox)
 						}
 					}
+					function ByteTypeLabeling({ByteType = "", MiddleCount = 0n}) {
+						let NameColor = {
+							Left: "cyan",
+							Middle: "#00FF00",
+							Right: "red"
+						}
+						let ByteTypeText = createSVGElement("text")
+						ByteTypeText.setAttribute("x", Xpositioning.toString(10))
+						ByteTypeText.setAttribute("y", TileProcessYPositionRow+80n)
+						ByteTypeText.setAttribute("fill", NameColor[ByteType])
+						ByteTypeText.setAttribute("font-family", "monospace")
+						let Text = ByteType
+						if (ByteType == "Middle") {
+							Text += " " + MiddleCount.toString(10)
+						}
+						ByteTypeText.appendChild(document.createTextNode(Text))
+						SVGGraphToDisplay.appendChild(ByteTypeText)
+					}
 					if (GraphicalBarLeftEndPiece > 0n) {
 						DisplayCurrentlyProcessedTileByte(GraphicalBarLeftEndPiece)
+						ByteTypeLabeling({ByteType: "Left"})
 						for (let Countdown = GraphicalBarLeftEndPiece; Countdown > 0n; Countdown--) {
 							GeneratePieces()
 						}
@@ -196,6 +215,7 @@
 					}
 					for (let MiddleCountDown = GraphicalBarMiddleLength; MiddleCountDown > 0n; MiddleCountDown--) {
 						DisplayCurrentlyProcessedTileByte(GraphicalBarMiddlePiece)
+						ByteTypeLabeling({ByteType: "Middle", MiddleCount: GraphicalBarMiddleLength - MiddleCountDown + 1n})
 						for (let FillCountDownPerTile = GraphicalBarMiddlePiece; FillCountDownPerTile > 0n; FillCountDownPerTile--) {
 							GeneratePieces()
 						}
@@ -204,6 +224,7 @@
 					}
 					if (GraphicalBarRightEndPiece > 0n) {
 						DisplayCurrentlyProcessedTileByte(GraphicalBarRightEndPiece)
+						ByteTypeLabeling({ByteType: "Right"})
 						for (let Countdown = GraphicalBarRightEndPiece; Countdown > 0n; Countdown--) {
 							GeneratePieces()
 						}
