@@ -19,6 +19,7 @@
 			let FilledAmountLeftMargin = 10n
 			let TileProcessYPositionRow_Spacing = 90n
 			let FilledPieceXPosition = FilledAmountLeftMargin + 10n
+			let VerticalLineXPos = FilledPieceXPosition + (InputAmountFilled * 10n) + 30n
 		//Don't touch
 		{
 			//Starting fill amount
@@ -27,6 +28,7 @@
 			let StartingFillAmountText = createSVGElement("text")
 			StartingFillAmountText.setAttribute("x", FilledAmountLeftMargin.toString(10))
 			StartingFillAmountText.setAttribute("y", "30")
+			StartingFillAmountText.setAttribute("font-family", "monospace")
 			StartingFillAmountText.appendChild(document.createTextNode("$00-$01 fill amount:"))
 			SVGGraphToDisplay.appendChild(StartingFillAmountText)
 			
@@ -47,10 +49,10 @@
 			let FillAmountNumberTextDisplay = createSVGElement("text")
 			FillAmountNumberTextDisplay.setAttribute("x", (FilledAmountLeftMargin + (InputAmountFilled * 10n) + 15n).toString(10))
 			FillAmountNumberTextDisplay.setAttribute("y", "70")
+			FillAmountNumberTextDisplay.setAttribute("font-family", "monospace")
 			FillAmountNumberTextDisplay.appendChild(document.createTextNode(InputAmountFilled.toString(10)))
 			SVGGraphToDisplay.appendChild(FillAmountNumberTextDisplay)
 			
-			let VerticalLineXPos = FilledPieceXPosition + (InputAmountFilled * 10n) + 30n
 			let VerticalLine = createSVGElement("line")
 			VerticalLine.setAttribute("x1", VerticalLineXPos.toString(10))
 			VerticalLine.setAttribute("y1", "0")
@@ -63,6 +65,7 @@
 			//Each row representing each tile byte getting filled.
 			let RemainingFill = InputAmountFilled
 			let TileProcessYPositionRow = 100n
+			let CurrentFillXPos = VerticalLineXPos + 20n
 
 			//Show subtraction from the remaining fill amount
 			//Declare functions
@@ -75,30 +78,28 @@
 					HorizontalLine.setAttribute("stroke", "black")
 					SVGGraphToDisplay.appendChild(HorizontalLine)
 					
+					let RemainingFillSubtracted = RemainingFill-Max
+					
 					let SubtractionText = createSVGElement("text")
 					SubtractionText.setAttribute("x", FilledAmountLeftMargin.toString(10))
 					SubtractionText.setAttribute("y", (TileProcessYPositionRow + 20n).toString(10))
+					SubtractionText.setAttribute("font-family", "monospace")
 					
 					let Text = ""
-					let PostSubtractionAmount = RemainingFill-Max
-					if (PostSubtractionAmount < 0n) {
-						SubtractionText.setAttribute("stroke", "#800000")
-						SubtractionText.setAttribute("fill", "#800000")
-						Text += RemainingFill.toString(10) + " - " + Max.toString(10) + " = (" + PostSubtractionAmount + ") -> 0"
-						RemainingFill = 0n
+					if (RemainingFillSubtracted < 0n) {
+						SubtractionText.setAttribute("fill", "#900000")
+						Text += RemainingFill.toString(10) + " - " + Max.toString(10) + " = (" + RemainingFillSubtracted + ") -> 0"
 					} else {
-						//SubtractionText.setAttribute("stroke", "black")
-						Text += RemainingFill.toString(10) + " - " + Max.toString(10) + " = " + PostSubtractionAmount
-						RemainingFill = PostSubtractionAmount
+						Text += RemainingFill.toString(10) + " - " + Max.toString(10) + " = " + RemainingFillSubtracted
 					}
 					SubtractionText.appendChild(document.createTextNode(Text))
 					
 					SVGGraphToDisplay.appendChild(SubtractionText)
 					
 					//Graphical fill changes
-					if (PostSubtractionAmount < 0) { //Below max
-						for (let Countdown = Max, FillLeft = PostSubtractionAmount+Max; Countdown > 0n; Countdown--, FillLeft--) {
-							let Xpositioning = FilledPieceXPosition + ((RemainingFill+Max - Countdown) * 10n)
+					if (RemainingFillSubtracted < 0) { //Below max
+						for (let Countdown = Max, FillLeft = RemainingFill; Countdown > 0n; Countdown--, FillLeft--) {
+							let Xpositioning = FilledPieceXPosition + ((Max - Countdown) * 10n)
 							
 							let Piece = createSVGElement("rect")
 							Piece.setAttribute("x", Xpositioning.toString(10))
@@ -121,8 +122,8 @@
 						}
 						
 					} else {
-						for (let Countdown = RemainingFill+Max, Subtracted = RemainingFill; Countdown > 0n; Countdown--, Subtracted--) {
-							let Xpositioning = FilledPieceXPosition + ((RemainingFill+Max - Countdown) * 10n)
+						for (let Countdown = RemainingFill, Subtracted = RemainingFillSubtracted; Countdown > 0n; Countdown--, Subtracted--) {
+							let Xpositioning = FilledPieceXPosition + ((RemainingFill - Countdown) * 10n)
 							
 							let FillColor = "#00C000"
 							let Shifted = 0n
@@ -143,16 +144,108 @@
 							SVGGraphToDisplay.appendChild(Piece)
 						}
 					}
-					TileProcessYPositionRow += TileProcessYPositionRow_Spacing
 				}
+				function RepeatedSubtractionFills(Filled) {
+					let TempFillAmount = Filled
+					let Xpositioning = FilledPieceXPosition+VerticalLineXPos+20n
+					let CurrentFillByteIndex = 0n
+					
+					function GeneratePieces() {
+						let PieceFilledOrNot = createSVGElement("rect")
+						PieceFilledOrNot.setAttribute("x", (Xpositioning).toString(10))
+						PieceFilledOrNot.setAttribute("y", (TileProcessYPositionRow+30n).toString(10))
+						PieceFilledOrNot.setAttribute("width", "10")
+						PieceFilledOrNot.setAttribute("height", "30")
+						PieceFilledOrNot.setAttribute("stroke-width", "1")
+						PieceFilledOrNot.setAttribute("stroke", "#000000")
+						
+						let FillColor = "#00C000"
+						if (TempFillAmount == 0n) {
+							FillColor = "#808080"
+						}
+						
+						PieceFilledOrNot.setAttribute("fill", FillColor)
+						SVGGraphToDisplay.appendChild(PieceFilledOrNot)
+						
+						TempFillAmount--
+						if (TempFillAmount < 0n) {
+							TempFillAmount = 0
+						}
+						Xpositioning += 10n
+					}
+					function DisplayCurrentlyProcessedTileByte(NumberOfPieces) {
+						if (CurrentFillByteIndex == FillByteTableIndex_RecentlyFilled) {
+							let HighlightedBox = createSVGElement("rect")
+							HighlightedBox.setAttribute("x", (Xpositioning-5n).toString(10))
+							HighlightedBox.setAttribute("y", (TileProcessYPositionRow+30n-5n).toString(10))
+							HighlightedBox.setAttribute("width", ((NumberOfPieces*10n)+10n).toString(10))
+							HighlightedBox.setAttribute("height", "40")
+							HighlightedBox.setAttribute("fill", "rgb(0,0,0,0)")
+							HighlightedBox.setAttribute("stroke-width", "1")
+							HighlightedBox.setAttribute("stroke", "#FFFF00")
+							SVGGraphToDisplay.appendChild(HighlightedBox)
+						}
+					}
+					if (GraphicalBarLeftEndPiece > 0n) {
+						DisplayCurrentlyProcessedTileByte(GraphicalBarLeftEndPiece)
+						for (let Countdown = GraphicalBarLeftEndPiece; Countdown > 0n; Countdown--) {
+							GeneratePieces()
+						}
+						Xpositioning += 10n
+						CurrentFillByteIndex++
+					}
+					for (let MiddleCountDown = GraphicalBarMiddleLength; MiddleCountDown > 0n; MiddleCountDown--) {
+						DisplayCurrentlyProcessedTileByte(GraphicalBarMiddlePiece)
+						for (let FillCountDownPerTile = GraphicalBarMiddlePiece; FillCountDownPerTile > 0n; FillCountDownPerTile--) {
+							GeneratePieces()
+						}
+						Xpositioning += 10n
+						CurrentFillByteIndex++
+					}
+					if (GraphicalBarRightEndPiece > 0n) {
+						DisplayCurrentlyProcessedTileByte(GraphicalBarRightEndPiece)
+						for (let Countdown = GraphicalBarRightEndPiece; Countdown > 0n; Countdown--) {
+							GeneratePieces()
+						}
+						Xpositioning += 10n
+						CurrentFillByteIndex++
+					}
+				}
+				function NextTile({Max = 0n}) {
+					RemainingFill -= Max
+					if (RemainingFill < 0n) {
+						RemainingFill = 0n
+					}
+					TileProcessYPositionRow += TileProcessYPositionRow_Spacing
+					FillByteTableIndex_RecentlyFilled++
+				}
+			let StartingFillAmountOutputTable = 0n
+			function IncreaseFillByteTable(IncreaseBy) {
+				StartingFillAmountOutputTable += IncreaseBy
+				if (StartingFillAmountOutputTable > InputAmountFilled) {
+					StartingFillAmountOutputTable = InputAmountFilled
+				}
+			}
+			
+			let FillByteTableIndex_RecentlyFilled = 0n
+			
 			if (GraphicalBarLeftEndPiece > 0n) { //Left end
 				RepeatedSubtractionDisplay({Max: GraphicalBarLeftEndPiece})
+				IncreaseFillByteTable(GraphicalBarLeftEndPiece)
+				RepeatedSubtractionFills(StartingFillAmountOutputTable)
+				NextTile({Max: GraphicalBarLeftEndPiece})
 			}
 			for (let MiddleLeft = GraphicalBarMiddleLength; MiddleLeft > 0n; MiddleLeft--) {
 				RepeatedSubtractionDisplay({Max: GraphicalBarMiddlePiece})
+				IncreaseFillByteTable(GraphicalBarMiddlePiece)
+				RepeatedSubtractionFills(StartingFillAmountOutputTable)
+				NextTile({Max: GraphicalBarMiddlePiece})
 			}
 			if (GraphicalBarRightEndPiece > 0n) {
 				RepeatedSubtractionDisplay({Max: GraphicalBarRightEndPiece})
+				IncreaseFillByteTable(GraphicalBarRightEndPiece)
+				RepeatedSubtractionFills(StartingFillAmountOutputTable)
+				NextTile({Max: GraphicalBarRightEndPiece})
 			}
 		}
 	}
