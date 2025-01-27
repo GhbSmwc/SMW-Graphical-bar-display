@@ -36,7 +36,7 @@ See <a href="https://github.com/GhbSmwc/SMW-Graphical-bar-display">github</a>.</
 <p>This is a guide on how to setup a display of a value of something as a graphical bar (or progress bar) that you see in many games. Unlike some hacks like
 SMWCP2 and brutal Mario (both as health bars), which are 1-unit (or piece) per tile being displayed, this package contains code to display multiple units
 per tile (8 units normally), as well as representing a ratio of something with any number (1-65535) as the max. This means that this can have more accurate
-representation of a value (say it approximate to the nearest pixel instead of 8x8 tile) as a percentage and have any maximum amount without affecting the
+representation (or &ldquo;smoother increments&rdquo;) of a value (say it approximate to the nearest pixel instead of 8x8 tile) as a percentage and have any maximum amount without affecting the
 length of the bar.</p>
 
 <p>Make sure you read the comments at the top in the ASM files to fully understand them. This readme covers most of those info.</p>
@@ -50,6 +50,7 @@ length of the bar.</p>
 &ldquo;Consolas&rdquo; so it displays properly.</li>
 <li>You must have at least some ASM knowledge. See this ASM tutorial <a href="https://www.smwcentral.net/?p=section&a=details&id=14268">here.</a></li>
 <li>If you want to easily select and copy text inside of boxes, hold down CTRL and double-click them.</li>
+<li>The HTML files included here uses <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt"><kbd>BigInt</kbd></a> to prevent potential rounding upwards instead of downwards. Make sure your browser supports it.</li>
 </ul>
 <hr>
 <h2>Quick jumps:</h2>
