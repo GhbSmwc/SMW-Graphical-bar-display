@@ -17,7 +17,7 @@
 			let InputAmountFilled = 14n
 		//Display positioning settings
 			let FilledAmountLeftMargin = 10n
-			let TileProcessYPositionRow_Spacing = 90n
+			let TileProcessYPositionRow_Spacing = 150n
 			let FilledPieceXPosition = FilledAmountLeftMargin + 10n
 			let VerticalLineXPos = FilledPieceXPosition + (InputAmountFilled * 10n) + 30n
 		//Don't touch
@@ -188,15 +188,20 @@
 					}
 					function ByteTypeLabeling({ByteType = "", MiddleCount = 0n}) {
 						let NameColor = {
-							Left: "cyan",
-							Middle: "#00FF00",
-							Right: "red"
+							"Left End": "cyan",
+							"Middle": "#00FF00",
+							"Right End": "red"
 						}
 						let ByteTypeText = createSVGElement("text")
-						ByteTypeText.setAttribute("x", Xpositioning.toString(10))
-						ByteTypeText.setAttribute("y", TileProcessYPositionRow+80n)
+						//ByteTypeText.setAttribute("x", Xpositioning.toString(10))
+						//ByteTypeText.setAttribute("y", TileProcessYPositionRow+80n)
+						ByteTypeText.setAttribute("transform", "translate(" + (Xpositioning+5n).toString(10) + ", " + (TileProcessYPositionRow+70n).toString(10) + ")rotate(90)")
+						
 						ByteTypeText.setAttribute("fill", NameColor[ByteType])
 						ByteTypeText.setAttribute("font-family", "monospace")
+						if (ByteType == "Left End" || ByteType == "Right End") {
+							ByteTypeText.setAttribute("asdf", "asdf")
+						}
 						let Text = ByteType
 						if (ByteType == "Middle") {
 							Text += " " + MiddleCount.toString(10)
@@ -206,7 +211,7 @@
 					}
 					if (GraphicalBarLeftEndPiece > 0n) {
 						DisplayCurrentlyProcessedTileByte(GraphicalBarLeftEndPiece)
-						ByteTypeLabeling({ByteType: "Left"})
+						ByteTypeLabeling({ByteType: "Left End"})
 						for (let Countdown = GraphicalBarLeftEndPiece; Countdown > 0n; Countdown--) {
 							GeneratePieces()
 						}
@@ -224,7 +229,7 @@
 					}
 					if (GraphicalBarRightEndPiece > 0n) {
 						DisplayCurrentlyProcessedTileByte(GraphicalBarRightEndPiece)
-						ByteTypeLabeling({ByteType: "Right"})
+						ByteTypeLabeling({ByteType: "Right End"})
 						for (let Countdown = GraphicalBarRightEndPiece; Countdown > 0n; Countdown--) {
 							GeneratePieces()
 						}
