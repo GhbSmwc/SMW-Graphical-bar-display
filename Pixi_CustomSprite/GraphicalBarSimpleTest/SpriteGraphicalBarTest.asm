@@ -3,7 +3,7 @@ incsrc "../GraphicalBarDefines/SpriteOAMSettings.asm"
 
 ;I strongly recommend using the "No more sprite tile limits" patch:
 ;https://www.smwcentral.net/?p=section&a=details&id=24816 as you might
-;ecounter tile issues (tile priority and disappearing tiles).
+;encounter tile issues (tile priority and disappearing tiles).
 
 ;Extra bytes note:
 ;EXB1: X position [signed], Relative to "body of sprite" (the egg sprite).
