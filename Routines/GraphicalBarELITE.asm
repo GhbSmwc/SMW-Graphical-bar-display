@@ -215,6 +215,7 @@ CalculateGraphicalBarPercentageRoundUp:
 	REP #$20
 	LDA $04				;\If remainder is zero, (meaning exactly an integer), don't increment
 	BEQ .NoRoundUp			;/
+	.RoundUp
 	INC $00				;>Otherwise if there is a remainder (between Quotient and Quotient+1), use Quotient+1
 	.NoRoundUp
 	SEP #$20
@@ -314,6 +315,17 @@ CalculateGraphicalBarPercentageRoundDown:
 		STA $04						;/
 		SEP #$20
 		JSL MathDiv32_16				;>;[$00-$03 : Quotient (rounded down), $04-$05 : Remainder], After this division, its impossible to be over #$FFFF.
+		..CheckRoundToZero
+			LDY #$00
+			REP #$20
+			LDA $00
+			ORA $02
+			BNE ...No				;>If quotient is nonzero, then no.
+			LDA $04
+			BEQ ...No				;>If quotient is zero AND remainder is zero, then it's exactly zero
+			LDY #$01				;>Otherwise if Q = 0 and R != 0, then the fill amount is between 0 and 1, which rounded to zero.
+			...No
+			SEP #$20
 	RTL
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Convert amount of fill to each fill per byte.

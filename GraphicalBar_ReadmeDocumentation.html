@@ -573,7 +573,7 @@ Result:
 <td><kbd><span class="NoLineBreak"><span style="font-weight: bold;">$00</span></span></kbd> to <kbd><span class="NoLineBreak"><span style="font-weight: bold;">$01</span></span></kbd></td>
 <td style="text-align: center; vertical-align: middle;">2</td>
 <td>The amount of fill as a &ldquo;percentage&rdquo; (known as &ldquo;<kbd>FillAmount</kbd>&rdquo;). Calculated by:<br><br><kbd>FillAmount = Round(Quantity * TotalNumberOfPiecesInBar / MaxQuantity)</kbd><br><br>The <kbd>Round</kbd> function
-rounds the number to an integer, depending on the 3 variations of this subroutine
+rounds the number to an integer, depending on the 3 variations of these subroutines:
 <ul>
 	<li><kbd>CalculateGraphicalBarPercentage</kbd>: Round half up, during division, if the remainder is less than half the divisor, would round down to nearest integer, otherwise if greater than or equal to, rounds up to nearest integer.</li>
 	<li><kbd>CalculateGraphicalBarPercentageRoundUp</kbd>: Round up. After division, if the remainder is any nonzero value, rounds up to nearest integer.</li>
