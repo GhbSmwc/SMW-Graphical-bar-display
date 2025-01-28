@@ -67,7 +67,7 @@ length of the bar.</p>
 <ul>
 	<li><a href="#GraphicalBarELITE" id="GraphicalBarELITEBack"><kbd>GraphicalBarELITE.asm</kbd></a></li>
 	<ul>
-		<li><a href="#CalculateGraphicalBarPercentage" id="CalculateGraphicalBarPercentage_Back"><kbd>CalculateGraphicalBarPercentage</kbd></a></li>
+		<li><a href="#CalculateGraphicalBarPercentage" id="CalculateGraphicalBarPercentage_Back"><kbd>CalculateGraphicalBarPercentage</kbd>, <kbd>CalculateGraphicalBarPercentageRoundDown</kbd>, and <kbd>CalculateGraphicalBarPercentageRoundUp</kbd></a></li>
 		<li><a href="#DrawGraphicalBar" id="DrawGraphicalBar_Back"><s><kbd>DrawGraphicalBar</kbd></s></a> (depreciated and commented out, please use <kbd>DrawGraphicalBarSubtractionLoopEdition</kbd> instead)</li>
 		<li><a href="#DrawGraphicalBarSubtractionLoopEdition" id="DrawGraphicalBarSubtractionLoopEdition_Back"><kbd>DrawGraphicalBarSubtractionLoopEdition</kbd></a></li>
 		<li><a href="#TOCRoundAwayFromComplete" id="TOCRoundAwayFromComplete_Back"><kbd>Round away from empty/full/both</kbd></a></li>
@@ -506,7 +506,7 @@ Note: All values here are unsigned. Routine information follows:
 <ol>
 <li><a href="#GraphicalBarELITEBack" id="GraphicalBarELITE">^</a>Inside <kbd>GraphicalBarELITE.asm</kbd></li>
 <ul>
-<li><a href="#CalculateGraphicalBarPercentage_Back" id="CalculateGraphicalBarPercentage">^</a><kbd>CalculateGraphicalBarPercentage</kbd>: Calculates the ratio of <kbd>Quantity/MaxQuantity</kbd> to convert to X over the number of pieces (the whole bar).
+<li><a href="#CalculateGraphicalBarPercentage_Back" id="CalculateGraphicalBarPercentage">^</a><kbd>CalculateGraphicalBarPercentage</kbd>, <kbd>CalculateGraphicalBarPercentageRoundDown</kbd>, and <kbd>CalculateGraphicalBarPercentageRoundUp</kbd>: Calculates the ratio of <kbd>Quantity/MaxQuantity</kbd> to convert to X over the number of pieces (the whole bar).
 For example: 50/100 on a 62-pieced bar outputs value of 31.</li>
 <table>
 <tr>
@@ -572,7 +572,13 @@ Result:
 <tr>
 <td><kbd><span class="NoLineBreak"><span style="font-weight: bold;">$00</span></span></kbd> to <kbd><span class="NoLineBreak"><span style="font-weight: bold;">$01</span></span></kbd></td>
 <td style="text-align: center; vertical-align: middle;">2</td>
-<td>The amount of fill as a &ldquo;percentage&rdquo; (known as &ldquo;<kbd>FillAmount</kbd>&rdquo;). Calculated by <kbd>FillAmount = <abbr title="During division, if the remainder is less than half the divisor, would round down to nearest integer, otherwise if greater than or equal to, rounds up to nearest integer.">RoundHalfUp</abbr>(Quantity * TotalNumberOfPiecesInBar / MaxQuantity)</kbd>
+<td>The amount of fill as a &ldquo;percentage&rdquo; (known as &ldquo;<kbd>FillAmount</kbd>&rdquo;). Calculated by:<br><br><kbd>FillAmount = Round(Quantity * TotalNumberOfPiecesInBar / MaxQuantity)</kbd><br><br>The <kbd>Round</kbd> function
+rounds the number to an integer, depending on the 3 variations of this subroutine
+<ul>
+	<li><kbd>CalculateGraphicalBarPercentage</kbd>: Round half up, during division, if the remainder is less than half the divisor, would round down to nearest integer, otherwise if greater than or equal to, rounds up to nearest integer.</li>
+	<li><kbd>CalculateGraphicalBarPercentageRoundUp</kbd>: Round up. After division, if the remainder is any nonzero value, rounds up to nearest integer.</li>
+	<li><kbd>CalculateGraphicalBarPercentageRoundDown</kbd>: Always round down, regardless of remainder.</li>
+</ul><br>
 If max quantity is 0, a division by zero occurs, and outputs <kbd>$FFFF</kbd>. If you are familiar with what that is, that is <a href="https://en.wikipedia.org/wiki/Cross-multiplication">cross-multiplying</a> to convert fractions.<br><br>
 
 Because we are dealing with integer values and rounding after division, if you have more MaxQuantity than MaxFill, then several quantity values may result in the same number of pieces filled. See <a href="readme_files/Js_GraphicalBar_PercentageRoundBounds.html" id="CalculateGraphicalBarPercentage_Discription">this</a> to view the distribution of values to each fill amount<br><br>
