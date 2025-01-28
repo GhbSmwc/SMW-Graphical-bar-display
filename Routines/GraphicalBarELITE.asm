@@ -102,9 +102,12 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ; -!Scratchram_GraphicalBar_TempLength: number of middle bytes excluding both ends.
 ;
 ;Output:
-; -$00 to $01: the "percentage" amount of fill in the bar (rounded 1/2 up, done by
-;  checking if the remainder after division, is being >= half of the divisor
-;  (MaxQuantity)).
+; -$00 to $01: the "percentage" amount of fill in the bar, Rounded:
+; --CalculateGraphicalBarPercentage: 1/2 up, done by checking if the remainder
+;   after division, is being >= half of the divisor (MaxQuantity)).
+; --CalculateGraphicalBarPercentageRoundDown: Rounds down an integer.
+; --CalculateGraphicalBarPercentageRoundUp: Rounds up an integer, if remainder
+;   is nonzero.
 ; -Y register: if rounded towards empty (fill amount = 0) or full:
 ; --Y = #$00 if:
 ; ---Exactly full (or more, so it treats as if the bar is full if more than enough)
@@ -118,97 +121,60 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ; -$02 to $09: because math routines need that much bytes.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 CalculateGraphicalBarPercentage:
-		JSL CalculateGraphicalBarPercentageRoundDown
-		.RoundHalfUp
-		..Rounding
-			REP #$20
-			LDA !Scratchram_GraphicalBar_FillByteTbl+2	;>Max Quantity
-			LSR						;>Divide by 2 (halfway point of max)..
-			BCC ...ExactHalfPoint				;>Should a remainder in the carry is 0 (no remainder), don't round the 1/2 point
-			INC						;>Round the 1/2 point
+	JSL CalculateGraphicalBarPercentageRoundDown
+	.RoundHalfUp
+	..Rounding
+		REP #$20
+		LDA !Scratchram_GraphicalBar_FillByteTbl+2	;>Max Quantity
+		LSR						;>Divide by 2 (halfway point of max)..
+		BCC ...ExactHalfPoint				;>Should a remainder in the carry is 0 (no remainder), don't round the 1/2 point
+		INC						;>Round the 1/2 point
 
-			...ExactHalfPoint
-				CMP $04						;>Half of max compares with remainder
-				BEQ ...RoundDivQuotient				;>If HalfPoint = Remainder, round upwards
-				BCS ...NoRoundDivQuotient			;>If HalfPoint > remainder (or remainder is smaller), round down (if exactly full, this branch is taken).
+		...ExactHalfPoint
+			CMP $04						;>Half of max compares with remainder
+			BEQ ...RoundDivQuotient				;>If HalfPoint = Remainder, round upwards
+			BCS ...NoRoundDivQuotient			;>If HalfPoint > remainder (or remainder is smaller), round down (if exactly full, this branch is taken).
 
-			...RoundDivQuotient
-				;^this also gets branched to if the value is already an exact integer number of pieces (so if the
-				;quantity is 50 out of 100, and a bar of 62, it would be perfectly at 31 [(50*62)/100 = 31]
-				LDA $00						;\Round up an integer
-				INC						;/
-				STA $08						;>move towards $08 because 16bit*16bit multiplication uses $00 to $07
+		...RoundDivQuotient
+			;^this also gets branched to if the value is already an exact integer number of pieces (so if the
+			;quantity is 50 out of 100, and a bar of 62, it would be perfectly at 31 [(50*62)/100 = 31]
+			LDA $00						;\Round up an integer
+			INC						;/
+			STA $08						;>move towards $08 because 16bit*16bit multiplication uses $00 to $07
 
-		;check should this rounded value made a full bar when it is actually not:
-				....RoundingUpTowardsFullCheck
-					;Just as a side note, should the bar be EXACTLY full (so 62/62 and NOT 61.9/62, it guarantees
-					;that the remainder is 0, so thus, no rounding is needed.) This is due to the fact that
-					;[Quantity * FullAmount / MaxQuantity] when Quantity and MaxQuantity are the same number,
-					;thus, canceling each other out (so 62 divide by 62 = 1) and left with FullAmount (the
-					;number of pieces in the bar)
-					
-					;Get the full number of pieces
-					if !Setting_GraphicalBar_SNESMathOnly == 0
-						LDA !Scratchram_GraphicalBar_MiddlePiece	;\Get amount of pieces in middle
-						AND #$00FF					;|
-						STA $00						;|
-						LDA !Scratchram_GraphicalBar_TempLength		;|
-						AND #$00FF					;|
-						STA $02						;/
-						SEP #$20
-						JSL MathMul16_16				;>[$04-$07: Product]
-					else
-						SEP #$20
-						LDA !Scratchram_GraphicalBar_MiddlePiece
-						STA $4202
-						LDA !Scratchram_GraphicalBar_TempLength
-						STA $4203
-						XBA						;\Wait 8 cycles (XBA takes 3, NOP takes 2) for calculation
-						XBA						;|
-						NOP						;/
-						LDA $4216					;\[$04-$07: Product]
-						STA $04						;|
-						LDA $4217					;|
-						STA $05						;/
-					endif
-					LDY #$00					;>Default that the meter didn't round towards empty/full (cannot be before the above subroutine since it overwrites Y).
+	;check should this rounded value made a full bar when it is actually not:
+			....RoundingUpTowardsFullCheck
+				;Just as a side note, should the bar be EXACTLY full (so 62/62 and NOT 61.9/62, it guarantees
+				;that the remainder is 0, so thus, no rounding is needed.) This is due to the fact that
+				;[Quantity * FullAmount / MaxQuantity] when Quantity and MaxQuantity are the same number,
+				;thus, canceling each other out (so 62 divide by 62 = 1) and left with FullAmount (the
+				;number of pieces in the bar)
+				
+				JSL GetMaxBarInAForRoundToMaxCheck
+				
+				LDY #$00					;>Default that the meter didn't round towards empty/full (cannot be before the above subroutine since it overwrites Y).
+				
+				CMP $08						;>compare with rounded fill amount
+				BNE .....TransferFillAmtBack			;\should the rounded up fill matches with the full value, flag that
+				LDY #$02					;/it had rounded to full.
 
-					;add the 2 ends tiles amount (both are 8-bit, but results 16-bit)
-					
-					;NOTE: should the fill amount be exactly full OR greater, Y will be #$00.
-					;This is so that greater than full is 100% treated as exactly full.
-					LDA #$00					;\A = $YYXX, (initially YY is $00)
-					XBA						;/
-					LDA !Scratchram_GraphicalBar_LeftEndPiece	;\get total pieces
-					CLC						;|\carry is set should overflow happens (#$FF -> #$00)
-					ADC !Scratchram_GraphicalBar_RightEndPiece	;//
-					XBA						;>A = $XXYY
-					ADC #$00					;>should that overflow happen, increase the A's upper byte (the YY) by 1 ($01XX)
-					XBA						;>A = $YYXX, addition maximum shouldn't go higher than $01FE. A = 16-bit total ends pieces
-					REP #$20
-					CLC						;\plus middle pieces = full amount
-					ADC $04						;/
-					CMP $08						;>compare with rounded fill amount
-					BNE .....TransferFillAmtBack			;\should the rounded up fill matches with the full value, flag that
-					LDY #$02					;/it had rounded to full.
-
-					.....TransferFillAmtBack
-						LDA $08						;\move the fill amount back to $00.
-						STA $00						;/
-						BRA .Done
-		
-			...NoRoundDivQuotient
-				....RoundingDownTowardsEmptyCheck
-					LDY #$00					;>Default that the meter didn't round towards empty/full.
-					LDA $00						;\if the rounded down (result from fraction part is less than .5) quotient value ISN't zero,
-					BNE .Done					;/(exactly 1 piece filled or more) don't even consider setting Y to #$01.
-					LDA $04						;\if BOTH rounded down quotient and the remainder are zero, the bar is TRUELY completely empty
-					BEQ .Done					;/and don't set Y to #$01.
-					
-					LDY #$01					;>indicate that the value was rounded down towards empty
-					
-					.Done
-					SEP #$20
+				.....TransferFillAmtBack
+					LDA $08						;\move the fill amount back to $00.
+					STA $00						;/
+					BRA .Done
+	
+		...NoRoundDivQuotient
+			....RoundingDownTowardsEmptyCheck
+				LDY #$00					;>Default that the meter didn't round towards empty/full.
+				LDA $00						;\if the rounded down (result from fraction part is less than .5) quotient value ISN't zero,
+				BNE .Done					;/(exactly 1 piece filled or more) don't even consider setting Y to #$01.
+				LDA $04						;\if BOTH rounded down quotient and the remainder are zero, the bar is TRUELY completely empty
+				BEQ .Done					;/and don't set Y to #$01.
+				
+				LDY #$01					;>indicate that the value was rounded down towards empty
+				
+				.Done
+				SEP #$20
 	RTL
 CalculateGraphicalBarPercentageRoundUp:
 	JSL CalculateGraphicalBarPercentageRoundDown
@@ -216,7 +182,27 @@ CalculateGraphicalBarPercentageRoundUp:
 	LDA $04				;\If remainder is zero, (meaning exactly an integer), don't increment
 	BEQ .NoRoundUp			;/
 	.RoundUp
-	INC $00				;>Otherwise if there is a remainder (between Quotient and Quotient+1), use Quotient+1
+		INC $00				;>Otherwise if there is a remainder (between Quotient and Quotient+1), use Quotient+1
+		if !Setting_GraphicalBar_SNESMathOnly == 0
+			LDA $00				;\Preserve rounded quotient
+			PHA				;/
+		endif
+		JSL GetMaxBarInAForRoundToMaxCheck
+		if !Setting_GraphicalBar_SNESMathOnly == 0
+			REP #$30
+			TAY
+			PLA				;\Restore quotient
+			STA $00				;/
+			TYA
+			SEP #$30
+		endif
+		LDY #$00
+		REP #$20
+		CMP $00
+		SEP #$20
+		BNE .NoRoundToMax
+		LDY #$02
+	.NoRoundToMax
 	.NoRoundUp
 	SEP #$20
 	RTL
@@ -326,6 +312,52 @@ CalculateGraphicalBarPercentageRoundDown:
 			LDY #$01				;>Otherwise if Q = 0 and R != 0, then the fill amount is between 0 and 1, which rounded to zero.
 			...No
 			SEP #$20
+	RTL
+GetMaxBarInAForRoundToMaxCheck:
+	;Must be called with 16-bit A.
+	;Get the full number of pieces (for checking if rounding a number between Max-1 and Max to Max.)
+	;Output: A (16-bit): Maximum fill amount (processor flag for A is 8-bit though)
+	;Destroys:
+	; -$00-$07 in LoROM
+	; -$04-$05 in SA-1
+	if !Setting_GraphicalBar_SNESMathOnly == 0
+		LDA !Scratchram_GraphicalBar_MiddlePiece	;\Get amount of pieces in middle
+		AND #$00FF					;|
+		STA $00						;|
+		LDA !Scratchram_GraphicalBar_TempLength		;|
+		AND #$00FF					;|
+		STA $02						;/
+		SEP #$20
+		JSL MathMul16_16				;>[$04-$07: Product]
+	else
+		SEP #$20
+		LDA !Scratchram_GraphicalBar_MiddlePiece
+		STA $4202
+		LDA !Scratchram_GraphicalBar_TempLength
+		STA $4203
+		XBA						;\Wait 8 cycles (XBA takes 3, NOP takes 2) for calculation
+		XBA						;|
+		NOP						;/
+		LDA $4216					;\[$04-$07: Product]
+		STA $04						;|
+		LDA $4217					;|
+		STA $05						;/
+	endif
+	;add the 2 ends tiles amount (both are 8-bit, but results 16-bit)
+	
+	;NOTE: should the fill amount be exactly full OR greater, Y will be #$00.
+	;This is so that greater than full is 100% treated as exactly full.
+	LDA #$00					;\A = $YYXX, (initially YY is $00)
+	XBA						;/
+	LDA !Scratchram_GraphicalBar_LeftEndPiece	;\get total pieces
+	CLC						;|\carry is set should overflow happens (#$FF -> #$00)
+	ADC !Scratchram_GraphicalBar_RightEndPiece	;//
+	XBA						;>A = $XXYY
+	ADC #$00					;>should that overflow happen, increase the A's upper byte (the YY) by 1 ($01XX)
+	XBA						;>A = $YYXX, addition maximum shouldn't go higher than $01FE. A = 16-bit total ends pieces
+	REP #$20
+	CLC						;\plus middle pieces = full amount
+	ADC $04						;/
 	RTL
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Convert amount of fill to each fill per byte.

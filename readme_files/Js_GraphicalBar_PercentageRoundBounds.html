@@ -38,6 +38,16 @@
 		<td>Number of pieces in bar:</td>
 		<td><input type="number" value="62" min="0" max="65535" id="GraphicalBar_MaxPieces" data-input_number_radix="10" onchange="MultiRadixInputs(); MainCode()" data-list_of_input_radixes_ids_to_update="GraphicalBar_MaxPieces_Hex"> ($<input type="text" value="3E" class="AnyRadixNumberInput" data-input_number_radix="16" data-list_of_input_radixes_ids_to_update="GraphicalBar_MaxPieces" onchange="MultiRadixInputs(); MainCode()" id="GraphicalBar_MaxPieces_Hex">)</td>
 	</tr>
+	<tr>
+		<td>Rounding type:</td>
+		<td>
+			<select style="font-family: monospace;" onchange="MainCode()">
+				<option id="RoundType_HalfUp" selected>CalculateGraphicalBarPercentage</option>
+				<option id="RoundType_Down">CalculateGraphicalBarPercentageRoundDown</option>
+				<option id="RoundType_Up">CalculateGraphicalBarPercentageRoundUp</option>
+			</select>
+		</td>
+	</tr>
 </table>
 <hr>
 <table id="Output"></table>
@@ -71,7 +81,7 @@
 			}
 		if (MaxQuantityValue != 0n && MaxPiecesValue != 0n) {
 			for (let QuantityAmount = 1n; QuantityAmount <= MaxQuantityValue; QuantityAmount++) {
-				let Output_CalculateGraphicalBarPercentage = DivideRoundHalfUpBigInt(QuantityAmount*MaxPiecesValue, MaxQuantityValue, MaxPiecesValue)
+				let Output_CalculateGraphicalBarPercentage = DivideRound(QuantityAmount*MaxPiecesValue, MaxQuantityValue, MaxPiecesValue)
 				if (GraphicalBar_PiecesList.at(-1).PiecesFilled == Output_CalculateGraphicalBarPercentage.PiecesFilled && GraphicalBar_PiecesList.at(-1).RoundTo0OrFull == Output_CalculateGraphicalBarPercentage.RoundTo0OrFull) { //If resulted in the same number of pieces as the previous quantity amount, merge/update it.
 					GraphicalBar_PiecesList.at(-1).RangeMax = QuantityAmount //Update range max
 				} else { //Otherwise if it has more pieces filled than before, add a new object representing a new range
@@ -145,30 +155,50 @@
 		//Restrict a number within a specified range, bigInt edition.
 			return num <= min ? min : num >= max ? max : num;
 	}
-	
-	function DivideRoundHalfUpBigInt(dividend, divisor, MaxPiecesValue) {
+	function DivideRound(dividend, divisor, MaxPiecesValue) {
 		if (divisor != 0n) {
 			let RoundTo0OrFull = 0
 			let Quotient = dividend / divisor
 			let Remainder = dividend % divisor
-			let HalfwayPoint = divisor / 2n
-			
-			if (divisor % 2n != 0) { //Round halfwaypoint upwards
-				HalfwayPoint++
-			}
-			if (Remainder >= HalfwayPoint) { //If remainder is more than halfway, round up the division result
-				Quotient++
-				if (Quotient == MaxPiecesValue) { //If rounds up to full, set flag
-					RoundTo0OrFull = 2
+			if (document.getElementById("RoundType_HalfUp").selected) {
+				let HalfwayPoint = divisor / 2n
+				
+				if (divisor % 2n != 0) { //Round halfwaypoint upwards
+					HalfwayPoint++
 				}
-			} else {
+				if (Remainder >= HalfwayPoint) { //If remainder is more than halfway, round up the division result
+					Quotient++
+					if (Quotient == MaxPiecesValue) { //If rounds up to full, set flag
+						RoundTo0OrFull = 2
+					}
+				} else {
+					if (Quotient == 0n && Remainder != 0n) {
+						RoundTo0OrFull = 1
+					}
+				}
+				return {
+					PiecesFilled: Quotient,
+					RoundTo0OrFull: RoundTo0OrFull
+				}
+			} else if (document.getElementById("RoundType_Down").selected) {
 				if (Quotient == 0n && Remainder != 0n) {
 					RoundTo0OrFull = 1
 				}
-			}
-			return {
-				PiecesFilled: Quotient,
-				RoundTo0OrFull: RoundTo0OrFull
+				return {
+					PiecesFilled: Quotient,
+					RoundTo0OrFull: RoundTo0OrFull
+				}
+			} else if (document.getElementById("RoundType_Up").selected) {
+				if (Remainder != 0) { //If having a remainder...
+					Quotient++ //Round up
+					if (Quotient == MaxPiecesValue) { //Rounded up to max
+						RoundTo0OrFull = 2
+					}
+				}
+				return {
+					PiecesFilled: Quotient,
+					RoundTo0OrFull: RoundTo0OrFull
+				}
 			}
 		} else {
 			return -1n
