@@ -498,11 +498,16 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
  -Graphical bar calculator update - fixed an issue where click-hold-drag is being let go on any disabled elements causes
   "mouseup" event to not fire, resulting in remaining in "drag mode" despite the left mouse button being released.
 1/28/2025 v6.4.0
- -CalculateGraphicalBarPercentage now have round down and up versions. This allows a more evenly distributed quantity
-  values to pieces filled in the bar (e.g. using the round 1/2 up and using RoundAway subroutines can cause a ~50% bigger
-  range size bias for a 1-piece-filled bar and a max-minus-one-filled bar. For example, a max quantity of 750 converted
-  to a 100-pieced bar results in ranges being 7 or 8 values apart, so approximately a range size of 7.5. But when using
-  the round-half-up and RoundAway subroutines to adjust so that its 1 or Max-1 when close to 0 or Max, we've merged the
-  range that would've round to 1 or Max-1 (prior to RoundAway, which are 8 units apart) with ranges that are close to 0
-  or max that rounds to 0 or max (which are 3 units apart, so 8 + 3 = 11 total range size, so 11 is about 47% bigger
-  than 7.5).
+ -CalculateGraphicalBarPercentage now have round down and up versions. This allows a more evenly distributed or controlled
+  bias quantity values to pieces filled in the bar. Example: using the round 1/2 up and using RoundAway subroutines can cause
+  a ~50% bigger range size bias for a 1-piece-filled bar and a max-minus-one-filled bar. For example, a max quantity of 65535
+  to a 62-pieced bar results in these quantities mapped to the pieces filled:
+   0 Quantity                                    ->  0 pieces filled
+   1-528 quantity (528 values in between)        ->  0 pieces filled with Y=$01 indicating a round-to-empty.
+   529-1585 quantity (1057 values in between)    ->  1 piece filled
+   ... (any sub-ranges here are either 1057 or 1058 values in between)
+   63950-65006 quantity (1057 values in between) -> 61 pieces filled
+   65007-65534 quantity (528 values in between)  -> 62 pieces filled with Y=$02 indicating a round-to-full.
+   65535 quantity                                -> 62 pieces filled
+  Applying the RoundAway functions would merge 1-528 with 529-1585 and/or 63950-65006 with 65007-65534 to represent
+  1-piece-filled and/or max-1 filled. This results 528 + 1057 = 1585, which is about 50% bigger than the common 1057-spacing.
