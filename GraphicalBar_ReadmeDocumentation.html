@@ -579,6 +579,9 @@ rounds the number to an integer, depending on the 3 variations of these subrouti
 	<li><kbd>CalculateGraphicalBarPercentageRoundUp</kbd>: Round up. After division, if the remainder is any nonzero value, rounds up to nearest integer.</li>
 	<li><kbd>CalculateGraphicalBarPercentageRoundDown</kbd>: Always round down, regardless of remainder.</li>
 </ul><br>
+These rounding variations are intended to minimize/control bias when used in conjunction with <a href="#TOCRoundAwayFromComplete"><kbd>RoundAwayEmpty</kbd>, <kbd>RoundAwayEmpty</kbd>, or <kbd>RoundAwayEmptyFull</kbd></a>.
+The bias is caused by when a quantity value are within a range that would round to 0 or max, then gets merged with the range that would round to 1 or max-1.
+<br><br>
 If max quantity is 0, a division by zero occurs, and outputs <kbd>$FFFF</kbd>. If you are familiar with what that is, that is <a href="https://en.wikipedia.org/wiki/Cross-multiplication">cross-multiplying</a> to convert fractions.<br><br>
 
 Because we are dealing with integer values and rounding after division, if you have more MaxQuantity than MaxFill, then several quantity values may result in the same number of pieces filled. See <a href="readme_files/Js_GraphicalBar_PercentageRoundBounds.html" id="CalculateGraphicalBarPercentage_Discription">this</a> to view the distribution of values to each fill amount<br><br>
