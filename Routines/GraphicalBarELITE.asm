@@ -128,7 +128,10 @@ CalculateGraphicalBarPercentage:
 		LDA !Scratchram_GraphicalBar_FillByteTbl+2	;>Max Quantity
 		LSR						;>Divide by 2 (halfway point of max)..
 		BCC ...ExactHalfPoint				;>Should a remainder in the carry is 0 (no remainder), don't round the 1/2 point
-		INC						;>Round the 1/2 point (this ensures that landing at +0.5 from exact 1/2 point should round up the quotient when MaxQuantity is an odd number)
+		INC						;>Round the 1/2 point...
+			;Reason 1/2 point must be rounded up, is so to truly check if remainder is greater or equal to half, to round the quotient up, when MaxQuantity is odd.
+			; e.g. 1 Quantity * 62 pieces / 5 MaxQuantity = Q:12 R:2, which is 12 and 2/5, or 12.4. The 1/2 point of 5 is EXACTLY 2.5, not 2 (LSR divides A by 2
+			; and round down, thus resulting 2). This means that the lowest remainder integer to trigger a round-up of the amount of pieces filled would be 3.
 
 		...ExactHalfPoint
 			CMP $04						;>Half of max compares with remainder
