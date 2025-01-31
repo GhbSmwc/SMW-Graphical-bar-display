@@ -9,7 +9,7 @@
 ;-CalculateGraphicalBarPercentage
 ;-CalculateGraphicalBarPercentageRoundUp
 ;-CalculateGraphicalBarPercentageRoundDown
-;-DrawGraphicalBar (depreciated, please use the one blow instead)
+;-DrawGraphicalBar (depreciated & commented out, please use the one below instead)
 ;-DrawGraphicalBarSubtractionLoopEdition
 ;-RoundAwayEmpty
 ;-RoundAwayFull
@@ -128,7 +128,7 @@ CalculateGraphicalBarPercentage:
 		LDA !Scratchram_GraphicalBar_FillByteTbl+2	;>Max Quantity
 		LSR						;>Divide by 2 (halfway point of max)..
 		BCC ...ExactHalfPoint				;>Should a remainder in the carry is 0 (no remainder), don't round the 1/2 point
-		INC						;>Round the 1/2 point
+		INC						;>Round the 1/2 point (this ensures that landing at +0.5 from exact 1/2 point should round up the quotient when MaxQuantity is an odd number)
 
 		...ExactHalfPoint
 			CMP $04						;>Half of max compares with remainder
