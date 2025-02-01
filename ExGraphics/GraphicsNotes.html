@@ -1,0 +1,396 @@
+<html>
+	<head>
+		<style>
+			html {
+			background-color: #000207;
+			color: rgb(221, 221, 221);
+			font-family: sans-serif;
+			}
+			
+			table, th, td {
+			border: 1px solid white;
+			border-collapse: collapse;
+			}
+			
+			span.NoLineBreak {
+				white-space: nowrap;
+			}
+			
+			abbr{cursor: help;}
+			img.img-hor {
+				-moz-transform: scaleX(-1);
+				-o-transform: scaleX(-1);
+				-webkit-transform: scaleX(-1);
+				transform: scaleX(-1);
+				filter: FlipH;
+				-ms-filter: "FlipH";
+			}
+			div.TabbedItems {
+				padding-left: 1rem;
+			}
+			div.TabbedFiltersGroup {
+				padding-top: 1rem;
+				padding-bottom: 1rem;
+				padding-right: 1rem;
+				border: 1px solid rgb(221, 221, 221);
+				margin: -1px 0 0 -1px; /* Thanks https://stackoverflow.com/a/22647869/11030779 */
+			}
+			
+		</style>
+	</head>
+<body style="max-width: 1000px; margin: auto; padding: 15px">
+Filter by orientation:
+<div class="TabbedFiltersGroup">
+	<div class="TabbedItems"><label><input type="checkbox" id="Filter_Horizontal" checked onchange="GenerateTableOfGraphics()">Horizontal</label></div>
+	<div class="TabbedItems"><label><input type="checkbox" id="Filter_Vertical" checked onchange="GenerateTableOfGraphics()">Vertical</label></div>
+</div>
+Filter by type:
+<div class="TabbedFiltersGroup">
+	<div class="TabbedItems"><label><input type="checkbox" id="Filter_LevelLayer3" checked onchange="GenerateTableOfGraphics()">Level, layer 3 (status bar/stripe)</label></div>
+	<div class="TabbedItems"><label><input type="checkbox" id="Filter_LevelSprite" checked onchange="GenerateTableOfGraphics()">Level, Sprite</label></div>
+	<div class="TabbedItems"><label><input type="checkbox" id="Filter_OverworldLayer3" checked onchange="GenerateTableOfGraphics()">Overworld, layer 3</label></div>
+</div>
+
+Sort: <select style="font-family: monospace" onchange="GenerateTableOfGraphics()">
+	<option selected id="Sort_ExGFXSlotNum">By ExGFX slot number</option>
+	<option id="Sort_HorizontalVertical">Horizontal or vertical</option>
+	<option id="Sort_LevelGraphicSlot">Graphic slot</option>
+	<option id="Sort_Type">Type</option>
+	<option id="Sort_Description">Description</option>
+</select><label><input type="checkbox" id="Sort_Reverse" onchange="GenerateTableOfGraphics()">Reverse</label><br><br>
+<hr>
+<pre>Number of GFX files shown: <span id="Statistic_ItemCountPostFilter"></span>, <span id="Statistic_ItemCountRemoved"></span> removed</pre> 
+<table id="GFXFileTable"></table>
+
+<script>
+//These makes all <pre>...</pre> have an effect that double-clicking will select all the text
+//in it, to make it easy to copy code and paste it in your ASM stuff.
+//
+//Credit:
+// https://keestalkstech.com/2014/04/click-to-select-all-on-the-pre-element/
+// https://www.sanwebe.com/2014/04/select-all-text-in-element-on-click
+document.addEventListener('dblclick', e => {
+  let pre = getClosest(e.target, "PRE");
+  if (pre && e.ctrlKey) {
+    let range = new Range();
+    range.selectNodeContents(pre);
+    document.getSelection().removeAllRanges();
+    document.getSelection().addRange(range);
+  }
+});
+
+function getClosest(el, tagName) {
+  tagName = tagName && tagName.toUpperCase();
+
+  if (!tagName || !el)
+    return null;
+
+  do
+    if (el.nodeName === tagName)
+      return el;
+  while (el = el.parentNode);
+
+  return null;
+}
+	GenerateTableOfGraphics()
+	function GenerateTableOfGraphics() {
+		let ListOfGraphicFiles = [
+			{
+				SlotNumb: "80",
+				VerticalHoriz: "Horizontal",
+				LevelGfxSlot: "LG1",
+				Description: "Black background graphical bar.",
+				Type: "LevelLayer3"
+			},
+			{
+				SlotNumb: "81",
+				VerticalHoriz: "Vertical",
+				LevelGfxSlot: "LG1",
+				Description: "Black background graphical bar (vertical).",
+				Type: "LevelLayer3"
+			},
+			{
+				SlotNumb: "82",
+				VerticalHoriz: "Horizontal",
+				LevelGfxSlot: "LG1",
+				Description: "Black background graphical double bar (part 1/2).",
+				Type: "LevelLayer3"
+			},
+			{
+				SlotNumb: "83",
+				VerticalHoriz: "Horizontal",
+				LevelGfxSlot: "LG2",
+				Description: "Black background graphical double bar (part 2/2).",
+				Type: "LevelLayer3"
+			},
+			{
+				SlotNumb: "84",
+				VerticalHoriz: "Horizontal",
+				LevelGfxSlot: "LG1",
+				Description: "Black background graphical double bar, SecondFill being a checkerboard (part 1/2).",
+				Type: "LevelLayer3"
+			},
+			{
+				SlotNumb: "85",
+				VerticalHoriz: "Horizontal",
+				LevelGfxSlot: "LG2",
+				Description: "Black background graphical double bar, SecondFill being a checkerboard (part 2/2).",
+				Type: "LevelLayer3"
+			},
+			{
+				SlotNumb: "86",
+				VerticalHoriz: "Horizontal",
+				LevelGfxSlot: "LG1",
+				Description: "Megaman-styled graphical bar.",
+				Type: "LevelLayer3"
+			},
+			{
+				SlotNumb: "87",
+				VerticalHoriz: "Horizontal",
+				LevelGfxSlot: "LG1",
+				Description: "Transperent background graphical bar.",
+				Type: "LevelLayer3"
+			},
+			{
+				SlotNumb: "88",
+				VerticalHoriz: "Vertical",
+				LevelGfxSlot: "LG1",
+				Description: "Transperent background graphical bar (vertical).",
+				Type: "LevelLayer3"
+			},
+			{
+				SlotNumb: "89",
+				VerticalHoriz: "Horizontal",
+				LevelGfxSlot: "LG1",
+				Description: "Transperent background graphical double bar (part 1/2).",
+				Type: "LevelLayer3"
+			},
+			{
+				SlotNumb: "8A",
+				VerticalHoriz: "Horizontal",
+				LevelGfxSlot: "LG2",
+				Description: "Transperent background graphical double bar (part 2/2).",
+				Type: "LevelLayer3"
+			},
+			{
+				SlotNumb: "8B",
+				VerticalHoriz: "Horizontal",
+				LevelGfxSlot: "LG1",
+				Description: "Transperent background graphical double bar, SecondFill being a checkerboard (part 1/2).",
+				Type: "LevelLayer3"
+			},
+			{
+				SlotNumb: "8C",
+				VerticalHoriz: "Horizontal",
+				LevelGfxSlot: "LG2",
+				Description: "Transperent background graphical double bar, SecondFill being a checkerboard (part 2/2).",
+				Type: "LevelLayer3"
+			},
+			{
+				SlotNumb: "8D",
+				VerticalHoriz: "Horizontal",
+				LevelGfxSlot: "LG1",
+				Description: "Transperent background graphical bar, diagonal fill edge.",
+				Type: "LevelLayer3"
+			},
+			{
+				SlotNumb: "8E",
+				VerticalHoriz: "Horizontal",
+				LevelGfxSlot: "LG1",
+				Description: "Transperent background graphical bar, outlined fill edge.",
+				Type: "LevelLayer3"
+			},
+			{
+				SlotNumb: "8F",
+				VerticalHoriz: "Horizontal",
+				LevelGfxSlot: "LG1",
+				Description: "Transperent background graphical bar, rounded fill edge.",
+				Type: "LevelLayer3"
+			},
+			{
+				SlotNumb: "90",
+				VerticalHoriz: "Horizontal",
+				LevelGfxSlot: "LG4",
+				Description: "Black background graphical bar.",
+				Type: "OverworldLayer3"
+			},
+			{
+				SlotNumb: "91",
+				VerticalHoriz: "Horizontal",
+				LevelGfxSlot: "LG4",
+				Description: "Black background graphical bar, diagonal fill edge.",
+				Type: "OverworldLayer3"
+			},
+			{
+				SlotNumb: "92",
+				VerticalHoriz: "Horizontal",
+				LevelGfxSlot: "LG4",
+				Description: "Megaman-styled graphical bar.",
+				Type: "OverworldLayer3"
+			},
+			{
+				SlotNumb: "A0",
+				VerticalHoriz: "Horizontal",
+				LevelGfxSlot: "SP3",
+				Description: "Giant Masked koopa (part 1/2).",
+				Type: "LevelSprite"
+			},
+			{
+				SlotNumb: "A1",
+				VerticalHoriz: "Horizontal",
+				LevelGfxSlot: "SP4",
+				Description: "Giant Masked koopa + sprite horizontal graphical bar (part 2/2).",
+				Type: "LevelSprite"
+			},
+			{
+				SlotNumb: "A2",
+				VerticalHoriz: "Horizontal",
+				LevelGfxSlot: "SP4",
+				Description: "Sprite horizontal bar (for SpriteGraphicalBarTest.asm).",
+				Type: "LevelSprite"
+			},
+			{
+				SlotNumb: "A3",
+				VerticalHoriz: "Vertical",
+				LevelGfxSlot: "SP4",
+				Description: "Sprite vertical bar (for SpriteGraphicalBarTest.asm).",
+				Type: "LevelSprite"
+			},
+			{
+				SlotNumb: "A4",
+				VerticalHoriz: "Horizontal",
+				LevelGfxSlot: "SP4",
+				Description: "Megaman-styled graphical bar (horizontal).",
+				Type: "LevelSprite"
+			},
+			{
+				SlotNumb: "A5",
+				VerticalHoriz: "Vertical",
+				LevelGfxSlot: "SP4",
+				Description: "Megaman-styled graphical bar (vertical).",
+				Type: "LevelSprite"
+			},
+		]
+		
+		let GFXFileTable = document.getElementById("GFXFileTable")
+		while (GFXFileTable.lastElementChild) {
+			GFXFileTable.removeChild(GFXFileTable.lastElementChild)
+		}
+		
+		let TableHeaderRow = document.createElement("tr")
+		
+		let Th_ExGFXSlotNumbLabel = document.createElement("th")
+		Th_ExGFXSlotNumbLabel.appendChild(document.createTextNode("ExGFX** slot number"))
+		TableHeaderRow.appendChild(Th_ExGFXSlotNumbLabel)
+		
+		let Th_VerticalHorizontalLabel = document.createElement("th")
+		Th_VerticalHorizontalLabel.appendChild(document.createTextNode("Vertical or Horizontal"))
+		TableHeaderRow.appendChild(Th_VerticalHorizontalLabel)
+		
+		let Th_LevelGraphicSlotLabel = document.createElement("th")
+		Th_LevelGraphicSlotLabel.appendChild(document.createTextNode("Graphic slot to use"))
+		TableHeaderRow.appendChild(Th_LevelGraphicSlotLabel)
+		
+		let Th_Type = document.createElement("th")
+		Th_Type.appendChild(document.createTextNode("Type"))
+		TableHeaderRow.appendChild(Th_Type)
+		
+		let Th_DescriptionLabel = document.createElement("th")
+		Th_DescriptionLabel.appendChild(document.createTextNode("Description"))
+		TableHeaderRow.appendChild(Th_DescriptionLabel)
+		
+		GFXFileTable.appendChild(TableHeaderRow)
+		
+		ListOfGraphicFiles = ListOfGraphicFiles.map(GraphicFile => { //Convert hexadecimal string ExGFX slot number to bigint
+			return {
+				SlotNumb: BigInt("0x" + GraphicFile.SlotNumb),
+				VerticalHoriz: GraphicFile.VerticalHoriz,
+				LevelGfxSlot: GraphicFile.LevelGfxSlot,
+				Description: GraphicFile.Description,
+				Type: GraphicFile.Type
+			}
+		})
+		let OriginalCount = ListOfGraphicFiles.length
+		ListOfGraphicFiles = ListOfGraphicFiles.filter(GraphicFile => {
+			if (!(document.getElementById("Filter_" + GraphicFile.Type).checked)) {
+				return false
+			}
+			if (!(document.getElementById("Filter_" + GraphicFile.VerticalHoriz).checked)) {
+				return false
+			}
+			return true
+		})
+		document.getElementById("Statistic_ItemCountPostFilter").textContent = ListOfGraphicFiles.length.toString(10)
+		document.getElementById("Statistic_ItemCountRemoved").textContent = (OriginalCount - ListOfGraphicFiles.length).toString(10)
+		
+		let ReverseSortMode = 1
+		if (document.getElementById("Sort_Reverse").checked) {
+			ReverseSortMode = -1
+		}
+		if (document.getElementById("Sort_ExGFXSlotNum").selected) {
+			ListOfGraphicFiles.sort((a,b) => Number(a.SlotNumb - b.SlotNumb) * ReverseSortMode)
+		} else if (document.getElementById("Sort_HorizontalVertical").selected) {
+			ListOfGraphicFiles.sort((a,b) => {
+				if (a.VerticalHoriz === b.VerticalHoriz) {
+					return 0;
+				} else {
+					return ((a.VerticalHoriz < b.VerticalHoriz) ? -1 : 1) * ReverseSortMode;
+				}
+			})
+		} else if (document.getElementById("Sort_LevelGraphicSlot").selected) {
+			ListOfGraphicFiles.sort((a,b) => {
+				if (a.LevelGfxSlot === b.LevelGfxSlot) {
+					return 0;
+				} else {
+					return ((a.LevelGfxSlot < b.LevelGfxSlot) ? -1 : 1) * ReverseSortMode;
+				}
+			})
+		} else if (document.getElementById("Sort_Type").selected) {
+			ListOfGraphicFiles.sort((a,b) => {
+				if (a.Type === b.Type) {
+					return 0;
+				} else {
+					return ((a.Type < b.Type) ? -1 : 1) * ReverseSortMode;
+				}
+			})
+		} else if (document.getElementById("Sort_Description").selected) {
+			ListOfGraphicFiles.sort((a,b) => {
+				if (a.Description === b.Description) {
+					return 0;
+				} else {
+					return ((a.Description < b.Description) ? -1 : 1) * ReverseSortMode;
+				}
+			})
+		}
+		ListOfGraphicFiles.forEach(GraphicFile => {
+			let Tr_GraphicFileRow = document.createElement("tr")
+			Tr_GraphicFileRow.style.fontFamily = "monospace"
+			
+			let Td_ExGFXNumber = document.createElement("td")
+			Td_ExGFXNumber.appendChild(document.createTextNode(GraphicFile.SlotNumb.toString(16).toUpperCase()))
+			Td_ExGFXNumber.style.textAlign = "center"
+			Tr_GraphicFileRow.appendChild(Td_ExGFXNumber)
+			
+			let Td_HorizVert = document.createElement("td")
+			Td_HorizVert.appendChild(document.createTextNode(GraphicFile.VerticalHoriz))
+			Td_HorizVert.style.textAlign = "center"
+			Tr_GraphicFileRow.appendChild(Td_HorizVert)
+			
+			let Td_LevelGfxSlot = document.createElement("td")
+			Td_LevelGfxSlot.appendChild(document.createTextNode(GraphicFile.LevelGfxSlot))
+			Td_LevelGfxSlot.style.textAlign = "center"
+			Tr_GraphicFileRow.appendChild(Td_LevelGfxSlot)
+			
+			let Td_Type = document.createElement("td")
+			Td_Type.appendChild(document.createTextNode(GraphicFile.Type))
+			Td_Type.style.textAlign = "center"
+			Tr_GraphicFileRow.appendChild(Td_Type)
+			
+			let Td_Description = document.createElement("td")
+			Td_Description.appendChild(document.createTextNode(GraphicFile.Description))
+			Tr_GraphicFileRow.appendChild(Td_Description)
+			
+			GFXFileTable.appendChild(Tr_GraphicFileRow)
+		})
+	}
+</script>
