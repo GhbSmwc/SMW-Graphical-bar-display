@@ -40,12 +40,12 @@
 	</head>
 <body style="max-width: 1000px; margin: auto; padding: 15px">
 Filter by orientation:
-<div class="TabbedFiltersGroup">
+<div class="TabbedFiltersGroup"><button onclick="ChangeCheckboxesByChildren(1, event.target.parentNode)">Check all</button><button onclick="ChangeCheckboxesByChildren(0, event.target.parentNode)">Uncheck all</button><button onclick="ChangeCheckboxesByChildren(2, event.target.parentNode)">Invert</button>
 	<div class="TabbedItems"><label><input type="checkbox" id="Filter_Horizontal" checked onchange="GenerateTableOfGraphics()">Horizontal</label></div>
 	<div class="TabbedItems"><label><input type="checkbox" id="Filter_Vertical" checked onchange="GenerateTableOfGraphics()">Vertical</label></div>
 </div>
 Filter by type:
-<div class="TabbedFiltersGroup">
+<div class="TabbedFiltersGroup"><button onclick="ChangeCheckboxesByChildren(1, event.target.parentNode)">Check all</button><button onclick="ChangeCheckboxesByChildren(0, event.target.parentNode)">Uncheck all</button><button onclick="ChangeCheckboxesByChildren(2, event.target.parentNode)">Invert</button>
 	<div class="TabbedItems"><label><input type="checkbox" id="Filter_LevelLayer3" checked onchange="GenerateTableOfGraphics()">Level, layer 3 (status bar/stripe)</label></div>
 	<div class="TabbedItems"><label><input type="checkbox" id="Filter_LevelSprite" checked onchange="GenerateTableOfGraphics()">Level, Sprite</label></div>
 	<div class="TabbedItems"><label><input type="checkbox" id="Filter_OverworldLayer3" checked onchange="GenerateTableOfGraphics()">Overworld, layer 3</label></div>
@@ -392,5 +392,15 @@ function getClosest(el, tagName) {
 			
 			GFXFileTable.appendChild(Tr_GraphicFileRow)
 		})
+	}
+	function ChangeCheckboxesByChildren(Setting, NodeToGrab) {
+		let Checkboxes = [...NodeToGrab.querySelectorAll("input[type=checkbox]")].forEach(ele => {
+			if (Setting < 2) {
+				ele.checked = Setting
+			} else {
+				ele.checked = !ele.checked
+			}
+		});
+		GenerateTableOfGraphics()
 	}
 </script>
