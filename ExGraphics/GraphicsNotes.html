@@ -55,12 +55,15 @@ Sort: <select style="font-family: monospace" onchange="GenerateTableOfGraphics()
 	<option selected id="Sort_ExGFXSlotNum">By ExGFX slot number</option>
 	<option id="Sort_HorizontalVertical">Horizontal or vertical</option>
 	<option id="Sort_LevelGraphicSlot">Graphic slot</option>
+	<option id="Sort_FillTableToUse">Fill table to use</option>
 	<option id="Sort_Type">Type</option>
 	<option id="Sort_Description">Description</option>
 </select><label><input type="checkbox" id="Sort_Reverse" onchange="GenerateTableOfGraphics()">Reverse</label><br><br>
 <hr>
 <pre>Number of GFX files shown: <span id="Statistic_ItemCountPostFilter"></span>, <span id="Statistic_ItemCountRemoved"></span> removed</pre> 
-<table id="GFXFileTable"></table>
+<div style="overflow: auto; resize: both;">
+	<table id="GFXFileTable"></table>
+</div>
 
 <script>
 //These makes all <pre>...</pre> have an effect that double-clicking will select all the text
@@ -100,6 +103,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "LG1",
 				Description: "Black background graphical bar.",
+				FillTable: "3/8/3 LevelLayer3",
 				Type: "LevelLayer3"
 			},
 			{
@@ -107,6 +111,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Vertical",
 				LevelGfxSlot: "LG1",
 				Description: "Black background graphical bar (vertical).",
+				FillTable: "3/8/3 LevelLayer3",
 				Type: "LevelLayer3"
 			},
 			{
@@ -114,6 +119,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "LG1",
 				Description: "Black background graphical double bar (part 1/2).",
+				FillTable: "3/8/3 LevelLayer3 double bar",
 				Type: "LevelLayer3"
 			},
 			{
@@ -121,6 +127,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "LG2",
 				Description: "Black background graphical double bar (part 2/2).",
+				FillTable: "3/8/3 LevelLayer3 double bar",
 				Type: "LevelLayer3"
 			},
 			{
@@ -128,6 +135,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "LG1",
 				Description: "Black background graphical double bar, SecondFill being a checkerboard (part 1/2).",
+				FillTable: "3/8/3 LevelLayer3 double bar",
 				Type: "LevelLayer3"
 			},
 			{
@@ -135,6 +143,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "LG2",
 				Description: "Black background graphical double bar, SecondFill being a checkerboard (part 2/2).",
+				FillTable: "3/8/3 LevelLayer3 double bar",
 				Type: "LevelLayer3"
 			},
 			{
@@ -142,6 +151,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "LG1",
 				Description: "Megaman-styled graphical bar.",
+				FillTable: "2/4/2 LevelLayer3 Megaman HP",
 				Type: "LevelLayer3"
 			},
 			{
@@ -149,6 +159,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "LG1",
 				Description: "Transperent background graphical bar.",
+				FillTable: "3/8/3 LevelLayer3",
 				Type: "LevelLayer3"
 			},
 			{
@@ -156,6 +167,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Vertical",
 				LevelGfxSlot: "LG1",
 				Description: "Transperent background graphical bar (vertical).",
+				FillTable: "3/8/3 LevelLayer3",
 				Type: "LevelLayer3"
 			},
 			{
@@ -163,6 +175,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "LG1",
 				Description: "Transperent background graphical double bar (part 1/2).",
+				FillTable: "3/8/3 LevelLayer3 double bar",
 				Type: "LevelLayer3"
 			},
 			{
@@ -170,6 +183,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "LG2",
 				Description: "Transperent background graphical double bar (part 2/2).",
+				FillTable: "3/8/3 LevelLayer3 double bar",
 				Type: "LevelLayer3"
 			},
 			{
@@ -177,6 +191,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "LG1",
 				Description: "Transperent background graphical double bar, SecondFill being a checkerboard (part 1/2).",
+				FillTable: "3/8/3 LevelLayer3 double bar",
 				Type: "LevelLayer3"
 			},
 			{
@@ -184,6 +199,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "LG2",
 				Description: "Transperent background graphical double bar, SecondFill being a checkerboard (part 2/2).",
+				FillTable: "3/8/3 LevelLayer3 double bar",
 				Type: "LevelLayer3"
 			},
 			{
@@ -191,6 +207,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "LG1",
 				Description: "Transperent background graphical bar, diagonal fill edge.",
+				FillTable: "3/8/6 LevelLayer3 Diagonal fill edge",
 				Type: "LevelLayer3"
 			},
 			{
@@ -198,6 +215,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "LG1",
 				Description: "Transperent background graphical bar, outlined fill edge.",
+				FillTable: "3/8/4 LevelLayer3 Outlined fill edge",
 				Type: "LevelLayer3"
 			},
 			{
@@ -205,6 +223,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "LG1",
 				Description: "Transperent background graphical bar, rounded fill edge.",
+				FillTable: "3/8/3 LevelLayer3 Rounded fill edge",
 				Type: "LevelLayer3"
 			},
 			{
@@ -212,6 +231,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "LG4",
 				Description: "Black background graphical bar.",
+				FillTable: "3/8/3 OverworldLayer3",
 				Type: "OverworldLayer3"
 			},
 			{
@@ -219,6 +239,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "LG4",
 				Description: "Black background graphical bar, diagonal fill edge.",
+				FillTable: "3/8/6 OverworldLayer3 Diagonal Fill edge",
 				Type: "OverworldLayer3"
 			},
 			{
@@ -226,6 +247,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "LG4",
 				Description: "Megaman-styled graphical bar.",
+				FillTable: "2/4/2 OverworldLayer3 Megaman HP",
 				Type: "OverworldLayer3"
 			},
 			{
@@ -233,6 +255,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "SP3",
 				Description: "Giant Masked koopa (part 1/2).",
+				FillTable: "N/A",
 				Type: "LevelSprite"
 			},
 			{
@@ -240,6 +263,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "SP4",
 				Description: "Giant Masked koopa + sprite horizontal graphical bar (part 2/2).",
+				FillTable: "3/8/3 LevelSprite GiantMaskedKoopa Layout",
 				Type: "LevelSprite"
 			},
 			{
@@ -247,6 +271,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "SP4",
 				Description: "Sprite horizontal bar (for SpriteGraphicalBarTest.asm).",
+				FillTable: "3/8/3 LevelSprite SpriteGraphicalBarTest Layout",
 				Type: "LevelSprite"
 			},
 			{
@@ -254,6 +279,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Vertical",
 				LevelGfxSlot: "SP4",
 				Description: "Sprite vertical bar (for SpriteGraphicalBarTest.asm).",
+				FillTable: "3/8/3 LevelSprite SpriteGraphicalBarTest Layout",
 				Type: "LevelSprite"
 			},
 			{
@@ -261,6 +287,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "SP4",
 				Description: "Megaman-styled graphical bar (horizontal).",
+				FillTable: "2/4/2 SpriteGraphicalBarTest LevelSprite Megaman HP",
 				Type: "LevelSprite"
 			},
 			{
@@ -268,6 +295,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: "Vertical",
 				LevelGfxSlot: "SP4",
 				Description: "Megaman-styled graphical bar (vertical).",
+				FillTable: "2/4/2 SpriteGraphicalBarTest LevelSprite Megaman HP",
 				Type: "LevelSprite"
 			},
 		]
@@ -288,8 +316,12 @@ function getClosest(el, tagName) {
 		TableHeaderRow.appendChild(Th_VerticalHorizontalLabel)
 		
 		let Th_LevelGraphicSlotLabel = document.createElement("th")
-		Th_LevelGraphicSlotLabel.appendChild(document.createTextNode("Graphic slot to use"))
+		Th_LevelGraphicSlotLabel.appendChild(document.createTextNode("Level graphic slot to use"))
 		TableHeaderRow.appendChild(Th_LevelGraphicSlotLabel)
+		
+		let Th_FillTable = document.createElement("th")
+		Th_FillTable.appendChild(document.createTextNode("Fill table to use"))
+		TableHeaderRow.appendChild(Th_FillTable)
 		
 		let Th_Type = document.createElement("th")
 		Th_Type.appendChild(document.createTextNode("Type"))
@@ -307,6 +339,7 @@ function getClosest(el, tagName) {
 				VerticalHoriz: GraphicFile.VerticalHoriz,
 				LevelGfxSlot: GraphicFile.LevelGfxSlot,
 				Description: GraphicFile.Description,
+				FillTable: GraphicFile.FillTable,
 				Type: GraphicFile.Type
 			}
 		})
@@ -345,6 +378,14 @@ function getClosest(el, tagName) {
 					return ((a.LevelGfxSlot < b.LevelGfxSlot) ? -1 : 1) * ReverseSortMode;
 				}
 			})
+		} else if (document.getElementById("Sort_FillTableToUse").selected) {
+			ListOfGraphicFiles.sort((a,b) => {
+				if (a.FillTable === b.FillTable) {
+					return 0;
+				} else {
+					return ((a.FillTable < b.FillTable) ? -1 : 1) * ReverseSortMode;
+				}
+			})
 		} else if (document.getElementById("Sort_Type").selected) {
 			ListOfGraphicFiles.sort((a,b) => {
 				if (a.Type === b.Type) {
@@ -380,6 +421,12 @@ function getClosest(el, tagName) {
 			Td_LevelGfxSlot.appendChild(document.createTextNode(GraphicFile.LevelGfxSlot))
 			Td_LevelGfxSlot.style.textAlign = "center"
 			Tr_GraphicFileRow.appendChild(Td_LevelGfxSlot)
+			
+			let Td_FileTable = document.createElement("td")
+			Td_FileTable.appendChild(document.createTextNode(GraphicFile.FillTable))
+			Td_FileTable.style.textAlign = "center"
+			Td_FileTable.style.whiteSpace = "nowrap"
+			Tr_GraphicFileRow.appendChild(Td_FileTable)
 			
 			let Td_Type = document.createElement("td")
 			Td_Type.appendChild(document.createTextNode(GraphicFile.Type))
