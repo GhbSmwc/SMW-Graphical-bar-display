@@ -431,7 +431,7 @@ function getClosest(el, tagName) {
 			Tr_GraphicFileRow.appendChild(Td_LevelGfxSlot)
 			
 			let Td_TileFillTable = document.createElement("td")
-			Td_TileFillTable.appendChild(document.createTextNode(GraphicFile.FillTable + " "))
+			Td_TileFillTable.appendChild(document.createTextNode(GraphicFile.FillTable))
 			Td_TileFillTable.style.textAlign = "center"
 			Td_TileFillTable.style.whiteSpace = "nowrap"
 			
@@ -447,10 +447,9 @@ function getClosest(el, tagName) {
 				let Btn_CopyFillTable = document.createElement("button")
 				Btn_CopyFillTable.addEventListener("click", TableToClipboard.bind(null))
 				Btn_CopyFillTable.appendChild(document.createTextNode("Copy"))
+				Btn_CopyFillTable.style.width = "60"
 				Td_TileFillTable2.appendChild(Btn_CopyFillTable)
 				
-				
-				Td_TileFillTable2.appendChild(document.createElement("span")) //This is the message indicating whether or not copied
 				Tr_GraphicFileRow.appendChild(Td_TileFillTable2)
 				
 			}
@@ -478,8 +477,9 @@ function getClosest(el, tagName) {
 		GenerateTableOfGraphics()
 	}
 	
-	function DeleteCopyMessage(HTMLElement) {
-		HTMLElement.textContent = ""
+	function RevertCopyMessage(HTMLElement) {
+		HTMLElement.textContent = "Copy"
+		HTMLElement.style.color = ""
 	}
 	
 	function setClipboard(String) {
@@ -489,55 +489,51 @@ function getClosest(el, tagName) {
 		const data = [new ClipboardItem({ [type]: blob })];
 		
 		let EventElement = event.target
-		let CopiedMessage = EventElement.parentNode.querySelector("span")
 	
 		navigator.clipboard.write(data).then(
 			((EventElement) => {
 			/* success */
-				CopiedMessage.textContent = "Copied!"
-				CopiedMessage.style.color = "#00FF00"
-				setTimeout(DeleteCopyMessage.bind(null, CopiedMessage), 1500)
+				EventElement.textContent = "Copied!"
+				EventElement.style.color = "#008000"
+				setTimeout(RevertCopyMessage.bind(null, EventElement), 1500)
 			}).bind(null, EventElement),
 			((EventElement) => {
 			/* failure */
-				CopiedMessage.textContent = "Failed!"
-				CopiedMessage.style.color = "#FF0000"
-				setTimeout(DeleteCopyMessage.bind(null, CopiedMessage), 1500)
+				EventElement.textContent = "Failed!"
+				EventElement.style.color = "#800000"
+				setTimeout(RevertCopyMessage.bind(null, EventElement), 1500)
 			}).bind(null, EventElement)
 		);
 	}
-	function DeleteCopyMessage(HTMLElement) {
-		HTMLElement.textContent = ""
-	}
 	
 	function TableToClipboard() {
-		let Text_TypeOfTileTableFormat = event.target.parentNode.childNodes[0].textContent.replace(/\s$/, "")
+		let Text_TypeOfTileTableFormat = event.target.parentNode.parentNode.childNodes[3].textContent
 		let ListOfTileTableFormats = {
 "3/8/3 LevelLayer3":
 `;3/8/3 LevelLayer3
 		GraphicalBar_LeftEnd8x8s_Lvl_L3:
 		;Left end fill amount tile numbers:
-		db $36		;>Fill amount/index: $00
-		db $37		;>Fill amount/index: $01
-		db $38		;>Fill amount/index: $02
-		db $39		;>Fill amount/index: $03
+		db $36		;>Fill amount/index: $00 (0/3)
+		db $37		;>Fill amount/index: $01 (1/3)
+		db $38		;>Fill amount/index: $02 (2/3)
+		db $39		;>Fill amount/index: $03 (3/3)
 		GraphicalBar_Middle8x8s_Lvl_L3:
 		;Middle fill amount tile numbers
-		db $55		;>Fill amount/index: $00
-		db $56		;>Fill amount/index: $01
-		db $57		;>Fill amount/index: $02
-		db $58		;>Fill amount/index: $03
-		db $59		;>Fill amount/index: $04
-		db $65		;>Fill amount/index: $05
-		db $66		;>Fill amount/index: $06
-		db $67		;>Fill amount/index: $07
-		db $68		;>Fill amount/index: $08
+		db $55		;>Fill amount/index: $00 (0/8)
+		db $56		;>Fill amount/index: $01 (1/8)
+		db $57		;>Fill amount/index: $02 (2/8)
+		db $58		;>Fill amount/index: $03 (3/8)
+		db $59		;>Fill amount/index: $04 (4/8)
+		db $65		;>Fill amount/index: $05 (5/8)
+		db $66		;>Fill amount/index: $06 (6/8)
+		db $67		;>Fill amount/index: $07 (7/8)
+		db $68		;>Fill amount/index: $08 (8/8)
 		GraphicalBar_RightEnd8x8s_Lvl_L3:
 		;Right end fill amount tile numbers:
-		db $50		;>Fill amount/index: $00
-		db $51		;>Fill amount/index: $01
-		db $52		;>Fill amount/index: $02
-		db $53		;>Fill amount/index: $03`,
+		db $50		;>Fill amount/index: $00 (0/3)
+		db $51		;>Fill amount/index: $01 (1/3)
+		db $52		;>Fill amount/index: $02 (2/3)
+		db $53		;>Fill amount/index: $03 (3/3)`,
 "3/8/3 LevelLayer3 double bar":
 `;3/8/3 LevelLayer3 double bar
 		GraphicalBar_LeftEnd8x8sDoubleBar_Lvl_L3:
