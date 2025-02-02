@@ -53,7 +53,7 @@ Filter by type:
 
 Sort: <select style="font-family: monospace" onchange="GenerateTableOfGraphics()">
 	<option selected id="Sort_ExGFXSlotNum">By ExGFX slot number</option>
-	<option id="Sort_HorizontalVertical">Horizontal or vertical</option>
+	<option id="Sort_Orientation">Orientation</option>
 	<option id="Sort_LevelGraphicSlot">Graphic slot</option>
 	<option id="Sort_FillTableToUse">Fill table to use</option>
 	<option id="Sort_Type">Type</option>
@@ -312,7 +312,7 @@ function getClosest(el, tagName) {
 		TableHeaderRow.appendChild(Th_ExGFXSlotNumbLabel)
 		
 		let Th_VerticalHorizontalLabel = document.createElement("th")
-		Th_VerticalHorizontalLabel.appendChild(document.createTextNode("Vertical or Horizontal"))
+		Th_VerticalHorizontalLabel.appendChild(document.createTextNode("Orientation"))
 		TableHeaderRow.appendChild(Th_VerticalHorizontalLabel)
 		
 		let Th_LevelGraphicSlotLabel = document.createElement("th")
@@ -362,7 +362,7 @@ function getClosest(el, tagName) {
 		}
 		if (document.getElementById("Sort_ExGFXSlotNum").selected) {
 			ListOfGraphicFiles.sort((a,b) => Number(a.SlotNumb - b.SlotNumb) * ReverseSortMode)
-		} else if (document.getElementById("Sort_HorizontalVertical").selected) {
+		} else if (document.getElementById("Sort_Orientation").selected) {
 			ListOfGraphicFiles.sort((a,b) => {
 				if (a.VerticalHoriz === b.VerticalHoriz) {
 					return 0;
