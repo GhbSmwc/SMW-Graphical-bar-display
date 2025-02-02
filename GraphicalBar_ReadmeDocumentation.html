@@ -145,6 +145,7 @@ supports it.</p>
 <ul>
 	<li><a id="TopJSLink" href="readme_files/JS_GraphicalBarCalculator3.html">Calculate the graphical bar's memory usage</a></li>
 	<li><a id="CalculatePercentageRoundBounds" href="readme_files/Js_GraphicalBar_PercentageRoundBounds.html">CalculateGraphicalBarPercentage's range of inputs to amount of pieces filled</li>
+	<li><a id="GraphicsTable" href="readme_files/JS_GraphicsNotes.html">Graphics notes</a></li>
 	<li><a id="OAMNotes" href="readme_files/JS_OAM_Side_notes.html">OAM table and conversion sheet</a></li>
 	<li>Tile property converters. Note they're not the same, rather similar, layer 3 has 2-bits (0-3) for page number and 1-bit (0-1) for priority, while sprites
 have 1-bit for page number and 2-bits of priority:</li>
@@ -196,14 +197,14 @@ gamemode:
 ; Insert files here
 ;0E		Gamemode0E_OWBorderTest.asm ;&gt;Need OWB+ patch to function!</pre></td></tr></table><br>
 </li>
-<li>Insert the graphics by (see <a href="readme_files/GraphicsNotes.html" target="_blank">this graphic documentation</a>):
+<li>Insert the graphics by (see <a href="readme_files/JS_GraphicsNotes.html" target="_blank">this graphic documentation</a>):
 <ol>
 <li>Create the &ldquo;ExGraphics&rdquo; if you haven't done so by clicking on the blue mushroom in Lunar Magic.</li>
 <li>Paste the graphic bin files found in this package's <kbd>ExGraphics</kbd> folder. The graphics include but not limited to:
 <ul>
 	<li>Transparent background: <img src="readme_files/TransperentBackground.png"></li>
 	<li>Black background: <img src="readme_files/BlackBackground.png"></li>
-	<li>Megaman-styled: <img src="readme_files/MegamanHPBar.png"> Note: make sure you follow the instructions provided in <a href="readme_files/GraphicsNotes.html" target="_blank"><kbd>readme_files/GraphicsNotes.html</kbd></a> as the fill amounts and tile layouts may differ</li>
+	<li>Megaman-styled: <img src="readme_files/MegamanHPBar.png"> Note: make sure you follow the instructions provided in <a href="readme_files/JS_GraphicsNotes.html" target="_blank"><kbd>readme_files/JS_GraphicsNotes.html</kbd></a> as the fill amounts and tile layouts may differ</li>
 </ul>
 Please note that there are huge combinations of this due to how many variations there are (<a href="readme_files/DoubleBarInfo.html">double bar</a>, <a href="readme_files/FillEdgeCrossingTileBorder.html">custom fill-edges</a> etc), therefore this readme will not cover every combinations.<br><br>
 
@@ -347,7 +348,7 @@ I recommend having the knowledge of how sprites work before doing this. Here is 
 	</li>
 	<li>
 		Tile table modification of <kbd>GraphicalBarConvertBarFillAmountToTiles.asm</kbd>: Because the sprites had to have a different tile numbers for the graphical bar tiles, they have to have different fill&rightarrow;TileNumber conversions.
-		By default, it uses &ldquo;<kbd>3/8/3 LevelSprite SpriteGraphicalBarTest Layout</kbd>&rdquo; for both <kbd>SpriteGraphicalBarTest.asm</kbd> and <kbd>Patch_DrawSpriteGraphicalBar/DrawOamPatch.asm</kbd>. The included graphics for pixi sprites are located in <kbd>ExGraphics</kbd> folder (see <a href="readme_files/GraphicsNotes.html" target="_blank"><kbd>readme_files/GraphicsNotes.html</kbd></a>
+		By default, it uses &ldquo;<kbd>3/8/3 LevelSprite SpriteGraphicalBarTest Layout</kbd>&rdquo; for both <kbd>SpriteGraphicalBarTest.asm</kbd> and <kbd>Patch_DrawSpriteGraphicalBar/DrawOamPatch.asm</kbd>. The included graphics for pixi sprites are located in <kbd>ExGraphics</kbd> folder (see <a href="readme_files/JS_GraphicsNotes.html" target="_blank"><kbd>readme_files/JS_GraphicsNotes.html</kbd></a>
 		on where/how the graphics should be inserted, in this case, it should be <kbd>ExGFXA2</kbd> or <kbd>ExGFXA3</kbd>), copy the table, then open <kbd>GraphicalBarConvertBarFillAmountToTiles.asm</kbd> in pixi's routines, and replace the sprite tile table with what you copied.
 	</li>
 	<li>
@@ -468,7 +469,7 @@ Therefore, if you push something, you must pull before calling <kbd>%GetDrawInfo
 <p>Everything is effectively the same as <kbd>GraphicalBarSimpleTest</kbd> except the bar having an actual purpose and the sprite is a boss sprite. Open the ASM file <kbd>giant_masked_koopa.asm</kbd>, and there will be comments I added to show an example
 on how to implement a sprite graphical bar (in this example, a HP bar).</p>
 
-<p>Don't forget: Because the boss sprite takes a considerable amount of 8x8 tiles, the bar tile numbers table for <kbd>ConvertBarFillAmountToTiles</kbd> had to be relocated. Open <a href="readme_files/GraphicsNotes.html" target="_blank"><kbd>readme_files/GraphicsNotes.html</kbd></a>, look for
+<p>Don't forget: Because the boss sprite takes a considerable amount of 8x8 tiles, the bar tile numbers table for <kbd>ConvertBarFillAmountToTiles</kbd> had to be relocated. Open <a href="readme_files/JS_GraphicsNotes.html" target="_blank"><kbd>readme_files/JS_GraphicsNotes.html</kbd></a>, look for
 <kbd>3/8/3 LevelSprite GiantMaskedKoopa Layout</kbd>, copy the fill table, open <kbd>GraphicalBarConvertBarFillAmountToTiles</kbd> and paste the table under &ldquo;sprite&rdquo;.
 
 alternatively, you could just use &ldquo;<kbd>IndirectAddressTable</kbd>&rdquo; variation (<kbd>GraphicalBarConvertBarFillAmountToTilesIndirectAddressTable</kbd>) instead and edit the code so that it supplies the table. This is good for situations where you have 2 sprites
