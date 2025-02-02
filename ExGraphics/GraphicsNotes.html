@@ -59,6 +59,13 @@ Sort: <select style="font-family: monospace" onchange="GenerateTableOfGraphics()
 	<option id="Sort_Type">Type</option>
 	<option id="Sort_Description">Description</option>
 </select><label><input type="checkbox" id="Sort_Reverse" onchange="GenerateTableOfGraphics()">Reverse</label><br><br>
+<div>
+	Notes:
+	<ul>
+		<li>The &ldquo;Fill table to use&rdquo;'s <kbd>&lt;Number&gt;/&lt;Number&gt;/&lt;Number&gt;</kbd> denotes the number of pieces for left end, each middle, and right end. Stuff like the megaman-styled
+		and diagonal/outlined/rounded fill edges uses a different piece maximums.</li>
+	</ul>
+</div>
 <hr>
 <pre>Number of GFX files shown: <span id="Statistic_ItemCountPostFilter"></span>, <span id="Statistic_ItemCountRemoved"></span> removed</pre> 
 <div style="overflow: auto; resize: both;">
@@ -320,6 +327,7 @@ function getClosest(el, tagName) {
 		TableHeaderRow.appendChild(Th_LevelGraphicSlotLabel)
 		
 		let Th_FillTable = document.createElement("th")
+		Th_FillTable.colSpan = "2"
 		Th_FillTable.appendChild(document.createTextNode("Fill table to use"))
 		TableHeaderRow.appendChild(Th_FillTable)
 		
@@ -426,14 +434,25 @@ function getClosest(el, tagName) {
 			Td_TileFillTable.appendChild(document.createTextNode(GraphicFile.FillTable + " "))
 			Td_TileFillTable.style.textAlign = "center"
 			Td_TileFillTable.style.whiteSpace = "nowrap"
+			
+			if (GraphicFile.FillTable == "N/A") {
+				Td_TileFillTable.colSpan = "2"
+			}
+			
 			Tr_GraphicFileRow.appendChild(Td_TileFillTable)
 			
 			if (GraphicFile.FillTable != "N/A") {
+				let Td_TileFillTable2 = document.createElement("td")
+				
 				let Btn_CopyFillTable = document.createElement("button")
 				Btn_CopyFillTable.addEventListener("click", TableToClipboard.bind(null))
 				Btn_CopyFillTable.appendChild(document.createTextNode("Copy"))
-				Td_TileFillTable.appendChild(Btn_CopyFillTable)
-				Td_TileFillTable.appendChild(document.createElement("span")) //This is the message indicating whether or not copied
+				Td_TileFillTable2.appendChild(Btn_CopyFillTable)
+				
+				
+				Td_TileFillTable2.appendChild(document.createElement("span")) //This is the message indicating whether or not copied
+				Tr_GraphicFileRow.appendChild(Td_TileFillTable2)
+				
 			}
 			
 			let Td_Type = document.createElement("td")
