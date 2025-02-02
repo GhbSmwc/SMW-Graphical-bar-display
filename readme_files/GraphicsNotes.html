@@ -297,16 +297,16 @@ function getClosest(el, tagName) {
 				SlotNumb: "A4",
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "SP4",
-				Description: "Megaman-styled graphical bar (horizontal).",
-				FillTable: "2/4/2 SpriteGraphicalBarTest LevelSprite Megaman HP",
+				Description: "Megaman-styled graphical bar (Horizontal, for SpriteGraphicalBarTest.asm).",
+				FillTable: "2/4/2 LevelSprite SpriteGraphicalBarTest Megaman HP",
 				Type: "LevelSprite"
 			},
 			{
 				SlotNumb: "A5",
 				VerticalHoriz: "Vertical",
 				LevelGfxSlot: "SP4",
-				Description: "Megaman-styled graphical bar (vertical).",
-				FillTable: "2/4/2 SpriteGraphicalBarTest LevelSprite Megaman HP",
+				Description: "Megaman-styled graphical bar (Vertical, for SpriteGraphicalBarTest.asm).",
+				FillTable: "2/4/2 LevelSprite SpriteGraphicalBarTest Megaman HP",
 				Type: "LevelSprite"
 			},
 		]
@@ -827,8 +827,8 @@ function getClosest(el, tagName) {
 		db $E0		;>Fill amount/index: $01
 		db $E1		;>Fill amount/index: $02
 		db $F0		;>Fill amount/index: $03`,
-"2/4/2 SpriteGraphicalBarTest LevelSprite Megaman HP":
-`;2/4/2 SpriteGraphicalBarTest LevelSprite Megaman HP
+"2/4/2 LevelSprite SpriteGraphicalBarTest Megaman HP":
+`;2/4/2 LevelSprite SpriteGraphicalBarTest Megaman HP
 		GraphicalBar_LeftEnd8x8s_Lvl_Spr:
 		;Left end fill amount tile numbers:
 		db $85		;>Fill amount/index: $00 ($00 out of $02)
