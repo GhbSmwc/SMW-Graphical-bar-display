@@ -54,6 +54,7 @@ Filter by type:
 	<div class="TabbedItems"><label><input type="checkbox" id="Filter_LevelSprite" checked onchange="GenerateTableOfGraphics()">Level, Sprite</label></div>
 	<div class="TabbedItems"><label><input type="checkbox" id="Filter_OverworldLayer3" checked onchange="GenerateTableOfGraphics()">Overworld, layer 3</label></div>
 </div>
+Filter by description text: <input type="text" id="Filter_DescriptionText" oninput="GenerateTableOfGraphics()" style="font-family: monospace;"><br>
 
 Sort: <select style="font-family: monospace" onchange="GenerateTableOfGraphics()">
 	<option selected id="Sort_ExGFXSlotNum">By ExGFX slot number</option>
@@ -366,6 +367,13 @@ function getClosest(el, tagName) {
 			}
 			if (!(document.getElementById("Filter_" + GraphicFile.VerticalHoriz).checked)) {
 				return false
+			}
+			if (!(/^\s*$/).test(document.getElementById("Filter_DescriptionText").value)) {
+				let EnteredSearchString_CaseInsensitive = document.getElementById("Filter_DescriptionText").value.toLowerCase()
+				let Description_CaseInsensitive = GraphicFile.Description.toLowerCase()
+				if (!Description_CaseInsensitive.includes(EnteredSearchString_CaseInsensitive)) {
+					return false
+				}
 			}
 			return true
 		})
