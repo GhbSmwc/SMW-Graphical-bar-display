@@ -77,7 +77,7 @@ Sort: <select style="font-family: monospace" onchange="GenerateTableOfGraphics()
 </div>
 <hr>
 <pre>Number of GFX files shown: <span id="Statistic_ItemCountPostFilter"></span>, <span id="Statistic_ItemCountRemoved"></span> removed</pre> 
-<div style="overflow: auto; resize: both;">
+<div style="overflow: auto; resize: both; border: 1px solid white;">
 	<table id="GFXFileTable"></table>
 </div>
 
@@ -369,7 +369,7 @@ function getClosest(el, tagName) {
 				return false
 			}
 			if (!(/^\s*$/).test(document.getElementById("Filter_DescriptionText").value)) {
-				let EnteredSearchString_CaseInsensitive = document.getElementById("Filter_DescriptionText").value.toLowerCase()
+				let EnteredSearchString_CaseInsensitive = document.getElementById("Filter_DescriptionText").value.replace(/^\s*/, "").replace(/\s*$/, "").toLowerCase()
 				let Description_CaseInsensitive = GraphicFile.Description.toLowerCase()
 				if (!Description_CaseInsensitive.includes(EnteredSearchString_CaseInsensitive)) {
 					return false
