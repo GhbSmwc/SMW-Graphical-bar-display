@@ -1233,7 +1233,7 @@ Note that this does not support overworld graphics unlike above, as there are ev
 <tr><td><kbd>$00</kbd></td><td style="text-align: center;">1</td><td>Used to keep track if all the middle tiles are processed.</td></tr>
 </table><br>
 
-<li><a href="#ConvertBarFillAmountToTilesEdgeOverMultipleTiles_Back" id="ConvertBarFillAmountToTilesEdgeOverMultipleTiles">^</a><kbd>ConvertBarFillAmountToTilesEdgeOverMultipleTiles</kbd>: Due to the way <kbd>DrawGraphicalBar</kbd>'s format of having only up to a single fraction tile byte exist, this subroutine makes having
+<li><a href="#ConvertBarFillAmountToTilesEdgeOverMultipleTiles_Back" id="ConvertBarFillAmountToTilesEdgeOverMultipleTiles">^</a><kbd>ConvertBarFillAmountToTilesEdgeOverMultipleTiles</kbd>: Converts the bar fill table into tile numbers like <kbd>ConvertBarFillAmountToTiles</kbd> but can handle fill edge crossing tile borders. Due to the way the fill byte table format of having only up to a single fraction tile byte exist, this subroutine makes having
 the fill edge covering multiple 8x8 tiles possible. This is useful for slanted, rounded, or outlined fill edged graphics:<br>
 <img src="readme_files/MultiPartiallyFilled.png"><br>
 See explanation <a href="readme_files/FillEdgeCrossingTileBorder.html" id="FillEdgeCrossingTileBorder">here</a> Inputs and outputs are the same as <kbd>ConvertBarFillAmountToTiles</kbd>.
