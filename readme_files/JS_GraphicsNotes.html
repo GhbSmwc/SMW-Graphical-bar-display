@@ -72,6 +72,14 @@ Sort: <select style="font-family: monospace" onchange="GenerateTableOfGraphics()
 <div style="border: 1px solid;"><pre style="padding: 0px; margin: 0px">	!Default_LeftPieces                  = 3             ;\These will by default, set the RAM for the pieces for each section
 	!Default_MiddlePieces                = 8             ;|
 	!Default_RightPieces                 = 3             ;/</pre></div>
+		or change these that sets the maximums (unlike above, this method will modify per-ASM file rather than globally):
+<div style="border: 1px solid;"><pre style="padding: 0px; margin: 0px">	LDA.b #!Default_LeftPieces				;\Input amount of pieces in each of the 3 types of sections.
+	STA !Scratchram_GraphicalBar_LeftEndPiece		;|
+	LDA.b #!Default_MiddlePieces				;|
+	STA !Scratchram_GraphicalBar_MiddlePiece		;|
+	LDA.b #!Default_RightPieces				;|
+	STA !Scratchram_GraphicalBar_RightEndPiece		;/</pre></div>
+		
 		</li>
 	</ul>
 </div>
@@ -246,7 +254,7 @@ function getClosest(el, tagName) {
 				GraphicsFileNumb: "90",
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "LG4",
-				Description: "Black background graphical bar.",
+				Description: "Black background graphical bar (overworld).",
 				FillTable: "3/8/3 OverworldLayer3",
 				Type: "OverworldLayer3"
 			},
@@ -254,7 +262,7 @@ function getClosest(el, tagName) {
 				GraphicsFileNumb: "91",
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "LG4",
-				Description: "Black background graphical bar, diagonal fill edge.",
+				Description: "Black background graphical bar, diagonal fill edge (overworld).",
 				FillTable: "3/8/6 OverworldLayer3 Diagonal Fill edge",
 				Type: "OverworldLayer3"
 			},
@@ -262,7 +270,7 @@ function getClosest(el, tagName) {
 				GraphicsFileNumb: "92",
 				VerticalHoriz: "Horizontal",
 				LevelGfxSlot: "LG4",
-				Description: "Megaman-styled graphical bar.",
+				Description: "Megaman-styled graphical bar (overworld).",
 				FillTable: "2/4/2 OverworldLayer3 Megaman HP",
 				Type: "OverworldLayer3"
 			},
