@@ -58,7 +58,7 @@ main:
 	STA !Scratchram_GraphicalBar_MiddlePiece				;/
 	LDA.b #!Default_RightPieces						;\Right end
 	STA !Scratchram_GraphicalBar_RightEndPiece				;/
-	LDA $95									;\length (number of middle tiles)
+	LDA $95									;\length (number of middle tiles), based on what screen boundary on the X-axis the player is in (Length = Floor(MarioXPos/256))
 	CMP.b #!Default_GraphicalBar_MaxMiddleLength				;|\Prevent overwriting data that is located before the status bar area.
 	BCC ..LowerThanMax							;||
 	LDA.b #!Default_GraphicalBar_MaxMiddleLength				;|/
