@@ -38,15 +38,16 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
 main:
 if !sa1 != 0
-	LDA.b #mainSA1				; \ Put the address
+	LDA.b #.mainSA1				; \ Put the address
 	STA $3180				;  | to jump in
-	LDA.b #mainSA1>>8			;  | $3180 - $3182.
+	LDA.b #.mainSA1>>8			;  | $3180 - $3182.
 	STA $3181				;  |
-	LDA.b #mainSA1>>16			;  |
+	LDA.b #.mainSA1>>16			;  |
 	STA $3182				; /
 	JSR $1E80				; Invoke SA-1 and wait to finish.
-	RTL
-	mainSA1:
+	JMP .MainSnes
+	
+	.mainSA1:
 endif
 ;Get x position percentage in horizontal level.
 ;This is basically the progress meter.
@@ -78,6 +79,10 @@ endif
 	LDA.b #!Default_RightPieces				;|
 	STA !Scratchram_GraphicalBar_RightEndPiece		;/
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
+	if !sa1 != 0
+		RTL
+		.MainSnes
+	endif
 	if notequal(and(notequal(!PaletteChanging, 0), notequal(!StatusBar_UsingCustomProperties, 0)), 0)
 		REP #$20
 		LDA $00						;>We are going to need this to determine its palette
