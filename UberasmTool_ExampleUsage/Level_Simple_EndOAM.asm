@@ -1,3 +1,8 @@
+;This code measures the player's X position in a horizontal level, similar to
+;"Level_Simple.asm" but uses sprite OAM. it measures from the very left side
+;of the area the screen can possibly go to the right edge of the stage
+;(last screen). Can be described as "progress"
+
 ;Don't touch
 	incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 	incsrc "../GraphicalBarDefines/SpriteOAMSettings.asm"
@@ -11,6 +16,17 @@
 			!GraphicalBar_OAMYFlip = 1
 		endif
 end:
+if !sa1 != 0
+	LDA.b #mainSA1				; \ Put the address
+	STA $3180				;  | to jump in
+	LDA.b #mainSA1>>8			;  | $3180 - $3182.
+	STA $3181				;  |
+	LDA.b #mainSA1>>16			;  |
+	STA $3182				; /
+	JSR $1E80				; Invoke SA-1 and wait to finish.
+	RTL
+	mainSA1:
+endif
 	.SpriteGraphicalBar
 		REP #$20
 		LDA $94							;\Player's X position "progress"

@@ -33,6 +33,17 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
 ;Again, this is an uberasm tool test file.
 main:
+if !sa1 != 0
+	LDA.b #mainSA1				; \ Put the address
+	STA $3180				;  | to jump in
+	LDA.b #mainSA1>>8			;  | $3180 - $3182.
+	STA $3181				;  |
+	LDA.b #mainSA1>>16			;  |
+	STA $3182				; /
+	JSR $1E80				; Invoke SA-1 and wait to finish.
+	RTL
+	mainSA1:
+endif
 .ClearBarAreaWhenShorten
 	;This code removes leftover "ghost tiles" artifact when the bar shortens after being extended.
 	LDX.b #(!TotalLength-1)*!StatusBarFormat

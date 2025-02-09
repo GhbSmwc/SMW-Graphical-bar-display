@@ -44,7 +44,7 @@ length of the bar.</p>
 <p>It supports both layer 3 and sprite OAM.</p>
 
 
-<h2>Notes</h2>
+<h2>Intro Notes</h2>
 <ul>
 <li>This HTML uses <a href="https://en.wikipedia.org/wiki/ASCII_art">ASCII art</a> to represent something in few areas, so make sure you have your browser setting for <a href="https://en.wikipedia.org/wiki/Monospaced_font">fixed-width font</a> such as
 &ldquo;Consolas&rdquo; so it displays properly.</li>
@@ -1909,6 +1909,45 @@ BEQ .SafeToWrite	;/(this is merely a timer of the goal animation, not necessary 
 	;Code to write your bar here
 	;[...]
 	RTL</pre></td></tr></table>
+
+</li><br>
+<li>Of course, some of these ASM codes and routines uses the SNES and SA-1 registers (especially the multiplication and division registers). If you run into emulator-specific issues like the bar displaying the incorrect fill amount after
+calling <kbd>CalculateGraphicalBarPercentage</kbd>, <kbd>CalculateGraphicalBarPercentageRoundDown</kbd>, and <kbd>CalculateGraphicalBarPercentageRoundUp</kbd>, it's most likely that the emulator handles such registers differently (espically accurate emulators):
+	<ul>
+		<li>Emulator assumes that SA-1 registers are inaccessible during SNES CPU, for me, it happened on <a href="https://github.com/SourMesen/Mesen2">Messen version 2.0.0</a>. If this occurs, you can make it invoke SA-1 so its registers will work properly:
+<table><tr><td><pre>main:
+	LDA.b #mainSA1				; \ Put the address
+	STA $3180				;  | to jump in
+	LDA.b #mainSA1&lt;&lt;8			;  | $3180 - $3182.
+	STA $3181				;  |
+	LDA.b #mainSA1&lt;&lt;16			;  |
+	STA $3182				; /
+	JSR $1E80				; Invoke SA-1 and wait to finish.
+	RTL
+	
+	mainSA1:
+	;Graphical bar code and its JSL/JSR to various subroutines happen here, all running in SA-1 CPU
+</pre></td></tr></table>
+		</li>
+		<li>The other way around can also occur, such as on <a href="https://github.com/devinacker/bsnes-plus">Bsnes+ v5</a> when trying to access SNES registers under SA-1 CPU. Code:
+<table><tr><td><pre>main:
+LDA.B #mainSNES				; \ Put the SNES pointer to run
+STA $0183				; | in $0183-$0185.
+LDA.B #mainSNES&lt;&lt;8			; |
+STA $0184				; | (Remember that $0000-$07FF
+LDA.B #mainSNES&lt;&lt;16			; |  is same as $3000-$37FF).
+STA $0185				; /
+LDA #$D0				; \ Invoke/Call SNES
+STA $2209				; /
+.Wait					; \ Wait for SNES.
+LDA $018A				; |
+BEQ .Wait				; |
+STZ $018A				; /
+RTL
+</pre></td></tr></table>
+		
+		</li>
+	</ul>
 
 </li>
 </ul>

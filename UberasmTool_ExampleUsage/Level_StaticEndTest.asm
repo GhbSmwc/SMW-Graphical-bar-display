@@ -7,12 +7,23 @@
 
 incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
+;^These are needed so the defines relating to the graphical bars work.
 
 ;This is a simple test ASM using the graphical bar.
 ;best tested using uberasm tool.
 
 main:
-;^These are needed so the defines relating to the graphical bars work.
+if !sa1 != 0
+	LDA.b #mainSA1				; \ Put the address
+	STA $3180				;  | to jump in
+	LDA.b #mainSA1>>8			;  | $3180 - $3182.
+	STA $3181				;  |
+	LDA.b #mainSA1>>16			;  |
+	STA $3182				; /
+	JSR $1E80				; Invoke SA-1 and wait to finish.
+	RTL
+	mainSA1:
+endif
 .ClearTiles
 	;Clear out tiles. This removes leftover ghost duplicate tiles on the status bar when the bar shortens.
 	LDX.b #(((!Default_GraphicalBar_MaxMiddleLength+!GraphicalBarExampleTest_StaticLeft+!GraphicalBarExampleTest_StaticRight)-1)*!StatusBarFormat) ;> clear ALL tiles

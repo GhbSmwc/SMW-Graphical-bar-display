@@ -61,6 +61,17 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;best tested using uberasm tool.
 
 main:
+if !sa1 != 0
+	LDA.b #mainSA1				; \ Put the address
+	STA $3180				;  | to jump in
+	LDA.b #mainSA1>>8			;  | $3180 - $3182.
+	STA $3181				;  |
+	LDA.b #mainSA1>>16			;  |
+	STA $3182				; /
+	JSR $1E80				; Invoke SA-1 and wait to finish.
+	RTL
+	mainSA1:
+endif
 ;Increment or decrement quantity based on up/down controls:
 .Control
 	LDA !ControlerToChangeQuantity				;\Control quantity based on tapping up and down.
