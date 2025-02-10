@@ -123,14 +123,11 @@ endif
 
 		!Setting_GraphicalBar_SNESMathOnly = 0
 			;^Info follows:
-			;-Set this to 0 if any of your code AT LEAST calls the graphical bar routine under the SA-1 processor;
-			; should you ever have one code calls this using SA-1 and the other calls using SNES, or ALL calls
-			; using SA-1.
-			;-Set this to 1 if *all* codes that call graphical bar routine are not using SA-1 processor.
+			;-Set this to 0 if your code calls the graphical bar routine under the SA-1 processor.
+			; Otherwise set it to 1 if it calls it under the SNES CPU.
 			;
-			;The reason for this is because if the user only uses the graphical bar routine on a SA-1
-			;ROM, but never processed the routine by SA-1, using SA-1's math registers is useless as
-			;the SNES's 8-bit math registers ($4202, $4203, $4216-$4217) become available for 8-bit*8-bit = 16-bit.
+			; As an important note: certain emulators follows a rule that the correct CPU can access the
+			; registers of the matching type (e.g. SA-1 registers can only be used by SA-1 CPU, not SNES)
 			;
 			;Things to note:
 			;
