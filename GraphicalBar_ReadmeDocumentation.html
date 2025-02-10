@@ -592,7 +592,7 @@ Note that this is not capped at total pieces in the bar, meaning that if <kbd>Qu
 As a side note to most programmers, yes, I could alternatively perform <kbd>FillAmount = (Quantity / MaxQuantity) * TotalNumberOfPiecesInBar</kbd>, but we are dealing with integers, not floating points. Performing that
 causes problem where the value could output only 0 or any number that is a multiple of n pieces in the bar (will display 0% or 100% but not in between when displayed) due to division rounding the quotient to the nearest
 integer, which the error is between 0 and 1, before multiplying by <kbd>TotalNumberOfPiecesInBar</kbd> and scaling that error by an enormous amount:
-<table><tr><td><pre>1 out of 3 HP = 20.[6] out of 62 pieces (bracket means repeating digits)
+<table><tr><td><pre>1 out of 3 HP = 20 and 2/3, or 20.[6] out of 62 pieces (bracket means repeating digits).
 
 The correct way: (1 * 62) / 3
 
