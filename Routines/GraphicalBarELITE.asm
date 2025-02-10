@@ -41,6 +41,13 @@ incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
 
+;Don't touch
+	;Determine should registers be SNES or SA-1
+	!CPUMode = 0
+	if (and(equal(!sa1, 1),equal(!Setting_GraphicalBar_SNESMathOnly, 0)))
+		!CPUMode = 1
+	endif
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Calculate ratio of Quantity/MaxQuantity to FilledPieces/TotalMaxPieces.
 ;
@@ -913,7 +920,7 @@ DrawGraphicalBarSubtractionLoopEdition:
 	;$2253 = 2nd Multiplicand
 	;$2306 = Product
 
-	if !sa1 != 0
+	if !CPUMode != 0
 		!Reg4202 = $2251
 		!Reg4203 = $2253
 		!Reg4216 = $2306
@@ -924,7 +931,7 @@ DrawGraphicalBarSubtractionLoopEdition:
 	endif
 
 	MathMul32_32:
-			if !sa1 != 0
+			if !CPUMode != 0
 				STZ $2250
 				STZ $2252
 			endif
@@ -938,7 +945,7 @@ DrawGraphicalBarSubtractionLoopEdition:
 	+		STY !Reg4202
 			LDY $04
 			STY !Reg4203
-			if !sa1 != 0
+			if !CPUMode != 0
 				STZ $2254	;>Multiplication actually happens when $2254 is written.
 				NOP		;\Wait till multiplication is done
 				BRA $00		;/
@@ -948,7 +955,7 @@ DrawGraphicalBarSubtractionLoopEdition:
 			LDY $05
 			LDA !Reg4216		;>This is always spitting out as 0.
 			STY !Reg4203
-			if !sa1 != 0
+			if !CPUMode != 0
 				STZ $2254	;>Multiplication actually happens when $2254 is written.
 				NOP		;\Wait till multiplication is done
 				BRA $00		;/
@@ -959,7 +966,7 @@ DrawGraphicalBarSubtractionLoopEdition:
 			ADC !Reg4216
 			LDY $06
 			STY !Reg4203
-			if !sa1 != 0
+			if !CPUMode != 0
 				STZ $2254	;>Multiplication actually happens when $2254 is written.
 				NOP		;\Wait till multiplication is done
 				BRA $00		;/
@@ -970,7 +977,7 @@ DrawGraphicalBarSubtractionLoopEdition:
 			ADC !Reg4216
 			LDY $07
 			STY !Reg4203
-			if !sa1 != 0
+			if !CPUMode != 0
 				STZ $2254	;>Multiplication actually happens when $2254 is written.
 				NOP		;\Wait till multiplication is done
 				BRA $00		;/
@@ -988,7 +995,7 @@ DrawGraphicalBarSubtractionLoopEdition:
 	+		STY !Reg4202
 			LDY $04
 			STY !Reg4203
-			if !sa1 != 0
+			if !CPUMode != 0
 				STZ $2254	;>Multiplication actually happens when $2254 is written.
 				NOP		;\Wait till multiplication is done
 				BRA $00		;/
@@ -999,7 +1006,7 @@ DrawGraphicalBarSubtractionLoopEdition:
 			ADC !Reg4216
 			LDY $05
 			STY !Reg4203
-			if !sa1 != 0
+			if !CPUMode != 0
 				STZ $2254	;>Multiplication actually happens when $2254 is written.
 				NOP		;\Wait till multiplication is done
 				BRA $00		;/
@@ -1010,7 +1017,7 @@ DrawGraphicalBarSubtractionLoopEdition:
 			ADC !Reg4216
 			LDY $06
 			STY !Reg4203
-			if !sa1 != 0
+			if !CPUMode != 0
 				STZ $2254	;>Multiplication actually happens when $2254 is written.
 				NOP		;\Wait till multiplication is done
 				BRA $00		;/
@@ -1021,7 +1028,7 @@ DrawGraphicalBarSubtractionLoopEdition:
 			ADC !Reg4216
 			LDY $07
 			STY !Reg4203
-			if !sa1 != 0
+			if !CPUMode != 0
 				STZ $2254	;>Multiplication actually happens when $2254 is written.
 				NOP		;\Wait till multiplication is done
 				BRA $00		;/
@@ -1039,7 +1046,7 @@ DrawGraphicalBarSubtractionLoopEdition:
 	+		STY !Reg4202
 			LDY $04
 			STY !Reg4203
-			if !sa1 != 0
+			if !CPUMode != 0
 				STZ $2254	;>Multiplication actually happens when $2254 is written.
 				NOP		;\Wait till multiplication is done
 				BRA $00		;/
@@ -1050,7 +1057,7 @@ DrawGraphicalBarSubtractionLoopEdition:
 			ADC !Reg4216
 			LDY $05
 			STY !Reg4203
-			if !sa1 != 0
+			if !CPUMode != 0
 				STZ $2254	;>Multiplication actually happens when $2254 is written.
 				NOP		;\Wait till multiplication is done
 				BRA $00		;/
@@ -1061,7 +1068,7 @@ DrawGraphicalBarSubtractionLoopEdition:
 			ADC !Reg4216
 			LDY $06
 			STY !Reg4203
-			if !sa1 != 0
+			if !CPUMode != 0
 				STZ $2254	;>Multiplication actually happens when $2254 is written.
 				NOP		;\Wait till multiplication is done
 				BRA $00		;/
@@ -1072,7 +1079,7 @@ DrawGraphicalBarSubtractionLoopEdition:
 			ADC !Reg4216
 			LDY $07
 			STY !Reg4203
-			if !sa1 != 0
+			if !CPUMode != 0
 				STZ $2254	;>Multiplication actually happens when $2254 is written.
 				NOP		;\Wait till multiplication is done
 				BRA $00		;/
@@ -1090,7 +1097,7 @@ DrawGraphicalBarSubtractionLoopEdition:
 	+		STY !Reg4202
 			LDY $04
 			STY !Reg4203
-			if !sa1 != 0
+			if !CPUMode != 0
 				STZ $2254	;>Multiplication actually happens when $2254 is written.
 				NOP		;\Wait till multiplication is done
 				BRA $00		;/
@@ -1101,7 +1108,7 @@ DrawGraphicalBarSubtractionLoopEdition:
 			ADC !Reg4216
 			LDY $05
 			STY !Reg4203
-			if !sa1 != 0
+			if !CPUMode != 0
 				STZ $2254	;>Multiplication actually happens when $2254 is written.
 				NOP		;\Wait till multiplication is done
 				BRA $00		;/
@@ -1112,7 +1119,7 @@ DrawGraphicalBarSubtractionLoopEdition:
 			ADC !Reg4216
 			LDY $06
 			STY !Reg4203
-			if !sa1 != 0
+			if !CPUMode != 0
 				STZ $2254	;>Multiplication actually happens when $2254 is written.
 				NOP		;\Wait till multiplication is done
 				BRA $00		;/
@@ -1123,7 +1130,7 @@ DrawGraphicalBarSubtractionLoopEdition:
 			ADC !Reg4216
 			LDY $07
 			STY !Reg4203
-			if !sa1 != 0
+			if !CPUMode != 0
 				STZ $2254	;>Multiplication actually happens when $2254 is written.
 				NOP		;\Wait till multiplication is done
 				BRA $00		;/
@@ -1192,7 +1199,7 @@ DrawGraphicalBarSubtractionLoopEdition:
 			STA $04
 			SEP #$20
 			RTL
-	if !sa1 == 0
+	if !CPUMode == 0
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		; 16bit * 16bit unsigned Multiplication
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
