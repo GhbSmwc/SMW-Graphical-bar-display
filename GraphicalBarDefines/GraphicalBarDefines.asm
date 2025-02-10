@@ -189,3 +189,11 @@ endif
 			print "-Fill byte table: $", hex(!Scratchram_GraphicalBar_FillByteTbl), " to $", hex(!Scratchram_GraphicalBar_FillByteTbl+31), " (at max length)"
 			print "-Fill byte table (double bar, 2 fills): $", hex(!Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset), " to $", hex(!Scratchram_GraphicalBar_FillByteTbl+31+!Setting_GraphicalBar_SecondFillByteTableOffset), " (at max length)"
 		endif
+
+
+;Don't touch.
+	;Determine should registers be SNES or SA-1
+	!CPUMode = 0
+	if (and(equal(!sa1, 1),equal(!Setting_GraphicalBar_SNESMathOnly, 0)))
+		!CPUMode = 1
+	endif

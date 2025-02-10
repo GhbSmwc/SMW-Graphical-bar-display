@@ -7,7 +7,7 @@
 	;	$04-$05: Remainder
 	?.FindTotalPieces
 		?..FindTotalMiddle
-			if !Setting_GraphicalBar_SNESMathOnly == 0
+			if !CPUMode == 0
 				LDA !Scratchram_GraphicalBar_MiddlePiece	;\TotalMiddlePieces = MiddlePieces*MiddleLength
 				STA $00						;|Note: Multiply two 8-bit numbers.
 				STZ $01						;|

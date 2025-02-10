@@ -41,13 +41,6 @@ incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
 
-;Don't touch
-	;Determine should registers be SNES or SA-1
-	!CPUMode = 0
-	if (and(equal(!sa1, 1),equal(!Setting_GraphicalBar_SNESMathOnly, 0)))
-		!CPUMode = 1
-	endif
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Calculate ratio of Quantity/MaxQuantity to FilledPieces/TotalMaxPieces.
 ;
