@@ -187,12 +187,12 @@ CalculateGraphicalBarPercentageRoundUp:
 	BEQ .NoRoundUp			;/
 	.RoundUp
 		INC $00				;>Otherwise if there is a remainder (between Quotient and Quotient+1), use Quotient+1
-		if !Setting_GraphicalBar_SNESMathOnly == 0
+		if !CPUMode != 0
 			LDA $00				;\Preserve rounded quotient
 			PHA				;/
 		endif
 		JSL GetMaxBarInAForRoundToMaxCheck
-		if !Setting_GraphicalBar_SNESMathOnly == 0
+		if !CPUMode != 0
 			REP #$30
 			TAY
 			PLA				;\Restore quotient
@@ -219,7 +219,7 @@ CalculateGraphicalBarPercentageRoundDown:
 	;	$04-$05: Remainder
 	.FindTotalPieces
 		..FindTotalMiddle
-			if !Setting_GraphicalBar_SNESMathOnly == 0
+			if !CPUMode != 0
 				LDA !Scratchram_GraphicalBar_MiddlePiece	;\TotalMiddlePieces = MiddlePieces*MiddleLength
 				STA $00						;|Note: Multiply two 8-bit numbers.
 				STZ $01						;|
@@ -324,7 +324,7 @@ GetMaxBarInAForRoundToMaxCheck:
 	;Destroys:
 	; -$00-$07 in LoROM
 	; -$04-$05 in SA-1
-	if !Setting_GraphicalBar_SNESMathOnly == 0
+	if !CPUMode != 0
 		LDA !Scratchram_GraphicalBar_MiddlePiece	;\Get amount of pieces in middle
 		AND #$00FF					;|
 		STA $00						;|
@@ -641,7 +641,7 @@ GetMaxBarInAForRoundToMaxCheck:
 ;		LDA !Scratchram_GraphicalBar_RightEndPiece	;\check if right end exist
 ;		BEQ .Done					;/
 ;		
-;		if !Setting_GraphicalBar_SNESMathOnly == 0
+;		if !CPUMode != 0
 ;			LDA !Scratchram_GraphicalBar_MiddlePiece	;\MiddlePieceTotal = MiddlePiecePer8x8 * Length
 ;			STA $00						;|
 ;			STZ $01						;|

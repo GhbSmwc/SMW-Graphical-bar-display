@@ -192,7 +192,7 @@ endif
 
 
 ;Don't touch.
-	;Determine should registers be SNES or SA-1
+	;Determine should registers be SNES (0) or SA-1 (1)
 	!CPUMode = 0
 	if (and(equal(!sa1, 1),equal(!Setting_GraphicalBar_SNESMathOnly, 0)))
 		!CPUMode = 1

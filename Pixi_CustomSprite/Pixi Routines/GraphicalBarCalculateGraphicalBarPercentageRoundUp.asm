@@ -5,12 +5,12 @@
 	BEQ ?.NoRoundUp			;/
 	?.RoundUp
 		INC $00				;>Otherwise if there is a remainder (between Quotient and Quotient+1), use Quotient+1
-		if !CPUMode == 0
+		if !CPUMode != 0
 			LDA $00				;\Preserve rounded quotient
 			PHA				;/
 		endif
 		%GraphicalBarGetMaxBarInAForRoundToMaxCheck()
-		if !CPUMode == 0
+		if !CPUMode != 0
 			REP #$30
 			TAY
 			PLA				;\Restore quotient
