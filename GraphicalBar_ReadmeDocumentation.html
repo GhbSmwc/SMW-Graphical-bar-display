@@ -1264,51 +1264,52 @@ Destroyed:
 </table><br>
 
 <p>In case if you don't know how input an address into scratch RAM, you label your table like this (this is an example from the tile table for the Giant Masked Koopa Boss):
-<table><tr><td><pre>			GraphicalBar_LeftEnd8x8s_Lvl_Spr:
-			;Left end fill amount tile numbers:
-			db $88		;&gt;Fill amount/index: $00
-			db $89		;&gt;Fill amount/index: $01
-			db $8A		;&gt;Fill amount/index: $02
-			db $8B		;&gt;Fill amount/index: $03
-			GraphicalBar_Middle8x8s_Lvl_Spr:
-			;Middle fill amount tile numbers
-			db $8C		;&gt;Fill amount/index: $00
-			db $8D		;&gt;Fill amount/index: $01
-			db $8E		;&gt;Fill amount/index: $02
-			db $8F		;&gt;Fill amount/index: $03
-			db $98		;&gt;Fill amount/index: $04
-			db $99		;&gt;Fill amount/index: $05
-			db $9A		;&gt;Fill amount/index: $06
-			db $9B		;&gt;Fill amount/index: $07
-			db $9C		;&gt;Fill amount/index: $08
-			GraphicalBar_RightEnd8x8s_Lvl_Spr:
-			;Right end fill amount tile numbers:
-			db $9D		;&gt;Fill amount/index: $00
-			db $9E		;&gt;Fill amount/index: $01
-			db $9F		;&gt;Fill amount/index: $02
-			db $A8		;&gt;Fill amount/index: $03</pre></td></tr></table><br>
+<table><tr><td><pre>		BarTilesLeft:
+		;Left end fill amount tile numbers:
+		db $88		;&gt;Fill amount/index: $00
+		db $89		;&gt;Fill amount/index: $01
+		db $8A		;&gt;Fill amount/index: $02
+		db $8B		;&gt;Fill amount/index: $03
+		BarTilesMiddle:
+		;Middle fill amount tile numbers
+		db $8C		;&gt;Fill amount/index: $00
+		db $8D		;&gt;Fill amount/index: $01
+		db $8E		;&gt;Fill amount/index: $02
+		db $8F		;&gt;Fill amount/index: $03
+		db $98		;&gt;Fill amount/index: $04
+		db $99		;&gt;Fill amount/index: $05
+		db $9A		;&gt;Fill amount/index: $06
+		db $9B		;&gt;Fill amount/index: $07
+		db $9C		;&gt;Fill amount/index: $08
+		BarTilesRight:
+		;Right end fill amount tile numbers:
+		db $9D		;&gt;Fill amount/index: $00
+		db $9E		;&gt;Fill amount/index: $01
+		db $9F		;&gt;Fill amount/index: $02
+		db $A8		;&gt;Fill amount/index: $03</pre></td></tr></table><br>
 The labels are <kbd>GraphicalBar_LeftEnd8x8s_Lvl_Spr</kbd>, <kbd>GraphicalBar_Middle8x8s_Lvl_Spr</kbd>, and <kbd>GraphicalBar_RightEnd8x8s_Lvl_Spr</kbd> are labels, and points to an array of bytes (starting at the first byte of the array).<br><br>
 
 To write such address into RAM with the labels in existence, you do this:
-<table><tr><td><pre>;Remember, little endian (lowest byte comes first)!
-	LDA.b #GraphicalBar_LeftEnd8x8s_Lvl_Spr			;\$00-$02 contains the address of GraphicalBar_LeftEnd8x8s_Lvl_Spr
-	STA $00							;|
-	LDA.b #GraphicalBar_LeftEnd8x8s_Lvl_Spr&gt;&gt;8		;|
-	STA $01							;|
-	LDA.b #GraphicalBar_LeftEnd8x8s_Lvl_Spr&gt;&gt;16		;|
-	STA $02							;/
-	LDA.b #GraphicalBar_Middle8x8s_Lvl_Spr			;\$03-$05 contains the address of GraphicalBar_Middle8x8s_Lvl_Spr
-	STA $03							;|
-	LDA.b #GraphicalBar_Middle8x8s_Lvl_Spr&gt;&gt;8		;|
-	STA $04							;|
-	LDA.b #GraphicalBar_Middle8x8s_Lvl_Spr&gt;&gt;16		;|
-	STA $05							;/
-	LDA.b #GraphicalBar_RightEnd8x8s_Lvl_Spr		;\$06-$08 contains the address of GraphicalBar_RightEnd8x8s_Lvl_Spr
-	STA $06							;|
-	LDA.b #GraphicalBar_RightEnd8x8s_Lvl_Spr&gt;&gt;8		;|
-	STA $07							;|
-	LDA.b #GraphicalBar_RightEnd8x8s_Lvl_Spr&gt;&gt;16		;|
-	STA $08							;/
+<table><tr><td><pre>			REP #$20
+			LDA $00 : PHA	;Preserve a bunch of stuff because following subroutine uses $00-$09.
+			LDA $02 : PHA
+			LDA $04 : PHA
+			LDA $06 : PHA
+			LDA $08 : PHA
+			LDA.w #BarTilesLeft : STA $00		;\Here is the actual writing the address into RAM.
+			LDA.w #BarTilesMiddle : STA $03		;|(the low 2 bytes of the 3-byte address)
+			LDA.w #BarTilesRight : STA $06		;/
+			SEP #$20
+			LDA.b #BarTilesLeft&gt;&gt;16 : STA $02 : STA $05 : STA $08
+				;^Same as above but this time, the high byte. Because all 3 tables resides in the same bank, we only need one LDA.
+			%GraphicalBarConvertBarFillAmountToTilesIndirectAddressTable() ;Convert fill amount to tiles
+			REP #$20
+			PLA : STA $08
+			PLA : STA $06
+			PLA : STA $04
+			PLA : STA $02
+			PLA : STA $00
+			SEP #$20
 	
 	;Labels represents the address (or position) in the ROM. LDA.w #Label when Label is at location $1234, that means it will
 	;be LDA #$1234. If you don't have that hash symbol, it would be LDA Label -&gt; LDA $1234 (which loads RAM instead of &ldquo;Immediate&rdquo;)</pre></td></tr></table><br>

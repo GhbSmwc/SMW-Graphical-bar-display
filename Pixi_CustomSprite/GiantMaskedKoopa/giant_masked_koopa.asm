@@ -1108,6 +1108,32 @@ Tilemap: dw .green,.fire,.rocks,.jumping,.walking
     db $00,$02,$24,$26,$44,$46,$64,$66
     db $00,$02,$20,$22,$40,$42,$60,$62
     db $00,$02,$24,$26,$44,$46,$64,$66
+
+;3/8/3 LevelSprite GiantMaskedKoopa Layout
+		BarTilesLeft:
+		;Left end fill amount tile numbers:
+		db $88		;>Fill amount/index: $00
+		db $89		;>Fill amount/index: $01
+		db $8A		;>Fill amount/index: $02
+		db $8B		;>Fill amount/index: $03
+		BarTilesMiddle:
+		;Middle fill amount tile numbers
+		db $8C		;>Fill amount/index: $00
+		db $8D		;>Fill amount/index: $01
+		db $8E		;>Fill amount/index: $02
+		db $8F		;>Fill amount/index: $03
+		db $98		;>Fill amount/index: $04
+		db $99		;>Fill amount/index: $05
+		db $9A		;>Fill amount/index: $06
+		db $9B		;>Fill amount/index: $07
+		db $9C		;>Fill amount/index: $08
+		BarTilesRight:
+		;Right end fill amount tile numbers:
+		db $9D		;>Fill amount/index: $00
+		db $9E		;>Fill amount/index: $01
+		db $9F		;>Fill amount/index: $02
+		db $A8		;>Fill amount/index: $03
+
 GraphicalBarXDisp:	;[GraphicalBar_For_HP]
 	;The origin of the sprites XY position isn't centered with the image of the sprite,
 	;so the bar's offset from the sprite's origin have to adjust to remain centered with the sprite.
@@ -1201,9 +1227,25 @@ Graphics:
 				..ShowCurrent
 			endif
 			%GraphicalBarDrawGraphicalBarSubtractionLoopEdition()		;>get bar values.
-			LDA #$01							;\Use Level-sprite tileset
-			STA $00								;/
-			%GraphicalBarConvertBarFillAmountToTiles()			;>Convert tiles.
+			REP #$20
+			LDA $00 : PHA	;Preserve a bunch of stuff because following subroutine uses $00-$09.
+			LDA $02 : PHA
+			LDA $04 : PHA
+			LDA $06 : PHA
+			LDA $08 : PHA
+			LDA.w #BarTilesLeft : STA $00
+			LDA.w #BarTilesMiddle : STA $03
+			LDA.w #BarTilesRight : STA $06
+			SEP #$20
+			LDA.b #BarTilesLeft>>16 : STA $02 : STA $05 : STA $08 ;>Resides in the same bank
+			%GraphicalBarConvertBarFillAmountToTilesIndirectAddressTable() ;Convert fill amount to tiles
+			REP #$20
+			PLA : STA $08
+			PLA : STA $06
+			PLA : STA $04
+			PLA : STA $02
+			PLA : STA $00
+			SEP #$20
 			PLX								;>Restore sprite slot index
 	;[GraphicalBar_For_HP] I rearrange the code and pushing values into the stack was needed because scratch RAM is going to be used:
 	;Y: Oam index
