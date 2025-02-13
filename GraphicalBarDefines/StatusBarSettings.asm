@@ -26,7 +26,7 @@
 		; $02 = each 8x8 tile byte have two bytes located next to each other;
 		;       Super status bar/Overworld border plus [TTTTTTTT YXPCCCTT, TTTTTTTT YXPCCCTT]...
 
-	!StatusBar_UsingCustomProperties           = 0
+	!StatusBar_UsingCustomProperties           = 1
 		;^Set this to 0 if you are using the vanilla SMW status bar or any status bar patches
 		; that doesn't enable editing the tile properties, otherwise set this to 1 (you may
 		; have to edit "!Default_GraphicalBar_Pos_Properties" in order for it to work though.).
@@ -61,7 +61,10 @@
 		;     to change colors, open the ASM files (mentioned on next sentence) and find
 		;     "PaletteThresholds" and "PaletteTable". Only supports "Level_Simple.asm",
 		;     "Level_Simple_UsingStripe.asm", and "Level_Simple_VerticalBar_NonStripe".
-
+	!UsingCustomStatusBar = 1
+		;^0 = Using vanilla SMW status bar
+		; 1 = Using any layer 3 custom status bar.
+		; These are needed for determining what coordinate system.
 	;Tile positions. If you are using other status bar patches other than the Super Status Bar
 	;patch, make sure the RAMs here matches the RAM address those patch are using. By default:
 	;
@@ -70,6 +73,12 @@
 	;
 	;These must be 3-bytes long (6 hexadecimal digits long), as they are under a routine that
 	;uses STA [$00],y to write the tiles to the status bar.
+	;
+	;Defines involving XY positions refer to their positions in units of 8x8 tiles:
+	; - X=0 being on the left edge (of the screen), increasing when moving to the right.,
+	;   with X=31 on the right edge of the screen that is visible.
+	; - Y=0 being at the top (of the screen), increasing when moving downwards.
+	; As always, numbers without a prefix are decimal, a dollar sign prefix are hexadecimal.
 	;
 	;Additional notes:
 	;
@@ -119,47 +128,31 @@
 			else
 				!FreeramFromAnotherPatch_StatusBarPropStart = $404001
 			endif
-		;This is the maximum length if you have a bar that has variable length. This prevents a bar long enough
+		;This is the maximum length if you have a bar that has variable length (including leftwards). This prevents a bar long enough
 		;that it would write tiles outside the status bar data and corrupt other data.
 			!Default_GraphicalBar_MaxMiddleLength = 30
-		;This also covers extending leftwards bar as well.
-		;The values here are calculated via an offset from the starting byte of the status bar tile data:
-		;
-		;DisiredTile = StatusBarStartAddress + Offset
-		;
-		;If you use [TTTTTTTT, YXPCCCTT] format, Offset must be an even number (have a 0, 2, 4, 6, 8, A, C, E, F on rightmost digit in hex) for tile numbers.
-		;That, and if you are dealing with properties, take the info about its offset from the HTML file (that displays the tile->Address that I made),
-		;and subtract by 1 (for example: "$7FA001 (!RAM_BAR+$1)", so it must be !FreeramFromAnotherPatch_StatusBarPropStart+$00, not
-		;+$01)
-		;
-		;I edited and submited several layer 3 patches with a HTML file containing JS that shows the offset for every tile.
-			;Graphical bar position, NOTE: does not include static end tiles, see !GraphicalBarExampleTest_NoExtendLeftBarPos
-			;and !GraphicalBarExampleTest_ExtendLeftBarPos
-				!Default_GraphicalBar_Pos_Tile = !FreeramFromAnotherPatch_StatusBarTileStart+$00
-					;^Location of the bar when !StatusBarFormat is $01. This is under use of
-					; STA [$00], that is why it needs to be 3-bytes ($XXXX and $XX is discouraged).
-				!Default_GraphicalBar_Pos_Properties = !FreeramFromAnotherPatch_StatusBarPropStart+$00
-					;^Tile properties (only applies to status bar patches that lets you change the properties in-game).
-					; Remember: bit format is [YXPCCCTT]. Again, must be 3 bytes.
+		;NOTE: following does not include static end tiles, see "Tile positions for static end tiles"
+				!Default_GraphicalBar_PosX_Tile = 0
+				!Default_GraphicalBar_PosY_Tile = 0
 		;This is when you are using a bar that would extend towards the left as the length increases.
-		;!Default_GraphicalBar_Pos_Tile_ExtendLeftwards is the position of the rightmost last tile (even when x-flipped to fill leftwards). Therefore
-		;the status bar write range is [DesiredLastTilePos-((NumberOfTiles-1)*!StatusBarFormat)] to [DesiredLastTilePos]. Again, this does not
+		;The position entered here is the position of the rightmost last tile (even when x-flipped to fill leftwards). Therefore
+		;the status bar write range is [DesiredLastTilePos-(NumberOfTiles-1)] to [DesiredLastTilePos]. Again, this does not
 		;include static end tiles bar.
-			!Default_GraphicalBar_Pos_Tile_ExtendLeftwards = !FreeramFromAnotherPatch_StatusBarTileStart+$3E
-			!Default_GraphicalBar_Pos_Properties_ExtendLeftwards = !FreeramFromAnotherPatch_StatusBarPropStart+$3E
+			!Default_GraphicalBar_PosX_ExtendLeftwards = 31
+			!Default_GraphicalBar_PosY_ExtendLeftwards = 0
 		;For vertical bars (only supports super status bars and SMB3 status bar at the time of making this,
 		;since they work with a system that each row is 32-width tiles).
 
 			!Default_VerticalBarDirection = $00 ;>Only use these values: $00 = fill and extend upwards, $02 = fill or extend downwards.
-				;^Note: This makes "Level_Simple_VerticalBar_NonStripe.asm" set the Y bit when set to downwards.
+				;^Note: This makes "Level_Simple_VerticalBar_NonStripe.asm" set the Y-flip bit when set to downwards.
 				; For "Level_Simple_UsingStripe.asm", use "!Default_StripeVerticalDownwardsBar" instead.
 				
 			;Upwards (this is where the bottom part of the bar would be at)
-				!Default_GraphicalBar_Pos_Tile_VerticalUpwards = !FreeramFromAnotherPatch_StatusBarTileStart+$100
-				!Default_GraphicalBar_Pos_Properties_VerticalUpwards = !FreeramFromAnotherPatch_StatusBarPropStart+$100
+				!Default_GraphicalBar_PosX_VerticalUpwards = 0
+				!Default_GraphicalBar_PosY_VerticalUpwards = 4
 			;Downwards (this is where the top part of the bar would be at)
-				!Default_GraphicalBar_Pos_Tile_VerticalDownwards = !FreeramFromAnotherPatch_StatusBarTileStart+$00
-				!Default_GraphicalBar_Pos_Properties_VerticalDownwards = !FreeramFromAnotherPatch_StatusBarPropStart+$00
+				!Default_GraphicalBar_PosX_VerticalDownwards = 0
+				!Default_GraphicalBar_PosY_VerticalDownwards = 0
 		;Layer 3 graphical bar with static end tiles that extends left or right
 			;0 to not write static end tiles, otherwise set to 1 (don't set to any other number, it does addition values on it).
 				!GraphicalBarExampleTest_StaticLeft = 1
@@ -174,15 +167,16 @@
 				;Static right tile of bar
 					!GraphicalBarExampleTest_RightSideTileNum = $29
 					!GraphicalBarExampleTest_RightSideTileProps = %01111000
-			;Tile positions
+			;Tile positions for static end tiles
 				;Extend Rightwards
-					!GraphicalBarExampleTest_NoExtendLeftBarPos = !FreeramFromAnotherPatch_StatusBarTileStart+$02
-					!GraphicalBarExampleTest_NoExtendLeftBarPropsPos = !FreeramFromAnotherPatch_StatusBarPropStart+$02
+					!GraphicalBarExampleTest_PosX_StaticEnds_ExtendRightBar = 1
+					!GraphicalBarExampleTest_PosY_StaticEnds_ExtendRightBar = 0
 				;Extend leftwards
-					!GraphicalBarExampleTest_ExtendLeftBarPos = !FreeramFromAnotherPatch_StatusBarTileStart+$3C
-					!GraphicalBarExampleTest_ExtendLeftBarPropsPos = !FreeramFromAnotherPatch_StatusBarPropStart+$3C
+					!GraphicalBarExampleTest_PosX_StaticEnds_ExtendLeftBar = 30
+					!GraphicalBarExampleTest_PosY_StaticEnds_ExtendLeftBar = 0
+
 	;Layer 3 stripe
-		;X and Y position.
+		;X and Y position (coordinates system works the same way as the status bar).
 			!Default_StripeImage_XPos = 0			;>X position of 31 ($1F) is the rightmost tile that can be seen.
 			!Default_StripeImage_YPos = 27			;>Y position of 27 ($1B) is the bottommost tile that can be seen
 		;Direction. 0 = horizontal, 1 = vertical
@@ -312,20 +306,58 @@
 	!Interval_Write_Pos_Properties = !FreeramFromAnotherPatch_StatusBarPropStart+$14
 		;^Same as above but tile properties.
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;Don't touch these below
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	;Patched status bar
+		function PatchedStatusBarXYToAddress(x, y, StatusBarTileDataBaseAddr, format) = StatusBarTileDataBaseAddr+(x*format)+(y*32*format)
+		;You don't have to do STA $7FA000+StatusBarXYToByteOffset(0, 0, $02) when you can do STA PatchedStatusBarXYToAddress(0, 0, $7FA000, $02)
+		
+		macro CheckValidPatchedStatusBarPos(x,y)
+			assert and(greaterequal(<x>, 0), lessequal(<x>, 31)), "Invalid position on the patched status bar"
+		endmacro
+	
+	;Vanilla SMW status bar
+		function VanillaStatusBarXYToAddress(x,y, SMWStatusBar0EF9) = (select(equal(y,2), SMWStatusBar0EF9+(x-2), SMWStatusBar0EF9+$1C+(x-3)))
+		
+		macro CheckValidVanillaStatusBarPos(x,y)
+			assert or(and(equal(<y>, 2), and(greaterequal(<x>, 2), lessequal(<x>, 29))), and(equal(<y>, 3), and(greaterequal(<x>, 3), lessequal(<x>, 29)))), "Invalid position on the vanilla status bar"
+		endmacro
+		
+		if !sa1 == 0
+			!RAM_0EF9 = $0EF9
+		else
+			!RAM_0EF9 = $400EF9
+		endif
+	;Convert XY position to address
+		!Default_GraphicalBar_Pos_Tile = VanillaStatusBarXYToAddress(!Default_GraphicalBar_PosX_Tile, !Default_GraphicalBar_PosY_Tile, !RAM_0EF9)
+		!Default_GraphicalBar_Pos_Tile_ExtendLeftwards = VanillaStatusBarXYToAddress(!Default_GraphicalBar_PosX_ExtendLeftwards, !Default_GraphicalBar_PosY_ExtendLeftwards, !RAM_0EF9)
+		!GraphicalBarExampleTest_ExtendRightBarPos = VanillaStatusBarXYToAddress(!GraphicalBarExampleTest_PosX_StaticEnds_ExtendRightBar, !GraphicalBarExampleTest_PosY_StaticEnds_ExtendRightBar, !RAM_0EF9)
+		!GraphicalBarExampleTest_ExtendLeftBarPos = VanillaStatusBarXYToAddress(!GraphicalBarExampleTest_PosX_StaticEnds_ExtendLeftBar, !GraphicalBarExampleTest_PosY_StaticEnds_ExtendLeftBar, !RAM_0EF9)
+		
+		if !UsingCustomStatusBar != 0
+			%CheckValidPatchedStatusBarPos(!Default_GraphicalBar_PosX_Tile, !Default_GraphicalBar_PosY_Tile)
+			%CheckValidPatchedStatusBarPos(!Default_GraphicalBar_PosX_ExtendLeftwards, !Default_GraphicalBar_PosY_ExtendLeftwards)
+			%CheckValidPatchedStatusBarPos(!Default_GraphicalBar_PosX_VerticalUpwards, !Default_GraphicalBar_PosY_VerticalUpwards)
+			%CheckValidPatchedStatusBarPos(!Default_GraphicalBar_PosX_VerticalDownwards, !Default_GraphicalBar_PosY_VerticalDownwards)
+			%CheckValidPatchedStatusBarPos(!GraphicalBarExampleTest_PosX_StaticEnds_ExtendRightBar, !GraphicalBarExampleTest_PosY_StaticEnds_ExtendRightBar)
+			%CheckValidPatchedStatusBarPos(!GraphicalBarExampleTest_PosX_StaticEnds_ExtendLeftBar, !GraphicalBarExampleTest_PosY_StaticEnds_ExtendLeftBar)
+		
+			!Default_GraphicalBar_Pos_Tile = PatchedStatusBarXYToAddress(!Default_GraphicalBar_PosX_Tile, !Default_GraphicalBar_PosY_Tile, !FreeramFromAnotherPatch_StatusBarTileStart, !StatusBarFormat)
+			!Default_GraphicalBar_Pos_Properties = PatchedStatusBarXYToAddress(!Default_GraphicalBar_PosX_Tile, !Default_GraphicalBar_PosY_Tile, !FreeramFromAnotherPatch_StatusBarPropStart, !StatusBarFormat)
 
-; ;Don't touch, these are used for loops to write to the status bar.
-;  !GraphiBar_LeftTileExist = 0
-;  !GraphiBar_MiddleTileExist = 0
-;  !GraphiBar_RightTileExist = 0
-;  if !Default_LeftPieces != 0
-;   !GraphiBar_LeftTileExist = 1
-;  endif
-;  if !Default_MiddlePieces != 0 && !Default_MiddleLength != 0
-;   !GraphiBar_MiddleTileExist = 1
-;  endif
-;  if !Default_RightPieces != 0
-;   !GraphiBar_RightTileExist = 1
-;  endif
-;  
-;  !Setting_GraphicalBar_SecondFillByteTableOffset = !GraphiBar_LeftTileExist+(!GraphiBar_MiddleTileExist*!Default_MiddleLength)+!GraphiBar_RightTileExist
-;   ;^The amount of bytes the table used up.
+			!Default_GraphicalBar_Pos_Tile_ExtendLeftwards = PatchedStatusBarXYToAddress(!Default_GraphicalBar_PosX_ExtendLeftwards, !Default_GraphicalBar_PosY_ExtendLeftwards, !FreeramFromAnotherPatch_StatusBarTileStart, !StatusBarFormat)
+			!Default_GraphicalBar_Pos_Properties_ExtendLeftwards = PatchedStatusBarXYToAddress(!Default_GraphicalBar_PosX_ExtendLeftwards, !Default_GraphicalBar_PosY_ExtendLeftwards, !FreeramFromAnotherPatch_StatusBarPropStart, !StatusBarFormat)
+
+			!Default_GraphicalBar_Pos_Tile_VerticalUpwards = PatchedStatusBarXYToAddress(!Default_GraphicalBar_PosX_VerticalUpwards, !Default_GraphicalBar_PosY_VerticalUpwards, !FreeramFromAnotherPatch_StatusBarTileStart, !StatusBarFormat)
+			!Default_GraphicalBar_Pos_Properties_VerticalUpwards = PatchedStatusBarXYToAddress(!Default_GraphicalBar_PosX_VerticalUpwards, !Default_GraphicalBar_PosY_VerticalUpwards, !FreeramFromAnotherPatch_StatusBarPropStart, !StatusBarFormat)
+			
+			!Default_GraphicalBar_Pos_Tile_VerticalDownwards = PatchedStatusBarXYToAddress(!Default_GraphicalBar_PosX_VerticalDownwards, !Default_GraphicalBar_PosY_VerticalDownwards, !FreeramFromAnotherPatch_StatusBarTileStart, !StatusBarFormat)
+			!Default_GraphicalBar_Pos_Properties_VerticalDownwards = PatchedStatusBarXYToAddress(!Default_GraphicalBar_PosX_VerticalDownwards, !Default_GraphicalBar_PosY_VerticalDownwards, !FreeramFromAnotherPatch_StatusBarPropStart, !StatusBarFormat)
+			
+			!GraphicalBarExampleTest_StaticEndsExtendRightBarPos = PatchedStatusBarXYToAddress(!GraphicalBarExampleTest_PosX_StaticEnds_ExtendRightBar, !GraphicalBarExampleTest_PosY_StaticEnds_ExtendRightBar, !FreeramFromAnotherPatch_StatusBarTileStart, !StatusBarFormat)
+			!GraphicalBarExampleTest_StaticEndsExtendRightBarPropsPos = PatchedStatusBarXYToAddress(!GraphicalBarExampleTest_PosX_StaticEnds_ExtendRightBar, !GraphicalBarExampleTest_PosY_StaticEnds_ExtendRightBar, !FreeramFromAnotherPatch_StatusBarPropStart, !StatusBarFormat)
+			
+			!GraphicalBarExampleTest_StaticEndsExtendLeftBarPos = PatchedStatusBarXYToAddress(!GraphicalBarExampleTest_PosX_StaticEnds_ExtendLeftBar, !GraphicalBarExampleTest_PosY_StaticEnds_ExtendLeftBar, !FreeramFromAnotherPatch_StatusBarTileStart, !StatusBarFormat)
+			!GraphicalBarExampleTest_StaticEndsExtendLeftBarPropsPos = PatchedStatusBarXYToAddress(!GraphicalBarExampleTest_PosX_StaticEnds_ExtendLeftBar, !GraphicalBarExampleTest_PosY_StaticEnds_ExtendLeftBar, !FreeramFromAnotherPatch_StatusBarPropStart, !StatusBarFormat)
+		endif

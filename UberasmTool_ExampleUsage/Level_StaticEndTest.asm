@@ -31,19 +31,19 @@ endif
 	
 	LDA #$FC
 	if !GraphicalBarExampleTest_StaticEnd_ExtendLeft == 0
-		STA.l !GraphicalBarExampleTest_NoExtendLeftBarPos-(!GraphicalBarExampleTest_StaticLeft*!StatusBarFormat),x ;>[-!GraphicalBarExampleTest_StaticLeft*!StatusBarFormat] to also remove the lefside
+		STA.l !GraphicalBarExampleTest_StaticEndsExtendRightBarPos-(!GraphicalBarExampleTest_StaticLeft*!StatusBarFormat),x ;>[-!GraphicalBarExampleTest_StaticLeft*!StatusBarFormat] to also remove the lefside
 		if !StatusBar_UsingCustomProperties != 0
 			LDA.b #%00111000
-			STA !GraphicalBarExampleTest_NoExtendLeftBarPropsPos-(!GraphicalBarExampleTest_StaticLeft*!StatusBarFormat),x
+			STA !GraphicalBarExampleTest_StaticEndsExtendRightBarPropsPos-(!GraphicalBarExampleTest_StaticLeft*!StatusBarFormat),x
 		endif
-		print "Tile range (tile numbers only): $", hex(!GraphicalBarExampleTest_NoExtendLeftBarPos-(!GraphicalBarExampleTest_StaticLeft*!StatusBarFormat)), " to $", hex((!GraphicalBarExampleTest_NoExtendLeftBarPos-(!GraphicalBarExampleTest_StaticLeft*!StatusBarFormat))+(((!Default_GraphicalBar_MaxMiddleLength+!GraphicalBarExampleTest_StaticLeft+!GraphicalBarExampleTest_StaticRight)-1)*!StatusBarFormat))
+		print "Tile range (tile numbers only): $", hex(!GraphicalBarExampleTest_StaticEndsExtendRightBarPos-(!GraphicalBarExampleTest_StaticLeft*!StatusBarFormat)), " to $", hex((!GraphicalBarExampleTest_StaticEndsExtendRightBarPos-(!GraphicalBarExampleTest_StaticLeft*!StatusBarFormat))+(((!Default_GraphicalBar_MaxMiddleLength+!GraphicalBarExampleTest_StaticLeft+!GraphicalBarExampleTest_StaticRight)-1)*!StatusBarFormat))
 	else
-		STA.l !GraphicalBarExampleTest_ExtendLeftBarPos-(((!Default_GraphicalBar_MaxMiddleLength+!GraphicalBarExampleTest_StaticLeft)-1)*!StatusBarFormat),x
+		STA.l !GraphicalBarExampleTest_StaticEndsExtendLeftBarPos-(((!Default_GraphicalBar_MaxMiddleLength+!GraphicalBarExampleTest_StaticLeft)-1)*!StatusBarFormat),x
 		if !StatusBar_UsingCustomProperties != 0
 			LDA.b #%00111000
-			STA !GraphicalBarExampleTest_ExtendLeftBarPropsPos-(((!Default_GraphicalBar_MaxMiddleLength+!GraphicalBarExampleTest_StaticLeft)-1)*!StatusBarFormat),x
+			STA !GraphicalBarExampleTest_StaticEndsExtendLeftBarPropsPos-(((!Default_GraphicalBar_MaxMiddleLength+!GraphicalBarExampleTest_StaticLeft)-1)*!StatusBarFormat),x
 		endif
-		print "Tile range (tile numbers only): $", hex(!GraphicalBarExampleTest_ExtendLeftBarPos-(((!Default_GraphicalBar_MaxMiddleLength+!GraphicalBarExampleTest_StaticLeft)-1))), " to $", hex(!GraphicalBarExampleTest_ExtendLeftBarPos-(((!Default_GraphicalBar_MaxMiddleLength+!GraphicalBarExampleTest_StaticLeft)-1))+(((!GraphicalBarExampleTest_StaticLeft+!GraphicalBarExampleTest_StaticRight)-1)*!StatusBarFormat))
+		print "Tile range (tile numbers only): $", hex(!GraphicalBarExampleTest_StaticEndsExtendLeftBarPos-(((!Default_GraphicalBar_MaxMiddleLength+!GraphicalBarExampleTest_StaticLeft)-1))), " to $", hex(!GraphicalBarExampleTest_StaticEndsExtendLeftBarPos-(((!Default_GraphicalBar_MaxMiddleLength+!GraphicalBarExampleTest_StaticLeft)-1))+(((!GraphicalBarExampleTest_StaticLeft+!GraphicalBarExampleTest_StaticRight)-1)*!StatusBarFormat))
 	endif
 	DEX #!StatusBarFormat
 	BPL ..Loop
@@ -78,18 +78,18 @@ endif
 	STZ $00								;>Use Level-layer3 tileset
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
 	if !GraphicalBarExampleTest_StaticEnd_ExtendLeft == 0
-		LDA.b #!GraphicalBarExampleTest_NoExtendLeftBarPos		;\Setup address to where to draw the bar.
+		LDA.b #!GraphicalBarExampleTest_StaticEndsExtendRightBarPos		;\Setup address to where to draw the bar.
 		STA $00								;|
-		LDA.b #!GraphicalBarExampleTest_NoExtendLeftBarPos>>8		;|
+		LDA.b #!GraphicalBarExampleTest_StaticEndsExtendRightBarPos>>8		;|
 		STA $01								;|
-		LDA.b #!GraphicalBarExampleTest_NoExtendLeftBarPos>>16		;|
+		LDA.b #!GraphicalBarExampleTest_StaticEndsExtendRightBarPos>>16		;|
 		STA $02								;/
 		if !StatusBar_UsingCustomProperties != 0
-			LDA.b #!GraphicalBarExampleTest_NoExtendLeftBarPropsPos		;\Same as above but properties
+			LDA.b #!GraphicalBarExampleTest_StaticEndsExtendRightBarPropsPos		;\Same as above but properties
 			STA $03								;|
-			LDA.b #!GraphicalBarExampleTest_NoExtendLeftBarPropsPos>>8	;|
+			LDA.b #!GraphicalBarExampleTest_StaticEndsExtendRightBarPropsPos>>8	;|
 			STA $04								;|
-			LDA.b #!GraphicalBarExampleTest_NoExtendLeftBarPropsPos>>16	;|
+			LDA.b #!GraphicalBarExampleTest_StaticEndsExtendRightBarPropsPos>>16	;|
 			STA $05								;/
 			if !Default_LeftwardsBar == 0
 				LDA.b #!Default_StatusBar_TilePropertiesSetting			;\Properties
@@ -99,19 +99,19 @@ endif
 			STA $06								;/
 		endif
 	else
-		LDA.b #!GraphicalBarExampleTest_ExtendLeftBarPos		;\Input rightmost tile position
+		LDA.b #!GraphicalBarExampleTest_StaticEndsExtendLeftBarPos		;\Input rightmost tile position
 		STA $00								;|
-		LDA.b #!GraphicalBarExampleTest_ExtendLeftBarPos>>8		;|
+		LDA.b #!GraphicalBarExampleTest_StaticEndsExtendLeftBarPos>>8		;|
 		STA $01								;|
-		LDA.b #!GraphicalBarExampleTest_ExtendLeftBarPos>>16		;|
+		LDA.b #!GraphicalBarExampleTest_StaticEndsExtendLeftBarPos>>16		;|
 		STA $02								;/
 		
 		if !StatusBar_UsingCustomProperties != 0
-			LDA.b #!GraphicalBarExampleTest_ExtendLeftBarPropsPos		;\Same as above but tile properties
+			LDA.b #!GraphicalBarExampleTest_StaticEndsExtendLeftBarPropsPos		;\Same as above but tile properties
 			STA $03								;|
-			LDA.b #!GraphicalBarExampleTest_ExtendLeftBarPropsPos>>8	;|
+			LDA.b #!GraphicalBarExampleTest_StaticEndsExtendLeftBarPropsPos>>8	;|
 			STA $04								;|
-			LDA.b #!GraphicalBarExampleTest_ExtendLeftBarPropsPos>>16	;|
+			LDA.b #!GraphicalBarExampleTest_StaticEndsExtendLeftBarPropsPos>>16	;|
 			STA $05								;/
 			if !Default_LeftwardsBar == 0
 				LDA.b #!Default_StatusBar_TilePropertiesSetting			;\Properties

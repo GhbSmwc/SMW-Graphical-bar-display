@@ -513,3 +513,12 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
   1-piece-filled and/or max-1 filled. This results 528 + 1057 = 1585, which is about 50% bigger than the common 1057-spacing.
  -Fixed a bug that causes incorrect SA-1 multiplication calculations on accurate emulators (such as mesen 2.0.0) as I realized
   that SA-1 registers are only accessible to SA-1 CPU, not the SNES CPU.
+ -Defines update:
+ --Status bar defines now uses a coordinate system rather than merely as an offset, as suggested by Fernap on the submission
+   rejection log on my P-meter: https://www.smwcentral.net/?p=viewthread&t=127931 . This also fixes an inconvenience that
+   when using status bar patches with a !StatusBarFormat set to $01, the user have to edit the offset value since it takes
+   the total number of bytes from the status bar starting RAM.
+ --I don't even know why I use the term "NoExtendLeft" for rightwards-extending bar when I could just say "ExtendRight",
+   therefore a more reasonable naming of the define is used.
+ ---Also renamed defines for static ends using extending bars because it is confusing with "Level_ExtendsLeftwards.asm"
+    which that tests the leftwards extending bar using non-static left and right ends.
