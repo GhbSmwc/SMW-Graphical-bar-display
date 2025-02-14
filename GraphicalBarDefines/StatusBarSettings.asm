@@ -28,8 +28,7 @@
 
 	!StatusBar_UsingCustomProperties           = 1
 		;^Set this to 0 if you are using the vanilla SMW status bar or any status bar patches
-		; that doesn't enable editing the tile properties, otherwise set this to 1 (you may
-		; have to edit "!Default_GraphicalBar_Pos_Properties" in order for it to work though.).
+		; that doesn't enable editing the tile properties, otherwise set this to 1.
 		; This define is needed to prevent writing what it assumes tile properties into invalid
 		; RAM addresses.
 		;
@@ -39,7 +38,7 @@
 		;  status bar patches that are layer 3-based enables you to edit tile properties,
 		;  therefore its likely you are going to set this to 1.
 		; -When using the VRAM upload stripe image, this MUST be set to 1 because their tile
-		;  properties may not be initalized and the bar could be garbage tiles or crash the game.
+		;  properties may not be initialized and the bar could be garbage tiles or crash the game.
 
 	!Default_StatusBar_TilePropertiesSetting      = %00111000
 		;^Tile properties (if you enable editing properties in-game). Note: Bit 6 (X-flip) is
@@ -74,11 +73,16 @@
 	;These must be 3-bytes long (6 hexadecimal digits long), as they are under a routine that
 	;uses STA [$00],y to write the tiles to the status bar.
 	;
-	;Defines involving XY positions refer to their positions in units of 8x8 tiles:
-	; - X=0 being on the left edge (of the screen), increasing when moving to the right.,
-	;   with X=31 on the right edge of the screen that is visible.
-	; - Y=0 being at the top (of the screen), increasing when moving downwards.
+	;Defines involving XY positions refer to their positions in units of 8x8 tiles (obviously
+	;they must be integers):
+	; - X=0 being on the left edge (of the area; such as the screen), increasing when
+	;   moving to the right, with X=31 ($1F) on the right edge of the zone that is visible.
+	; - Y=0 being at the top (of the area or screen), increasing when moving downwards.
 	; As always, numbers without a prefix are decimal, a dollar sign prefix are hexadecimal.
+	;
+	; I use the term "area" because it is not necessarily the screen, rather a position on
+	; the layer, and the fact that the SMB3 status bar's 0,0 position is the top-left of
+	; the section of the bottom of the screen.
 	;
 	;Additional notes:
 	;
@@ -195,7 +199,7 @@
 				; image. For on-status-bar or on-overworld border, it is
 				; "!Default_VerticalBarDirection" on this define ASM file.
 
-	;Overworld graphical bar:
+	;Overworld graphical bar (this assumes you are using the overworld border plus patch):
 		;Starting RAM address of OWB+'s tile number
 			if !sa1 == 0
 				!FreeramFromAnotherPatch_OWBorderTileStart = $7FEC00
@@ -208,13 +212,23 @@
 			else
 				!FreeramFromAnotherPatch_OWBorderPropStart = $41EC01
 			endif
-		; Again about [DisiredTile = StatusBarStartAddress + Offset]. But this time, at the time of writing this,
-		; only OWB+ exists, and that uses [TTTTTTTT, YXPCCCTT] the same way as the SSB patch does, which also means
-		; Offset's hex number must end in 0, 2, 4, 6, 8, A, C, E, or F. Also that you take the offset information
-		; from the HTML file and subtract 1 when dealing with properties ("$7FEC01 (!TileRAM+$1)" is
-		; !FreeramFromAnotherPatch_OWBorderPropStart+$00, not +$01).
-		!Default_GraphicalBar_Pos_Tile_OverworldMap = !FreeramFromAnotherPatch_OWBorderTileStart+$00
-		!Default_GraphicalBar_Pos_Properties_OverworldMap = !FreeramFromAnotherPatch_OWBorderPropStart+$00
+		;Position. Works similarly to the status bar, but the Y position "skips" the intermediate rows of tiles
+		;between the top and bottom. This means that going downwards on the last row of  "top lines" will immediately
+		;end up being on "bottom lines". For example, with !Top_Lines set to 5 rows (Y ranges from 0-4), going from Y=4
+		;to Y=5 would now be at the first row of the bottom lines (which the true Y position would be Y=26).
+		;
+		;You can convert TrueYPositioning (this counts all rows, and must be 26-27) into YEditableRows (numbering only
+		;rows the OWB+ can edit) when using the bottom lines:
+		;
+		; YEditableRows = TrueYPositioning - 26 + !Top_Lines
+		;
+		;For example (having !Top_Lines set to 5), I want a counter on the top row of bottom lines. I can literally just do this:
+		;
+		;!Default_GraphicalBar_PosY_OverworldMap = 26-26+5, which is row 5 (rows 0-4 are top lines, 5-6 are bottom lines)
+		;
+		;Conversion is not needed if you are having your stuff on the top-lines.
+		!Default_GraphicalBar_PosX_OverworldMap = 0
+		!Default_GraphicalBar_PosY_OverworldMap = 0
 
 ;Tile settings, for all bars (length does not apply to [ExtendLeftwards.asm] as that is variable in-game):
 	!Default_MiddleLength                = 7             ;>30 = screen-wide (30 + 2 end tiles = 32, all 8x8 tile row in the screen's width)
@@ -245,26 +259,34 @@
 		;  the firstfill, this also acts as how much delay (in frames) before
 		;  secondfill increments/decrements towards firstfill.
 	;Number display for debugging
-		!FirstFillHexValDisplayPos = !FreeramFromAnotherPatch_StatusBarTileStart+$36
-			;^Position of a hex number display of the amount of firstfill.
-		!SecondFillHexValDisplayPos = !FreeramFromAnotherPatch_StatusBarTileStart+$3C
-			;^Same as above, but secondfill.
-		;Same as above, but this is the "percent" fill:
-			!FirstFillPercentHexValDisplayPos = !FreeramFromAnotherPatch_StatusBarTileStart+$76
-			!SecondFillPercentHexValDisplayPos = !FreeramFromAnotherPatch_StatusBarTileStart+$7C
-				;^NOTE: these only display how much of the 2 fills is in the
-				; bar. Meaning with !DoubleBar_DisplayIncrease set to 1,
-				; when FirstQuantity is greater than SecondQuantity (when the
-				; value increases), this happens:
-				;
-				;  SecondFill ("transparent fill") = "Current value"
-				;  FirstFill ("Opaque fill") = "Previous value"
-				;
-				; Therefore, this is the inverse when the fill amount decreases:
-				;
-				;  SecondFill ("transparent fill") = "Previous value"
-				;  FirstFill ("Opaque fill") = "Current value"
-				;
+		;Position of a hex number display of the amount of firstfill.
+			!FirstFillHexValDisplay_PosX = 27
+			!FirstFillHexValDisplay_PosY = 0
+			
+		;Position of a hex number display of the amount of secondfill.
+			!SecondFillHexValDisplay_PosX = 30
+			!SecondFillHexValDisplay_PosY = 0
+			
+		; NOTE: these below only display how much of the 2 fills is in the
+		; bar. Meaning with !DoubleBar_DisplayIncrease set to 1,
+		; when FirstQuantity is greater than SecondQuantity (when the
+		; value increases), this happens:
+		;
+		;  SecondFill ("transparent fill") = "Current value"
+		;  FirstFill ("Opaque fill") = "Previous value"
+		;
+		; Therefore, this is the inverse when the fill amount decreases:
+		;
+		;  SecondFill ("transparent fill") = "Previous value"
+		;  FirstFill ("Opaque fill") = "Current value"
+		;
+		;Same as above, but this is the "percent" first fill:
+			!FirstFillPercentHexValDisplay_PosX = 27
+			!FirstFillPercentHexValDisplay_PosY = 1
+		;Percent second fill:
+			!SecondFillPercentHexValDisplay_PosX = 30
+			!SecondFillPercentHexValDisplay_PosY = 1
+		;
 	;Display type
 		!DoubleBar_DisplayType = 1
 			;^0 = Use alternating frames (rapid flicker). Must use
@@ -300,11 +322,9 @@
 			; before incrementing/decrementing itself to firstfill. Not used
 			; if !Setting_DoubleBar_FillMode is 0.
 ;Settings for Range-based bar ("Level_RangeBased.asm"):
-	!Interval_Write_Pos_Tile = !FreeramFromAnotherPatch_StatusBarTileStart+$14
-		;^Where to write a single-digit number on the status bar indicating what
-		; range the quantity is in.
-	!Interval_Write_Pos_Properties = !FreeramFromAnotherPatch_StatusBarPropStart+$14
-		;^Same as above but tile properties.
+	;Position of a single-digit number representing how many bars is it on.
+		!Interval_Write_PosX = 10
+		!Interval_Write_PosY = 0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Don't touch these below
@@ -342,6 +362,12 @@
 			%CheckValidPatchedStatusBarPos(!Default_GraphicalBar_PosX_VerticalDownwards, !Default_GraphicalBar_PosY_VerticalDownwards)
 			%CheckValidPatchedStatusBarPos(!GraphicalBarExampleTest_PosX_StaticEnds_ExtendRightBar, !GraphicalBarExampleTest_PosY_StaticEnds_ExtendRightBar)
 			%CheckValidPatchedStatusBarPos(!GraphicalBarExampleTest_PosX_StaticEnds_ExtendLeftBar, !GraphicalBarExampleTest_PosY_StaticEnds_ExtendLeftBar)
+			%CheckValidPatchedStatusBarPos(!Default_GraphicalBar_PosX_OverworldMap, !Default_GraphicalBar_PosY_OverworldMap)
+			%CheckValidPatchedStatusBarPos(!FirstFillHexValDisplay_PosX, !FirstFillHexValDisplay_PosY)
+			%CheckValidPatchedStatusBarPos(!SecondFillHexValDisplay_PosX, !SecondFillHexValDisplay_PosY)
+			%CheckValidPatchedStatusBarPos(!FirstFillPercentHexValDisplay_PosX, !FirstFillPercentHexValDisplay_PosY)
+			%CheckValidPatchedStatusBarPos(!SecondFillPercentHexValDisplay_PosX, !SecondFillPercentHexValDisplay_PosY)
+			%CheckValidPatchedStatusBarPos(!Interval_Write_PosX, !Interval_Write_PosY)
 		
 			!Default_GraphicalBar_Pos_Tile = PatchedStatusBarXYToAddress(!Default_GraphicalBar_PosX_Tile, !Default_GraphicalBar_PosY_Tile, !FreeramFromAnotherPatch_StatusBarTileStart, !StatusBarFormat)
 			!Default_GraphicalBar_Pos_Properties = PatchedStatusBarXYToAddress(!Default_GraphicalBar_PosX_Tile, !Default_GraphicalBar_PosY_Tile, !FreeramFromAnotherPatch_StatusBarPropStart, !StatusBarFormat)
@@ -360,4 +386,16 @@
 			
 			!GraphicalBarExampleTest_StaticEndsExtendLeftBarPos = PatchedStatusBarXYToAddress(!GraphicalBarExampleTest_PosX_StaticEnds_ExtendLeftBar, !GraphicalBarExampleTest_PosY_StaticEnds_ExtendLeftBar, !FreeramFromAnotherPatch_StatusBarTileStart, !StatusBarFormat)
 			!GraphicalBarExampleTest_StaticEndsExtendLeftBarPropsPos = PatchedStatusBarXYToAddress(!GraphicalBarExampleTest_PosX_StaticEnds_ExtendLeftBar, !GraphicalBarExampleTest_PosY_StaticEnds_ExtendLeftBar, !FreeramFromAnotherPatch_StatusBarPropStart, !StatusBarFormat)
+			
+			!Default_GraphicalBar_Pos_Tile_OverworldMap = PatchedStatusBarXYToAddress(!Default_GraphicalBar_PosX_OverworldMap, !Default_GraphicalBar_PosY_OverworldMap, !FreeramFromAnotherPatch_OWBorderTileStart, $02)
+			!Default_GraphicalBar_Pos_Properties_OverworldMap = PatchedStatusBarXYToAddress(!Default_GraphicalBar_PosX_OverworldMap, !Default_GraphicalBar_PosY_OverworldMap, !FreeramFromAnotherPatch_OWBorderPropStart, $02)
+			
+			!FirstFillHexValDisplayPos = PatchedStatusBarXYToAddress(!FirstFillHexValDisplay_PosX, !FirstFillHexValDisplay_PosY, !FreeramFromAnotherPatch_StatusBarTileStart, $02)
+			!SecondFillHexValDisplayPos = PatchedStatusBarXYToAddress(!SecondFillHexValDisplay_PosX, !SecondFillHexValDisplay_PosY, !FreeramFromAnotherPatch_StatusBarTileStart, $02)
+			
+			!FirstFillPercentHexValDisplayPos = PatchedStatusBarXYToAddress(!FirstFillPercentHexValDisplay_PosX, !FirstFillPercentHexValDisplay_PosY, !FreeramFromAnotherPatch_StatusBarTileStart, $02)
+			!SecondFillPercentHexValDisplayPos = PatchedStatusBarXYToAddress(!SecondFillPercentHexValDisplay_PosX, !SecondFillPercentHexValDisplay_PosY, !FreeramFromAnotherPatch_StatusBarTileStart, $02)
+			
+			!Interval_Write_Pos_Tile = PatchedStatusBarXYToAddress(!Interval_Write_PosX, !Interval_Write_PosY, !FreeramFromAnotherPatch_StatusBarTileStart, !StatusBarFormat)
+			!Interval_Write_Pos_Properties = PatchedStatusBarXYToAddress(!Interval_Write_PosX, !Interval_Write_PosY, !FreeramFromAnotherPatch_StatusBarPropStart, !StatusBarFormat)
 		endif
