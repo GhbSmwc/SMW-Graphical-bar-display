@@ -126,7 +126,7 @@ endif
 				LDX.w #((RangeTableEnd-RangeTable)-4)		;|
 		
 			..ValidRange
-				LDA RangeTable,x				;|\Miminum
+				LDA RangeTable,x				;|\Minimum
 				STA $02						;|/
 				+
 			..WriteIntervalNumber
