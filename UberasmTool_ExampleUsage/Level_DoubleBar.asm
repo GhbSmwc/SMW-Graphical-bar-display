@@ -70,6 +70,15 @@
 incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
+macro HexDisplay(RamToRead, StatusBarAddress)
+	LDA <RamToRead>					;\every 16th number increments the 1st digit.
+	LSR #$04					;|
+	STA <StatusBarAddress>				;/
+	LDA <RamToRead>					;\limit it to #$00-#$0F on 2nd digit digit.
+	AND #$0F					;|
+	STA <StatusBarAddress>+(1*!StatusBarFormat)	;/
+endmacro
+
 main:
 if !sa1 != 0
 	LDA.b #mainSA1				; \ Put the address
@@ -187,19 +196,8 @@ endif
 	;This displays the hex numbers representing the two fills in the bar.
 	;Only works with Super Status Bar patch.
 	if !StatusBarFormat == $02
-		LDA !Freeram_FirstQuantity				;\every 16th number increments the 1st digit.
-		LSR #$04						;|
-		STA !FirstFillHexValDisplayPos				;/
-		LDA !Freeram_FirstQuantity				;\limit it to #$00-#$0F on 2nd digit digit.
-		AND #$0F						;|
-		STA !FirstFillHexValDisplayPos+(1*!StatusBarFormat)	;/
-
-		LDA !Freeram_SecondQuantity				;\every 16th number increments the 1st digit.
-		LSR #$04						;|
-		STA !SecondFillHexValDisplayPos				;/
-		LDA !Freeram_SecondQuantity				;\limit it to #$00-#$0F on 2nd digit digit.
-		AND #$0F						;|
-		STA !SecondFillHexValDisplayPos+(1*!StatusBarFormat)	;/
+		%HexDisplay(!Freeram_FirstQuantity, !FirstFillHexValDisplayPos)
+		%HexDisplay(!Freeram_SecondQuantity, !SecondFillHexValDisplayPos)
 	endif
 
 .GraphicalDoubleBarTest
