@@ -227,8 +227,8 @@
 		;!Default_GraphicalBar_PosY_OverworldMap = 26-26+5, which is row 5 (rows 0-4 are top lines, 5-6 are bottom lines)
 		;
 		;Conversion is not needed if you are having your stuff on the top-lines.
-		!Default_GraphicalBar_PosX_OverworldMap = 0
-		!Default_GraphicalBar_PosY_OverworldMap = 0
+			!Default_GraphicalBar_PosX_OverworldMap = 0
+			!Default_GraphicalBar_PosY_OverworldMap = 0
 
 ;Tile settings, for all bars (length does not apply to [ExtendLeftwards.asm] as that is variable in-game):
 	!Default_MiddleLength                = 7             ;>30 = screen-wide (30 + 2 end tiles = 32, all 8x8 tile row in the screen's width)
