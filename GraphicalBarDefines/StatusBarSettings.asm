@@ -45,7 +45,7 @@
 		; forced to be set when !Default_LeftwardsBar is set to 1. If you want this to be x flipped
 		; on a left-to-right bar, set that here. (YXPCCCTT)
 		;
-		; For vertical bars on layer 3, a downward bars will be forced a Y-flip (bit 7).
+		; For vertical bars on layer 3, downward bars will be forced a Y-flip (bit 7).
 		;
 		;This does not apply to color-changing bars, see [Level_Simple.asm] at the table at the bottom,
 		;as this define only apply to graphical bars with static tile properties.
@@ -213,14 +213,14 @@
 				!FreeramFromAnotherPatch_OWBorderPropStart = $41EC01
 			endif
 		;Position. Works similarly to the status bar, but the Y position "skips" the intermediate rows of tiles
-		;between the top and bottom. This means that going downwards on the last row of  "top lines" will immediately
-		;end up being on "bottom lines". For example, with !Top_Lines set to 5 rows (Y ranges from 0-4), going from Y=4
-		;to Y=5 would now be at the first row of the bottom lines (which the true Y position would be Y=26).
+		;between the top and bottom. This means that going downwards on the last row of "top lines" will immediately
+		;end up being on "bottom lines" on the first row. For example, with !Top_Lines set to 5 rows (Y ranges from 0-4),
+		;going from Y=4 to Y=5 would now be at the first row of the bottom lines (which the true Y position would be Y=26).
 		;
-		;You can convert TrueYPositioning (this counts all rows, and must be 26-27) into YEditableRows (numbering only
-		;rows the OWB+ can edit) when using the bottom lines:
+		;You can convert TrueYPosition (this counts all rows of the layer 3, and must be 26-27) into EditableYPosition
+		;(numbering only rows the OWB+ can edit) when using the bottom lines:
 		;
-		; YEditableRows = TrueYPositioning - 26 + !Top_Lines
+		; EditableYPosition = TrueYPosition - 26 + !Top_Lines
 		;
 		;For example (having !Top_Lines set to 5), I want a counter on the top row of bottom lines. I can literally just do this:
 		;
@@ -329,7 +329,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Don't touch these below
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	;Patched status bar
+	;Patched status bar. Feel free to use this.
 		function PatchedStatusBarXYToAddress(x, y, StatusBarTileDataBaseAddr, format) = StatusBarTileDataBaseAddr+(x*format)+(y*32*format)
 		;You don't have to do STA $7FA000+StatusBarXYToByteOffset(0, 0, $02) when you can do STA PatchedStatusBarXYToAddress(0, 0, $7FA000, $02)
 		
@@ -337,7 +337,7 @@
 			assert and(greaterequal(<x>, 0), lessequal(<x>, 31)), "Invalid position on the patched status bar"
 		endmacro
 	
-	;Vanilla SMW status bar
+	;Vanilla SMW status bar. Again, feel free to use this.
 		function VanillaStatusBarXYToAddress(x,y, SMWStatusBar0EF9) = (select(equal(y,2), SMWStatusBar0EF9+(x-2), SMWStatusBar0EF9+$1C+(x-3)))
 		
 		macro CheckValidVanillaStatusBarPos(x,y)

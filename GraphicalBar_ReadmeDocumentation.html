@@ -502,7 +502,7 @@ You can uninstall it by simply opening <kbd>GraphicalBarDefines/SpriteOAMSetting
 As a side note, this ASM resource was made before UberASM Tool v2.0 (released on SMWC on 2024-08-02). That means you no longer need the patch by moving the code to UberASM tool's <kbd>level</kbd>'s <kbd>end:</kbd> label (and excluding the hijacks).
 <hr>
 <h2><a href="#AsmDocumentationBack" id="AsmDocumentation">^</a>ASM Documentation</h2>
-Note: All values here are unsigned. Routine information follows:
+Note: All number values here are unsigned. Routine information follows:
 <ol>
 <li><a href="#GraphicalBarELITEBack" id="GraphicalBarELITE">^</a>Inside <kbd>GraphicalBarELITE.asm</kbd></li>
 <ul>
@@ -573,11 +573,11 @@ Result:
 <td><kbd><span class="NoLineBreak"><span style="font-weight: bold;">$00</span></span></kbd> to <kbd><span class="NoLineBreak"><span style="font-weight: bold;">$01</span></span></kbd></td>
 <td style="text-align: center; vertical-align: middle;">2</td>
 <td>The amount of fill as a &ldquo;percentage&rdquo; (known as &ldquo;<kbd>FillAmount</kbd>&rdquo;). Calculated by:<br><br><kbd>FillAmount = Round(Quantity * TotalNumberOfPiecesInBar / MaxQuantity)</kbd><br><br>The <kbd>Round</kbd> function
-rounds the number to an integer, depending on the 3 variations of these subroutines:
+<a href="https://en.wikipedia.org/wiki/Rounding">rounds</a> the number to an integer, depending on the 3 variations of these subroutines:
 <ul>
 	<li><kbd>CalculateGraphicalBarPercentage</kbd>: Round half up, during division, if the remainder is less than half the divisor, would round down to nearest integer, otherwise if greater than or equal to, rounds up to nearest integer.</li>
-	<li><kbd>CalculateGraphicalBarPercentageRoundUp</kbd>: Round up. After division, if the remainder is any nonzero value, rounds up to nearest integer.</li>
-	<li><kbd>CalculateGraphicalBarPercentageRoundDown</kbd>: Always round down, regardless of remainder.</li>
+	<li><kbd>CalculateGraphicalBarPercentageRoundUp</kbd>: Round up (ceiling). After division, if the remainder is any nonzero value, rounds up to nearest integer.</li>
+	<li><kbd>CalculateGraphicalBarPercentageRoundDown</kbd>: Always round down (floor), regardless of remainder.</li>
 </ul><br>
 These rounding variations are intended to minimize/control bias when used in conjunction with <a href="#TOCRoundAwayFromComplete"><kbd>RoundAwayEmpty</kbd>, <kbd>RoundAwayEmpty</kbd>, or <kbd>RoundAwayEmptyFull</kbd></a>.
 The bias is caused by when a quantity value are within a range that would round to 0 or max, then gets merged with the range that would round to 1 or max-1.
@@ -586,7 +586,7 @@ If max quantity is 0, a division by zero occurs, and outputs <kbd>$FFFF</kbd>. I
 
 Because we are dealing with integer values and rounding after division, if you have more MaxQuantity than MaxFill, then several quantity values may result in the same number of pieces filled. See <a href="readme_files/Js_GraphicalBar_PercentageRoundBounds.html" id="CalculateGraphicalBarPercentage_Discription">this</a> to view the distribution of values to each fill amount<br><br>
 
-Note that this is not capped at total pieces in the bar, meaning that if <kbd>Quantity</kbd> is greater than <kbd>MaxQuantity</kbd>, this routine will output the number of pieces in the bar greater than its maximum, although <kbd>DrawGraphicalBar</kbd> and
+Note that this is not capped at total pieces in the bar, meaning that if <kbd>Quantity</kbd> is greater than <kbd>MaxQuantity</kbd>, this routine may output the number of pieces in the bar greater than its maximum, although <kbd>DrawGraphicalBar</kbd> and
 <kbd>DrawGraphicalBarSubtractionLoopEdition</kbd> will treat it as capped.<br><br>
 
 As a side note to most programmers, yes, I could alternatively perform <kbd>FillAmount = (Quantity / MaxQuantity) * TotalNumberOfPiecesInBar</kbd>, but we are dealing with integers, not floating points. Performing that
