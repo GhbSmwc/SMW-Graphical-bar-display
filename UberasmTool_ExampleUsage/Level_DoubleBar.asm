@@ -81,13 +81,7 @@ endmacro
 
 main:
 if !sa1 != 0
-	LDA.b #mainSA1				; \ Put the address
-	STA $3180				;  | to jump in
-	LDA.b #mainSA1>>8			;  | $3180 - $3182.
-	STA $3181				;  |
-	LDA.b #mainSA1>>16			;  |
-	STA $3182				; /
-	JSR $1E80				; Invoke SA-1 and wait to finish.
+	%invoke_sa1(mainSA1)
 	RTL
 	mainSA1:
 endif

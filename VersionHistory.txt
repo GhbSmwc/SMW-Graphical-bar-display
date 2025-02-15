@@ -522,3 +522,5 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
    therefore a more reasonable naming of the define is used.
  ---Also renamed defines for static ends using extending bars because it is confusing with "Level_ExtendsLeftwards.asm"
     which that tests the leftwards extending bar using non-static left and right ends.
+ -Fixed an issue with Level_Simple_UsingStripe.asm where there was a copy-paste error with "!YFlipForHorizontalBar", which
+  was intended to be "!YFlipForVerticalBar"
