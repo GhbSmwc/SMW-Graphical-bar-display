@@ -1898,11 +1898,12 @@ would need a bar that is more than 255 tile bytes long (So a 16-bit addressing w
 the address write range is <kbd>DesiredLastTilePos-((NumberOfTiles-1)*!StatusBarFormat)</kbd> to <kbd>DesiredLastTilePos</kbd>, so be careful not to have the bar data be written past the starting RAM
 address of the status bar (avoid placing the <kbd>DesiredLastTilePos</kbd> that would cause placing the tiles before the first byte of the status bar tiles).</p></li></ul>
 
-<li>When writing stripe image <b>every frame</b> during levels, make sure you don't write them during the &ldquo;COURSE CLEAR!&rdquo; text (the text appears when <kbd>JSL $05CBFF</kbd> is executed), as it causes the text to glitch out
-with some areas having the wrong tiles. Easiest way is to check RAM <kbd>$1493</kbd> like so:
+<li>When writing stripe image <b>every frame</b> during levels, make sure you don't write them during the &ldquo;COURSE CLEAR!&rdquo; text (the text appears when <kbd>JSL $05CBFF</kbd> is executed) or during message box, as it
+may cause graphical glitches (or even graphic corruptions). Easiest way is to check RAM <kbd>$1493</kbd> like so:
 <table><tr><td><pre>
-LDA $1493|!addr		;\If goal text is dispayed, don't write the bar during that.
-BEQ .SafeToWrite	;/(this is merely a timer of the goal animation, not necessary a RAM that is nonzero when the actual "COURSE CLEAR!" message)
+LDA $1493|!addr		;&gt;Goal timer
+ORA $1426|!addr		;&gt;Message box (to me, I did experienced screen went black except for the layer 3, I kept this here anyways just in case)
+BEQ .SafeToWrite	;&gt;0 = None of the above are active, Nonzero: Any of above are active.
 .NotSafeTo
 	;[...]
 	RTL
