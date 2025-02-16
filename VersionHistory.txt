@@ -525,3 +525,5 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
  -Fixed an issue with Level_Simple_UsingStripe.asm where there was a copy-paste error with "!YFlipForHorizontalBar", which
   was intended to be "!YFlipForVerticalBar"
  -HTML update: Made the layout a bit more pleasant to read. Reduced contrast by brightening the background, and use
+2/15/2025 (1)
+ -Last minute change: Removed a reduandant SEP #$20 on CalculateGraphicalBarPercentageRoundUp.
