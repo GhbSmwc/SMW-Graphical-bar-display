@@ -126,15 +126,8 @@ endif
 			;-Set this to 0 if your code calls the graphical bar routine under the SA-1 processor.
 			; Otherwise set it to 1 if it calls it under the SNES CPU.
 			;
-			; As an important note: certain emulators follows a rule that the correct CPU can access the
-			; registers of the matching type (e.g. SA-1 registers can only be used by SA-1 CPU, not SNES)
-			;
-			;Things to note:
-			;
-			;-SNES' math handles 8bit*8bit = 16bit numbers, all unsigned. This will be unavailable to
-			; be used if processing SA-1.
-			;-SA-1's math are 16bit*16bit = 32bit, all *signed*. The register is always available
-			; to use regardless if SNES or SA-1 being used.
+			; As an important note: certain emulators follows a rule that only the correct CPU can access
+			; the registers of the matching type (e.g. SA-1 registers can only be used by SA-1 CPU, not SNES),
 
 		!Setting_Beta32bitMultiplication = 0
 			;^In case if you are editing this code to handle 32 bit for quantity, set this to 1.
