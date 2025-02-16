@@ -21,7 +21,6 @@
 		LDY #$00
 		REP #$20
 		CMP $00
-		SEP #$20
 		BNE ?.NoRoundToMax
 		LDY #$02
 	?.NoRoundToMax
