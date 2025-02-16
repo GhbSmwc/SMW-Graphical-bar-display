@@ -16,7 +16,7 @@
 			!GraphicalBar_OAMYFlip = 1
 		endif
 end:
-if !sa1 != 0
+if !CPUMode != 0
 	%invoke_sa1(mainSA1)
 	RTL
 	mainSA1:

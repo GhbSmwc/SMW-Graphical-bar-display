@@ -80,7 +80,7 @@ macro HexDisplay(RamToRead, StatusBarAddress)
 endmacro
 
 main:
-if !sa1 != 0
+if !CPUMode != 0
 	%invoke_sa1(mainSA1)
 	RTL
 	mainSA1:

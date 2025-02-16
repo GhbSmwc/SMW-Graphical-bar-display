@@ -61,7 +61,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;best tested using uberasm tool.
 
 main:
-if !sa1 != 0
+if !CPUMode != 0
 	%invoke_sa1(mainSA1)
 	RTL
 	mainSA1:

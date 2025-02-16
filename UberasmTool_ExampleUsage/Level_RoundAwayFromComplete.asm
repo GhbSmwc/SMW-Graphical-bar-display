@@ -17,7 +17,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
 ;These (below) are tables to convert whats in !Scratchram_GraphicalBar_FillByteTbl to tile numbers.
 main:
-if !sa1 != 0
+if !CPUMode != 0
 	%invoke_sa1(mainSA1)
 	RTL
 	mainSA1:

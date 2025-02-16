@@ -16,7 +16,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 main:
 ;Get x position percentage in horizontal level.
 ;This is basically the progress meter.
-if !sa1 != 0
+if !CPUMode != 0
 	%invoke_sa1(mainSA1)
 	RTL
 	mainSA1:

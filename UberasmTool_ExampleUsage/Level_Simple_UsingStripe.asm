@@ -37,7 +37,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
 
 main:
-if !sa1 != 0
+if !CPUMode != 0
 	%invoke_sa1(.mainSA1)
 	JMP .MainSnes
 	.mainSA1:
@@ -72,7 +72,7 @@ endif
 	LDA.b #!Default_RightPieces				;|
 	STA !Scratchram_GraphicalBar_RightEndPiece		;/
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
-	if !sa1 != 0
+	if !CPUMode != 0
 		RTL
 		.MainSnes
 	endif
