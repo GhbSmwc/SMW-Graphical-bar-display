@@ -497,7 +497,7 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
  -Last minute update: removed older versions of the graphical bar calculator.
  -Graphical bar calculator update - fixed an issue where click-hold-drag is being let go on any disabled elements causes
   "mouseup" event to not fire, resulting in remaining in "drag mode" despite the left mouse button being released.
-1/28/2025 v6.4.0
+2/15/2025 v6.4.0
  -CalculateGraphicalBarPercentage now have round down and up versions. This allows a more evenly distributed or controlled
   bias quantity values to pieces filled in the bar. Example: using the round 1/2 up and using RoundAway subroutines can cause
   a ~50% bigger range size bias for a 1-piece-filled bar and a max-minus-one-filled bar. For example, a max quantity of 65535
@@ -524,3 +524,4 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
     which that tests the leftwards extending bar using non-static left and right ends.
  -Fixed an issue with Level_Simple_UsingStripe.asm where there was a copy-paste error with "!YFlipForHorizontalBar", which
   was intended to be "!YFlipForVerticalBar"
+ -HTML update: Made the layout a bit more pleasant to read. Reduced contrast by brightening the background, and use
