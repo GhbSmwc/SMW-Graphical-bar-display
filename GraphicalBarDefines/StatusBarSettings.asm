@@ -64,14 +64,9 @@
 		;^0 = Using vanilla SMW status bar
 		; 1 = Using any layer 3 custom status bar.
 		; These are needed for determining what coordinate system.
+		
 	;Tile positions. If you are using other status bar patches other than the Super Status Bar
-	;patch, make sure the RAMs here matches the RAM address those patch are using. By default:
-	;
-	; $0F09|!addr overwrites the word "TIME".
-	; $7FA000 and $404000 takes the top-left corner when using the super status bar patch.
-	;
-	;These must be 3-bytes long (6 hexadecimal digits long), as they are under a routine that
-	;uses STA [$00],y to write the tiles to the status bar.
+	;patch, make sure the RAMs here matches the RAM address those patch are using.
 	;
 	;Defines involving XY positions refer to their positions in units of 8x8 tiles (obviously
 	;they must be integers):
@@ -79,6 +74,28 @@
 	;   moving to the right, with X=31 ($1F) on the right edge of the zone that is visible.
 	; - Y=0 being at the top (of the area or screen), increasing when moving downwards.
 	; As always, numbers without a prefix are decimal, a dollar sign prefix are hexadecimal.
+	;
+	; The range of positions that are valid depends on what type of status bar you're using:
+	; - Vanilla SMW: Y can only be 2-3. And...
+	; -- When Y=2, X ranges 2-29.
+	; -- When Y=3, X ranges 3-29.
+	; - Super status bar patch: X:0-31, Y:0-4.
+	; - SMB3 status bar: X:0-31, Y:0-3
+	; - Minimalist status bar top OR bottom: X:0-31. Y is *ALWAYS* 0.
+	; - Minimalist status bar double: X:0-31, Y:0-1. Y=0 for top row, Y=1 for bottom row.
+	;
+	; Entering a position outside of the valid range may result in using a RAM address that
+	; is outside the status bar tile data (which may cause glitches or crash your game).
+	; This may also occur even if you use a valid position, for display elements made up of
+	; multiple tiles and those tiles extend beyond the first or last byte of the tile data
+	; (such as a 2-digit counter placed so the 10s digit of the counter is on the bottom-
+	; rightmost of the editable tile area, causing the 1s place to be written outside the
+	; tile data range).
+	;
+	; This define ASM file does have an assert failsafe against invalid XY positions, but
+	; it is not entirely foolproof due to each status bar types having different tile range
+	; and display elements spans many number of tiles to be written down.
+	; 
 	;
 	; I use the term "area" because it is not necessarily the screen, rather a position on
 	; the layer, and the fact that the SMB3 status bar's 0,0 position is the top-left of
@@ -108,7 +125,8 @@
 	;Note that these information may be out of date should the patches be updated with the
 	;formats and RAM address be changed.
 	;Levels
-		;Base address of status bar patches
+		;Base address of status bar patches. Note: Must be a 24-bit (3-byte) address
+		;due to using "direct indirect long" ([$xx]) addressing.
 		; - SMW's status bar :
 		; -- $7E0F09 (TTTTTTTT, TTTTTTTT...) - https://smwc.me/m/smw/ram/7E0EF9
 		; - Super status bar (TTTTTTTT, YXPCCCTT):
@@ -355,7 +373,14 @@
 		!GraphicalBarExampleTest_ExtendRightBarPos = VanillaStatusBarXYToAddress(!GraphicalBarExampleTest_PosX_StaticEnds_ExtendRightBar, !GraphicalBarExampleTest_PosY_StaticEnds_ExtendRightBar, !RAM_0EF9)
 		!GraphicalBarExampleTest_ExtendLeftBarPos = VanillaStatusBarXYToAddress(!GraphicalBarExampleTest_PosX_StaticEnds_ExtendLeftBar, !GraphicalBarExampleTest_PosY_StaticEnds_ExtendLeftBar, !RAM_0EF9)
 		
-		if !UsingCustomStatusBar != 0
+		if !UsingCustomStatusBar == 0
+			%CheckValidVanillaStatusBarPos(!Default_GraphicalBar_PosX_Tile, !Default_GraphicalBar_PosY_Tile)
+			%CheckValidVanillaStatusBarPos(!Default_GraphicalBar_PosX_ExtendLeftwards, !Default_GraphicalBar_PosY_ExtendLeftwards)
+			%CheckValidVanillaStatusBarPos(!GraphicalBarExampleTest_PosX_StaticEnds_ExtendRightBar, !GraphicalBarExampleTest_PosY_StaticEnds_ExtendRightBar)
+			%CheckValidVanillaStatusBarPos(!GraphicalBarExampleTest_PosX_StaticEnds_ExtendLeftBar, !GraphicalBarExampleTest_PosY_StaticEnds_ExtendLeftBar)
+			
+		else
+		
 			%CheckValidPatchedStatusBarPos(!Default_GraphicalBar_PosX_Tile, !Default_GraphicalBar_PosY_Tile)
 			%CheckValidPatchedStatusBarPos(!Default_GraphicalBar_PosX_ExtendLeftwards, !Default_GraphicalBar_PosY_ExtendLeftwards)
 			%CheckValidPatchedStatusBarPos(!Default_GraphicalBar_PosX_VerticalUpwards, !Default_GraphicalBar_PosY_VerticalUpwards)
