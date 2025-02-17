@@ -497,7 +497,7 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
  -Last minute update: removed older versions of the graphical bar calculator.
  -Graphical bar calculator update - fixed an issue where click-hold-drag is being let go on any disabled elements causes
   "mouseup" event to not fire, resulting in remaining in "drag mode" despite the left mouse button being released.
-2/16/2025 v6.4.0
+2/17/2025 v6.4.0
  -Graphic files are moved so they can easily be inserted in bulk.
  -CalculateGraphicalBarPercentage now have round down and up versions. This allows a more evenly distributed or controlled
   bias quantity values to pieces filled in the bar. Example: using the round 1/2 up and using RoundAway subroutines can cause
@@ -518,7 +518,8 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
  --Status bar defines now uses a coordinate system rather than merely as an offset, as suggested by Fernap on the submission
    rejection log on my P-meter: https://www.smwcentral.net/?p=viewthread&t=127931 . This also fixes an inconvenience that
    when using status bar patches with a !StatusBarFormat set to $01, the user have to edit the offset value since it takes
-   the total number of bytes from the status bar starting RAM.
+   the total number of bytes from the status bar starting RAM. I also added notes on valid XY positions for L3 status bar
+   versions for the meter.
  --I don't even know why I use the term "NoExtendLeft" for rightwards-extending bar when I could just say "ExtendRight",
    therefore a more reasonable naming of the define is used.
  ---Also renamed defines for static ends using extending bars because it is confusing with "Level_ExtendsLeftwards.asm"
