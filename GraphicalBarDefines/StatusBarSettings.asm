@@ -63,7 +63,7 @@
 	!UsingCustomStatusBar = 1
 		;^0 = Using vanilla SMW status bar
 		; 1 = Using any layer 3 custom status bar.
-		; These are needed for determining what coordinate system.
+		; These are needed for determining what coordinate system as well as checking valid positionings.
 		
 	;Tile positions. If you are using other status bar patches other than the Super Status Bar
 	;patch, make sure the RAMs here matches the RAM address those patch are using.
@@ -101,7 +101,7 @@
 	; the layer, and the fact that the SMB3 status bar's 0,0 position is the top-left of
 	; the section of the bottom of the screen.
 	;
-	;Additional notes:
+	;Additional notes (this may be outdated):
 	;
 	;Minimalist status bar patch RAM address location:
 	; -status_double.asm:
@@ -112,18 +112,7 @@
 	; -status_top.asm and status_bottom.asm:
 	; --$0B05-$0B24: Tile number row
 	; --$0B45-$0B64: Tile properties row
-	; -^To calculate position: TileLocation = StartingAddress + X (x ranges from 0-31)
 	;
-	;Positions I recommend, assuming you don't make other changes on the defines and positions:
-	;Super status bar patch:
-	;-$7FA000/$7FA001 (extend rightwards) and $7FA03E/$7fA03F (extend leftwards): Top row
-	; is entirely not used by any info display.
-	;Minimalist status bar (using status_double.asm):
-	;-$0B2D/$0B6D (extend rightwards) and $0B3C/$0B7C (extend leftwards): The "middle" space
-	; between the coin display and the score. When placed in a define, make sure you
-	; add "|!addr" for sa-1.
-	;Note that these information may be out of date should the patches be updated with the
-	;formats and RAM address be changed.
 	;Levels
 		;Base address of status bar patches. Note: Must be a 24-bit (3-byte) address
 		;due to using "direct indirect long" ([$xx]) addressing.
