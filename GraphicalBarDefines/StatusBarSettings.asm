@@ -1,3 +1,8 @@
+includeonce
+ ;^This prevents redefinition errors when using "Patch_DrawSpriteGraphicalBar/DrawOamPatch.asm" because
+ ; the text file you are reading right now uses a function, and the patch includes this file multiple
+ ; times, including when incsrc another ASM file which that also include this.
+
 ;This is separate from the main define file "GraphicalBarDefines.asm" because of these reasons:
 ;-This is a preset setting, made for specific bars and not for all of them.
 ;-The main define file covers all stuff using the graphical bar routines.
