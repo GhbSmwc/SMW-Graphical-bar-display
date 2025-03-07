@@ -42,37 +42,40 @@
 ;*MaxQuantity = the maximum amount of something, say max HP.
 ;*FilledPieces = the number of pieces filled in the whole bar (rounded 1/2 up).
 ; *Note that this value isn't capped (mainly Quantity > MaxQuantity), the
-;  "DrawGraphicalBar" subroutine will detect and will not display over max,
-;  just in case if you somehow want to use the over-the-max-value on advance
-;  use (such as filling 2 separate bars, filling up the 2nd one after the 1st
-;  is full).
+;  "DrawGraphicalBar" (and "DrawGraphicalBarSubtractionLoopEdition") subroutine will
+;  detect and will not display over max, just in case if you somehow want to use the
+;  over-the-max-value on advance use (such as filling 2 separate bars, filling up
+;  the 2nd one after the 1st is full).
 ;*TotalMaxPieces = the number of pieces of the whole bar when full.
 ;
 ;Input:
-; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+1:
-;  the quantity.
-; -!Scratchram_GraphicalBar_FillByteTbl+2 to !Scratchram_GraphicalBar_FillByteTbl+3:
-;  the max quantity.
-; -!Scratchram_GraphicalBar_LeftEndPiece: number of pieces in left end
-; -!Scratchram_GraphicalBar_MiddlePiece: same as above but for each middle
-; -!Scratchram_GraphicalBar_RightEndPiece: same as above, but right end
-; -!Scratchram_GraphicalBar_TempLength: number of middle bytes excluding both ends.
+; - !Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+1:
+;   the quantity.
+; - !Scratchram_GraphicalBar_FillByteTbl+2 to !Scratchram_GraphicalBar_FillByteTbl+3:
+;   the max quantity.
+; - !Scratchram_GraphicalBar_LeftEndPiece: number of pieces in left end
+; - !Scratchram_GraphicalBar_MiddlePiece: same as above but for each middle
+; - !Scratchram_GraphicalBar_RightEndPiece: same as above, but right end
+; - !Scratchram_GraphicalBar_TempLength: number of middle bytes excluding both ends.
 ;
 ;Output:
-; -$00 to $01: the "percentage" amount of fill in the bar (rounded 1/2 up, done by
-;  checking if the remainder after division, is being >= half of the divisor
-;  (MaxQuantity)).
-; -Y register: if rounded towards empty (fill amount = 0) or full:
-; --Y = #$00 if:
-; ---Exactly full (or more, so it treats as if the bar is full if more than enough)
-;    or exactly empty.
-; ---Anywhere between full or empty
-; --Y = #$01 if rounded to empty (so a nonzero value less than 0.5 pieces filled).
-; --Y = #$02 if rounded to full (so if full amount is 62, values from 61.5 to 61.9).
-;  This is useful in case you don't want the bar to display completely full or empty
-;  when it is not.
+; - $00 to $01: the "percentage" amount of fill in the bar, Rounded:
+; -- CalculateGraphicalBarPercentage: 1/2 up, done by checking if the remainder
+;    after division, is being >= half of the divisor (MaxQuantity)).
+; -- CalculateGraphicalBarPercentageRoundDown: Rounds down an integer.
+; -- CalculateGraphicalBarPercentageRoundUp: Rounds up an integer, if remainder
+;    is nonzero.
+; - Y register: if rounded towards empty (fill amount = 0) or full:
+; -- Y = #$00 if:
+; --- Exactly full (or more, so it treats as if the bar is full if more than enough)
+;     or exactly empty.
+; --- Anywhere between full or empty
+; -- Y = #$01 if rounded to empty (so a nonzero value less than 0.5 pieces filled).
+; -- Y = #$02 if rounded to full (so if full amount is 62, values from 61.5 to 61.9).
+;   This is useful in case you don't want the bar to display completely full or empty
+;   when it is not.
 ;Overwritten/Destroyed:
-; -$02 to $09: because math routines need that much bytes.
+; - $02 to $09: because math routines need that much bytes.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ?CalculateGraphicalBarPercentage:
 	%GraphicalBarCalculateGraphicalBarPercentageRoundDown()

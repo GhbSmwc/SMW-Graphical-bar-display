@@ -12,25 +12,25 @@
 ; $13-$14 covers level load and level.
 ;
 ;Input:
-; -!Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1:
-;  fill amount array to convert to tile numbers.
-; -$00: What set of graphics to use. Under default setting and code:
-;  -#$00 = Level, layer 3
-;  -#$01 = Level, sprite
-;  -#$02 = Overworld, layer 3
-;  You can add more sets of bar tiles by adding a new table as well as adding code
-;  to use the new table.
-; -!Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
-;  the maximum amount of fill for this byte itself. If 0, it's not included in table.
-; -!Scratchram_GraphicalBar_MiddlePiece: Same as above but each middle byte.
-; -!Scratchram_GraphicalBar_RightEndPiece: Same as above but for right end.
-; -!Scratchram_GraphicalBar_TempLength: The length of the bar (only counts
+; - !Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1:
+;   fill amount array to convert to tile numbers.
+; - $00: What set of graphics to use. Under default setting and code:
+; -- #$00 = Level, layer 3
+; -- #$01 = Level, sprite
+; -- #$02 = Overworld, layer 3
+;   You can add more sets of bar tiles by adding a new table as well as adding code
+;   to use the new table.
+; - !Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
+;   the maximum amount of fill for this byte itself. If 0, it's not included in table.
+; - !Scratchram_GraphicalBar_MiddlePiece: Same as above but each middle byte.
+; - !Scratchram_GraphicalBar_RightEndPiece: Same as above but for right end.
+; - !Scratchram_GraphicalBar_TempLength: The length of the bar (only counts
 ;   middle bytes)
 ;Output:
-; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+x:
-;  converted to tile numbers.
+; - !Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+x:
+;   converted to tile numbers.
 ;Overwritten/Destroyed:
-; -$01: Needed to tell if all the middle tiles are done
+; - $01: Needed to tell if all the middle tiles are done
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;Convert tile code following:
 		?ConvertBarFillAmountToTiles:

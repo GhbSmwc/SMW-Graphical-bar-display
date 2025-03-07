@@ -4,16 +4,16 @@
 ;of tile number tables to use, this lets you manually set the tile number
 ;table to use outside this subroutine.
 ;Input:
-; -!Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1:
-;  fill amount array to convert to tile numbers.
-; -$00 to $02: 24-bit address representing the (starting) location of the table containing the left end
-; -$03 to $05: 24-bit address representing the (starting) location of the table containing the middles
-; -$06 to $08: 24-bit address representing the (starting) location of the table containing the right end
+; - !Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1:
+;   fill amount array to convert to tile numbers.
+; - $00 to $02: 24-bit address representing the (starting) location of the table containing the left end
+; - $03 to $05: 24-bit address representing the (starting) location of the table containing the middles
+; - $06 to $08: 24-bit address representing the (starting) location of the table containing the right end
 ;Output:
-; -!Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1
-;  the converted-to-tile-numbers array
+; - !Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1
+;   the converted-to-tile-numbers array
 ;Destroyed
-;-$09: Used to track the middle tiles if all of them are done.
+; - $09: Used to track the middle tiles if all of them are done.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;Convert tile code following:
 		?ConvertBarFillAmountToTilesIndirectAddressTable:

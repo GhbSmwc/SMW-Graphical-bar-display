@@ -10,34 +10,34 @@ incsrc "../GraphicalBarDefines/SpriteOAMSettings.asm"
 ;sizes for $0460 (and also have Y=$FF when finishing the OAM write)
 ;
 ;Before calling this subroutine:
-;-Call GetDrawInfo to obtain the Y index of which OAM to use (increments of 4).
-;-XY register must be 16-bit (REP #$10)
+; - Call GetDrawInfo to obtain the Y index of which OAM to use (increments of 4).
+; - XY register must be 16-bit (REP #$10)
 ;
 ;After calling this subroutine:
-;-It is not recommended to call GetDrawInfo and finishing the OAM routine more than once.
-; Therefore having the sprite GFX and graphical bar GFX together after GetDrawInfo and
-; before FinishOAMWrite is better suited.
-;-When finishing the OAM write, make sure you add the total number (without the minus 1s on EACH)
-; number of OAM tiles used, and THEN subtract by 1 (don't subtract by 1 for the sprite itself
-; and the graphical bar, you'll total the subtraction by 2 instead of 1).
-;-X index is used for which tile byte of the bar, so make sure you restore X in some way (PHX,
-; call this subroutine, PLX or use LDX $15E9).
+; - It is not recommended to call GetDrawInfo and finishing the OAM routine more than once.
+;   Therefore having the sprite GFX and graphical bar GFX together after GetDrawInfo and
+;   before FinishOAMWrite is better suited.
+; - When finishing the OAM write, make sure you add the total number (without the minus 1s on EACH)
+;   number of OAM tiles used, and THEN subtract by 1 (don't subtract by 1 for the sprite itself
+;   and the graphical bar, you'll total the subtraction by 2 instead of 1).
+; - X index is used for which tile byte of the bar, so make sure you restore X in some way (PHX,
+;   call this subroutine, PLX or use LDX $15E9).
 ;
 ;Input:
-; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl + (NumberOfTiles -1)
-;  the tile numbers to write.
-; -Y index: The OAM index (increments of 4)
-; -$02: X position
-; -$03: Y position
-; -$04 to $05: Number of tiles to write
-; -$06: Direction of increasing fill:
-;  -#$00 = left to right
-;  -#$01 = right to left (YXPPCCCT's X bit being set)
-; -$07: Properties (YXPPCCCT).
+; - !Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl + (NumberOfTiles -1)
+;   the tile numbers to write.
+; - Y index: The OAM index (increments of 4)
+; - $02: X position
+; - $03: Y position
+; - $04 to $05: Number of tiles to write
+; - $06: Direction of increasing fill:
+; -- #$00 = left to right
+; -- #$01 = right to left (YXPPCCCT's X bit being set)
+; - $07: Properties (YXPPCCCT).
 ;Output:
-; -Y index: The OAM index after writing the last tile of the bar.
+; - Y index: The OAM index after writing the last tile of the bar.
 ;Destroyed:
-; $08: Displacement of each tile during processing.
+; - $08: Displacement of each tile during processing.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ?DrawSpriteGraphicalBarHoriz:
 	?.HorizontalBar
