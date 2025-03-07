@@ -5,22 +5,22 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;NOTE: "Format2" refers to a variation of the original (original, as in without the "Format2")
 ;that supports Super Status Bar, Overworld Border plus or any other ASM resource
 ;in which the tile format is [TTTTTTTT, YXPCCCTT, TTTTTTTT, YXPCCCTT...].
-;-WriteBarToHUD
-;-WriteBarToHUDFormat2
-;-WriteBarToHUDLeftwards
-;-WriteBarToHUDLeftwardsFormat2
-;-WriteBarToHUDVertically
-;-WriteBarToHUDVerticallyFormat2
-;-BarExtendLeft
-;-BarExtendLeftFormat2
-;-CountNumberOfTiles
-;-WriteBarStaticTileToHUDLeftside
-;-WriteBarStaticTileToHUDLeftsideFormat2
-;-WriteBarStaticTileToHUDRightside
-;-WriteBarStaticTileToHUDRightsideFormat2
-;-WriteDoubleEndedBar
-;-WriteDoubleEndedBarFormat2
-;-SetupStripe
+; - WriteBarToHUD
+; - WriteBarToHUDFormat2
+; - WriteBarToHUDLeftwards
+; - WriteBarToHUDLeftwardsFormat2
+; - WriteBarToHUDVertically
+; - WriteBarToHUDVerticallyFormat2
+; - BarExtendLeft
+; - BarExtendLeftFormat2
+; - CountNumberOfTiles
+; - WriteBarStaticTileToHUDLeftside
+; - WriteBarStaticTileToHUDLeftsideFormat2
+; - WriteBarStaticTileToHUDRightside
+; - WriteBarStaticTileToHUDRightsideFormat2
+; - WriteDoubleEndedBar
+; - WriteDoubleEndedBarFormat2
+; - SetupStripe
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;This routine directly writes the tile to the status bar or
 ;overworld border plus.
@@ -31,26 +31,26 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;8x8 tiles wide.
 ;
 ;Input:
-; -$00 to $02: The starting byte address location of the status bar (tile number).
-; --If you're using SA-1 mode here and using vanilla status bar,
-;  the status bar tilemap table is moved to bank $40.
-; -!Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
-;  the maximum amount of fill for this byte itself. If 0, it's not included in table.
-; -!Scratchram_GraphicalBar_MiddlePiece: Same as above but each middle byte.
-; -!Scratchram_GraphicalBar_RightEndPiece: Same as above but for right end.
-; -!Scratchram_GraphicalBar_TempLength: The length of the bar (only counts
-;  middle bytes)
-; -If you are using custom status bar patches that enables editing tile properties in-game,
-;  and have set "!StatusBar_UsingCustomProperties" to 1, you have another input:
-; --$03 to $05: Same as $00 to $02 but for tile properties instead of tile numbers.
-; --$06: The tile properties (YXPCCCTT) you want it to be. Note: This does not automatically
-;   modify the X-bit flip flag. You need to flip them yourself for this routine alone for flipped bars.
+; - $00 to $02: The starting byte address location of the status bar (tile number).
+; -- If you're using SA-1 mode here and using vanilla status bar,
+;    the status bar tilemap table is moved to bank $40.
+; - !Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
+;   the maximum amount of fill for this byte itself. If 0, it's not included in table.
+; - !Scratchram_GraphicalBar_MiddlePiece: Same as above but each middle byte.
+; - !Scratchram_GraphicalBar_RightEndPiece: Same as above but for right end.
+; - !Scratchram_GraphicalBar_TempLength: The length of the bar (only counts
+;   middle bytes)
+; - If you are using custom status bar patches that enables editing tile properties in-game,
+;   and have set "!StatusBar_UsingCustomProperties" to 1, you have another input:
+; -- $03 to $05: Same as $00 to $02 but for tile properties instead of tile numbers.
+; -- $06: The tile properties (YXPCCCTT) you want it to be. Note: This does not automatically
+;    modify the X-bit flip flag. You need to flip them yourself for this routine alone for flipped bars.
 ;Output:
-; -[RAMAddressIn00] to [RAMAddressIn00 + ((NumberOfTiles-1)*TileFormat]: the status bar/OWB+
-;  RAM write range.
-; -If using SB/OWB+ patch that allows editing YXPCCCTT in-game and have set !StatusBar_UsingCustomProperties
-;  to 1:
-; --[RAMAddressIn03] to [RAMAddressIn03 + ((NumberOfTiles-1)*TileFormat]: same as above but YXPCCCTT
+; - [RAMAddressIn00] to [RAMAddressIn00 + ((NumberOfTiles-1)*TileFormat]: the status bar/OWB+
+;   RAM write range.
+; - If using SB/OWB+ patch that allows editing YXPCCCTT in-game and have set !StatusBar_UsingCustomProperties
+;   to 1:
+; -- [RAMAddressIn03] to [RAMAddressIn03 + ((NumberOfTiles-1)*TileFormat]: same as above but YXPCCCTT
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	if !OWPlusAndSSBSameFormat == 0
 		WriteBarToHUD:
@@ -157,32 +157,32 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Write graphical bar vertically
 ;Input;
-; -$00 to $02: The starting byte address location of the status bar (tile number).
-; --If you're using SA-1 mode here and using vanilla status bar,
-;  the status bar tilemap table is moved to bank $40.
-; -!Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
-;  the maximum amount of fill for this byte itself. If 0, it's not included in table.
-; -!Scratchram_GraphicalBar_MiddlePiece: Same as above but each middle byte.
-; -!Scratchram_GraphicalBar_RightEndPiece: Same as above but for right end.
-; -!Scratchram_GraphicalBar_TempLength: The length of the bar (only counts
-;  middle bytes)
-; -If you are using custom status bar patches that enables editing tile properties in-game,
-;  and have set "!StatusBar_UsingCustomProperties" to 1, you have another input:
-; --$03 to $05: Same as $00 to $02 but for tile properties instead of tile numbers.
-; --$06: The tile properties (YXPCCCTT) you want it to be. Note: This does not automatically
-;   modify the Y-bit flip flag. You need to flip them yourself for this routine alone for flipped bars.
-; -$07: X = $00 for upwards, X = $02 for downwards, don't use any other values.
+; - $00 to $02: The starting byte address location of the status bar (tile number).
+; -- If you're using SA-1 mode here and using vanilla status bar,
+;    the status bar tilemap table is moved to bank $40.
+; - !Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
+;   the maximum amount of fill for this byte itself. If 0, it's not included in table.
+; - !Scratchram_GraphicalBar_MiddlePiece: Same as above but each middle byte.
+; - !Scratchram_GraphicalBar_RightEndPiece: Same as above but for right end.
+; - !Scratchram_GraphicalBar_TempLength: The length of the bar (only counts
+;   middle bytes)
+; - If you are using custom status bar patches that enables editing tile properties in-game,
+;   and have set "!StatusBar_UsingCustomProperties" to 1, you have another input:
+; -- $03 to $05: Same as $00 to $02 but for tile properties instead of tile numbers.
+; -- $06: The tile properties (YXPCCCTT) you want it to be. Note: This does not automatically
+;    modify the Y-bit flip flag. You need to flip them yourself for this routine alone for flipped bars.
+; - $07: X = $00 for upwards, X = $02 for downwards, don't use any other values.
 ;Output:
-; -[RAMAddressIn00]-(X*32*Format) where X increases from 0 to NumberOfTiles-1 for upwards, [RAMAddressIn00]+(X*32*Format) where X increases from 0 to NumberOfTiles-1 for downwards:
-;  the tiles written to the status bar
-; -If using SB/OWB+ patch that allows editing YXPCCCTT in-game and have set !StatusBar_UsingCustomProperties
-;  to 1:
-; --[RAMAddressIn03]-(X*32*Format) where X increases from 0 to NumberOfTiles-1:
-;   the tile properties written:
-; -$00 to $02: The address after writing the last tile (as if writing the amount of tiles plus 1), can be used
-;  for writing static end tile where the fill ends at.
-; -$03 to $05: The address after writing the last tile (as if writing the amount of tiles plus 1), can be used
-;  for writing static end tile where the fill ends at.
+; - [RAMAddressIn00]-(X*32*Format) where X increases from 0 to NumberOfTiles-1 for upwards, [RAMAddressIn00]+(X*32*Format) where X increases from 0 to NumberOfTiles-1 for downwards:
+;   the tiles written to the status bar
+; - If using SB/OWB+ patch that allows editing YXPCCCTT in-game and have set !StatusBar_UsingCustomProperties
+;   to 1:
+; -- [RAMAddressIn03]-(X*32*Format) where X increases from 0 to NumberOfTiles-1:
+;    the tile properties written:
+; - $00 to $02: The address after writing the last tile (as if writing the amount of tiles plus 1), can be used
+;   for writing static end tile where the fill ends at.
+; - $03 to $05: The address after writing the last tile (as if writing the amount of tiles plus 1), can be used
+;   for writing static end tile where the fill ends at.
 ;
 ;NOTE: this only works with status bar having a width of 32 8x8 tiles. So far at the time of writing this
 ;is that the super status bar and SMB3 status bar patches are the only status bar patches that offer
@@ -323,24 +323,21 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;unlikely though.
 ;
 ; Input:
-;  $00-$02: the position of the final/last/rightmost tile would be
-;           at.
-;  $03-$05: Same as above, but for tile properties if applicable.
+;  - $00-$02: the position of the final/last/rightmost tile would be at.
+;  - $03-$05: Same as above, but for tile properties if applicable.
 ; Output:
-;  $00-$02: the position of the first tile would be at.
-;  $03-$05: Same as above, but for tile properties if applicable.
+;  - $00-$02: the position of the first tile would be at.
+;  - $03-$05: Same as above, but for tile properties if applicable.
 ;
 ; Status bar address write range (when using this routine and
 ; WriteBarToHUD or WriteBarToHUDLeftwards):
-;  [RAMAddressIn00 - ((NumberOfTiles-1)*TileFormat)]
-;  to [RAMAddressIn00]. 
+;  - [RAMAddressIn00 - ((NumberOfTiles-1)*TileFormat)]
+;    to [RAMAddressIn00]. Where RAMAddressIn00 is the address you
+;    enter before calling this routine.
 ;
-;  Where RAMAddressIn00 is the address you enter before calling
-;  this routine.
-;
-;  TileFormat is 1 if [TTTTTTTT, TTTTTTTT, ...] and 2 otherwise,
-;  similar to !StatusBarFormat, but this also applies to OWB+.
-;  Same applies to tile properties.
+;  - TileFormat is 1 if [TTTTTTTT, TTTTTTTT, ...] and 2 otherwise,
+;    similar to !StatusBarFormat, but this also applies to OWB+.
+;    Same applies to tile properties.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 BarExtendLeftFormat2:
 	JSL CountNumberOfTiles
@@ -386,15 +383,15 @@ BarExtendLeftFormat2:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Count tiles.
 ;Input:
-;-!Scratchram_GraphicalBar_LeftEndPiece,
-; !Scratchram_GraphicalBar_MiddlePiece,
-; !Scratchram_GraphicalBar_TempLength, and
-; !Scratchram_GraphicalBar_RightEndPiece: used to find how many
-; tiles.
+; - !Scratchram_GraphicalBar_LeftEndPiece,
+;   !Scratchram_GraphicalBar_MiddlePiece,
+;   !Scratchram_GraphicalBar_TempLength, and
+;   !Scratchram_GraphicalBar_RightEndPiece: used to find how many
+;   tiles.
 ;Output:
-; X = Number of bytes or 8x8 tiles the bar takes up of minus 1
-;     For example: 9 total bytes, this routine would output X=$08.
-;     Returns X=$FF should not a single tile exist.
+; - X = Number of bytes or 8x8 tiles the bar takes up of minus 1
+;   For example: 9 total bytes, this routine would output X=$08.
+;   Returns X=$FF should not a single tile exist.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 CountNumberOfTiles:
 	LDX #$00
@@ -441,22 +438,22 @@ CountNumberOfTiles:
 ;to the right).
 ;
 ;Input:
-;$00 to $02: Same as WriteBarToHUD
-;$03 to $05: Same as WriteBarToHUD
-;$06: same as WriteBarToHUD (writes tile properties)
-;$07: The tile number to write as the static tile.
+; - $00 to $02: Same as WriteBarToHUD
+; - $03 to $05: Same as WriteBarToHUD
+; - $06: same as WriteBarToHUD (writes tile properties)
+; - $07: The tile number to write as the static tile.
 ;
 ;Note:
-; -If not using the extend-left routine:
-; --Leftside tile is written at [RAMAddressIn00 - TileFormat]
-; --Rightside tile is written at [RAMAddressIn00 + (NumberOfTiles*TileFormat)]
-;  otherwise (using extend left, assuming value in RAMAddressIn00 is BEFORE
-;  using BarExtendLeft):
-; --Leftside tile is written at [RAMAddressIn00 - (NumberOfTiles*TileFormat)]
-; --Rightside tile is written at [RAMAddressIn00 + TileFormat]
+; - If not using the extend-left routine:
+; -- Leftside tile is written at [RAMAddressIn00 - TileFormat]
+; -- Rightside tile is written at [RAMAddressIn00 + (NumberOfTiles*TileFormat)]
+;    otherwise (using extend left, assuming value in RAMAddressIn00 is BEFORE
+;    using BarExtendLeft):
+; -- Leftside tile is written at [RAMAddressIn00 - (NumberOfTiles*TileFormat)]
+; -- Rightside tile is written at [RAMAddressIn00 + TileFormat]
 ;
-; -If you use this routine with the end tiles being set to non-zero number
-;  of pieces, the static tiles are written "past" the end tiles:
+; - If you use this routine with the end tiles being set to non-zero number
+;   of pieces, the static tiles are written "past" the end tiles:
 ;
 ;   <[===]>
 ;
@@ -542,18 +539,18 @@ WriteBarStaticTileToHUDRightsideFormat2:
 ;must be filling left-to-right by default (in the .bin files).
 ;
 ;Input:
-; -!Scratchram_GraphicalBar_LeftEndPiece, !Scratchram_GraphicalBar_MiddlePiece,
+; - !Scratchram_GraphicalBar_LeftEndPiece, !Scratchram_GraphicalBar_MiddlePiece,
 ;   !Scratchram_GraphicalBar_RightEndPiece, and !Scratchram_GraphicalBar_TempLength:
 ;   Used to determine how many tile bytes.
-; -$00-$02: The location of the left-to-right bar (address taken from the first tile)
+; - $00-$02: The location of the left-to-right bar (address taken from the first tile)
 ;   to copy from for the tile numbers.
-; -$03-$05: Same as above but tile properties.
+; - $03-$05: Same as above but tile properties.
 ;Output:
-; -[Address_In_00 - (NumberOfTiles * !StatusBarFormat)] to [Address_In_00 - (1 * !StatusBarFormat)]
+; - [Address_In_00 - (NumberOfTiles * !StatusBarFormat)] to [Address_In_00 - (1 * !StatusBarFormat)]
 ;   the area the mirrored copy will be written at, applies to both tile numbers and properties.
 ;Overwritten:
-; -$06-$08: Used for the address of the mirrored copy for tile numbers.
-; -$09-$0B: Used for the address of the mirrored copy for tile properties.
+; - $06-$08: Used for the address of the mirrored copy for tile numbers.
+; - $09-$0B: Used for the address of the mirrored copy for tile properties.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 WriteDoubleEndedBar:
 	;Get starting address of the flipped bar (write the flipped bar at an address stored in $06 and $09):
@@ -670,24 +667,24 @@ WriteDoubleEndedBarFormat2:
 ;and writes the terminating byte. You only need to write the tile data
 ;afterwards.
 ;
-;-$00: X position (%00XXXXXX, only bits 0-5 used, ranges from 0-63 ($00-$3F))
-;-$01: Y position (%00YYYYYY, only bits 0-5 used, ranges from 0-63 ($00-$3F))
-;-$02: What layer:
-;  $02 = Layer 1
-;  $03 = Layer 2
-;  $05 = Layer 3
-;-$03: Direction and RLE: %DR00000000
-;  D = Direction: 0 = horizontal (rightwards), 1 = vertical (downwards)
-;  R = RLE: 0 = no (manually write different tiles), 1 = yes (write one
+; - $00: X position (%00XXXXXX, only bits 0-5 used, ranges from 0-63 ($00-$3F))
+; - $01: Y position (%00YYYYYY, only bits 0-5 used, ranges from 0-63 ($00-$3F))
+; - $02: What layer:
+; -- $02 = Layer 1
+; -- $03 = Layer 2
+; -- $05 = Layer 3
+; - $03: Direction and RLE: %DR000000
+;   D = Direction: 0 = horizontal (rightwards), 1 = vertical (downwards)
+;   R = RLE: 0 = no (manually write different tiles), 1 = yes (write one
 ;   tile multiple times, based on input $04-$05).
-;-$04 to $05 (16-bit): Number of tiles, minus 1 (a value of 2 here means 3
-;  tiles). (If RLE is used, this is how many times a tile is repeated).
+; - $04 to $05 (16-bit): Number of tiles, minus 1 (a value of 2 here means 3
+;   tiles). (If RLE is used, this is how many times a tile is repeated).
 ;Output:
-;-$7F837B-$7F837C: Updated length of stripe data.
-;-X register (16-bit, XY registers are 16-bit): The index position of where
-; to write tile data (starting at $7F837D+4,x)
+; - $7F837B-$7F837C: Updated length of stripe data.
+; - X register (16-bit, XY registers are 16-bit): The index position of where
+;   to write tile data (starting at $7F837D+4,x)
 ;Destroyed:
-;-$06-$08: Used when not using RLE, to calculate the terminating byte location.
+; - $06-$08: Used when not using RLE, to calculate the terminating byte location.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;note to self
 ; $7F837B = Length of stripe, counting header and tile data, but not the terminating byte.

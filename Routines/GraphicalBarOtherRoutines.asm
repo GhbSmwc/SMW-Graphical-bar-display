@@ -1,8 +1,8 @@
 ;This contains misc routines that least likely going to be used
 ;in most cases.
 ;Routines list:
-;-MapRangeToStartAt0
-;-InvertQuantity
+; - MapRangeToStartAt0
+; - InvertQuantity
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;SA-1 handling
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -65,16 +65,16 @@
 ;quotient is what bar the HP number is on.
 ;
 ;Input:
-; -$00-$01 (16-bit): The quantity
-; -$02-$03 (16-bit): The minimal quantity
-; -$04-$05 (16-bit): The maximal quantity
+; - $00-$01 (16-bit): The quantity
+; - $02-$03 (16-bit): The minimal quantity
+; - $04-$05 (16-bit): The maximal quantity
 ;Output:
-; -$00-$01 (16-bit): The quantity, after subtracted by minimal quantity
-;                    (If quantity is < MIN, then return 0). Essentially
-;                    how much from the minimum
-; -$02-$03 (16-bit): The minimal quantity (same number as entered before)
-; -$04-$05 (16-bit): The maximal quantity (subtracted by minimal quantity).
-;                    This will represent how big the range is.
+; - $00-$01 (16-bit): The quantity, after subtracted by minimal quantity
+;                     (If quantity is < MIN, then return 0). Essentially
+;                     how much from the minimum
+; - $02-$03 (16-bit): The minimal quantity (same number as entered before)
+; - $04-$05 (16-bit): The maximal quantity (subtracted by minimal quantity).
+;                     This will represent how big the range is.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 MapRangeToStartAt0:
 	REP #$20
@@ -109,11 +109,11 @@ MapRangeToStartAt0:
 ;rounding errors cause by converting into fill amounts.
 ;
 ;Input:
-; -$00-$01 (16-bit): The quantity
-; -$02-$03 (16-bit): The max quantity
+; - $00-$01 (16-bit): The quantity
+; - $02-$03 (16-bit): The max quantity
 ;Output:
-; -$00-$01 (16-bit): The inverted quantity (InvertedQuantity = max(MaxQuantity - Quantity, 0))
-; -$02-$03 (16-bit): The max quantity (unchanged)
+; - $00-$01 (16-bit): The inverted quantity (InvertedQuantity = max(MaxQuantity - Quantity, 0))
+; - $02-$03 (16-bit): The max quantity (unchanged)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 InvertQuantity:
 	REP #$20

@@ -20,19 +20,19 @@
 		;patches. Instead, use DrawSpriteGraphicalBarHoriz instead.
 		;
 		;Input
-		; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl + (NumberOfTiles -1)
-		;  the tile numbers to write.
-		; -$00 to $01: X position, relative to screen border
-		; -$02 to $03: Y position, same as above but Y position
-		; -$04 to $05: Number of tiles to write
-		; -$06: Direction of increasing fill:
-		;  -#$00 = left to right
-		;  -#$01 = right to left (YXPPCCCT's X bit being set)
-		; -$07: Properties (YXPPCCCT).
+		; - !Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl + (NumberOfTiles -1)
+		;   the tile numbers to write.
+		; - $00 to $01: X position, relative to screen border
+		; - $02 to $03: Y position, same as above but Y position
+		; - $04 to $05: Number of tiles to write
+		; - $06: Direction of increasing fill:
+		; -- #$00 = left to right
+		; -- #$01 = right to left (YXPPCCCT's X bit being set)
+		; - $07: Properties (YXPPCCCT).
 		;Destroyed:
-		; -$08 to $09: Displacement of each tile during processing. Once finished
-		;  this will be the tile after the final tile, can be used for placing
-		;  static end tile here.
+		; - $08 to $09: Displacement of each tile during processing. Once finished
+		;   this will be the tile after the final tile, can be used for placing
+		;   static end tile here.
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		DrawOamGraphicalBarHoriz:
 			PHB
@@ -159,19 +159,19 @@
 		;patches.
 		;
 		;Input
-		; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl + (NumberOfTiles -1)
-		;  the tile numbers to write.
-		; -$00 to $01: X position, relative to screen border
-		; -$02 to $03: Y position, same as above but Y position
-		; -$04 to $05: Number of tiles to write
-		; -$06: Direction of increasing fill:
-		;  -#$00 = bottom to top
-		;  -#$01 = top to bottom (YXPPCCCT's Y bit being set)
-		; -$07: Properties (YXPPCCCT).
+		; - !Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl + (NumberOfTiles -1)
+		;   the tile numbers to write.
+		; - $00 to $01: X position, relative to screen border
+		; - $02 to $03: Y position, same as above but Y position
+		; - $04 to $05: Number of tiles to write
+		; - $06: Direction of increasing fill:
+		; -- #$00 = bottom to top
+		; -- #$01 = top to bottom (YXPPCCCT's Y bit being set)
+		; - $07: Properties (YXPPCCCT).
 		;Destroyed:
-		; -$08 to $09: Displacement of each tile during processing. Once finished
-		;  this will be the tile after the final tile, can be used for placing
-		;  static end tile here.
+		; - $08 to $09: Displacement of each tile during processing. Once finished
+		;   this will be the tile after the final tile, can be used for placing
+		;   static end tile here.
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		DrawOamGraphicalBarVert:
 			PHB

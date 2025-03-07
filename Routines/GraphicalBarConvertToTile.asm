@@ -2,11 +2,11 @@ incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
 ;Main routines to call are:
-;-ConvertBarFillAmountToTiles
-;-ConvertBarFillAmountToTilesDoubleBar
-;-ConvertBarFillAmountToTilesEdgeOverMultipleTiles
-;-ConvertBarFillAmountToTilesIndirectAddressTable
-;-ConvertBarFillAmountToTilesEdgeOverMultipleTilesIndirectAddressTable
+; - ConvertBarFillAmountToTiles
+; - ConvertBarFillAmountToTilesDoubleBar
+; - ConvertBarFillAmountToTilesEdgeOverMultipleTiles
+; - ConvertBarFillAmountToTilesIndirectAddressTable
+; - ConvertBarFillAmountToTilesEdgeOverMultipleTilesIndirectAddressTable
 ;
 ;Note: Tile tables here are generally ordered from empty (0) to full (max).
 ;And these routines only support the TTTTTTTT byte of the tile data, therefore
@@ -22,25 +22,25 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ; $13-$14 covers level load and level.
 ;
 ;Input:
-; -!Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1:
-;  fill amount array to convert to tile numbers.
-; -$00: What set of graphics to use. Under default setting and code:
-;  -#$00 = Level, layer 3
-;  -#$01 = Level, sprite
-;  -#$02 = Overworld, layer 3
-;  You can add more sets of bar tiles by adding a new table as well as adding code
-;  to use the new table.
-; -!Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
-;  the maximum amount of fill for this byte itself. If 0, it's not included in table.
-; -!Scratchram_GraphicalBar_MiddlePiece: Same as above but each middle byte.
-; -!Scratchram_GraphicalBar_RightEndPiece: Same as above but for right end.
-; -!Scratchram_GraphicalBar_TempLength: The length of the bar (only counts
+; - !Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1:
+;   fill amount array to convert to tile numbers.
+; - $00: What set of graphics to use. Under default setting and code:
+; -- #$00 = Level, layer 3
+; -- #$01 = Level, sprite
+; -- #$02 = Overworld, layer 3
+;   You can add more sets of bar tiles by adding a new table as well as adding code
+;   to use the new table.
+; - !Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
+;   the maximum amount of fill for this byte itself. If 0, it's not included in table.
+; - !Scratchram_GraphicalBar_MiddlePiece: Same as above but each middle byte.
+; - !Scratchram_GraphicalBar_RightEndPiece: Same as above but for right end.
+; - !Scratchram_GraphicalBar_TempLength: The length of the bar (only counts
 ;   middle bytes)
 ;Output:
-; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+x:
-;  converted to tile numbers.
+; - !Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+x:
+;   converted to tile numbers.
 ;Overwritten/Destroyed:
-; -$01: Needed to tell if all the middle tiles are done
+; - $01: Needed to tell if all the middle tiles are done
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;These are tile numbers. Each number, starting from the
 	;left represent each tile of pieces ordered from empty
@@ -252,22 +252,22 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;Inputs and outputs the same as above.
 ;
 ;Input:
-; -!Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1:
-;  SecondFill tile array.
-; -!Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset to
-;  ((!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1)+!Setting_GraphicalBar_SecondFillByteTableOffset:
-;  FirstFill tile array
-; -!Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
-;  the maximum amount of fill for this byte itself. If 0, it's not included in table.
-; -!Scratchram_GraphicalBar_MiddlePiece: Same as above but each middle byte.
-; -!Scratchram_GraphicalBar_RightEndPiece: Same as above but for right end.
-; -!Scratchram_GraphicalBar_TempLength: The length of the bar (only counts
+; - !Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1:
+;   SecondFill tile array.
+; - !Scratchram_GraphicalBar_FillByteTbl+!Setting_GraphicalBar_SecondFillByteTableOffset to
+;   ((!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1)+!Setting_GraphicalBar_SecondFillByteTableOffset:
+;   FirstFill tile array
+; - !Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
+;   the maximum amount of fill for this byte itself. If 0, it's not included in table.
+; - !Scratchram_GraphicalBar_MiddlePiece: Same as above but each middle byte.
+; - !Scratchram_GraphicalBar_RightEndPiece: Same as above but for right end.
+; - !Scratchram_GraphicalBar_TempLength: The length of the bar (only counts
 ;   middle bytes)
 ;Output:
-; -!Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1:
-;  Tile array containing tile numbers representing both first and second fills.
+; - !Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1:
+;   Tile array containing tile numbers representing both first and second fills.
 ;Overwritten:
-; -$00: Needed to tell if all the middle tiles are done
+; - $00: Needed to tell if all the middle tiles are done
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;How this works in relation of using the table (regarding each 8x8 byte section):
 ;1) Amount of FirstFill multiply by the number of pieces +1 (example: LeftEndFirstFill*4).
@@ -496,33 +496,33 @@ db $80,$80,$80,$80    ;>(3;0)[$0B], (3;1)[$0D], (3;2)[$0E], (3;3)[$0F]
 ;This by default, uses the slanted fill edge and not the outlined edge.
 ;
 ;Input:
-; -!Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1:
-;  fill amount array to convert to tile numbers.
-; -$00: What set of graphics to use. Under default setting and code:
-;  -#$00 = Level, layer 3
-;  -#$01 = Level, sprite
-;  -#$02 = Overworld, layer 3
-;  You can add more sets of bar tiles by adding a new table as well as adding code
-;  to use the new table.
-; -!Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
-;  the maximum amount of fill for this byte itself. If 0, it's not included in table.
-; -!Scratchram_GraphicalBar_MiddlePiece: Same as above but each middle byte.
-; -!Scratchram_GraphicalBar_RightEndPiece: Same as above but for right end.
-; -!Scratchram_GraphicalBar_TempLength: The length of the bar (only counts
+; - !Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1:
+;   fill amount array to convert to tile numbers.
+; - $00: What set of graphics to use. Under default setting and code:
+; -- #$00 = Level, layer 3
+; -- #$01 = Level, sprite
+; -- #$02 = Overworld, layer 3
+;   You can add more sets of bar tiles by adding a new table as well as adding code
+;   to use the new table.
+; - !Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
+;   the maximum amount of fill for this byte itself. If 0, it's not included in table.
+; - !Scratchram_GraphicalBar_MiddlePiece: Same as above but each middle byte.
+; - !Scratchram_GraphicalBar_RightEndPiece: Same as above but for right end.
+; - !Scratchram_GraphicalBar_TempLength: The length of the bar (only counts
 ;   middle bytes)
 ;Output:
-; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+x:
-;  converted to tile numbers.
+; - !Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+x:
+;   converted to tile numbers.
 ;Overwritten/Destroyed:
-; -$00 Needed for fast checking if overworld or not (better than
-;  checking $0100 every time using BCC/BCS):
-; --#$00 for level
-; --#$01 for overworld.
-;  I deliberately make it use scratch RAM in the case you have
-;  even more tables (3+ states of graphics) for each graphic.
-;  Feel free to edit the code though.
-; -$01 Needed to convert the middle tiles
-; -$02 Needed to avoid checking a tile that is after the last tile.
+; - $00 Needed for fast checking if overworld or not (better than
+;   checking $0100 every time using BCC/BCS):
+; -- #$00 for level
+; -- #$01 for overworld.
+;   I deliberately make it use scratch RAM in the case you have
+;   even more tables (3+ states of graphics) for each graphic.
+;   Feel free to edit the code though.
+; - $01 Needed to convert the middle tiles
+; - $02 Needed to avoid checking a tile that is after the last tile.
 ;
 ;Note: There isn't a double bar separate graphics for this one
 ;because IT TAKES A HUGE AMOUNT OF SPACE on the graphics.
@@ -807,15 +807,15 @@ db $80,$80,$80,$80    ;>(3;0)[$0B], (3;1)[$0D], (3;2)[$0E], (3;3)[$0F]
 	;side is at a fixed position.
 	;
 	;Input:
-	;-!Scratchram_GraphicalBar_LeftEndPiece,
-	; !Scratchram_GraphicalBar_MiddlePiece,
-	; !Scratchram_GraphicalBar_TempLength, and
-	; !Scratchram_GraphicalBar_RightEndPiece: used to find how many
-	; tiles.
+	; - !Scratchram_GraphicalBar_LeftEndPiece,
+	;   !Scratchram_GraphicalBar_MiddlePiece,
+	;   !Scratchram_GraphicalBar_TempLength, and
+	;   !Scratchram_GraphicalBar_RightEndPiece: used to find how many
+	;   tiles.
 	;Output:
-	; X = Number of bytes or 8x8 tiles the bar takes up of minus 1
-	;     For example: 9 total bytes, this routine would output X=$08.
-	;     Returns X=$FF should not a single tile exist.
+	; - X = Number of bytes or 8x8 tiles the bar takes up of minus 1
+	;   For example: 9 total bytes, this routine would output X=$08.
+	;   Returns X=$FF should not a single tile exist.
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	CountNumberOfTiles:
 		LDX #$00
@@ -842,16 +842,16 @@ db $80,$80,$80,$80    ;>(3;0)[$0B], (3;1)[$0D], (3;2)[$0E], (3;3)[$0F]
 ;of tile number tables to use, this lets you manually set the tile number
 ;table to use outside this subroutine.
 ;Input:
-; -!Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1:
-;  fill amount array to convert to tile numbers.
-; -$00 to $02: 24-bit address representing the (starting) location of the table containing the left end
-; -$03 to $05: 24-bit address representing the (starting) location of the table containing the middles
-; -$06 to $08: 24-bit address representing the (starting) location of the table containing the right end
+; - !Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1:
+;   fill amount array to convert to tile numbers.
+; - $00 to $02: 24-bit address representing the (starting) location of the table containing the left end
+; - $03 to $05: 24-bit address representing the (starting) location of the table containing the middles
+; - $06 to $08: 24-bit address representing the (starting) location of the table containing the right end
 ;Output:
-; -!Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1
-;  the converted-to-tile-numbers array
+; - !Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1
+;   the converted-to-tile-numbers array
 ;Destroyed
-;-$09: Used to track the middle tiles if all of them are done.
+; - $09: Used to track the middle tiles if all of them are done.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;Convert tile code following:
 		ConvertBarFillAmountToTilesIndirectAddressTable:
@@ -945,17 +945,17 @@ db $80,$80,$80,$80    ;>(3;0)[$0B], (3;1)[$0D], (3;2)[$0E], (3;3)[$0F]
 ;of tile number tables to use, this lets you manually set the tile number
 ;table to use outside this subroutine.
 ;Input:
-; -!Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1:
-;  fill amount array to convert to tile numbers.
-; -$00 to $02: 24-bit address representing the (starting) location of the table containing the left end
-; -$03 to $05: 24-bit address representing the (starting) location of the table containing the middles
-; -$06 to $08: 24-bit address representing the (starting) location of the table containing the right end
+; - !Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1:
+;   fill amount array to convert to tile numbers.
+; - $00 to $02: 24-bit address representing the (starting) location of the table containing the left end
+; - $03 to $05: 24-bit address representing the (starting) location of the table containing the middles
+; - $06 to $08: 24-bit address representing the (starting) location of the table containing the right end
 ;Output:
-; -!Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1
-;  the converted-to-tile-numbers array
+; - !Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1
+;   the converted-to-tile-numbers array
 ;Destroyed
-;-$09: Used to track the middle tiles if all of them are done.
-;-$0A: Needed to prevent taking the last tile, and adding by an invalid data after that.
+; - $09: Used to track the middle tiles if all of them are done.
+; - $0A: Needed to prevent taking the last tile, and adding by an invalid data after that.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ConvertBarFillAmountToTilesEdgeOverMultipleTilesIndirectAddressTable:
 			;PHB						;>Preserve bank (so that table indexing work properly)

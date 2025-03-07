@@ -1,19 +1,19 @@
 ;Subroutines this file included (in case if your game already have those routines
 ;to avoid duplicate subroutines):
-;-MathMul16_16
-;-MathMul32_32 (not actually used, as of version 3.15)
-;-MathDiv32_16
-;-MathDiv
+; - MathMul16_16
+; - MathMul32_32 (not actually used, as of version 3.15)
+; - MathDiv32_16
+; - MathDiv
 ;
 ;Main routines to use:
-;-CalculateGraphicalBarPercentage
-;-CalculateGraphicalBarPercentageRoundUp
-;-CalculateGraphicalBarPercentageRoundDown
-;-DrawGraphicalBar (depreciated & commented out, please use the one below instead)
-;-DrawGraphicalBarSubtractionLoopEdition
-;-RoundAwayEmpty
-;-RoundAwayFull
-;-RoundAwayEmptyFull
+; - CalculateGraphicalBarPercentage
+; - CalculateGraphicalBarPercentageRoundUp
+; - CalculateGraphicalBarPercentageRoundDown
+; - DrawGraphicalBar (depreciated & commented out, please use the one below instead)
+; - DrawGraphicalBarSubtractionLoopEdition
+; - RoundAwayEmpty
+; - RoundAwayFull
+; - RoundAwayEmptyFull
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;SA-1 handling
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -92,33 +92,33 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;*TotalMaxPieces = the number of pieces of the whole bar when full.
 ;
 ;Input:
-; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+1:
-;  the quantity.
-; -!Scratchram_GraphicalBar_FillByteTbl+2 to !Scratchram_GraphicalBar_FillByteTbl+3:
-;  the max quantity.
-; -!Scratchram_GraphicalBar_LeftEndPiece: number of pieces in left end
-; -!Scratchram_GraphicalBar_MiddlePiece: same as above but for each middle
-; -!Scratchram_GraphicalBar_RightEndPiece: same as above, but right end
-; -!Scratchram_GraphicalBar_TempLength: number of middle bytes excluding both ends.
+; - !Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+1:
+;   the quantity.
+; - !Scratchram_GraphicalBar_FillByteTbl+2 to !Scratchram_GraphicalBar_FillByteTbl+3:
+;   the max quantity.
+; - !Scratchram_GraphicalBar_LeftEndPiece: number of pieces in left end
+; - !Scratchram_GraphicalBar_MiddlePiece: same as above but for each middle
+; - !Scratchram_GraphicalBar_RightEndPiece: same as above, but right end
+; - !Scratchram_GraphicalBar_TempLength: number of middle bytes excluding both ends.
 ;
 ;Output:
-; -$00 to $01: the "percentage" amount of fill in the bar, Rounded:
-; --CalculateGraphicalBarPercentage: 1/2 up, done by checking if the remainder
-;   after division, is being >= half of the divisor (MaxQuantity)).
-; --CalculateGraphicalBarPercentageRoundDown: Rounds down an integer.
-; --CalculateGraphicalBarPercentageRoundUp: Rounds up an integer, if remainder
-;   is nonzero.
-; -Y register: if rounded towards empty (fill amount = 0) or full:
-; --Y = #$00 if:
-; ---Exactly full (or more, so it treats as if the bar is full if more than enough)
-;    or exactly empty.
-; ---Anywhere between full or empty
-; --Y = #$01 if rounded to empty (so a nonzero value less than 0.5 pieces filled).
-; --Y = #$02 if rounded to full (so if full amount is 62, values from 61.5 to 61.9).
-;  This is useful in case you don't want the bar to display completely full or empty
-;  when it is not.
+; - $00 to $01: the "percentage" amount of fill in the bar, Rounded:
+; -- CalculateGraphicalBarPercentage: 1/2 up, done by checking if the remainder
+;    after division, is being >= half of the divisor (MaxQuantity)).
+; -- CalculateGraphicalBarPercentageRoundDown: Rounds down an integer.
+; -- CalculateGraphicalBarPercentageRoundUp: Rounds up an integer, if remainder
+;    is nonzero.
+; - Y register: if rounded towards empty (fill amount = 0) or full:
+; -- Y = #$00 if:
+; --- Exactly full (or more, so it treats as if the bar is full if more than enough)
+;     or exactly empty.
+; --- Anywhere between full or empty
+; -- Y = #$01 if rounded to empty (so a nonzero value less than 0.5 pieces filled).
+; -- Y = #$02 if rounded to full (so if full amount is 62, values from 61.5 to 61.9).
+;   This is useful in case you don't want the bar to display completely full or empty
+;   when it is not.
 ;Overwritten/Destroyed:
-; -$02 to $09: because math routines need that much bytes.
+; - $02 to $09: because math routines need that much bytes.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 CalculateGraphicalBarPercentage:
 	JSL CalculateGraphicalBarPercentageRoundDown
@@ -407,52 +407,52 @@ GetMaxBarInAForRoundToMaxCheck:
 ; Then move on to the next cup (n increments by 1) and repeat back to (1) until n equals to NumberOfCups.
 ;
 ;Notes:
-; -This routine output only have 1 partially filled (non-full and non-empty)
-;  byte, due to only 1 "fraction" is supported. To have custom edge, after
-;  this routine is done, you simply read the amount of the fraction to
-;  determine the edge is crossing the next 8x8 byte.
-; -The fraction byte/8x8 tile includes the value 0 (it's actually 0 to max-1,
-;  not 1 to max-1), thus if there are only full bytes tile and empty bytes after,
-;  the first empty byte after the last full byte is considered the fraction tile.
+; - This routine output only have 1 partially filled (non-full and non-empty)
+;   byte, due to only 1 "fraction" is supported. To have custom edge, after
+;   this routine is done, you simply read the amount of the fraction to
+;   determine the edge is crossing the next 8x8 byte.
+; - The fraction byte/8x8 tile includes the value 0 (it's actually 0 to max-1,
+;   not 1 to max-1), thus if there are only full bytes tile and empty bytes after,
+;   the first empty byte after the last full byte is considered the fraction tile.
 ;
 ;Input:
-; -$00 to $01: The amount of fill for the WHOLE bar.
-; -!Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
-;  the maximum amount of fill for this byte itself. If 0, it's not included in table.
-; -!Scratchram_GraphicalBar_MiddlePiece: Same as above but each middle byte.
-; -!Scratchram_GraphicalBar_RightEndPiece: Same as above but for right end.
-; -!Scratchram_GraphicalBar_TempLength: The length of the bar (only counts
+; - $00 to $01: The amount of fill for the WHOLE bar.
+; - !Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
+;   the maximum amount of fill for this byte itself. If 0, it's not included in table.
+; - !Scratchram_GraphicalBar_MiddlePiece: Same as above but each middle byte.
+; - !Scratchram_GraphicalBar_RightEndPiece: Same as above but for right end.
+; - !Scratchram_GraphicalBar_TempLength: The length of the bar (only counts
 ;   middle bytes)
 ;Output:
-; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+EndAddress:
-;  A table array containing the amount of fill for each byte, explained previously.
+; - !Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+EndAddress:
+;   A table array containing the amount of fill for each byte, explained previously.
 ;
-;  The numbers of each byte should total equal to the value stored in ram address
-;  $00 prior. Should the bar be more than full, the table will act as if the bar
-;  full and will not store higher values nor write additional bytes beyond table.
-; -$08 to $09 are used for handling fill for each of the 3 groups of bytes
-;  (left, middle, and right). Once the routine is done, it's the amount of
-;  fill you have input for $00 to $01 (not capped to the value to be full
-;  if greater than).
+;   The numbers of each byte should total equal to the value stored in ram address
+;   $00 prior. Should the bar be more than full, the table will act as if the bar
+;   full and will not store higher values nor write additional bytes beyond table.
+; - $08 to $09 are used for handling fill for each of the 3 groups of bytes
+;   (left, middle, and right). Once the routine is done, it's the amount of
+;   fill you have input for $00 to $01 (not capped to the value to be full
+;   if greater than).
 ;
 ;  The end of the address going to be used is this:
 ;
 ;  EndAddress = (L + MLength + R) - 1
 ;
-;  -L (left end) and/or R (right end) are 0 if there are no pieces for each of them, otherwise 1.
-;  -MLength (Middle length) is basically !Scratchram_GraphicalBar_TempLength. If that or
-;   if MiddlePiece = zero (either 16 or 8-bit, this will be zero and will not be
-;   included).
+;  - L (left end) and/or R (right end) are 0 if there are no pieces for each of them, otherwise 1.
+;  - MLength (Middle length) is basically !Scratchram_GraphicalBar_TempLength. If that or
+;    if MiddlePiece = zero (either 16 or 8-bit, this will be zero and will not be
+;    included).
 ;  This can be read as each byte means each 8x8 tile.
 ;Overwritten/Destroyed:
-; -$00 to $07: garbage:
-; --$00 to $01: will be when this routine is finished:
-; ---The amount right end contains if right end exist and no regards to left
-;    end and middle.
-; ---#$00 if no right end exist but middle exist.
-; ---The amount left end contains when middle and right end doesn't exist.
-; --$02 to $07: needed to move values to another address due to subroutines,
-;   as well as outputs of the subroutines.
+; - $00 to $07: garbage:
+; -- $00 to $01: will be when this routine is finished:
+; --- The amount right end contains if right end exist and no regards to left
+;     end and middle.
+; --- #$00 if no right end exist but middle exist.
+; --- The amount left end contains when middle and right end doesn't exist.
+; -- $02 to $07: needed to move values to another address due to subroutines,
+;    as well as outputs of the subroutines.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;DrawGraphicalBar:
 ;	if !Setting_GraphicalBar_IndexSize == 0
@@ -731,24 +731,24 @@ GetMaxBarInAForRoundToMaxCheck:
 ; subtraction. Much lighter than the other version.
 ;
 ;Input:
-; -$00 to $01: The amount of fill for the WHOLE bar.
-; -!Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
-;  the maximum amount of fill for this byte itself. If 0, it's not included in table.
-; -!Scratchram_GraphicalBar_MiddlePiece: Same as above but each middle byte.
-; -!Scratchram_GraphicalBar_RightEndPiece: Same as above but for right end.
-; -!Scratchram_GraphicalBar_TempLength: The length of the bar (only counts
+; - $00 to $01: The amount of fill for the WHOLE bar.
+; - !Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
+;   the maximum amount of fill for this byte itself. If 0, it's not included in table.
+; - !Scratchram_GraphicalBar_MiddlePiece: Same as above but each middle byte.
+; - !Scratchram_GraphicalBar_RightEndPiece: Same as above but for right end.
+; - !Scratchram_GraphicalBar_TempLength: The length of the bar (only counts
 ;   middle bytes)
 ;Output:
-; -!Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+EndAddress:
-;  A table array containing the amount of fill for each byte (N bytes (including zero) full,
-;  0 or 1 bytes a fraction, and then N bytes (including zero) empty), the address it ends at is:
+; - !Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+EndAddress:
+;   A table array containing the amount of fill for each byte (N bytes (including zero) full,
+;   0 or 1 bytes a fraction, and then N bytes (including zero) empty), the address it ends at is:
 ;
-;  EndAddress = (L + MLength + R) - 1
+;    EndAddress = (L + MLength + R) - 1
 ;
-;  -L and R are 0 if set to 0 number of pieces, 1 otherwise on any nonzero values.
-;  -MLength is how many middle tiles.
+;  - L and R are 0 if set to 0 number of pieces, 1 otherwise on any nonzero values.
+;  - MLength is how many middle tiles.
 ;
-; -$00 to $01: The leftover fill amount. If bar isn't full, it will be #$0000, otherwise its
+; - $00 to $01: The leftover fill amount. If bar isn't full, it will be #$0000, otherwise its
 ;  [RemainingFill = OriginalFill - EntireBarCapicity]. (overall calculation: RemainingFill = max((InputFillAmount - BarMaximumFull), 0))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 DrawGraphicalBarSubtractionLoopEdition:
@@ -855,12 +855,12 @@ DrawGraphicalBarSubtractionLoopEdition:
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;Round away code
 	;Input:
-	; -Y: rounding status, obtained from CalculateGraphicalBarPercentage:
-	; --$00 = not rounded to full or empty
-	; --$01 = rounded to empty
-	; --$02 = rounded to full
+	; - Y: rounding status, obtained from CalculateGraphicalBarPercentage:
+	; -- $00 = not rounded to full or empty
+	; -- $01 = rounded to empty
+	; -- $02 = rounded to full
 	;Output:
-	; -$00-$01: Percentage, rounded away from 0 and max.
+	; - $00-$01: Percentage, rounded away from 0 and max.
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	RoundAwayEmpty:
 		CPY #$01
