@@ -530,3 +530,4 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
  -Removed a redundant SEP #$20 on CalculateGraphicalBarPercentageRoundUp.
  -Corrected a comment explaining about "!Setting_GraphicalBar_SNESMathOnly".
  -Made descriptions of the routines inside the ASM files a bit easier to read.
+ -Fixed an issue with SA-1 with the patch OAM drawing.

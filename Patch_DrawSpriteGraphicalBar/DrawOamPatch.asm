@@ -49,6 +49,16 @@
 			!bank = $000000
 			!sa1 = 1
 		endif
+	;Invoke SA-1
+		macro invoke_sa1(label)
+			LDA.b #<label>
+			STA $3180
+			LDA.b #<label>>>8
+			STA $3181
+			LDA.b #<label>>>16
+			STA $3182
+			JSR $1E80
+		endmacro
 	;Handle bar direction
 		!GraphicalBar_OAMXFlip = 0
 		!GraphicalBar_OAMYFlip = 0
@@ -77,6 +87,10 @@ if !PatchSprite_Uninstall == 0
 	GraphicalBarTest:
 		.RestoreOverwrittenCode
 			JSL $028AB1		;>Restore the JSL (we write our own OAM after all sprite OAM of SMW are finished)
+			if !CPUMode != 0
+				%invoke_sa1(.MainCode)
+				JMP .BackToSMW
+			endif
 		.MainCode
 				PHB		;\In case if you are going to use tables using 16-bit addressing
 				PHK		;|
@@ -148,6 +162,10 @@ if !PatchSprite_Uninstall == 0
 		.Restore
 			SEP #$30
 			PLB
+			if !CPUMode != 0
+				RTL
+			endif
+		.BackToSMW
 			JML $00A2EA		;>Continue onwards
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;Subroutines below
