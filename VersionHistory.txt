@@ -530,4 +530,7 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
  -Removed a redundant SEP #$20 on CalculateGraphicalBarPercentageRoundUp.
  -Corrected a comment explaining about "!Setting_GraphicalBar_SNESMathOnly".
  -Made descriptions of the routines inside the ASM files a bit easier to read.
+ 3/15/2025 v6.4.1
  -Fixed an issue with SA-1 with the patch OAM drawing.
+ -Removed redundant code in "Patch_DrawSpriteGraphicalBar/DrawOamPatch.asm" since the code after incsrc to include uberasm tool
+  routine files also included that code.
