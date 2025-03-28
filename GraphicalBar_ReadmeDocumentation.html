@@ -500,7 +500,8 @@ To install:
 
 You can uninstall it by simply opening <kbd>GraphicalBarDefines/SpriteOAMSettings.asm</kbd>, and set <kbd>!PatchSprite_Uninstall</kbd> to <kbd>1</kbd>, and then re-apply the patch.<br><br>
 
-As a side note, this ASM resource was made before UberASM Tool v2.0 (released on SMWC on 2024-08-02). That means you no longer need the patch by moving the code to UberASM tool's <kbd>level</kbd>'s <kbd>end:</kbd> label (and excluding the hijacks).
+As a side note, this ASM resource was made before UberASM Tool v2.0 (released on SMWC on 2024-08-02). That means you no longer need the patch, but have its main code as <kbd>level</kbd> under <kbd>end:</kbd> label. I already provided a modified version
+in <kbd>UberasmTool_ExampleUsage/Level_Simple_EndOAM.asm</kbd>.
 <hr>
 <h2><a href="#AsmDocumentationBack" id="AsmDocumentation">^</a>ASM Documentation</h2>
 Note: All number values here are unsigned. Routine information follows:
