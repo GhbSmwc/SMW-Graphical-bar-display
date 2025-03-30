@@ -23,7 +23,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ; - SetupStripe
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;This routine directly writes the tile to the status bar or
-;overworld border plus.
+;overworld border plus, filling left to right.
 ;
 ;Note: This only writes up to 128 (64 if using super status
 ;bar and OWB+ format) tiles. But it is unlikely you would ever
@@ -32,6 +32,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;
 ;Input:
 ; - $00 to $02: The starting byte address location of the status bar (tile number).
+;   This is the leftmost tile to position.
 ; -- If you're using SA-1 mode here and using vanilla status bar,
 ;    the status bar tilemap table is moved to bank $40.
 ; - !Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also
@@ -158,6 +159,7 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;Write graphical bar vertically
 ;Input;
 ; - $00 to $02: The starting byte address location of the status bar (tile number).
+;   This is where top or bottom where the fill starts at.
 ; -- If you're using SA-1 mode here and using vanilla status bar,
 ;    the status bar tilemap table is moved to bank $40.
 ; - !Scratchram_GraphicalBar_LeftEndPiece: Number of pieces in left byte (0-255), also

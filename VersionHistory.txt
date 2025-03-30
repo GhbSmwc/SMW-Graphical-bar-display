@@ -541,3 +541,5 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
   version of the OAM patch for uberasm v2.0+.
  3/30/2025 v6.4.2
  -Added missing info on XY position on OAM writes that it is the tile where the fill starts at.
+ -Added comments explaining that "WriteBarToHUDVertically" (including its "Format2" variant) that the given address to write
+  is where the fill starts at.
