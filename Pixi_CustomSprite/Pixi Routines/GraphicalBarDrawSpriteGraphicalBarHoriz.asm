@@ -27,8 +27,8 @@ incsrc "../GraphicalBarDefines/SpriteOAMSettings.asm"
 ; - !Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl + (NumberOfTiles -1)
 ;   the tile numbers to write.
 ; - Y index: The OAM index (increments of 4)
-; - $02: X position
-; - $03: Y position
+; - $02: X position (where the fill start at)
+; - $03: Y position (where the fill start at)
 ; - $04 to $05: Number of tiles to write
 ; - $06: Direction of increasing fill:
 ; -- #$00 = left to right

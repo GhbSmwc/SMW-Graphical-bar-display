@@ -22,7 +22,8 @@
 		;Input
 		; - !Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl + (NumberOfTiles -1)
 		;   the tile numbers to write.
-		; - $00 to $01: X position, relative to screen border
+		; - $00 to $01: X position, relative to screen border (where the
+		;   fill starts at)
 		; - $02 to $03: Y position, same as above but Y position
 		; - $04 to $05: Number of tiles to write
 		; - $06: Direction of increasing fill:
@@ -161,7 +162,8 @@
 		;Input
 		; - !Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl + (NumberOfTiles -1)
 		;   the tile numbers to write.
-		; - $00 to $01: X position, relative to screen border
+		; - $00 to $01: X position, relative to screen border (where the
+		;   fill starts at)
 		; - $02 to $03: Y position, same as above but Y position
 		; - $04 to $05: Number of tiles to write
 		; - $06: Direction of increasing fill:

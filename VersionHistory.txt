@@ -539,3 +539,5 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
   routine files also included that code.
  -Reworded the explanation under "Drawing OAM (not using sprite slots, but patch using OAM)." since I have included a modified
   version of the OAM patch for uberasm v2.0+.
+ 3/30/2025 v6.4.2
+ -Added missing info on XY position on OAM writes that it is the tile where the fill starts at.

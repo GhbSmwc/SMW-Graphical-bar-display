@@ -1708,7 +1708,7 @@ function similarly to most sprite status bar patches. These are located at <kbd>
 	<table>
 	<tr><th>Input</th><th>Number of bytes</th><th>Description</th></tr>
 	<tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td><kbd>LeftEnd + MiddleLength + RightEnd</kbd></td><td>Tile numbers to write.</td></tr>
-	<tr><td><kbd>$00</kbd> to <kbd>$01</kbd></td><td style="text-align: center;">2</td><td rowspan="2">X and Y position, relative to screen border. Note: The XY position origin is the top-left of the 8x8 tile where the fill starts at when increasing<sup>1</sup>.</td></tr>
+	<tr><td><kbd>$00</kbd> to <kbd>$01</kbd></td><td style="text-align: center;">2</td><td rowspan="2">X and Y position, relative to screen border (where the fill starts at). Note: The XY position origin is the top-left of the 8x8 tile where the fill starts at when increasing<sup>1</sup>.</td></tr>
 	<tr><td><kbd>$02</kbd> to <kbd>$03</kbd></td><td style="text-align: center;">2</td></tr>
 	<tr><td><kbd>$04</kbd> to <kbd>$05</kbd></td><td style="text-align: center;">2</td><td>Number of tiles to write.</td></tr>
 	<tr>
@@ -1768,7 +1768,7 @@ setting the tile size) should your sprite use both 8x8 and 16x16 tile sizes.
 <tr><th>Input</th><th>Number of Bytes</th><th>Description</th></tr>
 <tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td style="text-align: center;"><kbd>LeftEnd + MiddleLength + RightEnd</kbd></td><td>Tile numbers to write.</td></tr>
 <tr><td><kbd>Y index</kbd></td><td style="text-align: center;">1 (not stored)</td><td>OAM index to use (start from <kbd>$0300</kbd>/<kbd>$0460</kbd>, not <kbd>$0200</kbd>/<kbd>$0420</kbd>)</td></tr>
-<tr><td><kbd>$02</kbd></td><td style="text-align: center;">1</td><td rowspan="2">X and Y position, relative to screen border. Note: The XY position origin is the top-left of the 8x8 tile where the fill starts at when increasing.</td></tr>
+<tr><td><kbd>$02</kbd></td><td style="text-align: center;">1</td><td rowspan="2">X and Y position, relative to screen border (where the fill starts at). Note: The XY position origin is the top-left of the 8x8 tile where the fill starts at when increasing.</td></tr>
 <tr><td><kbd>$03</kbd></td><td style="text-align: center;">1</td></tr>
 <tr><td><kbd>$04</kbd> to <kbd>$05</kbd></td><td style="text-align: center;">2</td><td>Number of tiles.</td></tr>
 <tr><td><kbd>$06</kbd></td><td style="text-align: center;">1</td><td>Direction:
