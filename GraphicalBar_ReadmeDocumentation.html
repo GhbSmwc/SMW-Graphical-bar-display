@@ -1351,9 +1351,9 @@ Destroyed:
 regarding the tile formats.
 </li>
 <ul>
-<li><a href="#WriteBarToHUD_Back" id="WriteBarToHUD">^</a><kbd>WriteBarToHUD</kbd>: Copies the tile numbers in the table to paste to (writes) the status bar, in the direction of filling left to right.
-Inputs are again, similar to <kbd>CalculateGraphicalBarPercentage</kbd> with only the attributes being used, but a new input is required:
-
+<li><a href="#WriteBarToHUD_Back" id="WriteBarToHUD">^</a><kbd>WriteBarToHUD</kbd>: Copies the tile numbers in the table to paste to (writes) the status bar or stripe image,
+in the direction of filling left to right. If used as a stripe on vertical mode, it would be downwards. Inputs are again, similar to <kbd>CalculateGraphicalBarPercentage</kbd>
+with only the attributes being used, but a new input is required:
 <table>
 <tr>
 <th>Input</th>
@@ -1409,10 +1409,12 @@ table to use OW layer 3 tiles).<br><br>
 As a side note, the <kbd>Format2</kbd> version of this also works stripe image both horizontal and vertical, since SSB, OWB+ and stripe uses the same <kbd>TTTTTTTT YXPCCCTT TTTTTTTT YXPCCCTT...</kbd> format. However, I strongly
 recommend having <kbd>!StatusBar_UsingCustomProperties</kbd> set to <kbd>1</kbd> in <kbd>GraphicalBarDefines/StatusBarSettings.asm</kbd> because it could write garbage tiles or crash your game.</li><br>
 
-<li><a href="#WriteBarToHUDLeftwards_Back" id="WriteBarToHUDLeftwards">^</a><kbd>WriteBarToHUDLeftwards</kbd>: Same as above, but writes an X-flipped version, in the direction of filling right to left (<img width="96" class="img-hor" src="readme_files/TransperentBackground.png">). Note that it only
-works properly if you set bit 6 of YXPCCCTT properties byte (this routine itself does not automatically set bit 6, even with <kbd>!StatusBar_UsingCustomProperties</kbd> set to <kbd>1</kbd>), assuming
-the default graphic for the fill tiles are left-to-right. The tiles are arranged in reverse order so the leftmost tile (including the end tiles) is now the right most, the second leftmost is second
-rightmost, and so on. If you didn't X-flip the tiles via editing the tile properties (YXPCCCTT), each tile will starts filling left-to-right starting at the rightmost tile going towards the left.
+<li><a href="#WriteBarToHUDLeftwards_Back" id="WriteBarToHUDLeftwards">^</a><kbd>WriteBarToHUDLeftwards</kbd>: Same as above, but writes an X-flipped version, in the direction of filling right to left (<img width="96" class="img-hor" src="readme_files/TransperentBackground.png">), if used
+as a vertical stripe, it would be bottom to top.<br><br>
+
+Note that the properties byte (assuming <kbd>!StatusBar_UsingCustomProperties == 1</kbd>) does not automatically modify the X- and/or Y-flip flags when set to fill leftwards or downwards. This is because when having vertical
+bars as a stripe image, they need to be Y-flipped instead of X when filling in opposite directions.<br><br>
+
 In vanilla SMW, it is still possible to edit the tile properties (but cannot be changed in-game as the data is stored in ROM) at around address <kbd>$008C81</kbd>.<br><br>
 
 Note that this does NOT reverse the order of bytes stored in <kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> table, it simply takes that table, and write them on the HUD backwards.<br><br>
@@ -1423,7 +1425,7 @@ Also keep in mind that as you increase the length of the bar, it will always ext
 Another note is that the address provided on where to write on the status bar is still &ldquo;left to right&rdquo; meaning as the bar extends, the left side of the bar does not move and will still extend rightwards although
 the fill starts on the right side.<br><br>
 
-Just like <kbd>WriteBarToHUD</kbd>, this will also work on stripe image data for both vertical and horizontal.
+Just like <kbd>WriteBarToHUD</kbd>, this will also work on stripe image data for both vertical and horizontal (this is for upwards-filling bar).
 </li><br>
 <li><a href="#WriteBarToHUDVertically_Back" id="WriteBarToHUDVertically">^</a><kbd>WriteBarToHUDVertically</kbd>: Writes a vertical bar on the HUD, supports both upwards and downwards. Only works if the status bar is 32 tiles wide on each contiguous row,
 at the time of writing this, only SMB3, SSB, and OWB+ patches will work on this. Don't use this for stripe image.
