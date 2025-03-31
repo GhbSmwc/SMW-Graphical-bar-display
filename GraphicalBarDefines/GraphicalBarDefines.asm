@@ -123,8 +123,8 @@ endif
 
 		!Setting_GraphicalBar_SNESMathOnly = 0
 			;^Info follows:
-			;-Set this to 0 if your code calls the graphical bar routine under the SA-1 processor.
-			; Otherwise set it to 1 if it calls it under the SNES CPU.
+			;-Set this to 0 if your code calls the graphical bar routines under the SA-1 processor.
+			; Otherwise set it to 1 if it only calls it under the SNES CPU.
 			;
 			; As an important note: certain emulators follows a rule that only the correct CPU can access
 			; the registers of the matching type (e.g. SA-1 registers can only be used by SA-1 CPU, not SNES),
