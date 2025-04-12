@@ -2,7 +2,7 @@ incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
 ;List of routines.
-;NOTE: "Format2" refers to a variation of the original (original, as in without the "Format2")
+;Note: "Format2" refers to a variation of the original (original, as in without the "Format2")
 ;that supports Super Status Bar, Overworld Border plus or any other ASM resource
 ;in which the tile format is [TTTTTTTT, YXPCCCTT, TTTTTTTT, YXPCCCTT...].
 ; - WriteBarToHUD
@@ -52,6 +52,9 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ; - If using SB/OWB+ patch that allows editing YXPCCCTT in-game and have set !StatusBar_UsingCustomProperties
 ;   to 1:
 ; -- [RAMAddressIn03] to [RAMAddressIn03 + ((NumberOfTiles-1)*TileFormat]: same as above but YXPCCCTT
+;Note:
+; - These routines can be used on stripe image for both horizontal (left to right) and vertical (top to
+;   bottom)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	if !OWPlusAndSSBSameFormat == 0
 		WriteBarToHUD:
@@ -101,14 +104,18 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 		.Done
 			RTL
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;Same as above, but fills leftwards as opposed to rightwards.
-;Note that this is still "left anchored", meaning the address
-;to write your bar on would be the left side where the fill
-;is at when full.
+;Same as WriteBarToHUD, but fills leftwards as opposed to
+;rightwards.
 ;
-;NOTE: does not reverse the order of data in
-;!Scratchram_GraphicalBar_FillByteTbl, it simply writes to the HUD
-;in reverse order.
+;Note:
+; - This is still "left anchored", meaning the address
+;   to write your bar on would be the left side where the fill
+;   edge is at when full.
+; - Does not reverse the order of data in
+;   !Scratchram_GraphicalBar_FillByteTbl, it simply writes to the
+;   HUD in reverse order.
+; - These routines can be used on stripe image for both horizontal
+;   (right to left) and vertical (bottom to top).
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	if !OWPlusAndSSBSameFormat == 0
 		WriteBarToHUDLeftwards:
@@ -186,9 +193,12 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ; - $03 to $05: The address after writing the last tile (as if writing the amount of tiles plus 1), can be used
 ;   for writing static end tile where the fill ends at.
 ;
-;NOTE: this only works with status bar having a width of 32 8x8 tiles. So far at the time of writing this
-;is that the super status bar and SMB3 status bar patches are the only status bar patches that offer
-;tile property modification and have more than 1 contiguous row that each have the same number of tiles.
+;Note:
+; - This only works with status bar having a width of 32 8x8 tiles on each row. So far at the time of writing
+;   this is that the Super Status Bar and SMB3 status bar patches are the only status bar patches that offer
+;   tile property modification and have more than 1 contiguous row that each have the same number of tiles.
+; - Don't use these for stripe image. Stripe already supports vertical mode for writing each tile data 2-bytes
+;   apart. Use WriteBarToHUD or WriteBarToHUDLeftwards instead.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	if !OWPlusAndSSBSameFormat == 0
 		WriteBarToHUDVertically:
