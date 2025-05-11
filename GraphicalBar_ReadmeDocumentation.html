@@ -470,11 +470,7 @@ Therefore, if you push something, you must pull before calling <kbd>%GetDrawInfo
 <p>Everything is effectively the same as <kbd>GraphicalBarSimpleTest</kbd> except the bar having an actual purpose and the sprite is a boss sprite. Open the ASM file <kbd>giant_masked_koopa.asm</kbd>, and there will be comments I added to show an example
 on how to implement a sprite graphical bar (in this example, a HP bar).</p>
 
-<p>Don't forget: Because the boss sprite takes a considerable amount of 8x8 tiles, the bar tile numbers table for <kbd>ConvertBarFillAmountToTiles</kbd> had to be relocated. Open <a href="readme_files/JS_GraphicsNotes.html" target="_blank"><kbd>readme_files/JS_GraphicsNotes.html</kbd></a>, look for
-<kbd>3/8/3 LevelSprite GiantMaskedKoopa Layout</kbd>, copy the fill table, open <kbd>GraphicalBarConvertBarFillAmountToTiles</kbd> and paste the table under &ldquo;sprite&rdquo;.
-
-alternatively, you could just use &ldquo;<kbd>IndirectAddressTable</kbd>&rdquo; variation (<kbd>GraphicalBarConvertBarFillAmountToTilesIndirectAddressTable</kbd>) instead and edit the code so that it supplies the table. This is good for situations where you have 2 sprites
-in your game that have different tile layouts that you want them to display a bar.</p>
+<p>Because the boss sprite takes a considerable amount of 8x8 tiles, it uses the <kbd>ConvertBarFillAmountToTilesIndirectAddressTable</kbd> routine to avoid tile conflicts.</p>
 <hr>
 <h2><a href="#DrawOamPatch_Back" id="DrawOamPatch">^</a>Drawing OAM (not using sprite slots, but patch using OAM).</h2>
 <p>This is similar to the sprite version, but written using a patch. Using a hijack at <kbd>$00A2E6</kbd> and running the patch's OAM handler AFTER processing all sprites (including after $028AB1), gives
@@ -1242,7 +1238,8 @@ See explanation <a href="readme_files/FillEdgeCrossingTileBorder.html" id="FillE
 </li>
 
 <li><a href="#ConvertBarFillAmountToTilesIndirectAddressTable_Back" id="ConvertBarFillAmountToTilesIndirectAddressTable">^</a><kbd>ConvertBarFillAmountToTilesIndirectAddressTable</kbd>: Does the same thing as <kbd><a href="#ConvertBarFillAmountToTiles">ConvertBarFillAmountToTiles</a></kbd>, but tile
-tables are no longer &ldquo;fixed&rdquo; (no need to edit the routine's code to check $00's newer values and adding new tables around that area), which is useful for things like sprite tile remapping.
+tables are no longer &ldquo;fixed&rdquo; (no need to edit the routine's code to check $00's newer values and adding new tables around that area). This is useful for situations that you need different tile layouts across levels due to other sprites occupying certain 8x8 tiles
+(the Giant Masked Koopa included here demonstrates this).
 <table>
 <tr><th>Input</th><th>Number of Bytes</th><th>Description</th></tr>
 <tr><td><kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> to <kbd>!Scratchram_GraphicalBar_FillByteTbl + ((LeftEnd + MiddleLength + RightEnd) - 1)</kbd></td><td style="text-align: center;"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td><td>The fill amount array to be converted to tile numbers.</td></tr>
