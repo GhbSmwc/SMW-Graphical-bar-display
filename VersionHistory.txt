@@ -543,3 +543,5 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
  -Added missing info on XY position on OAM writes that it is the tile where the fill starts at.
  -Added comments explaining that "WriteBarToHUDVertically" (including its "Format2" variant) that the given address to write
   is where the fill starts at. Did a similar thing with WriteBarToHUDVertically.
+ -Explained better about "ConvertBarFillAmountToTilesIndirectAddressTable" and fixed the explanation about the GMK boss needing
+  an alternate tile table where it says "Because the boss sprite takes a considerable amount of 8x8 tiles".
