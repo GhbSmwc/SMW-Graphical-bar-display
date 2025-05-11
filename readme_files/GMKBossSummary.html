@@ -21,6 +21,14 @@
 			
 			abbr{cursor: help;}
 			
+			div.CodeBlock {
+				overflow: auto;
+				width: 1000px;
+				height: 500px;
+				border: 1px solid white;
+				resize: both;
+				background-color: #101010;
+			}
 		</style>
 	</head>
 <body>
@@ -116,7 +124,7 @@ up later after calculating the graphical bar.<br><br>
 
 We want to include our code to display its HP bar, but we have to do so without interfering with the GMK's code. My method is simply make it so that the very first thing to do is calculate the HP
 bar <i>before</i> it does anything else on the graphics routine:<br>
-<table><tr><td><pre>
+<div class="CodeBlock"><pre>
 ;3/8/3 LevelSprite GiantMaskedKoopa Layout
 		BarTilesLeft:
 		;Left end fill amount tile numbers:
@@ -251,14 +259,14 @@ Graphics:
 			PLA : STA $00
 			SEP #$20
 			PLX								;&gt;Restore sprite slot index
-			;[...]</pre></td></tr></table><br>
+			;[...]</pre></div><br>
 Parts of this is very similar to the status bar-based code, but only the parts that <i>calculate</i> the tiles (not the actual writing the tile numbers as part of
 the final steps). We want to calculate this before calling <kbd>%GetDrawInfo()</kbd> as several subroutines it uses writes data into scratch RAM and also mangles the Y register, especially
 <kbd>CalculateGraphicalBarPercentage</kbd> ($00-$09 are all used). What we are concerned about is writing the tiles to OAM.
 </ul>
 To write to OAM, it has to be <i>after</i> <kbd>%GetDrawInfo()</kbd>, we must set up values for inputs for <a href="../GraphicalBar_ReadmeDocumentation.html#DrawSpriteGraphicalBarHorizVert"><kbd>DrawSpriteGraphicalBarHoriz</kbd>
 or <kbd>DrawSpriteGraphicalBarVert</kbd></a> prior calling it:
-<table><tr><td><pre>GraphicalBarXDisp:	;[GraphicalBar_For_HP]
+<div class="CodeBlock"><pre>GraphicalBarXDisp:	;[GraphicalBar_For_HP]
 	;The origin of the sprites XY position isn't centered with the image of the sprite,
 	;so the bar's offset from the sprite's origin have to adjust to remain centered with the sprite.
 	db !Default_GiantMaskedKoopa_GraphicalBar_XPosOffset_StandFaceRight	;&gt;Facing right
@@ -342,7 +350,7 @@ or <kbd>DrawSpriteGraphicalBarVert</kbd></a> prior calling it:
 		LDA Properties,y	;|
 		STA $0A			;|
 		SEP #$20		;/
-		PLY			;&gt;Restore OAM index</span></pre></td></tr></table><br>
+		PLY			;&gt;Restore OAM index</span></pre></div><br>
 
 The comments should explain everything. Of course, there is no issue of having what's marked in red to be placed from before calling <kbd>%GetDrawInfo()</kbd> to after it (like I said, it only uses Y, $00, and $01, nothing else).<br><br>
 
@@ -371,7 +379,7 @@ However, since XY are swapped due opcode limitations: <kbd>LDA ($xx),x</kbd> doe
 <h4>Finish OAM write</h4>
 <p>Because we are using hybrid tile sizes, the FinishOAMWrite (either by calling <kbd>JSL $01B7B3|!BankB</kbd> or <kbd>%FinishOAMWrite()</kbd>), the Y input must be $FF (to indicate to the routine not to automatically write to $0460),
 and for the number of tiles, thankfully, this isn't too hard:
-<table><tr><td><pre>	;[GraphicalBar_For_HP] This is the last steps on working with OAM handling.
+<div class="CodeBlock"><pre>	;[GraphicalBar_For_HP] This is the last steps on working with OAM handling.
 	;Like I said, most sprites are composed of 16x16 tiles, and having a bar made of 8x8s means we are manually setting the tile sizes.
 	;When finishing OAM write, the inputs are:
 	; Y = size: $00 = 8x8s, $02 = 16x16s, $FF manuel
@@ -388,9 +396,9 @@ and for the number of tiles, thankfully, this isn't too hard:
 		ADC.b #!GiantMaskedKoopa_GraphicalBar_TotalTiles ; Add by the number of tiles of the graphical bar (no need to subtract by 1, else we are doing it twice).
                                 ; I drew 2 tiles, so 2-1 = 1. A = 01.
     JSL $01B7B3|!BankB          ; Call the routine that draws the sprite (finish OAM write).
-    RTS</pre></td></tr></table><br><br>
+    RTS</pre></div><br>
 again, the comments should explain everything. If you are wondering how does the program finds the total number of tiles, (which is <kbd>!GiantMaskedKoopa_GraphicalBar_TotalTiles</kbd>), it is calculated via this:
-<table><tr><td><pre> ;Giant Masked koopa tile count
+<div class="CodeBlock" style="height: 300px"><pre> ;Giant Masked koopa tile count
   ;Explanation: if these tiles don't exist (pieces set to 0, and/or middle length set to 0)
   ;They're not written, so they are not counted. If they do exist (pieces set to any nonzero values),
   ;that counts as a tile. After knowing if they exist or not we add all of them.
@@ -406,7 +414,7 @@ again, the comments should explain everything. If you are wondering how does the
   if !Default_PatchSprite_RightEndPieces != 0
    !GiantMaskedKoopa_GraphicalBar_RightEndExist = 1
   endif
-  !GiantMaskedKoopa_GraphicalBar_TotalTiles = !GiantMaskedKoopa_GraphicalBar_LeftEndExist+!GiantMaskedKoopa_GraphicalBar_MiddleExist+!GiantMaskedKoopa_GraphicalBar_RightEndExist</pre></td></tr></table><br>
+  !GiantMaskedKoopa_GraphicalBar_TotalTiles = !GiantMaskedKoopa_GraphicalBar_LeftEndExist+!GiantMaskedKoopa_GraphicalBar_MiddleExist+!GiantMaskedKoopa_GraphicalBar_RightEndExist</pre></div><br>
 Which is found in <kbd>SMW-Graphical-bar-display/GraphicalBarDefines/SpriteOAMSettings.asm</kbd>.</p>
 <h3><a href="#Other_Back" id="Other">^</a>Other information</h3>
 <ul>
@@ -415,7 +423,7 @@ Which is found in <kbd>SMW-Graphical-bar-display/GraphicalBarDefines/SpriteOAMSe
 		<ul>
 			<li>Trial and error. If the bar is too far to the right, pick a smaller number, if too far to the left, pick a larger number.</li>
 			<li>Locking its XY position ($E4/$14E0 $D8/$14D4) at a specified value every frame using uberasm tool's <kbd>level main</kbd>:
-<table><tr><td><pre>;Note, it does this within a screen boundary, for the sake of simplicity!
+<div class="CodeBlock" style="height: 200px"><pre>;Note, it does this within a screen boundary, for the sake of simplicity!
 ;Run this in main (every frame), not init!
 	LDX #!sprite_slots-1
 	-
@@ -424,7 +432,7 @@ Which is found in <kbd>SMW-Graphical-bar-display/GraphicalBarDefines/SpriteOAMSe
 	DEX
 	BPL -
 	RTL
-;xx and yy are the level coordinates (low byte). Use LM's coordinate display at the bottom-left corner, multiply by $10 (or 16 in decimal) to convert from 16x16 blocks to pixel coordinates.</pre></td></tr></table>
+;xx and yy are the level coordinates (low byte). Use LM's coordinate display at the bottom-left corner, multiply by $10 (or 16 in decimal) to convert from 16x16 blocks to pixel coordinates.</pre></div>
 			And arranged the blocks to mark its position.</li><br>
 			<li>Setting the bar's XY position to (0,0) (no displacement), <abbr title="OAM writes from highest slot to the lowest, therefore, slot 0 is in front of slot 1, and sprites write OAM at increasing slot numbers.">make sure this is drawn first before drawing the koopa's body, else the bar can get covered and may not be visible</abbr>. The top-left pixel of the 8x8 tile that the fill starts at will point to where the origin point of the sprite.</li>
 		</ul>
