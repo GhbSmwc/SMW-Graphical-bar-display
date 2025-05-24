@@ -545,3 +545,6 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
   is where the fill starts at. Did a similar thing with WriteBarToHUDVertically.
  -Explained better about "ConvertBarFillAmountToTilesIndirectAddressTable" and fixed the explanation about the GMK boss needing
   an alternate tile table where it says "Because the boss sprite takes a considerable amount of 8x8 tiles".
+ 05/24/2025 v6.4.2 Address tracker tool update
+ -Changed "Graphical Bar" to "Graphical_Bar" on the text extracted from "JS_GraphicalBarCalculator3.html" (a RAM usage
+  calculator). This is because the address tracker's assigner tool no longer accepts spaces in the ASM resource name.
