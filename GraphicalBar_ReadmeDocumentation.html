@@ -599,13 +599,15 @@ The correct way: (1 * 62) / 3
 	(65,535 * 65,535 = 4,294,836,225) is less than 4,294,967,295, the maximum unsigned 32-bit integer (close though).
 	
 	62 / 3 = 20.[6] the routine would've round this number to 20 or 21, making the error tiny off by 0.[6] or 0.[3].
+	The amount off will always be less than 1.
 
 The incorrect way: (1 / 3) * 62
 
 	1/3 = 0.[3], the routine would've round this number to 0 or 1, making the error 0.[3] or 0.[6]
 	
-	If rounded to 0, then 0 * 62 = 0, the routine is now off by 20.[6] units.
-	If rounded to 1, then 1 * 62 = 62, the routine is off by 41.[3].
+	If rounded to 0, then 0 * 62 = 0, the calculation is off by 20.[6] units, otherwise if rounded to 1, then
+	1 * 62 = 62, which is off by 41.[3] units. Both of these causes the fill amount to always be in multiples of
+	TotalNumberOfPiecesInBar.
 </pre></td></tr></table>
 Therefore it's best to perform calculations in a way that rounding to only be applied on the final operator (in this case, integer division), when possible.
 </tr>
