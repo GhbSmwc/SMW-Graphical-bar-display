@@ -173,7 +173,7 @@ to modify, and that codes here only supports the OWB+ patch). Remember that this
 bar's &ldquo;each next tile is next byte&rdquo; format and OWB+'s &ldquo;each next tile is next 2 bytes over, provided you have set <kbd>!OWPlusAndSSBSameFormat</kbd> to <kbd>0</kbd>).</li><br>
 
 <li>Another thing to note is the define <kbd>!StatusBar_UsingCustomProperties</kbd>, this applies to <span sty;e="font-weight: bold;">both</span> the status bar and the overworld border plus patch. This is because both
-writes to the status bar and the border reuses the same &ldquo;write tile&rdquo; routine to save space. Thankfully, most status bar patches that are layer 3-based,
+writes to the status bar and the border reuses the same &ldquo;write tile&rdquo; routines to save space. Thankfully, most status bar patches that are layer 3-based,
 regardless of the formats, will likely enable you to edit their tile properties, so its more likely you have to set this define to 1 (its 0 by default).</li><br>
 </ul>
 
@@ -1730,7 +1730,14 @@ function similarly to most sprite status bar patches. These are located at <kbd>
 	</ul>
 	</td>
 	</tr>
-	<tr><td><kbd>$07</kbd></td><td style="text-align: center;">1</td><td>Properties (YXPPCCCT)</td></tr>
+	<tr><td><kbd>$07</kbd></td><td style="text-align: center;">1</td><td>Properties (YXPPCCCT). Note that:
+		<ul>
+			<li>If bar is horizontal, X-flip is forcibly set when filling right-to-left.</li>
+			<li>If bar is vertical, Y-flip is forcibly set when filling top-to-bottom.</li>
+		</ul>
+		Otherwise they are kept as-is.
+	
+	</td></tr>
 	</table><br>
 	
 	<table>
