@@ -1721,23 +1721,16 @@ function similarly to most sprite status bar patches. These are located at <kbd>
 	For horizontal (using <kbd>DrawOamGraphicalBarHoriz</kbd>):
 	<ul>
 	<li><kbd>$00</kbd> = Left to right</li>
-	<li><kbd>$01</kbd> = Right to left (YXPPCCCT's X bit set)</li>
+	<li><kbd>$01</kbd> = Right to left (YXPPCCCT's X bit automatically set)</li>
 	</ul>
 	For vertical (<kbd>DrawOamGraphicalBarVert</kbd>):
 	<ul>
 	<li><kbd>$00</kbd> = Bottom to top</li>
-	<li><kbd>$01</kbd> = Top to bottom (YXPPCCCT's Y bit set)</li>
+	<li><kbd>$01</kbd> = Top to bottom (YXPPCCCT's Y bit automatically set)</li>
 	</ul>
 	</td>
 	</tr>
-	<tr><td><kbd>$07</kbd></td><td style="text-align: center;">1</td><td>Properties (YXPPCCCT). Note that:
-		<ul>
-			<li>If bar is horizontal, X-flip is forcibly set when filling right-to-left.</li>
-			<li>If bar is vertical, Y-flip is forcibly set when filling top-to-bottom.</li>
-		</ul>
-		Otherwise they are kept as-is.
-	
-	</td></tr>
+	<tr><td><kbd>$07</kbd></td><td style="text-align: center;">1</td><td>Properties (YXPPCCCT)</td></tr>
 	</table><br>
 	
 	<table>
