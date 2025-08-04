@@ -71,10 +71,10 @@ incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 
 macro HexDisplay(RamToRead, StatusBarAddress)
-	LDA <RamToRead>					;\every 16th number increments the 1st digit.
+	LDA <RamToRead>					;\every 16th number increments the 1st digit (divide by 16).
 	LSR #$04					;|
 	STA <StatusBarAddress>				;/
-	LDA <RamToRead>					;\limit it to #$00-#$0F on 2nd digit digit.
+	LDA <RamToRead>					;\wrap the rightmost digit to $00~$0F (modulo by 16)
 	AND #$0F					;|
 	STA <StatusBarAddress>+(1*!StatusBarFormat)	;/
 endmacro
