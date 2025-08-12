@@ -341,26 +341,32 @@ includeonce
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Don't touch these below
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	;Patched status bar. Feel free to use this.
-		function PatchedStatusBarXYToAddress(x, y, StatusBarTileDataBaseAddr, format) = StatusBarTileDataBaseAddr+(x*format)+(y*32*format)
-		;You don't have to do STA $7FA000+StatusBarXYToByteOffset(0, 0, $02) when you can do STA PatchedStatusBarXYToAddress(0, 0, $7FA000, $02)
+	if not(defined("FunctionGuard_StatusBarFunctionDefined"))
+		;^This if statement prevents an issue where "includeonce" is "ignored" if two ASMs files
+		; incsrcs to the same ASM file with a different path due to asar not being able to tell
+		; if the incsrc'ed file is the same file: https://github.com/RPGHacker/asar/issues/287
 		
-		macro CheckValidPatchedStatusBarPos(x,y)
-			assert and(greaterequal(<x>, 0), lessequal(<x>, 31)), "Invalid position on the patched status bar"
-		endmacro
-	
-	;Vanilla SMW status bar. Again, feel free to use this.
-		function VanillaStatusBarXYToAddress(x,y, SMWStatusBar0EF9) = (select(equal(y,2), SMWStatusBar0EF9+(x-2), SMWStatusBar0EF9+$1C+(x-3)))
+		;Patched status bar. Feel free to use this.
+			function PatchedStatusBarXYToAddress(x, y, StatusBarTileDataBaseAddr, format) = StatusBarTileDataBaseAddr+(x*format)+(y*32*format)
+			;You don't have to do STA $7FA000+StatusBarXYToByteOffset(0, 0, $02) when you can do STA PatchedStatusBarXYToAddress(0, 0, $7FA000, $02)
+			
+			macro CheckValidPatchedStatusBarPos(x,y)
+				assert and(greaterequal(<x>, 0), lessequal(<x>, 31)), "Invalid position on the patched status bar"
+			endmacro
 		
-		macro CheckValidVanillaStatusBarPos(x,y)
-			assert or(and(equal(<y>, 2), and(greaterequal(<x>, 2), lessequal(<x>, 29))), and(equal(<y>, 3), and(greaterequal(<x>, 3), lessequal(<x>, 29)))), "Invalid position on the vanilla status bar"
-		endmacro
-		
-		if !sa1 == 0
-			!RAM_0EF9 = $0EF9
-		else
-			!RAM_0EF9 = $400EF9
-		endif
+		;Vanilla SMW status bar. Again, feel free to use this.
+			function VanillaStatusBarXYToAddress(x,y, SMWStatusBar0EF9) = (select(equal(y,2), SMWStatusBar0EF9+(x-2), SMWStatusBar0EF9+$1C+(x-3)))
+			
+			macro CheckValidVanillaStatusBarPos(x,y)
+				assert or(and(equal(<y>, 2), and(greaterequal(<x>, 2), lessequal(<x>, 29))), and(equal(<y>, 3), and(greaterequal(<x>, 3), lessequal(<x>, 29)))), "Invalid position on the vanilla status bar"
+			endmacro
+			
+			if !sa1 == 0
+				!RAM_0EF9 = $0EF9
+			else
+				!RAM_0EF9 = $400EF9
+			endif
+	endif
 	;Convert XY position to address
 		!Default_GraphicalBar_Pos_Tile = VanillaStatusBarXYToAddress(!Default_GraphicalBar_PosX_Tile, !Default_GraphicalBar_PosY_Tile, !RAM_0EF9)
 		!Default_GraphicalBar_Pos_Tile_ExtendLeftwards = VanillaStatusBarXYToAddress(!Default_GraphicalBar_PosX_ExtendLeftwards, !Default_GraphicalBar_PosY_ExtendLeftwards, !RAM_0EF9)
