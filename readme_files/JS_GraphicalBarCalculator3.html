@@ -319,10 +319,7 @@ Notes:<br>
 					}
 					let EnteredNumber = ParseBigIntValue(e.target.value, parseInt(e.target.dataset.radix)) + IncrementDecrement
 					event.target.value = (EnteredNumber.toString(parseInt(e.target.dataset.radix))).toUpperCase()
-					
-					let a = 0
 					UpdateOtherInputs(e.target)
-					
 				}
 			}
 		)
