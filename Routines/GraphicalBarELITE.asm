@@ -739,11 +739,11 @@ GetMaxBarInAForRoundToMaxCheck:
 ; - !Scratchram_GraphicalBar_TempLength: The length of the bar (only counts
 ;   middle bytes)
 ;Output:
-; - !Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+EndAddress:
+; - !Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+NumberOfBytes-1:
 ;   A table array containing the amount of fill for each byte (N bytes (including zero) full,
 ;   0 or 1 bytes a fraction, and then N bytes (including zero) empty), the address it ends at is:
 ;
-;    EndAddress = (L + MLength + R) - 1
+;    NumberOfBytes = (L + MLength + R)
 ;
 ;  - L and R are 0 if set to 0 number of pieces, 1 otherwise on any nonzero values.
 ;  - MLength is how many middle tiles.
