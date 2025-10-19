@@ -391,7 +391,7 @@ we don't want to put our code there, instead we place it at a location that is <
 <li>Preserve sprite index (usually on the X index register), often by doing push/pull them (like <kbd>PHX</kbd> (before X is being used for something else)...<kbd>PLX</kbd> (after done using X for something else)) them (or just <kbd>LDX $15E9|!addr</kbd> after done using X for something else), as many stuff and subroutines (including ones here) uses the X register for other things.</li><br>
 </ul>
 Many sprites on the sprite section on SMWC can be complex and have different coding structures, but following the principals above should make it possible to implement on any sprite.<br>
-Another important note is that the routine <kbd>%GetDrawInfo()</kbd> uses &ldquo;<span style="font-weight: bold;">destructive return</span>&rdquo;-- A stack-manipulation technique to &ldquo;double-exit&rdquo; the subroutine upon returning (RTS/RTL), consider this simple example shown below:
+Another important note is that the routine <kbd>%GetDrawInfo()</kbd> uses &ldquo;<span style="font-weight: bold;">destructive return</span>&rdquo;-- A stack-manipulation technique to exit multiple subroutines at once upon returning (RTS/RTL), consider this simple example shown below:
 <table>
 <tr><td><pre>	JSR Subroutine
 	STZ $00
@@ -426,7 +426,7 @@ Another important note is that the routine <kbd>%GetDrawInfo()</kbd> uses &ldquo
 	;The same applies to JSL and RTL, but 3 bytes instead.
 </pre></td></tr>
 </table>
-Therefore, if you push something, you must pull before calling <kbd>%GetDrawInfo()</kbd> as the game will crash upon the sprite going offscreen (it doubles-out if the sprite goes offscreen, else it keeps the return address). Normally, you can
+Therefore, if you push something, you must pull before calling <kbd>%GetDrawInfo()</kbd> (or any subroutines using this technique) as the game will crash. For <kbd>%GetDrawInfo()</kbd>, doing the same will crash upon the sprite going offscreen (it doubles-out if the sprite goes offscreen, else it keeps the return address). Normally, you can
 push stuff (such as scratch RAM), call a subroutine, then pull stuff (often to restore values such as scratch RAM), but this is an exception to the rule.
 </p>
 <ol>
