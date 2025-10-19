@@ -25,6 +25,9 @@
 				filter: FlipH;
 				-ms-filter: "FlipH";
 			}
+			li {
+				padding: 5px;
+			}
 		</style>
 	</head>
 <body style="max-width: 1000px; margin: auto; padding: 15px">
@@ -502,7 +505,15 @@ As a side note, this ASM resource was made before UberASM Tool v2.0 (released on
 in <kbd>UberasmTool_ExampleUsage/Level_Simple_EndOAM.asm</kbd>.
 <hr>
 <h2><a href="#AsmDocumentationBack" id="AsmDocumentation">^</a>ASM Documentation</h2>
-Note: All number values here are unsigned. Routine information follows:
+Notes: 
+<ul>
+	<li>All number values here are unsigned (negative numbers don't exists).</li>
+	<li>
+		<kbd>MiddleLength</kbd> is equal to a value stored in RAM defined as <kbd>!Scratchram_GraphicalBar_TempLength</kbd>, which is the number of middle tiles. However, if that <b>and/or</b> the number of pieces in each middle tile were to be
+		set to <kbd>$00</kbd>, then <kbd>MiddleLength</kbd> would be zero.
+	</li>
+</ul>
+Routine information follows:
 <ol>
 <li><a href="#GraphicalBarELITEBack" id="GraphicalBarELITE">^</a>Inside <kbd>GraphicalBarELITE.asm</kbd></li>
 <ul>
@@ -594,16 +605,17 @@ causes problem where the value could output only 0 or any number that is a multi
 integer, which the error is between 0 and 1, before multiplying by <kbd>TotalNumberOfPiecesInBar</kbd> and scaling that error by an enormous amount:
 <table><tr><td><pre>1 out of 3 HP = 20 and 2/3, or 20.[6] out of 62 pieces (bracket means repeating digits).
 
-The correct way: (1 * 62) / 3
+The correct way (multiply-first): (1 * 62) / 3
 
-	1 * 62 = 62, multiplying 2 integers always results in the correct number assuming no overflows. However since the
-	multiplication routine used here is 16-bit * 16-bit = 32-bit, overflows are not possible
-	(65,535 * 65,535 = 4,294,836,225) is less than 4,294,967,295, the maximum unsigned 32-bit integer (close though).
+	1 * 62 = 62, multiplying 2 integers always results in the correct number assuming no overflows. However
+	since the multiplication routine used here is 16-bit * 16-bit = 32-bit, overflows are not possible, because
+	65,535 * 65,535 = 4,294,836,225 and the maximum unsigned 32-bit integer is 4,294,967,295. which means the maximum
+	product would be under the maximum unsigned 32-bit integer (131,070 away from the 32-bit max).
 	
 	62 / 3 = 20.[6] the routine would've round this number to 20 or 21, making the error tiny off by 0.[6] or 0.[3].
 	The amount off will always be less than 1.
 
-The incorrect way: (1 / 3) * 62
+The incorrect way (divide first): (1 / 3) * 62
 
 	1/3 = 0.[3], the routine would've round this number to 0 or 1, making the error 0.[3] or 0.[6]
 	
@@ -860,8 +872,8 @@ relative address (index):</td>
 RAM address $00-$01:                         $0004 (4)
 
 Note: !Scratchram_GraphicalBar_MiddlePiece <u>and/or</u>
-!Scratchram_GraphicalBar_TempLength is set to zero,
-excludes the entire middle section.</pre>
+!Scratchram_GraphicalBar_TempLength to be set to zero,
+will excludes the entire middle section.</pre>
 </td>
 <td>
 
