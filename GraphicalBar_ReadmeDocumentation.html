@@ -47,11 +47,12 @@ length of the bar.</p>
 <p>It supports both layer 3 and sprite OAM.</p>
 
 
-<h2>Intro Notes</h2>
+<h2>Before we begin</h2>
 <ul>
 <li>This HTML uses <a href="https://en.wikipedia.org/wiki/ASCII_art">ASCII art</a> to represent something in few areas, so make sure you have your browser setting for <a href="https://en.wikipedia.org/wiki/Monospaced_font">fixed-width font</a> such as
 &ldquo;Consolas&rdquo; so it displays properly.</li>
 <li>You must have at least some ASM knowledge. See this ASM tutorial <a href="https://www.smwcentral.net/?p=section&a=details&id=14268">here.</a></li>
+<li>This document assumes you have some knowledge on how to use the Heads-Up display (HUD) elements. If you are new to that, I recommend reading my <a href="https://www.smwcentral.net/?p=section&a=details&id=39627">status bar tutorial</a> before doing this.</li>
 <li>If you want to easily select and copy text inside of boxes, hold down CTRL and double-click them.</li>
 <li>The HTML files included here uses <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt"><kbd>BigInt</kbd></a> to prevent potential rounding upwards instead of downwards. Make sure your browser supports it.</li>
 </ul>
@@ -1725,7 +1726,7 @@ on-screen position, a bar that is placed relative to the character, such as on t
 <h3>Sprite-status bar-styled HUD (placed at highest priority)</h3>
 <p>Note: The three following routines are not to be used for &ldquo;normal sprites&rdquo;, as they use the OAM directly (&ldquo;normal sprites&rdquo; is a term I refer to the type of sprites
 that are often interactable, such as enemies, platforms, items, etc. that are SMW or pixi-made, that are part of the 12 (or 22 for sa-1 hacks)-sprite slot limit) and are intended to
-function similarly to most sprite status bar patches. These are located at <kbd>Patch_DrawSpriteGraphicalBar/DrawOamPatch.asm</kbd>.</p>
+function similarly to most sprite status bar patches. These are used by the patch at <kbd>Patch_DrawSpriteGraphicalBar/DrawOamPatch.asm</kbd> which includes the routines from <kbd>Routines</kbd> folder.</p>
 <ul>
 	<li><a href="#DrawOamGraphicalBarHorizVert_Back" id="DrawOamGraphicalBarHorizVert">^</a><kbd>DrawOamGraphicalBarHoriz</kbd> and <kbd>DrawOamGraphicalBarVert</kbd>: Draws a horizontal/vertical graphical bar:
 	<table>
