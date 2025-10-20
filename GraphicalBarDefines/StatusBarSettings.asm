@@ -366,6 +366,8 @@ includeonce
 			else
 				!RAM_0EF9 = $400EF9
 			endif
+		;Mark that the macros and functions are now defined
+			!FunctionGuard_StatusBarFunctionDefined = 1
 	endif
 	;Convert XY position to address
 		!Default_GraphicalBar_Pos_Tile = VanillaStatusBarXYToAddress(!Default_GraphicalBar_PosX_Tile, !Default_GraphicalBar_PosY_Tile, !RAM_0EF9)
