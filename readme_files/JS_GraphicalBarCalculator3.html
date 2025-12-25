@@ -132,8 +132,8 @@ Notes:<br>
 		<td>Status bar tile format</td>
 		<td>
 			<select onchange="MainCode()">
-				<option id="StatusBarFormat_2" selected>Interleaved [TT, PP, TT, PP,...]</option>
-				<option id="StatusBarFormat_1">2 Seperate tables [TT, TT, TT,...][PP, PP, PP,...]</option>
+				<option id="StatusBarFormat_2" selected>Interleaved [$TT, $PP, $TT, $PP,...]</option>
+				<option id="StatusBarFormat_1">2 Separate tables [$TT, $TT, $TT,...][$PP, $PP, $PP,...]</option>
 			</select>
 		</td>
 	</tr>
@@ -311,6 +311,9 @@ Notes:<br>
 			"keydown",
 			function (e) {
 				let KeyName = e.key
+				if (e.altKey) {
+					return
+				}
 				if (/(ArrowDown|ArrowUp)/.test(KeyName)) {
 					e.preventDefault()
 					let IncrementDecrement = 1n
