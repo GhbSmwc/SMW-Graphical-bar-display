@@ -29,6 +29,9 @@
 				resize: both;
 				background-color: #101010;
 			}
+			pre {
+				margin: 0px;
+			}
 		</style>
 	</head>
 <body>
@@ -379,7 +382,7 @@ However, since XY are swapped due opcode limitations: <kbd>LDA ($xx),x</kbd> doe
 <h4>Finish OAM write</h4>
 <p>Because we are using hybrid tile sizes, the FinishOAMWrite (either by calling <kbd>JSL $01B7B3|!BankB</kbd> or <kbd>%FinishOAMWrite()</kbd>), the Y input must be $FF (to indicate to the routine not to automatically write to $0460),
 and for the number of tiles, thankfully, this isn't too hard:
-<div class="CodeBlock"><pre>	;[GraphicalBar_For_HP] This is the last steps on working with OAM handling.
+<div class="CodeBlock" style="height: 289px;"><pre>	;[GraphicalBar_For_HP] This is the last steps on working with OAM handling.
 	;Like I said, most sprites are composed of 16x16 tiles, and having a bar made of 8x8s means we are manually setting the tile sizes.
 	;When finishing OAM write, the inputs are:
 	; Y = size: $00 = 8x8s, $02 = 16x16s, $FF manuel
@@ -398,7 +401,7 @@ and for the number of tiles, thankfully, this isn't too hard:
     JSL $01B7B3|!BankB          ; Call the routine that draws the sprite (finish OAM write).
     RTS</pre></div><br>
 again, the comments should explain everything. If you are wondering how does the program finds the total number of tiles, (which is <kbd>!GiantMaskedKoopa_GraphicalBar_TotalTiles</kbd>), it is calculated via this:
-<div class="CodeBlock" style="height: 300px"><pre> ;Giant Masked koopa tile count
+<div class="CodeBlock" style="height: 273px; width: 994px;"><pre> ;Giant Masked koopa tile count
   ;Explanation: if these tiles don't exist (pieces set to 0, and/or middle length set to 0)
   ;They're not written, so they are not counted. If they do exist (pieces set to any nonzero values),
   ;that counts as a tile. After knowing if they exist or not we add all of them.
@@ -423,7 +426,7 @@ Which is found in <kbd>SMW-Graphical-bar-display/GraphicalBarDefines/SpriteOAMSe
 		<ul>
 			<li>Trial and error. If the bar is too far to the right, pick a smaller number, if too far to the left, pick a larger number.</li>
 			<li>Locking its XY position ($E4/$14E0 $D8/$14D4) at a specified value every frame using uberasm tool's <kbd>level main</kbd>:
-<div class="CodeBlock" style="height: 200px"><pre>;Note, it does this within a screen boundary, for the sake of simplicity!
+<div class="CodeBlock" style="height: 165px;"><pre>;Note, it does this within a screen boundary, for the sake of simplicity!
 ;Run this in main (every frame), not init!
 	LDX #!sprite_slots-1
 	-

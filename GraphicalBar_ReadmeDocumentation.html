@@ -28,6 +28,17 @@
 			li {
 				padding: 5px;
 			}
+			div.CodeBlock {
+				overflow: auto;
+				width: 1000px;
+				height: 250px;
+				border: 1px solid white;
+				resize: both;
+				background-color: #101010;
+			}
+			pre {
+				margin: 0px;
+			}
 		</style>
 	</head>
 <body style="max-width: 1000px; margin: auto; padding: 15px">
@@ -133,14 +144,14 @@ length of the bar.</p>
 you are using this patch.</li>
 <li>
 	<a href="https://www.smwcentral.net/?p=section&a=details&id=29064">Address tracker v4+</a>, if you already have inserted other ASM stuff that occupies freeram, I made it so it sets the RAM for you to avoid conflicts:
-<table><tr><td><pre>
+<div class="CodeBlock" style="height: 106px; width: 930px;"><pre>
 GraphicalBar	!Scratchram_GraphicalBar_LeftEndPiece	1	-	-
 GraphicalBar	!Scratchram_GraphicalBar_MiddlePiece	1	-	-
 GraphicalBar	!Scratchram_GraphicalBar_RightEndPiece	1	-	-
 GraphicalBar	!Scratchram_GraphicalBar_TempLength	1	-	-
 GraphicalBar	!Scratchram_GraphicalBar_FillByteTbl	12	-	-
 GraphicalBar	!Freeram_RangeBasedValue	2	-	-
-GraphicalBar	!Scratchram_WhatRange	2	-	-</pre></td></tr></table>
+GraphicalBar	!Scratchram_WhatRange	2	-	-</pre></div>
 	After getting the results, just place it at the bottom after ALL the free/scratch RAM defines (will override the previous default values). Please note that I assume you only need 12 or less bytes for
 	<kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd>, in rare situations that you need a really long bar that is more than 12 fill-able tiles long, then you need to change that number to a higher value.
 </li>
@@ -191,7 +202,7 @@ regardless of the formats, will likely enable you to edit their tile properties,
 <p>*Please note that if you wish to test <kbd>Patch_DrawSpriteGraphicalBar/DrawOamPatch.asm</kbd>, only copy these files, don't move (&ldquo;cut&rdquo;) to the parent/subdirectory or rename them, else you get errors upon patching.</p>
 </ul></li>
 <li>Open uberasm tool's <kbd>list.txt</kbd>, and paste these so that the codes get inserted:
-<table><tr><td><pre>; Level list. Valid values: 000-1FF.
+<div class="CodeBlock" style="width: 547px; height: 171px;"><pre>; Level list. Valid values: 000-1FF.
 level:
 104		Level_DoubleBar.asm
 105		Level_Simple.asm
@@ -201,7 +212,7 @@ level:
 
 gamemode:
 ; Insert files here
-;0E		Gamemode0E_OWBorderTest.asm ;&gt;Need OWB+ patch to function!</pre></td></tr></table><br>
+;0E		Gamemode0E_OWBorderTest.asm ;&gt;Need OWB+ patch to function!</pre></div><br>
 </li>
 <li>Insert the graphics by (see <a href="readme_files/JS_GraphicsNotes.html" target="_blank">this graphic documentation</a>):
 <ol>
@@ -245,7 +256,7 @@ Perhaps if you want to display something other than the provided examples above,
 
 <ul>
 <li>A simple graphical bar.
-<table><tr><td><pre>incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
+<div class="CodeBlock"><pre>incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;^These are needed so the defines relating to the graphical bars work.
 
@@ -308,7 +319,7 @@ main:		;&gt;You DO need this if using uberasm tool.
 		endif
 	endif
 	RTL
-	</pre></td></tr></table><br>
+	</pre></div><br>
 Font colored in <span style="color: red">red</span> is the things you change, while the <span style="color: green">green</span>, you edit values in the defines via opening up
 <kbd>GraphicalBarDefines/StatusBarSettings.asm</kbd> and changing those, and yes, you can safely redefine them when you have multiple bars for advanced use. <span style="color: yellow">Yellow</span>
 is the same as green, but it has to be a 3-byte (24-bit) address. <span style="color: orange">Orange</span> means you can remove the rounding away code if you want the bar to be able to round
@@ -359,10 +370,10 @@ I recommend having the knowledge of how sprites work before doing this. Here is 
 	</li>
 	<li>
 		Now open or create <kbd>list.txt</kbd>, and have the following text written (for sprites you didn't pasted in the sprites folder, remove them off the list):
-<table><tr><td><pre>00 SpriteGraphicalBarTest.json
+<div class="CodeBlock" style="width: 220px; height: 62px;"><pre>00 SpriteGraphicalBarTest.json
 01 giant_masked_koopa.cfg
 02 masked_koopa_fireball.cfg
-03 masked_koopa_rock.cfg</pre></td></tr></table>
+03 masked_koopa_rock.cfg</pre></div>
 		And now save. If you have the fireball and rock sprite at a different sprite ID number, you have to edit <kbd>giant_masked_koopa.asm</kbd>'s defines to spawn the correct sprite.
 	</li>
 	<li>Now run pixi.exe to insert.</li>
@@ -396,8 +407,7 @@ we don't want to put our code there, instead we place it at a location that is <
 </ul>
 Many sprites on the sprite section on SMWC can be complex and have different coding structures, but following the principals above should make it possible to implement on any sprite.<br>
 Another important note is that the routine <kbd>%GetDrawInfo()</kbd> uses &ldquo;<span style="font-weight: bold;">destructive return</span>&rdquo;-- A stack-manipulation technique to exit multiple subroutines at once upon returning (RTS/RTL), consider this simple example shown below:
-<table>
-<tr><td><pre>	JSR Subroutine
+<div class="CodeBlock" style="height: 480px; width: 1069px;"><pre>	JSR Subroutine
 	STZ $00
 	RTL
 	
@@ -427,9 +437,7 @@ Another important note is that the routine <kbd>%GetDrawInfo()</kbd> uses &ldquo
 	;(7) RTL
 	;JSR pushes 2 bytes of address into the stack (more specifically, the next instruction's location, minus 1 into the stack)
 	;RTS pulls 2 bytes of address out of the stack (specifically, the location address in the stack. Takes that, add 1, and sets the program counter to jump there)
-	;The same applies to JSL and RTL, but 3 bytes instead.
-</pre></td></tr>
-</table>
+	;The same applies to JSL and RTL, but 3 bytes instead.</pre></div>
 Therefore, if you push something, you must pull before calling <kbd>%GetDrawInfo()</kbd> (or any subroutines using this technique) as the game will crash. For <kbd>%GetDrawInfo()</kbd>, doing the same will crash upon the sprite going offscreen (it doubles-out if the sprite goes offscreen, else it keeps the return address). Normally, you can
 push stuff (such as scratch RAM), call a subroutine, then pull stuff (often to restore values such as scratch RAM), but this is an exception to the rule.
 </p>
@@ -447,7 +455,7 @@ push stuff (such as scratch RAM), call a subroutine, then pull stuff (often to r
 	</li>
 	<li>If you happen to want a graphical bar on a sprite that is composed of at least 1 16x16 OAM tile (most sprites are like that, by the way), you'll have to
 	manually handle the size of editing <kbd>$0460</kbd> in the sprite code (a mixture of 8x8s and 16x16, like the timed lift sprite (the platform itself is 2 16x16s and the number graphic in the center is a single 8x8.)):
-<table><tr><td><pre>;Manually set sprite tile size to 16x16 (this is for the main body of the sprite).
+<div class="CodeBlock" style="height: 336px; width: 949px;"><pre>;Manually set sprite tile size to 16x16 (this is for the main body of the sprite).
 
 ;Note: This may different depending on the sprite being used, for example, the Giant
 ;Masked Koopa Boss uses the X as the OAM index instead of Y because of indirect
@@ -467,7 +475,7 @@ push stuff (such as scratch RAM), call a subroutine, then pull stuff (often to r
 	LDY #$FF		;&gt;The graphical bar tiles are always 8x8, but the sprite's body isn't always 8x8 or 16x16. Y=$FF means mixture
 	;A = total number of tiles to write, -1
 	&lt;instruction to get the number of tiles, minus 1, into the A register&gt;
-	&lt;Either call using JSL $01B7B3, or use %FinishOAMWrite().&gt;</pre></td></tr></table>
+	&lt;Either call using JSL $01B7B3, or use %FinishOAMWrite().&gt;</pre></div>
 	</li>
 </ol><br></p>
 
@@ -604,7 +612,7 @@ Note that this is not capped at total pieces in the bar, meaning that if <kbd>Qu
 As a side note to most programmers, yes, I could alternatively perform <kbd>FillAmount = (Quantity / MaxQuantity) * TotalNumberOfPiecesInBar</kbd>, but we are dealing with integers, not floating points. Performing that
 causes problem where the value could output only 0 or any number that is a multiple of n pieces in the bar (will display 0% or 100% but not in between when displayed) due to division rounding the quotient to the nearest
 integer, which the error is between 0 and 1, before multiplying by <kbd>TotalNumberOfPiecesInBar</kbd> and scaling that error by an enormous amount:
-<table><tr><td><pre>1 out of 3 HP = 20 and 2/3, or 20.[6] out of 62 pieces (bracket means repeating digits).
+<div class="CodeBlock"><pre>1 out of 3 HP = 20 and 2/3, or 20.[6] out of 62 pieces (bracket means repeating digits).
 
 The correct way (multiply-first): (1 * 62) / 3
 
@@ -623,7 +631,7 @@ The incorrect way (divide first): (1 / 3) * 62
 	If rounded to 0, then 0 * 62 = 0, the calculation is off by 20.[6] units, otherwise if rounded to 1, then
 	1 * 62 = 62, which is off by 41.[3] units. Both of these causes the fill amount to always be in multiples of
 	TotalNumberOfPiecesInBar.
-</pre></td></tr></table>
+</pre></div>
 Therefore it's best to perform calculations in a way that rounding to only be applied on the final operator (in this case, integer division), when possible.
 </tr>
 <tr>
@@ -947,7 +955,7 @@ tiles as end tiles</span>. Static end tiles are unchanging tiles that only serve
 here is what I mean as an example:<br>
 <img src="readme_files/StaticEndTiles.png"><br>
 You have to manually write the tiles at either side of the bar yourself:
-<table><tr><td><pre>	LDA #&lt;LeftEndTileNumber&gt;
+<div class="CodeBlock" style="width: 539px; height: 185px;"><pre>	LDA #&lt;LeftEndTileNumber&gt;
 	STA &lt;LeftEndTilePosition&gt;
 	LDA #&lt;LeftEndTileProps&gt;
 	STA &lt;LeftEndTilePropsPosition&gt;
@@ -959,7 +967,7 @@ You have to manually write the tiles at either side of the bar yourself:
 	
 	;Remove any line with the words &ldquo;props&rdquo; if the status bar
 	;you're working on does not allow modifying the tile properties.
-</pre></td></tr></table>
+</pre></div>
 If you have variable-length bar, I've <a href="#StaticEndRoutine">provided routines</a> that would automatically calculate where to write the static end tiles. Also note that this readme
 assumes you never used static end tiles, most of the info provided about status bar write ranges only include the tiles affected based on fill amount, not static end tiles.
 <br><br>
@@ -1200,7 +1208,7 @@ Result:
 </table><br>
 If you changed the number of pieces in any tile bytes (left, middle (each middle), and right), the number of pieces must equal to the number of values, plus 1.
 For example, by making left end have 4 pieces instead of 3, you must have 5 values in the left end tile table. Else your tiles will glitch:
-<table><tr><td><pre>
+<div class="CodeBlock"><pre>
 ;This is an example, therefore the numbers in this table may
 ;be different to you.
 
@@ -1218,7 +1226,7 @@ For example, by making left end have 4 pieces instead of 3, you must have 5 valu
 			db $37		;&gt;Fill amount/index: $01
 			db $38		;&gt;Fill amount/index: $02
 			db $39		;&gt;Fill amount/index: $03
-			db <span style="color: red">$xx</span>		;&gt;Fill amount/index: $04</pre></td></tr></table>
+			db <span style="color: red">$xx</span>		;&gt;Fill amount/index: $04</pre></div>
 
 <br><br>
 
@@ -1288,7 +1296,7 @@ Destroyed:
 </table><br>
 
 <p>In case if you don't know how input an address into scratch RAM, you label your table like this (this is an example from the tile table for the Giant Masked Koopa Boss):
-<table><tr><td><pre>		BarTilesLeft:
+<div class="CodeBlock"><pre>		BarTilesLeft:
 		;Left end fill amount tile numbers:
 		db $88		;&gt;Fill amount/index: $00
 		db $89		;&gt;Fill amount/index: $01
@@ -1310,11 +1318,11 @@ Destroyed:
 		db $9D		;&gt;Fill amount/index: $00
 		db $9E		;&gt;Fill amount/index: $01
 		db $9F		;&gt;Fill amount/index: $02
-		db $A8		;&gt;Fill amount/index: $03</pre></td></tr></table><br>
+		db $A8		;&gt;Fill amount/index: $03</pre></div><br>
 The labels are <kbd>GraphicalBar_LeftEnd8x8s_Lvl_Spr</kbd>, <kbd>GraphicalBar_Middle8x8s_Lvl_Spr</kbd>, and <kbd>GraphicalBar_RightEnd8x8s_Lvl_Spr</kbd> are labels, and points to an array of bytes (starting at the first byte of the array).<br><br>
 
 To write such address into RAM with the labels in existence, you do this:
-<table><tr><td><pre>			REP #$20
+<div class="CodeBlock" style="height: 353px; width: 1049px;"><pre>			REP #$20
 			LDA $00 : PHA	;Preserve a bunch of stuff because following subroutine uses $00-$09.
 			LDA $02 : PHA
 			LDA $04 : PHA
@@ -1336,7 +1344,7 @@ To write such address into RAM with the labels in existence, you do this:
 			SEP #$20
 	
 	;Labels represents the address (or position) in the ROM. LDA.w #Label when Label is at location $1234, that means it will
-	;be LDA #$1234. If you don't have that hash symbol, it would be LDA Label -&gt; LDA $1234 (which loads RAM instead of &ldquo;Immediate&rdquo;)</pre></td></tr></table><br>
+	;be LDA #$1234. If you don't have that hash symbol, it would be LDA Label -&gt; LDA $1234 (which loads RAM instead of &ldquo;Immediate&rdquo;)</pre></div><br>
 </p>
 </li>
 <li><a href="#ConvertBarFillAmountToTilesEdgeOverMultipleTilesIndirectAddressTable_Back" id="ConvertBarFillAmountToTilesEdgeOverMultipleTilesIndirectAddressTable">^</a><kbd>ConvertBarFillAmountToTilesEdgeOverMultipleTilesIndirectAddressTable</kbd>: same as <kbd><a href="#ConvertBarFillAmountToTilesEdgeOverMultipleTiles">ConvertBarFillAmountToTilesEdgeOverMultipleTiles</a></kbd>
@@ -1563,13 +1571,13 @@ to calculate where to place the bar when using <kbd>BarExtendLeft</kbd> as well 
 
 This subroutine also exists in <kbd>GraphicalBarConvertToTile.asm</kbd> because of one simple inconvenient reason: several subroutines in that and <kbd>GraphicalBarWriteToStatusBar.asm</kbd> uses this subroutine and you cannot
 have one <kbd>library</kbd> ASM file have labels referring to another ASM file in that library (you cannot have one code in a library call another ASM file code), as stated in the readme:
-<table><tr><td><pre>The second one is that you can't call other libraries codes from a
+<div class="CodeBlock" style="width: 517px; height: 109px;"><pre>The second one is that you can't call other libraries codes from a
 library file. For example, if you have a windowing HDMA code and you
 need to call a sqrt routine, which is located on the math library, you
 can't do that, because UberASM Tool can't guess what labels each file
 will generate nor what labels each library .asm file will depend from
 each other. So unfortunately the library files are pretty much
-isolated from each one.</pre></td></tr></table>
+isolated from each one.</pre></div>
 
 </li><br>
 <li><a href="#WriteDoubleEndedBar_Back" id="WriteDoubleEndedBar">^</a><kbd>WriteDoubleEndedBar</kbd>: Writes a mirrored version of the left-to-right bar and places it to the left of that bar. This is intended to display double-ended bars that as the fill increases, it starts in the center
@@ -1834,11 +1842,11 @@ itself only takes a value and represent them as each bytes capped at their maxim
 having 8 pieces at the max, it is better to have both end tiles set to 0 pieces and have 9 middle tiles holding 8 pieces, here is what it looks like on a full bar:<br><br>
 
 Less optimized:
-<table><tr><td><pre><span style="color: cyan">!Scratchram_GraphicalBar_LeftEndPiece:       $08</span>
+<div class="CodeBlock" style="width: 401px; height: 84px;"><pre><span style="color: cyan">!Scratchram_GraphicalBar_LeftEndPiece:       $08</span>
 <span style="color: #00C000">!Scratchram_GraphicalBar_MiddlePiece:        $08</span>
 <span style="color: red">!Scratchram_GraphicalBar_RightEndPiece:      $08</span>
 <span style="color: #00C000">!Scratchram_GraphicalBar_TempLength:         $07</span>
-RAM address $00-$01:                         $0048 (72)</pre></td></tr></table>
+RAM address $00-$01:                         $0048 (72)</pre></div>
 Result:
 <table>
 <tr>
@@ -1865,11 +1873,11 @@ Result:
 </tr>
 </table>
 Vs optimized:
-<table><tr><td><pre><span style="color: cyan"><s>!Scratchram_GraphicalBar_LeftEndPiece:       $00</s></span>
+<div class="CodeBlock" style="width: 401px; height: 84px;"><pre><span style="color: cyan"><s>!Scratchram_GraphicalBar_LeftEndPiece:       $00</s></span>
 <span style="color: #00C000">!Scratchram_GraphicalBar_MiddlePiece:        $08</span>
 <span style="color: red"><s>!Scratchram_GraphicalBar_RightEndPiece:      $00</s></span>
 <span style="color: #00C000">!Scratchram_GraphicalBar_TempLength:         $09</span>
-RAM address $00-$01:                         $0048 (72)</pre></td></tr></table>
+RAM address $00-$01:                         $0048 (72)</pre></div>
 Result:
 <table>
 <tr>
@@ -1900,7 +1908,7 @@ to change (Left end have 9 tiles with values 0-8 same as middle's 0-8 but uses a
 the tile converter does not recognize if the first and last tile are meant to be end tiles to have different graphic than the middle, so just before calling the tile converter,
 set the end tiles to be the same number of pieces for middle, and subtract the number of middle tiles by how many end tiles you are using (say 2) so that the end tiles don't use
 the same table graphic as middle and cause cutoff-ended bar.
-<table><tr><td><pre>	;[...]
+<div class="CodeBlock" style="height: 169px; width: 991px;"><pre>	;[...]
 	JSL GraphicalBarELITE_DrawGraphicalBarSubtractionLoopEdition	;&gt;get bar values.
 	LDA #$08							;\Middle tiles first and last replaced with end tiles.
 	STA !Scratchram_GraphicalBar_LeftEndPiece			;|
@@ -1910,7 +1918,7 @@ the same table graphic as middle and cause cutoff-ended bar.
 	SBC #$02							;|&gt;Left end + Right end = 2 end tiles
 	STA !Scratchram_GraphicalBar_TempLength				;/
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;&gt;Convert tiles (end tiles recognized).
-	;[...]</pre></td></tr></table><br><br>
+	;[...]</pre></div><br><br>
 
 </p></li>
 <li><p>You might've noticed the define <span class="NoLineBreak"><kbd>!Settings_GraphicalBar_IndexSize</kbd></span> found in <kbd>GraphicalBarDefines.asm</kbd>, I left that there in for some rare cases anyone
@@ -1926,7 +1934,7 @@ address of the status bar (avoid placing the <kbd>DesiredLastTilePos</kbd> that 
 
 <li>When writing stripe image <b>every frame</b> during levels, make sure you don't write them during the &ldquo;COURSE CLEAR!&rdquo; text (the text appears when <kbd>JSL $05CBFF</kbd> is executed) or during message box, as it
 may cause graphical glitches (or even graphic corruptions). Easiest way is to check RAM <kbd>$1493</kbd> like so:
-<table><tr><td><pre>
+<div class="CodeBlock" style="width: 946px; height: 171px;"><pre>
 LDA $1493|!addr		;&gt;Goal timer
 ORA $1426|!addr		;&gt;Message box (to me, I did experienced screen went black except for the layer 3, I kept this here anyways just in case)
 BEQ .SafeToWrite	;&gt;0 = None of the above are active, Nonzero: Any of above are active.
@@ -1936,7 +1944,7 @@ BEQ .SafeToWrite	;&gt;0 = None of the above are active, Nonzero: Any of above ar
 .SafeToWrite
 	;Code to write your bar here
 	;[...]
-	RTL</pre></td></tr></table>
+	RTL</pre></div>
 
 </li><br>
 </ul>

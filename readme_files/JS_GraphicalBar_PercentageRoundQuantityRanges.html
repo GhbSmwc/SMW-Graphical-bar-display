@@ -21,6 +21,18 @@
 			}
 			input[type='text'] { font-family: monospace;}
 			input[type='number'] { font-family: monospace;}
+			
+			div.CodeBlock {
+				overflow: auto;
+				width: 1000px;
+				height: 500px;
+				border: 1px solid white;
+				resize: both;
+				background-color: #101010;
+			}
+			pre {
+				margin: 0px;
+			}
 		</style>
 	</head>
 <body style="max-width: 1000px; margin: auto; padding: 15px">
@@ -50,8 +62,9 @@
 	</tr>
 </table>
 <hr>
-<table id="Output"></table>
-
+<div class="CodeBlock">
+	<table id="Output"></table>
+</div>
 
 <script>
 //Input codes

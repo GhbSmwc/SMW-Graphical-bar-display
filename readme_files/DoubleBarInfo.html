@@ -11,6 +11,17 @@
 			border: 1px solid white;
 			border-collapse: collapse;
 			}
+			div.CodeBlock {
+				overflow: auto;
+				width: 1000px;
+				height: 250px;
+				border: 1px solid white;
+				resize: both;
+				background-color: #101010;
+			}
+			pre {
+				margin: 0px;
+			}
 		</style>
 	</head>
 <body style="max-width: 1000px; margin: auto; padding: 15px">
@@ -47,7 +58,7 @@ only, advanced features like one fill amount increments/decrements towards anoth
 <ul>
 <li><b>Rapid-flicker</b>:
 
-<table><tr><td><pre>incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
+<div class="CodeBlock"><pre>incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;^These are needed so the defines relating to the graphical bars work.
 
@@ -126,7 +137,7 @@ main:
 				JSL GraphicalBarWriteToStatusBar_WriteBarToHUDLeftwardsFormat2
 			endif
 		endif
-	RTL</pre></td></tr></table>
+	RTL</pre></div>
 Remove the semicolons in front of <nobr><kbd>REP #$20</kbd></nobr> and <nobr><kbd>SEP #$20</kbd></nobr> should your quantity amount is a 16-bit number (going over 255)
 The red font is the things you can replace. Note that this does not work with tiles that update other than each and every frame (for example, the Overworld
 Border Plus updates tile every other frame), in this case you left shift the <nobr><kbd>#%00000001</kbd></nobr> to <nobr><kbd>#%00000010</kbd></nobr> to obtain
@@ -135,7 +146,7 @@ a slower flicker animation to accommodate this (however the flicker distinct fra
 <li><b>Separate graphics</b>: You actually have to call the graphical bar routines (<kbd>DrawGraphicalBarSubtractionLoopEdition</kbd> and maybe
 <kbd>CalculateGraphicalBarPercentage</kbd>) twice, with the first one's (<kbd>FirstQuantity</kbd>) table being moved to another location in memory.
 Oh, and because there are repeated codes, they are moved to subroutines to save space:
-<table><tr><td><pre>incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
+<div class="CodeBlock"><pre>incsrc "../GraphicalBarDefines/GraphicalBarDefines.asm"
 incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;^These are needed so the defines relating to the graphical bars work.
 
@@ -221,12 +232,12 @@ GetMaxQuantityPercentage:
 	STA !Scratchram_GraphicalBar_FillByteTbl+2		;/
 	LDA <span style="color: red">#$00</span>						;\High byte above, same format as you would do for quantity, so do the same
 	STA !Scratchram_GraphicalBar_FillByteTbl+3		;/as that if your value is 8-bit.
-	RTS</pre></td></tr></table><br>
+	RTS</pre></div><br>
 	
 	<a name="SecondTable">Thus, assuming you left <nobr><kbd>!Setting_GraphicalBar_SecondFillByteTableOffset</kbd></nobr> equal to <kbd>32</kbd>, both ends set to 3
 	pieces, middle set to 8 pieces, and middle span 7 tile bytes long, the table of values
 	are laid out like this:
-<table><tr><td><pre>!Scratchram_GraphicalBar_FillByteTbl+0:  (SecondFill left end)
+<div class="CodeBlock"><pre>!Scratchram_GraphicalBar_FillByteTbl+0:  (SecondFill left end)
 !Scratchram_GraphicalBar_FillByteTbl+1:  (SecondFill 1st middle tile)
 !Scratchram_GraphicalBar_FillByteTbl+2:  (SecondFill 2nd middle tile)
 !Scratchram_GraphicalBar_FillByteTbl+3:  (SecondFill 3rd middle tile)
@@ -254,7 +265,7 @@ GetMaxQuantityPercentage:
 !Scratchram_GraphicalBar_FillByteTbl+40: (FirstFill right end)
 !Scratchram_GraphicalBar_FillByteTbl+41: (unused garbage)
 !Scratchram_GraphicalBar_FillByteTbl+42: (unused garbage)
-...</pre></td></tr></table>
+...</pre></div>
 Now that both bar tiles are stored, the routine <nobr><kbd>ConvertBarFillAmountToTilesDoubleBar</kbd></nobr> in
 <nobr><kbd>GraphicalBarConvertToTile.asm</kbd></nobr> checks the two equivalent tiles (the two left ends, then the two first middle tile, second middles, and so on...) to determine
 what index to use in order to convert the pairs of fill values into tile numbers (this will write to <nobr><kbd>!Scratchram_GraphicalBar_FillByteTbl+0</kbd></nobr>, not the other table address).<br><br>
@@ -286,7 +297,7 @@ of offsetting from the fill amounts, we are offsetting from the quantity amounts
 	<li>
 		<kbd>CalculateGraphicalBarPercentage</kbd> but you want to do this instead <kbd>SecondFillOffsetFromFirstFill = ((SecondQuantity + FirstQuantity) * BarMaximum) / MaximumQuantity</kbd> (we add using quantity amounts, not fill amounts),
 		done by adding the two quantities first, before calling <kbd>CalculateGraphicalBarPercentage</kbd>:
-<table><tr><td><pre>
+<div class="CodeBlock"><pre>
 ;Thankfully the graphical bar routines does not mess up the scratch RAM inputs (other than !Scratchram_GraphicalBar_FillByteTbl), therefore
 ;you only need to set them once.
 
@@ -304,7 +315,7 @@ of offsetting from the fill amounts, we are offsetting from the quantity amounts
 	SEP #$20
 ;Calculate percentage the second time.
 	JSL GraphicalBarELITE_CalculateGraphicalBarPercentage
-</pre></td></tr></table>
+</pre></div>
 	</li>
 </ol>
 Because if you do this instead:
@@ -313,7 +324,7 @@ Because if you do this instead:
 	<li><kbd>CalculateGraphicalBarPercentage</kbd> for <kbd>SecondFill = (SecondQuantity * BarMaximum) / MaximumQuantity</kbd></li>
 	<li>
 		Add: <kbd>SecondFillOffsetFromFirstFill = SecondFill + FirstFill</kbd>. Code would look something like this:
-<table><tr><td><pre>;Made-up example because very likely you'll have to preserve scratch RAM in a different way, such as either using the stack (push and pull)
+<div class="CodeBlock"><pre>;Made-up example because very likely you'll have to preserve scratch RAM in a different way, such as either using the stack (push and pull)
 ;or store a copy of it in another scratch RAM. This one assumes you use the stack.
 
 ;FirstFill result (Calculate percentage first time)
@@ -326,7 +337,7 @@ Because if you do this instead:
 	PLA							;&gt;Pull out FirstFill value into A
 	CLC							;\Add by SecondFill (also rounded), right here the result have "drifted" and could potentially rounded off by 2 units.
 	ADC $00							;/
-</pre></td></tr></table>
+</pre></div>
 	</li>
 </ol>
 <kbd>SecondFill</kbd> could be rounded by 2 units off, as the third step is adding 2 rounded numbers, <kbd>FirstFill</kbd> and <kbd>SecondFill</kbd>. This is the equivalent to pie charts, which also suffer <a href="https://en.wikipedia.org/wiki/Pie_chart#Example">this kind of problem</a>; adding
