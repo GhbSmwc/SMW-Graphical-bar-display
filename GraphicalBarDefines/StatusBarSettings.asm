@@ -48,6 +48,7 @@ includeonce
 		;   properties are not be initialized and the bar could be garbage tiles or crash the game.
 
 	;YXPCCCTT settings (split into individual parts). Does not apply if you have !StatusBar_UsingCustomProperties == 0.
+	;See "GetLayer3YXPCCCTT" function on how it converts multiple numbers into a single property byte.
 		!Default_StatusBar_TileProperties_Page        = 0 ;>Valid values: 0-3.
 		!Default_StatusBar_TileProperties_Palette     = 6 ;>Valid values: 0-7. This does not apply to color-changing bars.
 		!Default_StatusBar_TileProperties_Priority    = 1 ;>Valid values: 0-1. (you most likely always have this set to 1).
