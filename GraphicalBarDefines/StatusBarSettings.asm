@@ -32,31 +32,33 @@ includeonce
 		;       Super status bar/Overworld border plus [TTTTTTTT YXPCCCTT, TTTTTTTT YXPCCCTT]...
 
 	!StatusBar_UsingCustomProperties           = 1
-		;^Set this to 0 if you are using the vanilla SMW status bar or any status bar patches
-		; that doesn't enable editing the tile properties, otherwise set this to 1.
-		; This define is needed to prevent writing what it assumes tile properties into invalid
-		; RAM addresses.
+		;^Set this to 0 if you are only using vanilla status bar, status bar patches, and/or overworld border
+		; plus patch that have tile properties automatically set proper. Otherwise set this to 1 (if you need
+		; to set the tile properties). 
+		;
+		; This define is needed as there are subroutines that either write only to tile numbers, or both tile
+		; numbers and properties.
 		;
 		; Notes:
-		; -This also applies to overworld border plus write as well (both writes to status
-		;  bar and overworld border plus share the same "tile writer" code). But thankfully most
-		;  status bar patches that are layer 3-based enables you to edit tile properties,
-		;  therefore its likely you are going to set this to 1.
-		; -When using the VRAM upload stripe image, this MUST be set to 1 because their tile
-		;  properties may not be initialized and the bar could be garbage tiles or crash the game.
+		; - This also applies to overworld border plus write as well (both writes to status
+		;   bar and overworld border plus share the same "tile writer" code). But thankfully most
+		;   status bar patches that are layer 3-based enables you to edit tile properties,
+		;   therefore its likely you are going to set this to 1.
+		; - When using the VRAM upload stripe image, this MUST be set to 1 because their tile
+		;   properties are not be initialized and the bar could be garbage tiles or crash the game.
 
-	!Default_StatusBar_TilePropertiesSetting      = %00111000
-		;^Tile properties (if you enable editing properties in-game). Note: Bit 6 (X-flip) is
-		; forced to be set when !Default_LeftwardsBar is set to 1. If you want this to be x flipped
-		; on a left-to-right bar, set that here. (YXPCCCTT)
-		;
-		; For vertical bars on layer 3, downward bars will be forced a Y-flip (bit 7).
-		;
-		;This does not apply to color-changing bars, see [Level_Simple.asm] at the table at the bottom,
-		;as this define only apply to graphical bars with static tile properties.
-
-	!Default_Overworld_TilePropertiesSetting      = %00111001
-		;^Same as above, but overworld map.
+	;YXPCCCTT settings (split into individual parts). Does not apply if you have !StatusBar_UsingCustomProperties == 0.
+		!Default_StatusBar_TileProperties_Page        = 0 ;>Valid values: 0-3.
+		!Default_StatusBar_TileProperties_Palette     = 6 ;>Valid values: 0-7. This does not apply to color-changing bars.
+		!Default_StatusBar_TileProperties_Priority    = 1 ;>Valid values: 0-1. (you most likely always have this set to 1).
+		!Default_StatusBar_TileProperties_XFlip       = 0 ;>Valid values: 0-1. NOTE: this is ignored (forcibly set) if !Default_LeftwardsBar == 1. If you want a left-to-right bar, set this to 1.
+		!Default_StatusBar_TileProperties_YFlip       = 0 ;>Valid values: 0-1. NOTE: this is ignored for vertical downwards bar (forcibly set).
+	;Same as above, including the XY flip override.
+		!Default_Overworld_TileProperties_Page        = 1 ;>Valid values: 0-3.
+		!Default_Overworld_TileProperties_Palette     = 6 ;>Valid values: 0-7.
+		!Default_Overworld_TileProperties_Priority    = 1 ;>Valid values: 0-1. (you most likely always have this set to 1).
+		!Default_Overworld_TileProperties_XFlip       = 0 ;>Valid values: 0-1. NOTE: this is ignored (forcibly set) if !Default_LeftwardsBar == 1. If you want a left-to-right bar, set this to 1.
+		!Default_Overworld_TileProperties_YFlip       = 0 ;>Valid values: 0-1. NOTE: this is ignored for vertical downwards bar (forcibly set).
 		
 	!PaletteChanging = 0
 		;^0 = Use whatever colors specified by !Default_StatusBar_TilePropertiesSetting constantly.
@@ -177,12 +179,18 @@ includeonce
 				!GraphicalBarExampleTest_StaticEnd_ExtendLeft = 0
 					;^0 = Extend rightwards, 1 = extend leftwards, from a given position.
 			;Some tile number, properties, and positioning settings:
-				;Static left tile of bar
+				;Static left tile of bar (note that priority is shared with !Default_StatusBar_TileProperties_Priority.
 					!GraphicalBarExampleTest_LeftSideTileNum = $29
-					!GraphicalBarExampleTest_LeftSideTileProps = %00111000
+					!GraphicalBarExampleTest_LeftSideTile_TileProperties_Page    = 0 ;>Valid values: 0-3.
+					!GraphicalBarExampleTest_LeftSideTile_TileProperties_Palette = 6 ;>Valid values: 0-7.
+					!GraphicalBarExampleTest_LeftSideTile_TileProperties_XFlip   = 0 ;>Valid values: 0-1.
+					!GraphicalBarExampleTest_LeftSideTile_TileProperties_YFlip   = 0 ;>Valid values: 0-1.
 				;Static right tile of bar
 					!GraphicalBarExampleTest_RightSideTileNum = $29
-					!GraphicalBarExampleTest_RightSideTileProps = %01111000
+					!GraphicalBarExampleTest_RightSideTile_TileProperties_Page    = 0 ;>Valid values: 0-3.
+					!GraphicalBarExampleTest_RightSideTile_TileProperties_Palette = 6 ;>Valid values: 0-7.
+					!GraphicalBarExampleTest_RightSideTile_TileProperties_XFlip   = 1 ;>Valid values: 0-1.
+					!GraphicalBarExampleTest_RightSideTile_TileProperties_YFlip   = 0 ;>Valid values: 0-1.
 			;Tile positions for static end tiles
 				;Extend Rightwards
 					!GraphicalBarExampleTest_PosX_StaticEnds_ExtendRightBar = 1
@@ -366,9 +374,16 @@ includeonce
 			else
 				!RAM_0EF9 = $400EF9
 			endif
+		;Get YXPCCCTT
+			function GetLayer3YXPCCCTT(Y,X,P,CCC,TT) = ((Y<<7)+(X<<6)+(P<<5)+(CCC<<2)+TT)
 		;Mark that the macros and functions are now defined
 			!FunctionGuard_StatusBarFunctionDefined = 1
 	endif
+	;Obtain tile properties
+		!Default_StatusBar_TilePropertiesSetting = GetLayer3YXPCCCTT(!Default_StatusBar_TileProperties_YFlip,!Default_StatusBar_TileProperties_XFlip,!Default_StatusBar_TileProperties_Priority,!Default_StatusBar_TileProperties_Palette,!Default_StatusBar_TileProperties_Page)
+		!Default_Overworld_TilePropertiesSetting = GetLayer3YXPCCCTT(!Default_Overworld_TileProperties_YFlip,!Default_Overworld_TileProperties_XFlip,!Default_Overworld_TileProperties_Priority,!Default_Overworld_TileProperties_Palette,!Default_Overworld_TileProperties_Page)
+		!GraphicalBarExampleTest_LeftSideTileProps = GetLayer3YXPCCCTT(!GraphicalBarExampleTest_LeftSideTile_TileProperties_YFlip,!GraphicalBarExampleTest_LeftSideTile_TileProperties_XFlip,!Default_StatusBar_TileProperties_Priority,!GraphicalBarExampleTest_LeftSideTile_TileProperties_Palette,!GraphicalBarExampleTest_LeftSideTile_TileProperties_Page)
+		!GraphicalBarExampleTest_RightSideTileProps = GetLayer3YXPCCCTT(!GraphicalBarExampleTest_RightSideTile_TileProperties_YFlip,!GraphicalBarExampleTest_RightSideTile_TileProperties_XFlip,!Default_StatusBar_TileProperties_Priority,!GraphicalBarExampleTest_RightSideTile_TileProperties_Palette,!GraphicalBarExampleTest_RightSideTile_TileProperties_Page)
 	;Convert XY position to address
 		!Default_GraphicalBar_Pos_Tile = VanillaStatusBarXYToAddress(!Default_GraphicalBar_PosX_Tile, !Default_GraphicalBar_PosY_Tile, !RAM_0EF9)
 		!Default_GraphicalBar_Pos_Tile_ExtendLeftwards = VanillaStatusBarXYToAddress(!Default_GraphicalBar_PosX_ExtendLeftwards, !Default_GraphicalBar_PosY_ExtendLeftwards, !RAM_0EF9)

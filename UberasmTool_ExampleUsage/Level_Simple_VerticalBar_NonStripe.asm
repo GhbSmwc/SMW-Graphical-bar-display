@@ -125,15 +125,7 @@ endif
 	PaletteTable:
 		;These contain the colors to use based on how much fill,
 		;ordered in increasing thresholds, in YXPCCCTT form.
-		;Formula for making YXPCCCTT data format workable with defines: [(!YFlip<<7)+(!Default_LeftwardsBar<<6)+(!Priority<<5)+(!palette<<2)+(!PageNumber)]
-		; -!YFlip: Not mentioned in the defines, but for formula only (valid range 0-1).
-		; -!Default_LeftwardsBar: Mentioned in the defines, X flip (valid range 0-1).
-		; -!Priority: Goes in front or behind other things (valid range 0-1)
-		; -!palette: Not mentioned in the defines, but for formula only (valid range 0-7).
-		; -!PageNumber: Not mentioned in the defines, but for formula only (valid range 0-3).
-		;
-		;Because this code never assumes of you having a horizontal bar of 2 8x8 tiles tall, the Y flip is never needed
-		;((0<<7) results 0, which means no addition occurs).
-			db (!Default_LeftwardsBar<<6)+(1<<5)+(3<<2)+(0)	;>If below Threshold 1
-			db (!Default_LeftwardsBar<<6)+(1<<5)+(7<<2)+(0)	;>If below Threshold 2
-			db (!Default_LeftwardsBar<<6)+(1<<5)+(6<<2)+(0)	;>If at or above Threshold 2
+		;The color to use is a palette in the 4th argument of the function called (must be an integer 0-7)
+			db GetLayer3YXPCCCTT(!Default_StatusBar_TileProperties_YFlip,!Default_LeftwardsBar,!Default_StatusBar_TileProperties_Priority,3,!Default_StatusBar_TileProperties_Page) ;>If below Threshold 1
+			db GetLayer3YXPCCCTT(!Default_StatusBar_TileProperties_YFlip,!Default_LeftwardsBar,!Default_StatusBar_TileProperties_Priority,7,!Default_StatusBar_TileProperties_Page) ;>If below Threshold 2
+			db GetLayer3YXPCCCTT(!Default_StatusBar_TileProperties_YFlip,!Default_LeftwardsBar,!Default_StatusBar_TileProperties_Priority,6,!Default_StatusBar_TileProperties_Page) ;>If at or above Threshold 2
