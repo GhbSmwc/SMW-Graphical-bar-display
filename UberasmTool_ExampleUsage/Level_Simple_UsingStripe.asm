@@ -35,6 +35,8 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;This is a simple test ASM using the graphical bar.
 ;best tested using uberasm tool.
 
+;Check if the user have attempted to use stripe images without writing the tile properties.
+	assert !StatusBar_UsingCustomProperties != 0, "Using stripe images MUST have tile properties written, else garbage tiles can appear."
 
 main:
 if !CPUMode != 0
