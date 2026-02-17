@@ -1393,7 +1393,7 @@ with only the attributes being used, but a new input is required:
 <tr>
 <td><kbd><span class="NoLineBreak"><span style="font-weight: bold;">$00</span></span></kbd> to <kbd><span class="NoLineBreak"><span style="font-weight: bold;">$02</span></span></kbd></td>
 <td style="text-align: center; vertical-align: middle;">3</td>
-<td>The starting address (left end, extends rightwards, even when the bar is set to fill leftwards) location to write the tile numbers to the status bar.</td>
+<td>This input contains the starting <abbr title="You write an ADDRESS into RAM, e.g. Setting RAM $00~$02 to values $00, $A0, $7F would mean writing to $7FA000.">address</abbr> (left end, extends rightwards, even when the bar is set to fill leftwards) location to write the tile numbers to the status bar.</td>
 </tr>
 <tr>
 <td><kbd><span class="NoLineBreak"><span style="font-weight: bold;">$03</span></span></kbd> to <kbd><span class="NoLineBreak"><span style="font-weight: bold;">$05</span></span></kbd></td>
@@ -1512,7 +1512,7 @@ After executing this subroutine, then calling <kbd>WriteBarToHUD</kbd> or <kbd>W
 </tr>
 </table><br>
 <img src="readme_files/BarExtendLeftTiles.png"><br>
-Example when using the super status bar patch:<br>
+Example when using the Super Status Bar patch:<br>
 <img src="readme_files/BarExtendLeftTiles_OnStatBar.png"><br>
 Be careful with bank borders crossing (don't have status bar tile tables that goes from <kbd>$7EFFFF</kbd> to <kbd>$7F0000</kbd>, for a made-up example), as I discovered that
 Akaginite's <kbd>16Bit - 8Bit</kbd> (done by <kbd>((-8Bit) + 16Bit</kbd>)) does not work with bank borders if <kbd>8Bit</kbd> is <kbd>$00</kbd> because that causes the carry flag
