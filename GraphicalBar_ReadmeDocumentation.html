@@ -1295,7 +1295,7 @@ Destroyed:
 <tr><td><kbd>$09</kbd></td><td style="text-align: center;">1</td><td>Used to track the middle tiles if all of them are done.</td></tr>
 </table><br>
 
-<p>In case if you don't know how input an address into scratch RAM, you label your table like this (this is an example from the tile table for the Giant Masked Koopa Boss):
+<p>In case if you don't know how to input an address into scratch RAM, you label your table like this (this is an example from the tile table for the Giant Masked Koopa Boss):
 <div class="CodeBlock"><pre>		BarTilesLeft:
 		;Left end fill amount tile numbers:
 		db $88		;&gt;Fill amount/index: $00
@@ -1449,8 +1449,8 @@ In vanilla SMW, it is still possible to edit the tile properties (but cannot be 
 
 Note that this does NOT reverse the order of bytes stored in <kbd>!Scratchram_GraphicalBar_FillByteTbl</kbd> table, it simply takes that table, and write them on the HUD backwards.<br><br>
 
-To avoid confusion, I refer the end tiles in which the fill <span style="font-weight: bold;">starts</span> as the left end and right end to where the fill goes to. Left/right <i>side</i> refers the literal left/right side from the user's perspective.
-Also keep in mind that as you increase the length of the bar, it will always extend towards the right unless you use the <kbd>BarExtendLeft</kbd> routine.<br><br>
+To avoid confusion, I refer the end tiles in which the fill <span style="font-weight: bold;">starts</span> as the &ldquo;left end&rdquo; and where the fills go to as the &ldquo;right end&rdquo;. Left/right <i>side</i> refers the literal left/right side from the user's perspective.
+Also keep in mind that as you increase the length of the bar, it will always extend towards the right unless you use the <kbd>BarExtendLeft</kbd> routine. This also applies to vertical bars as well.<br><br>
 
 Another note is that the address provided on where to write on the status bar is still &ldquo;left to right&rdquo; meaning as the bar extends, the left side of the bar does not move and will still extend rightwards although
 the fill starts on the right side.<br><br>
@@ -1657,7 +1657,8 @@ Just like the Super Status Bar patch and OWB+, its tile data format is &ldquo;2-
 <li><a href="#GraphicalBarOtherRoutinesBack" id="GraphicalBarOtherRoutines">^</a>Inside <kbd>GraphicalBarOtherRoutines.asm</kbd></li>
 <ul>
 <li><a href="#MapRangeToStartAt0_Back" id="MapRangeToStartAt0">^</a><kbd>MapRangeToStartAt0</kbd>: Maps any given range, and the quantity (of 3 given numbers) to a zero-based range (for use so that any number that is the minimum maps to
-0% and maximum to 100%, akin to <a href="https://en.wikipedia.org/wiki/Feature_scaling#Rescaling_(min-max_normalization)">Min-max feature scaling</a>, but this subroutine merely subtracts Quantity and MaxQuantity by <kbd>min</kbd> so it is 0). For example: A range from 75 to 100 with a quantity of 85 would be converted to 0 to 25 with a quantity of 10. This is useful for stacked bars like EXP progress bar or multiple HP bars for bosses. You call this
+0% and maximum to 100%, akin to <a href="https://en.wikipedia.org/wiki/Feature_scaling#Rescaling_(min-max_normalization)">Min-max feature scaling</a>, but this subroutine merely subtracts Quantity and MaxQuantity by <kbd>min</kbd> so it is 0).
+For example: A range from 75 to 100 with a quantity of 85 would be converted to 0 to 25 with a quantity of 10. This is useful for stacked bars like EXP progress bar or multiple HP bars for bosses that damage carries over. You call this
 routine before you call <kbd>CalculateGraphicalBarPercentage</kbd>.
 <table>
 <tr><th>Input</th><th>Number of bytes</th><th>Description</th></tr>
@@ -1918,7 +1919,7 @@ the same table graphic as middle and cause cutoff-ended bar.
 	SBC #$02							;|&gt;Left end + Right end = 2 end tiles
 	STA !Scratchram_GraphicalBar_TempLength				;/
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;&gt;Convert tiles (end tiles recognized).
-	;[...]</pre></div><br><br>
+	;[...]</pre></div>
 
 </p></li>
 <li><p>You might've noticed the define <span class="NoLineBreak"><kbd>!Settings_GraphicalBar_IndexSize</kbd></span> found in <kbd>GraphicalBarDefines.asm</kbd>, I left that there in for some rare cases anyone

@@ -52,7 +52,7 @@
 		<input type="radio" name="BarDirection" id="BarDirectionL2R" checked onchange="CalculateBarCenteringPos()"><label for="BarDirectionL2R">Left to Right</label><br>
 		<input type="radio" name="BarDirection" id="BarDirectionR2L" onchange="CalculateBarCenteringPos()"><label for="BarDirectionR2L">Right to Left</label>
 	</li>
-	<li><abbr title="Width of the bar itself (not the space of the remaining parts of the 8x8 tile), in pixels."><kbd>BarWidth</kbd></abbr> (must be non-negative): <input type="number" id="BarWidth" min="0" max="256" onchange="CalculateBarCenteringPos()"></li>
+	<li><abbr title="Width of the bar itself (not the negative space of the remaining parts of the 8x8 tile), in pixels."><kbd>BarWidth</kbd></abbr> (must be non-negative): <input type="number" id="BarWidth" min="0" max="256" onchange="CalculateBarCenteringPos()"></li>
 	<li><abbr title="Distance between the nearest edge (left or right edge) of the bar to its origin position, which is the top-left pixel of the 8x8 tile where the fill starts when increasing."><kbd>EdgeOriginDistance</kbd></abbr> (must be non-negative): <input type="number" id="EdgeOriginDistance" min="0" max="7" onchange="CalculateBarCenteringPos()"></li>
 </ul><br><br>
 
