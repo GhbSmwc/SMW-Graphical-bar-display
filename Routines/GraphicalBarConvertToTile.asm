@@ -18,8 +18,8 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;Scroll down for the double-bar version.
 ;
 ;Note to self about the gamemode values:
-; $0D-$0E covers overworld load and overworld.
-; $13-$14 covers level load and level.
+; $0D to $0E covers overworld load and overworld.
+; $13 to $14 covers level load and level.
 ;
 ;Input:
 ; - !Scratchram_GraphicalBar_FillByteTbl to (!Scratchram_GraphicalBar_FillByteTbl+NumbOfTiles)-1:

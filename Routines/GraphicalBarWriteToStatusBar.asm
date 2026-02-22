@@ -335,11 +335,11 @@ incsrc "../GraphicalBarDefines/StatusBarSettings.asm"
 ;unlikely though.
 ;
 ; Input:
-;  - $00-$02: the position of the final/last/rightmost tile would be at.
-;  - $03-$05: Same as above, but for tile properties if applicable.
+;  - $00 to $02: the position of the final/last/rightmost tile would be at.
+;  - $03 to $05: Same as above, but for tile properties if applicable.
 ; Output:
-;  - $00-$02: the position of the first tile would be at.
-;  - $03-$05: Same as above, but for tile properties if applicable.
+;  - $00 to $02: the position of the first tile would be at.
+;  - $03 to $05: Same as above, but for tile properties if applicable.
 ;
 ; Status bar address write range (when using this routine and
 ; WriteBarToHUD or WriteBarToHUDLeftwards):
@@ -554,15 +554,15 @@ WriteBarStaticTileToHUDRightsideFormat2:
 ; - !Scratchram_GraphicalBar_LeftEndPiece, !Scratchram_GraphicalBar_MiddlePiece,
 ;   !Scratchram_GraphicalBar_RightEndPiece, and !Scratchram_GraphicalBar_TempLength:
 ;   Used to determine how many tile bytes.
-; - $00-$02: The location of the left-to-right bar (address taken from the first tile)
+; - $00 to $02: The location of the left-to-right bar (address taken from the first tile)
 ;   to copy from for the tile numbers.
-; - $03-$05: Same as above but tile properties.
+; - $03 to $05: Same as above but tile properties.
 ;Output:
 ; - [Address_In_00 - (NumberOfTiles * !StatusBarFormat)] to [Address_In_00 - (1 * !StatusBarFormat)]
 ;   the area the mirrored copy will be written at, applies to both tile numbers and properties.
 ;Overwritten:
-; - $06-$08: Used for the address of the mirrored copy for tile numbers.
-; - $09-$0B: Used for the address of the mirrored copy for tile properties.
+; - $06 to $08: Used for the address of the mirrored copy for tile numbers.
+; - $09 to $0B: Used for the address of the mirrored copy for tile properties.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 WriteDoubleEndedBar:
 	;Get starting address of the flipped bar (write the flipped bar at an address stored in $06 and $09):
