@@ -10,7 +10,7 @@
 ; -- $01 = rounded to empty
 ; -- $02 and up = rounded to full
 ;Output:
-; - $00-$01: Percentage, rounded away from 0 and max.
+; - $00 to $01: Percentage, rounded away from 0 and max.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ?RoundAwayEmptyFull:
 	CPY #$00		;>Needed so it compares Y instead of A depending on the codes prior calling this subroutine
