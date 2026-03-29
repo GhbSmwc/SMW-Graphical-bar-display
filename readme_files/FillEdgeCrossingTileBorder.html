@@ -47,7 +47,7 @@ then the total is now what tile index to use for that given tile byte:
 <tr><td>+8/<kbd>$7F8452</kbd></td><td><span style="color: red">Right end</span></td><td style="background-color: grey"><kbd>$00</kbd></td><td><kbd>$06</kbd></td><td><kbd>$00</kbd> (use only this tile's fill amount for indexing, don't add by a value after here)</td></tr>
 </table>
 
-This also means that duplicate tile numbers in the table may be needed on the last n items in the tile table, because this covers all possible indexes from <kbd>$00</kbd> to <kbd>NumberOfPiecesOfGivenTile + <abbr title="Any number of pieces of whichever tile after this have the highest number of pieces, for example, working on the left end tile, if the next tile is a middle with 8 pieces or the next tile is a right end (no middle tiles) that have 6 pieces, you would take the 8 and not the 6 for indexing for the left end, it then becomes 3 + 8 = 11 ($0B) which is the highest index.">HighestNumberOFPiecesOfNextTile</kbd>.
+This also means that duplicate tile numbers in the table may be needed on the last n items in the tile table, because this covers all possible indexes from <kbd>$00</kbd> to <kbd>NumberOfPiecesOfGivenTile + <abbr title="Any number of pieces of whichever tile after this have the highest number of pieces, for example, working on the left end tile, if the next tile is a middle with 8 pieces or the next tile is a right end (no middle tiles) that have 6 pieces, you would take the 8 and not the 6 for indexing for the left end, it then becomes 3 + 8 = 11 ($0B) which is the highest index.">HighestNumberOfPiecesOfNextTile</kbd>.
 If you happen to have fewer number of values in the table than needed, garbage tiles will appear as soon as the next tile's fill amount is higher than a certain amount.</p>
 
 <h2>Quick jumps</h2>
@@ -56,7 +56,7 @@ If you happen to have fewer number of values in the table than needed, garbage t
 	<li><a href="#OutlineEdge" id="TOC_OutlineEdge">Outlined edge</a></li>
 	<li><a href="#RoundedEdge" id="TOC_RoundedEdge">RoundedEdge</a></li>
 </ul><br>
-The following images below illustrates how they work. The numbers on the leftmost margin is the index, ranging <kbd>$00</kbd> to <kbd>NumberOfPiecesOfGivenTile + HighestNumberOFPiecesOfNextTile</kbd> and the numbers to the right of each tile is the fill amount. Whenever the next tile byte starts filling, the current tile
+The following images below illustrates how they work. The numbers on the leftmost margin is the index, ranging <kbd>$00</kbd> to <kbd>NumberOfPiecesOfGivenTile + HighestNumberOfPiecesOfNextTile</kbd> and the numbers to the right of each tile is the fill amount. Whenever the next tile byte starts filling, the current tile
 before it is always treated full (despite both current and next are graphically displaying partially filled), unless the current tile is the last tile, in which may have a higher maximum to graphically make it look full (example is for Diagonal edge, if the maximum is 3 and the graphics for the outline wasn't edited, it would use index 3, which ends up looking like the last tile is halfway full).
 <hr>
 <h1><a href="#TOC_DiagonalEdge" id="DiagonalEdge">^</a>Diagonal edge</h1>

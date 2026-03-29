@@ -162,7 +162,7 @@ supports it.</p>
 <ul>
 	<li><a id="TopJSLink" href="readme_files/JS_GraphicalBarCalculator3.html">Calculate the graphical bar's memory usage</a></li>
 	<li><a id="CalculatePercentageRoundBounds" href="readme_files/JS_GraphicalBar_PercentageRoundQuantityRanges.html">CalculateGraphicalBarPercentage's range of inputs to amount of pieces filled</li>
-	<li><a id="GraphicsTable" href="readme_files/JS_GraphicsNotes.html">Graphics notes</a></li>
+	<li><a id="GraphicsTable" href="readme_files/JS_GraphicsNotes.html">Graphics notes</a> (helps identify which graphic file corresponds to the fill &rarr; tile number tables and a description)</li>
 	<li><a id="OAMNotes" href="readme_files/JS_OAM_Side_notes.html">OAM table and conversion sheet</a></li>
 	<li>Tile property converters. Note they're not the same, rather similar, layer 3 has 2-bits (0-3) for page number and 1-bit (0-1) for priority, while sprites
 have 1-bit for page number and 2-bits of priority:</li>
@@ -991,11 +991,11 @@ it does the same thing, but slightly different. Instead of using any form of div
 same, except that the output <kbd>$00-$01</kbd> acts as the remaining fill when the bar is full or higher and 0 otherwise (<kbd>RemainingFill = <abbr title="Picks what number in the parameter is the highest value. If the fill amount is less than 0, it results things like max(-5, 0) which returns 0 and not -5">max</abbr>((InputFillAmount - BarMaximumFull), 0)</kbd>), while <kbd>$02-$09</kbd> aren't destroyed.<br>
 
 <p>It works like this: subtract the input fill amount by the tile byte maximum starting at the first byte going towards the last byte, if the subtraction was successful (having enough filled pieces to be full; subtracted without going in the negatives), then write
-the maximum amount to the byte in the table and write the difference back to the remaining fill amount, otherwise (if it fails, having less than maximum) it would write that remaining fill amount into the byte in the table and
+the maximum amount to the byte in the table and write the difference back to the remaining fill amount, otherwise (if it fails, having less than maximum) it would write that remaining fill amount (before subtracted into negatives) into the byte in the table and
 set the remaining fill amount to 0 (takes all the rest if less). After this, this then repeats (the remaining fill amount gets subtracted towards 0) until all tile bytes are finished.<br><br>
 
 As an analogy, there are N empty cups, arranged in a row, and starting at the first cup, you fill that cup with water until it's full, or until you run out of water, and then you repeat the process on the next
-cup finishing once you reached the last one. The only difference is that the bytes' value are <i>not</i> added by the fill amount, rather <i>set</i> to as it would be unoptimized to repeatedly do <kbd>0 + FillTaken</kbd>.<br><br>
+cup finishing once you reached the last one. The only difference is that the bytes' value are <i>not added</i> by the fill amount, rather <i>set</i> to as it would be unoptimized to repeatedly do <kbd>0 + FillTaken</kbd>.<br><br>
 
 <ul><li>For example: using the same attributes as examples above (but with 4 middle tiles), [14 - 3 = 11]. Subtraction successful, write 3 (maximum)
 for the left end, and then write 11 back to the remaining fill amount. Then [11 - 8 = 3], subtraction successful, so the first middle tile byte is 8 (maximum). Finally, [3 - 8 = (-5)]. Subtraction failed, write the remaining amount
