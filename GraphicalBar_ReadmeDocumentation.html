@@ -2152,7 +2152,7 @@ function getClosest(el, tagName) {
 					let Xpositioning = FilledPieceXPosition+VerticalLineXPos+20n
 					let CurrentFillByteIndex = 0n
 					
-					function GeneratePieces() {
+					function GenerateFillPiece() {
 						let PieceFilledOrNot = createSVGElement("rect")
 						PieceFilledOrNot.setAttribute("x", (Xpositioning).toString(10))
 						PieceFilledOrNot.setAttribute("y", (TileProcessYPositionRow+30n).toString(10))
@@ -2161,19 +2161,19 @@ function getClosest(el, tagName) {
 						PieceFilledOrNot.setAttribute("stroke-width", "1")
 						PieceFilledOrNot.setAttribute("stroke", "#000000")
 						
-						let FillColor = "#00C000"
+						let FillColor = "#00C000" //Color for filled piece
 						if (TempFillAmount == 0n) {
-							FillColor = "#808080"
+							FillColor = "#808080" //Color for empty piece
 						}
 						
 						PieceFilledOrNot.setAttribute("fill", FillColor)
 						SVGGraphToDisplay.appendChild(PieceFilledOrNot)
 						
-						TempFillAmount--
+						TempFillAmount-- //Deduct fill amount for every fill piece generated until 0.
 						if (TempFillAmount < 0n) {
 							TempFillAmount = 0
 						}
-						Xpositioning += 10n
+						Xpositioning += 10n //Offset the position for the next piece.
 					}
 					function DisplayCurrentlyProcessedTileByte(NumberOfPieces) {
 						if (CurrentFillByteIndex == FillByteTableIndex_RecentlyFilled) {
@@ -2223,7 +2223,7 @@ function getClosest(el, tagName) {
 						ByteTypeLabeling({ByteType: "Left end"})
 						DisplayCurrentlyProcessedTileByte(GraphicalBarLeftEndPiece)
 						for (let Countdown = GraphicalBarLeftEndPiece; Countdown > 0n; Countdown--) {
-							GeneratePieces()
+							GenerateFillPiece()
 						}
 						Xpositioning += 10n
 						CurrentFillByteIndex++
@@ -2232,7 +2232,7 @@ function getClosest(el, tagName) {
 						ByteTypeLabeling({ByteType: "Middle", MiddleCount: GraphicalBarMiddleLength - MiddleCountDown + 1n})
 						DisplayCurrentlyProcessedTileByte(GraphicalBarMiddlePiece)
 						for (let FillCountDownPerTile = GraphicalBarMiddlePiece; FillCountDownPerTile > 0n; FillCountDownPerTile--) {
-							GeneratePieces()
+							GenerateFillPiece()
 						}
 						Xpositioning += 10n
 						CurrentFillByteIndex++
@@ -2241,7 +2241,7 @@ function getClosest(el, tagName) {
 						ByteTypeLabeling({ByteType: "Right end"})
 						DisplayCurrentlyProcessedTileByte(GraphicalBarRightEndPiece)
 						for (let Countdown = GraphicalBarRightEndPiece; Countdown > 0n; Countdown--) {
-							GeneratePieces()
+							GenerateFillPiece()
 						}
 						Xpositioning += 10n
 						CurrentFillByteIndex++
