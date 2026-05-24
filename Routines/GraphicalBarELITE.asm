@@ -447,8 +447,7 @@ GetMaxBarInAForRoundToMaxCheck:
 ;Overwritten/Destroyed: $00 to $09:
 ; - $00 to $07: garbage:
 ; -- $00 to $01: will be when this routine is finished:
-; --- The amount right end contains if right end exist and no regards to left
-;     end and middle.
+; --- The amount right end contains if right end exist.
 ; --- #$XX00 if no right end exist but middle exist.
 ; --- The amount left end contains when middle and right end doesn't exist.
 ; -- $02 to $07: needed to move values to another address due to subroutines,
