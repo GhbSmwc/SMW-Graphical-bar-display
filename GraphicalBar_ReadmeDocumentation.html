@@ -735,13 +735,13 @@ See <a href="readme_files/DoubleBarInfo.html#SecondTable" target="_blank">this i
 		<td>
 			<kbd><span class="NoLineBreak"><span style="font-weight: bold;">$00</span></span></kbd> to <kbd><span class="NoLineBreak"><span style="font-weight: bold;">$09</span></span></kbd>
 		</td>
-		<td style="text-align: center; vertical-align: middle;">8</td>
+		<td style="text-align: center; vertical-align: middle;">10</td>
 		<td>
-			Garbage:
+			Garbage. Mainly used for preserving values and usage with several math routines:
 			<ul>
 				<li><kbd><span class="NoLineBreak"><span style="font-weight: bold;">$00</span></span></kbd> to <kbd><span class="NoLineBreak"><span style="font-weight: bold;">$01</span></span></kbd>:</li>
 				<ul>
-					<li>If the right end exist without regards of the middle and left end, will contain the right end amount.</li>
+					<li>If the right end exist, will contain the right end amount.</li>
 					<li>#$00 if right end does not exist and middle exist.</li>
 					<li>If the left end only exist and middle and right are not, contains the left end amount.</li>
 				</ul>
