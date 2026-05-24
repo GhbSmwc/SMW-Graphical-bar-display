@@ -444,7 +444,7 @@ GetMaxBarInAForRoundToMaxCheck:
 ;    if MiddlePiece = zero (either 16 or 8-bit, this will be zero and will not be
 ;    included).
 ;  This can be read as each byte means each 8x8 tile.
-;Overwritten/Destroyed:
+;Overwritten/Destroyed: $00 to $09:
 ; - $00 to $07: garbage:
 ; -- $00 to $01: will be when this routine is finished:
 ; --- The amount right end contains if right end exist and no regards to left
@@ -453,7 +453,7 @@ GetMaxBarInAForRoundToMaxCheck:
 ; --- The amount left end contains when middle and right end doesn't exist.
 ; -- $02 to $07: needed to move values to another address due to subroutines,
 ;    as well as outputs of the subroutines.
-; -- $09: A backup of $00.
+; -- $08 to $09: A backup of $00.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;DrawGraphicalBar:
 ;	if !Setting_GraphicalBar_IndexSize == 0
