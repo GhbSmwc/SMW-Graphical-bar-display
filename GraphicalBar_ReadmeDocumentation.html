@@ -723,42 +723,38 @@ nth bytes after depending on what you set <span class="NoLineBreak"><kbd>!Settin
 See <a href="readme_files/DoubleBarInfo.html#SecondTable" target="_blank">this information</a> for what I mean.
 </td>
 </tr>
-<tr>
-<td>
-<kbd><span class="NoLineBreak"><span style="font-weight: bold;">$08</span></span></kbd> to <kbd><span class="NoLineBreak"><span style="font-weight: bold;">$09</span></span></kbd>
-</td>
-<td style="text-align: center; vertical-align: middle;">2</td>
-<td>
-Garbage (see ASM file for details).
-</td>
-</tr>
 </table><br>
 
 <table>
-<th>Destroyed</th>
-<th>Number of bytes</th>
-<th>Description</th>
-</tr>
-<tr>
-<td>
-<kbd><span class="NoLineBreak"><span style="font-weight: bold;">$00</span></span></kbd> to <kbd><span class="NoLineBreak"><span style="font-weight: bold;">$07</span></span></kbd>
-</td>
-<td style="text-align: center; vertical-align: middle;">8</td>
-<td>
-Garbage:
-<ul>
-<li><kbd><span class="NoLineBreak"><span style="font-weight: bold;">$00</span></span></kbd> to <kbd><span class="NoLineBreak"><span style="font-weight: bold;">$01</span></span></kbd>:</li>
-<ul>
-<li>If the right end exist without regards of the middle and left end, will contain the right end amount.</li>
-<li>#$00 if right end does not exist and middle exist.</li>
-<li>If the left end only exist and middle and right are not, contains the left end amount.</li>
-</ul>
-
-<li><kbd><span class="NoLineBreak"><span style="font-weight: bold;">$02</span></span></kbd> to <kbd><span class="NoLineBreak"><span style="font-weight: bold;">$07</span></span></kbd>: Needed to move the values to another
-address due to subroutines as well as outputs of the subroutines.</li>
-</ul>
-</td>
-</tr>
+	<tr>
+		<th>Destroyed</th>
+		<th>Number of bytes</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>
+			<kbd><span class="NoLineBreak"><span style="font-weight: bold;">$00</span></span></kbd> to <kbd><span class="NoLineBreak"><span style="font-weight: bold;">$09</span></span></kbd>
+		</td>
+		<td style="text-align: center; vertical-align: middle;">8</td>
+		<td>
+			Garbage:
+			<ul>
+				<li><kbd><span class="NoLineBreak"><span style="font-weight: bold;">$00</span></span></kbd> to <kbd><span class="NoLineBreak"><span style="font-weight: bold;">$01</span></span></kbd>:</li>
+				<ul>
+					<li>If the right end exist without regards of the middle and left end, will contain the right end amount.</li>
+					<li>#$00 if right end does not exist and middle exist.</li>
+					<li>If the left end only exist and middle and right are not, contains the left end amount.</li>
+				</ul>
+				<li>
+					<kbd><span class="NoLineBreak"><span style="font-weight: bold;">$02</span></span></kbd> to <kbd><span class="NoLineBreak"><span style="font-weight: bold;">$07</span></span></kbd>: Needed to move the values to another
+					address due to subroutines as well as outputs of the subroutines.
+				</li>
+				<li>
+					<kbd><span class="NoLineBreak"><span style="font-weight: bold;">$08</span></span></kbd> to <kbd><span class="NoLineBreak"><span style="font-weight: bold;">$09</span></span></kbd>: A backup of <kbd>$00</kbd> to <kbd>$01</kbd>
+				</li>
+			</ul>
+		</td>
+	</tr>
 </table>
 
 Here are the formulas on how each are calculated:<br><br>
