@@ -729,9 +729,7 @@ See <a href="readme_files/DoubleBarInfo.html#SecondTable" target="_blank">this i
 </td>
 <td style="text-align: center; vertical-align: middle;">2</td>
 <td>
-The amount of fill that was <kbd><span class="NoLineBreak"><span style="font-weight: bold;">$00</span></span></kbd> to <kbd><span class="NoLineBreak"><span style="font-weight: bold;">$01</span></span></kbd> was originally before calling this routine, the value is not
-capped, so inputting a number 63 when there are 62 pieces will have this RAM address storing the value 63. Can be used on such things like &ldquo;multi-bars&rdquo; that multiple bars are shown, and the
-fills advances to the next bar: <img src="readme_files/MultiBar.gif">
+Garbage (see ASM file for details).
 </td>
 </tr>
 </table><br>
@@ -987,8 +985,8 @@ assumes you never used static end tiles, most of the info provided about status 
 Of course, I made a <a id="ComputeGraphicalBarData" href="readme_files/JS_GraphicalBarCalculator3.html">javascript code page</a> that calculates memory statistics
 without the need of manually calculating the values.</li><br>
 
-<li><a href="#DrawGraphicalBarSubtractionLoopEdition_Back" id="DrawGraphicalBarSubtractionLoopEdition">^</a><kbd>DrawGraphicalBarSubtractionLoopEdition</kbd> An alternative routine to <kbd>DrawGraphicalBar</kbd>,
-it does the same thing, but slightly different. Instead of using any form of division, it simply uses repeated subtraction, and in fact, does not use any other subroutines (this is a standalone). Almost all the inputs and outputs the
+<li><a href="#DrawGraphicalBarSubtractionLoopEdition_Back" id="DrawGraphicalBarSubtractionLoopEdition">^</a><kbd>DrawGraphicalBarSubtractionLoopEdition</kbd> An alternative and simpler routine to <kbd>DrawGraphicalBar</kbd>,
+It works like this: instead of using any form of division, it simply uses repeated subtraction, and in fact, is a standalone (doesn't need other subroutines to work). Almost all the inputs and outputs the
 same, except that the output <kbd>$00-$01</kbd> acts as the remaining fill when the bar is full or higher and 0 otherwise (<kbd>RemainingFill = <abbr title="Picks what number in the parameter is the highest value. If the fill amount is less than 0, it results things like max(-5, 0) which returns 0 and not -5">max</abbr>((InputFillAmount - BarMaximumFull), 0)</kbd>), while <kbd>$02-$09</kbd> aren't destroyed.<br>
 
 <p>It works like this: subtract the input fill amount by the tile byte maximum starting at the first byte going towards the last byte, if the subtraction was successful (having enough filled pieces to be full; subtracted without going in the negatives), then write
@@ -1033,7 +1031,18 @@ for the left end, and then write 11 back to the remaining fill amount. Then [11 
 </td>
 <td style="text-align: center; vertical-align: middle;"><kbd>LeftEnd + MiddleLength + RightEnd</kbd> (both ends are 0 or 1 if nonexistent or exist, MiddleLength is how many middle tiles)</td>
 <td>The table array containing each tile byte fill amount, same as <kbd>DrawGraphicalBar</kbd>.</td>
-<tr><td><kbd>$00</kbd> to <kbd>$01</kbd></td><td style="text-align: center; vertical-align: middle;">2</td><td>The leftover remaining amount of fill, if the fill amount is greater than the maximum/total, 0 otherwise (calculated via <kbd>RemainingFill = max((InputFillAmount - BarMaximumFull), 0)</kbd>)</td></tr>
+<tr>
+	<td><kbd>$00</kbd> to <kbd>$01</kbd></td>
+	<td style="text-align: center; vertical-align: middle;">2</td>
+	<td>
+		The leftover remaining amount of fill (amount of fill after all tile bytes processed), if the fill amount is greater than the maximum/total, 0 otherwise (calculated via:<br>
+		<span class="NoLineBreak"><kbd>RemainingFill = max((InputFillAmount - BarMaximumFull), 0)</kbd></span>
+		<br>
+		). Because of this,
+		you can have a multi-bar system like this:<br>
+		<img src="readme_files/MultiBar.gif"><br>
+		(after calling <kbd>DrawGraphicalBarSubtractionLoopEdition</kbd>, then preserve (push) <kbd>$00-$01</kbd>, convert fill amount to tiles, write them to the status bar, then restore (pull) <kbd>$00-$01</kbd> then call <kbd>DrawGraphicalBarSubtractionLoopEdition</kbd> again and repeat)
+	</td></tr>
 </tr>
 
 </table>
