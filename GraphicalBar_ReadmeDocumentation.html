@@ -2548,13 +2548,13 @@ function getClosest(el, tagName) {
 			let ByteCount = 1n
 			let EndAddress = 1n
 			
-			if (!(/^[\dA-Fa-f]+(,\d+|-[\dA-Fa-f]+)$/).test(Ele.dataset.addr_and_size)) {
-				console.log("Invalid address and size argument: " + Ele.dataset.addr_and_size)
+			if (!(/^[\dA-Fa-f]+(,\s*\d+|-[\dA-Fa-f]+)$/).test(Ele.dataset.addr_and_size)) {
+				console.error("Invalid address and size argument: " + Ele.dataset.addr_and_size)
 				return
 			}
 			
 			StartAddress = BigInt("0x" + (Ele.dataset.addr_and_size).match(/^[\dA-Fa-f]+/)[0]);
-			if ((/,\d+$/).test(Ele.dataset.addr_and_size)) {
+			if ((/,\s*\d+$/).test(Ele.dataset.addr_and_size)) {
 				ByteCount = BigInt((Ele.dataset.addr_and_size).match(/\d+$/)[0])
 				if (ByteCount <= 0) {
 					console.error("Invalid number of bytes: " + Ele.dataset.addr_and_size)
