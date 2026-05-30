@@ -2572,14 +2572,14 @@ function getClosest(el, tagName) {
 			
 			
 			let Element_kbd_StartAddr = document.createElement("kbd")
-			Element_kbd_StartAddr.style.fontWeight = "bold"
+			//Element_kbd_StartAddr.style.fontWeight = "bold"
 			Element_kbd_StartAddr.appendChild(document.createTextNode("$" + StartAddress.toString(16).toUpperCase().padStart(2, "0")))
 			Span_LineBreakless.appendChild(Element_kbd_StartAddr)
 			
 			if (ByteCount > 1n) {
 				Span_LineBreakless.appendChild(document.createTextNode(" to "))
 				let Element_kbd_EndAddr = document.createElement("kbd")
-				Element_kbd_EndAddr.style.fontWeight = "bold"
+				//Element_kbd_EndAddr.style.fontWeight = "bold"
 				Element_kbd_EndAddr.appendChild(document.createTextNode("$" + EndAddress.toString(16).toUpperCase().padStart(2, "0")))
 				Span_LineBreakless.appendChild(Element_kbd_EndAddr)
 			}
