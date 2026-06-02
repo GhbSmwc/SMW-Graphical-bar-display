@@ -2091,12 +2091,13 @@ function similarly to most sprite status bar patches. These are used by the patc
 <li><p>You don't have to call the routine <kbd>CalculateGraphicalBarPercentage</kbd> to use <kbd>DrawGraphicalBar</kbd>, this means you can make an icon-based HP system that each
 tile byte holds a set amount of HP, for example, in the <i>Legend of Zelda</i> series starting in <i>Ocarina of Time</i>, you can have each heart containing 4 pieces representing each 1 HP.</p></li>
 
-<li><p>It is best to avoid having any end tiles holding the same number of pieces as the middle, although it still works, it is less optimized as the routine <kbd>DrawGraphicalBar</kbd> (including <kbd>DrawGraphicalBarSubtractionLoopEdition</kbd>)
-itself only takes a value and represent them as each bytes capped at their maximum. Therefore if you're planning to have 8 pieces for both left and right ends, and have 7 middle bytes also
-having 8 pieces at the max, it is better to have both end tiles set to 0 pieces and have 9 middle tiles holding 8 pieces, here is what it looks like on a full bar:<br><br>
+<li><p>It's best to avoid having any end tiles holding the same number of pieces as the middle (assuming non-zero amounts), although it still works, it is less optimized as the routine
+<kbd>DrawGraphicalBar</kbd> (including <kbd>DrawGraphicalBarSubtractionLoopEdition</kbd>)
+itself only takes a value and represent them as each bytes capped at their maximum. Therefore if you're planning, say, to have 8 pieces for both left and right ends, and have 7 middle tiles also
+having 8 pieces as max, it is better to have both end tiles set to 0 pieces and have 9 middle tiles holding 8 pieces, here is what it looks like on a full bar:<br><br>
 
 Less optimized:
-<div class="CodeBlock" style="width: 401px; height: 84px;"><pre><span style="color: cyan">!Scratchram_GraphicalBar_LeftEndPiece:       $08</span>
+<div class="CodeBlock" style="width: 458px; height: 102px;"><pre><span style="color: cyan">!Scratchram_GraphicalBar_LeftEndPiece:       $08</span>
 <span style="color: #00C000">!Scratchram_GraphicalBar_MiddlePiece:        $08</span>
 <span style="color: red">!Scratchram_GraphicalBar_RightEndPiece:      $08</span>
 <span style="color: #00C000">!Scratchram_GraphicalBar_TempLength:         $07</span>
@@ -2127,7 +2128,7 @@ Result:
 </tr>
 </table>
 Vs optimized:
-<div class="CodeBlock" style="width: 401px; height: 84px;"><pre><span style="color: cyan"><s>!Scratchram_GraphicalBar_LeftEndPiece:       $00</s></span>
+<div class="CodeBlock" style="width: 458px; height: 102px;"><pre><span style="color: cyan"><s>!Scratchram_GraphicalBar_LeftEndPiece:       $00</s></span>
 <span style="color: #00C000">!Scratchram_GraphicalBar_MiddlePiece:        $08</span>
 <span style="color: red"><s>!Scratchram_GraphicalBar_RightEndPiece:      $00</s></span>
 <span style="color: #00C000">!Scratchram_GraphicalBar_TempLength:         $09</span>
