@@ -10,9 +10,9 @@
 
 ;While having !DoubleBar_DisplayIncrease set to 1, If you look at the codes at [...HandleSwappableFills], it has
 ;only one check of which of the two FillPercentages is greater and duplicate code to write to $00 before writing to
-;GraphicalBarELITE_DrawGraphicalBarSubtractionLoopEdition, which is different than [Level_DoubleBar.asm] which has
+;GraphicalBarELITE_GraphicalBarSplitFill, which is different than [Level_DoubleBar.asm] which has
 ;two checks, each comparing the two literal quantities but having a single code to use
-;GraphicalBarELITE_DrawGraphicalBarSubtractionLoopEdition. You may be asking, what's up with the inconsistency?
+;GraphicalBarELITE_GraphicalBarSplitFill. You may be asking, what's up with the inconsistency?
 ;Well, the other one has longer code, including executing BOTH GraphicalBarELITE_CalculateGraphicalBarPercentage,
 ;so I think it is better to have no duplicate of long codes and have two checks, while this one have duplicate of
 ;shorter codes, with a single check of the two fill percentage.
@@ -135,7 +135,7 @@ endif
 						STA $00
 					...ShowFirstFill			;>$00 already contains the FirstFill
 					;WriteGraphicalBar
-						JSL GraphicalBarELITE_DrawGraphicalBarSubtractionLoopEdition	;>get bar values.
+						JSL GraphicalBarELITE_GraphicalBarSplitFill	;>get bar values.
 						STZ $00								;>Use Level-layer3 tileset
 						JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert to tiles.
 						LDA.b #!Default_GraphicalBar_Pos_Tile
@@ -175,7 +175,7 @@ endif
 				;Separate graphics
 					if !DoubleBar_DisplayIncrease == 0
 						...FirstQuantity
-							JSL GraphicalBarELITE_DrawGraphicalBarSubtractionLoopEdition
+							JSL GraphicalBarELITE_GraphicalBarSplitFill
 							....TransferFirstFillBar
 								PHB
 								REP #$30
@@ -189,12 +189,12 @@ endif
 							LDA !Freeram_SecondQuantity
 							STA $00
 							STZ $01
-							JSL GraphicalBarELITE_DrawGraphicalBarSubtractionLoopEdition
+							JSL GraphicalBarELITE_GraphicalBarSplitFill
 							JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTilesDoubleBar	;>Convert to tiles.
 					else
 						...HandleSwappableFills
 							;We can display increase (such as healing) by swapping FirstQuantity and SecondQuantity when written into
-							;$00 prior calling DrawGraphicalBarSubtractionLoopEdition. In this event, FirstFill ends up displaying as
+							;$00 prior calling GraphicalBarSplitFill. In this event, FirstFill ends up displaying as
 							;SecondQuantity (i.e increased current HP) and SecondFill displaying as FirstQuantity (Previous HP that
 							;was lower then current HP).
 								LDA $00
@@ -202,7 +202,7 @@ endif
 								BCS ....SwapThem
 								....NoSwap
 									.....FirstQuantity
-										JSL GraphicalBarELITE_DrawGraphicalBarSubtractionLoopEdition
+										JSL GraphicalBarELITE_GraphicalBarSplitFill
 										......TransferFirstFillBar
 											PHB
 											REP #$30
@@ -216,7 +216,7 @@ endif
 										LDA !Freeram_SecondQuantity
 										STA $00
 										STZ $01
-										JSL GraphicalBarELITE_DrawGraphicalBarSubtractionLoopEdition
+										JSL GraphicalBarELITE_GraphicalBarSplitFill
 										JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTilesDoubleBar	;>Convert to tiles.
 									BRA ....WriteToTableDone
 								....SwapThem
@@ -226,7 +226,7 @@ endif
 										LDA !Freeram_SecondQuantity							;\SecondQuantityPercentage
 										STA $00										;/
 										STZ $01
-										JSL GraphicalBarELITE_DrawGraphicalBarSubtractionLoopEdition					;>FirstFill
+										JSL GraphicalBarELITE_GraphicalBarSplitFill					;>FirstFill
 										......TransferFirstFillBar
 											PHB
 											REP #$30
@@ -240,7 +240,7 @@ endif
 										PLA									;\FirstQuantityPercentage
 										STA $00									;/
 										STZ $01
-										JSL GraphicalBarELITE_DrawGraphicalBarSubtractionLoopEdition		;>SecondFill
+										JSL GraphicalBarELITE_GraphicalBarSplitFill		;>SecondFill
 										JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTilesDoubleBar	;>Convert to tiles.
 								....WriteToTableDone
 					endif

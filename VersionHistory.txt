@@ -550,3 +550,9 @@ a sub-version (like a chapter number), NOT a decimal point (goes like this 1.8, 
   "JS_GraphicalBarCalculator3.html" (a RAM usage calculator). This is because the address tracker's assigner tool no longer
   accepts spaces in the ASM resource name.
  -Tile property settings in the defines are now split into separate parts.
+ 09/26/2026 v6.4.3
+ -Completely ditched the DrawGraphicalBar, since the repeated-subtraction varient is now replacing it.
+ -Fixed a broken link to a missing file pointing to JS_GraphicalBarCalculator2.html, since JS_GraphicalBarCalculator3.html is
+  the replacement.
+ -Renamed "DrawGraphicalBarSubtractionLoopEdition" to "GraphicalBarSplitFill" to avoid confusing names, same with
+  pixi routine "GraphicalBarDrawGraphicalBarSubtractionLoopEdition".

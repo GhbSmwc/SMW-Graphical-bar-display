@@ -45,7 +45,7 @@ endif
 		LDA.b #!Default_RightPieces				;|
 		STA !Scratchram_GraphicalBar_RightEndPiece		;/
 		JSL GraphicalBarELITE_CalculateGraphicalBarPercentage		;>Get percentage
-		JSL GraphicalBarELITE_DrawGraphicalBarSubtractionLoopEdition	;>get bar values.
+		JSL GraphicalBarELITE_GraphicalBarSplitFill	;>get bar values.
 	
 		REP #$20
 		LDA.w #..LeftEnd

@@ -241,13 +241,13 @@ Graphics:
 					
 				..ShowCurrent
 			endif
-			%GraphicalBarDrawGraphicalBarSubtractionLoopEdition()		;&gt;get bar values.
+			%GraphicalBarSplitFill()		;&gt;get bar values.
+			PEI ($00)	;Preserve a bunch of stuff because following subroutine uses $00-$09.
+			PEI ($02)
+			PEI ($04)
+			PEI ($06)
+			PEI ($08)
 			REP #$20
-			LDA $00 : PHA	;Preserve a bunch of stuff because following subroutine uses $00-$09.
-			LDA $02 : PHA
-			LDA $04 : PHA
-			LDA $06 : PHA
-			LDA $08 : PHA
 			LDA.w #BarTilesLeft : STA $00
 			LDA.w #BarTilesMiddle : STA $03
 			LDA.w #BarTilesRight : STA $06

@@ -116,7 +116,7 @@ if !PatchSprite_Uninstall == 0
 			..ConvertToBar
 				JSL CalculateGraphicalBarPercentage				;>Get percentage
 				JSL RoundAwayEmptyFull
-				JSL DrawGraphicalBarSubtractionLoopEdition			;>get bar values.
+				JSL GraphicalBarSplitFill			;>get bar values.
 				LDA #$01							;\Use Level-sprite tileset
 				STA $00								;/
 				JSL ConvertBarFillAmountToTiles				;>Convert tiles.

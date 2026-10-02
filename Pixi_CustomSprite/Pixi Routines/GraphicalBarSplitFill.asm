@@ -1,11 +1,10 @@
 incsrc "../GraphicalBarDefines/SpriteOAMSettings.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;Convert amount of fill to each fill per byte, repeated subtraction edition.
+;Convert amount of fill to each fill per byte.
 ;
-;Same as the other version, "DrawGraphicalBar" however does not use
-;multiplication and division routines. In fact, this alone does not use any
-;other subroutines AT ALL.
+;It takes a given fill amount for the whole bar, and splits them into
+;individual tile bytes starting from the first byte to the last.
 ;
 ;It works by:
 ;
@@ -36,19 +35,23 @@ incsrc "../GraphicalBarDefines/SpriteOAMSettings.asm"
 ; - !Scratchram_GraphicalBar_TempLength: The length of the bar (only counts
 ;   middle bytes)
 ;Output:
-; - !Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+EndAddress:
-;   A table array containing the amount of fill for each byte (N bytes (including zero) full,
-;   0 or 1 bytes a fraction, and then N bytes (including zero) empty), the address it ends at is:
+; - !Scratchram_GraphicalBar_FillByteTbl to !Scratchram_GraphicalBar_FillByteTbl+NumberOfBytes-1:
+;   A table array containing the amount of fill for each tile byte, ordered
+;   with N (can be zero) tile bytes being full (filled to maximum), 0 or 1
+;   tile bytes being fraction (fill amount between inclusively 0 to max-1),
+;   then N (can be zero) tile bytes being empty (fill amount being $00). The
+;   amount of bytes occupied here is:
 ;
-;    EndAddress = (L + MLength + R) - 1
+;    NumberOfBytes = (L + MLength + R)
 ;
-;  - L and R are 0 if set to 0 number of pieces, 1 otherwise on any nonzero values.
-;  - MLength is how many middle tiles.
+; -- L and R are 0 if set to 0 number of pieces, 1 otherwise on any nonzero values.
+; -- MLength is how many middle tiles.
 ;
 ; - $00 to $01: The leftover fill amount. If bar isn't full, it will be #$0000, otherwise its
-;  [RemainingFill = OriginalFill - EntireBarCapicity]. (overall calculation: RemainingFill = max((InputFillAmount - BarMaximumFull), 0))
+;   [RemainingFill = OriginalFill - EntireBarCapicity]. (overall calculation:
+;   RemainingFill = max((InputFillAmount - BarMaximumFull), 0))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-?DrawGraphicalBarSubtractionLoopEdition:
+?GraphicalBarSplitFill:
 		LDX #$00
 	?.Leftend
 		LDA !Scratchram_GraphicalBar_LeftEndPiece       ;\If left end does not exist, skip

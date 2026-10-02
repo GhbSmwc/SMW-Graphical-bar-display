@@ -61,7 +61,7 @@ DrawSprite:
 		PHX								;>Preserve sprite slot index
 		%GraphicalBarCalculateGraphicalBarPercentage()				;>Get percentage
 		%GraphicalBarRoundAwayEmptyFull()
-		%GraphicalBarDrawGraphicalBarSubtractionLoopEdition()			;>get bar values.
+		%GraphicalBarSplitFill()			;>get bar values.
 		LDA #$01							;\Use Level-sprite tileset
 		STA $00								;/
 		%GraphicalBarConvertBarFillAmountToTiles()				;>Convert tiles.

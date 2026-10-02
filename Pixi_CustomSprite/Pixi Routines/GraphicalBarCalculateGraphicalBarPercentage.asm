@@ -42,10 +42,9 @@
 ;*MaxQuantity = the maximum amount of something, say max HP.
 ;*FilledPieces = the number of pieces filled in the whole bar (rounded 1/2 up).
 ; *Note that this value isn't capped (mainly Quantity > MaxQuantity), the
-;  "DrawGraphicalBar" (and "DrawGraphicalBarSubtractionLoopEdition") subroutine will
-;  detect and will not display over max, just in case if you somehow want to use the
-;  over-the-max-value on advance use (such as filling 2 separate bars, filling up
-;  the 2nd one after the 1st is full).
+;  "GraphicalBarSplitFill" subroutine will detect and will not display over max, just
+;  in case if you somehow want to use the over-the-max-value on advance use (such as
+;  filling 2 separate bars, filling up the 2nd one after the 1st is full).
 ;*TotalMaxPieces = the number of pieces of the whole bar when full.
 ;
 ;Input:

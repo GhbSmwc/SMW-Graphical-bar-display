@@ -84,7 +84,7 @@ endif
 		PHA
 		SEP #$20
 	endif
-	JSL GraphicalBarELITE_DrawGraphicalBarSubtractionLoopEdition	;>get bar values.
+	JSL GraphicalBarELITE_GraphicalBarSplitFill	;>get bar values.
 	STZ $00								;>Use Level-layer3 tileset
 	JSL GraphicalBarConvertToTile_ConvertBarFillAmountToTiles	;>Convert tiles.
 	;Write to layer 3
