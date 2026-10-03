@@ -1,3 +1,4 @@
+newer version o
 <html>
 	<head>
 		<style>
@@ -1545,14 +1546,14 @@ will generate nor what labels each library .asm file will depend from
 each other. So unfortunately the library files are pretty much
 isolated from each one.</pre></div><br>
 
-Note that newer version of UAT, starting in version 2, do supports subroutines (<kbd>%UberRoutine(name)</kbd>) and them calling another subroutine. However reasons to remain on using the library folder:
+Note that newer versions of UAT, starting in version 2, do support subroutines (<kbd>%UberRoutine(name)</kbd>) and them calling another subroutine. However reasons to remain on using the library folder:
 <ul>
 	<li>
 		With the sheer amount of subroutines here and it being long established using the library file. That would take a long time on converting them (changing labels to use macrolabels, subroutine that
 		uses part of another subroutine code (such as the RoundAway code), etc).
 	</li>
 	<li>
-		Easier to port to shared subroutines without editing.
+		Easier to port to shared subroutines without editing labels.
 	</li>
 </ul>
 
