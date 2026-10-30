@@ -815,9 +815,9 @@ HammerThrow:
     LDA #$20                            ; Speed of fireball, including diagonals.
     JSR Aiming                          ; Calculate the velocity.
     LDA $00                             ;\ set X speed
-    STA.w !sprite_speed_x|!Base1,y      ;/
+    STA.w !sprite_speed_x,y             ;/
     LDA $02                             ;\ set Y speed
-    STA.w !sprite_speed_y|!Base1,y      ;/
+    STA.w !sprite_speed_y,y             ;/
 .Return
     RTS
 
@@ -904,10 +904,10 @@ HammerThrow3:
     TAY                         ; |
     LDA X_ThrowSpeed2,y         ; |
     PLY                         ; |
-    STA.w !B6|!Base1,y          ;/
+    STA.w !B6,y                 ;/
 
     LDA #$C0                    ;\ set Y speed
-    STA.w !AA|!Base1,y          ;/
+    STA.w !AA,y                 ;/
 Return28:
     RTS
 
@@ -962,10 +962,10 @@ HammerThrow4:
     TAY                             ; |
     LDA X_ThrowSpeed3,y             ; |
     PLY                             ; |
-    STA.w !B6|!Base1,y              ;/
+    STA.w !B6,y                     ;/
 
     LDA #$C0                        ;\ set Y speed
-    STA.w !AA|!Base1,y              ;/
+    STA.w !AA,y                     ;/
 Return22:
     RTS
 
